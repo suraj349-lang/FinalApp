@@ -1,6 +1,7 @@
 package com.example.finalapp.auth.screensUI
 
 import android.annotation.SuppressLint
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -76,9 +77,10 @@ fun LoginScreenUI(navController: NavController= NavController(LocalContext.curre
                 OutlinedTextField(
                     value = loginNumberText,
                     onValueChange = { if (it.length <= maxLength) loginNumberText = it
-                    else Toast.makeText(mContext, "Cannot be more than 5 Characters", Toast.LENGTH_SHORT).show() },
+                                      else Toast.makeText(mContext, "Can be 10 digits only !", Toast.LENGTH_SHORT).show()
+                                    },
                     label = { Text(text = "Number") },
-                    leadingIcon = { Text(text = "+91", fontWeight = FontWeight.Bold, fontSize =20.sp, color = Color.DarkGray)},
+                    leadingIcon = { Text(text = "+91", fontWeight = FontWeight.Bold, fontSize =20.sp, color = Color(0xFF035206))},
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number,
                         imeAction = ImeAction.Done
@@ -92,7 +94,9 @@ fun LoginScreenUI(navController: NavController= NavController(LocalContext.curre
 
                 Spacer(modifier = Modifier.height(10.dp))
                 Button(
-                    onClick = { /*TODO*/ },
+                    onClick = {
+                        navController.navigate(SCREENS.ENTER_OTP.route)
+                        Log.d("Number Entered while login",loginNumberText) },
                     modifier = Modifier.width(120.dp),
                     shape = RoundedCornerShape(6.dp)
                 ) {
