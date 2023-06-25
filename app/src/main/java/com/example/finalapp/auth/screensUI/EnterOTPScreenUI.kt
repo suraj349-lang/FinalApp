@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -46,14 +47,14 @@ fun EnterOTPScreenUI(navController: NavController= NavController(LocalContext.cu
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
             Image(
-                painter = painterResource(id = R.drawable.baseline_lock_24),
+                painter = painterResource(id = R.drawable.baseline_verified_user_24),
                 contentDescription = "",
                 modifier = Modifier.size(60.dp),
-                colorFilter = ColorFilter.tint(Color.DarkGray)
+                colorFilter = ColorFilter.tint(Color(0xFFB8350C))
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(text = "Enter OTP", fontSize = 30.sp, fontWeight = FontWeight.Bold, color = Color(
-                0xFF0C7ED8
+                0xFF0A5C81
             )
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -61,7 +62,7 @@ fun EnterOTPScreenUI(navController: NavController= NavController(LocalContext.cu
             Spacer(modifier = Modifier.height(16.dp))
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
                 Text(text = "Didn't Receive OTP?")
-                TextButton(onClick = { /*TODO*/ }) {
+                TextButton(onClick = {  }) {
                     Text(
                         text = "Resend SMS",
                         fontSize = 16.sp,
@@ -70,7 +71,11 @@ fun EnterOTPScreenUI(navController: NavController= NavController(LocalContext.cu
                 }
             }
 
-            Button(onClick = { /*TODO*/ }, shape = RoundedCornerShape(6.dp)) {
+            Button(
+                onClick = { /*TODO*/ },
+                shape = RoundedCornerShape(6.dp)
+               // colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray, contentColor = Color.Black)
+                ) {
                 Text(text = "Verify OTP")
             }
 
