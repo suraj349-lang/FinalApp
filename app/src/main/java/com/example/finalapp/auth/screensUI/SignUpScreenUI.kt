@@ -53,19 +53,10 @@ import com.example.finalapp.navigation.SCREENS
 @Composable
 fun SignupScreenUI(navController: NavController = NavController(LocalContext.current)) {
 
-    var SignupEmailText by remember { mutableStateOf("") }
-    var SignupPasswordText by remember { mutableStateOf("") }
-    var ConfirmSignupPasswordText by remember { mutableStateOf("") }
-    val keyboardController = LocalSoftwareKeyboardController.current
+    var SignupNumberText by remember { mutableStateOf("") }
     val focusManager = LocalFocusManager.current
-    var passwordVisibility by rememberSaveable{mutableStateOf(false)}
+    val passwordVisibility by rememberSaveable{mutableStateOf(false)}
     val icon=if (passwordVisibility)
-        painterResource(id =R.drawable.round_visibility_24 )
-    else
-        painterResource(id = R.drawable.round_visibility_off_24)
-    var passwordVisibility2 by rememberSaveable{mutableStateOf(false)}
-
-    val icon2=if (passwordVisibility2)
         painterResource(id =R.drawable.round_visibility_24 )
     else
         painterResource(id = R.drawable.round_visibility_off_24)
@@ -79,15 +70,43 @@ fun SignupScreenUI(navController: NavController = NavController(LocalContext.cur
                            contentDescription = "",
                            modifier = Modifier.size(100.dp))
                 Text(text = "CHAT RADAR", fontSize = 30.sp, fontWeight = FontWeight.Bold, color = Color.DarkGray)
+                OutlinedTextField(
+                   value = SignupNumberText,
+                   onValueChange = { SignupNumberText = it },
+                   label = { Text(text = "First Name") },
+                   singleLine = true,
+                   keyboardOptions = KeyboardOptions(
+                       keyboardType = KeyboardType.Number,
+                       imeAction = ImeAction.Next
+                   ),
+                   keyboardActions = KeyboardActions(
+                       onNext = {focusManager.clearFocus()}
+                   )
+
+                )
+                OutlinedTextField(
+                   value = SignupNumberText,
+                   onValueChange = { SignupNumberText = it },
+                   label = { Text(text = "Last Name") },
+                   singleLine = true,
+                   keyboardOptions = KeyboardOptions(
+                       keyboardType = KeyboardType.Number,
+                       imeAction = ImeAction.Next
+                   ),
+                   keyboardActions = KeyboardActions(
+                       onNext = {focusManager.clearFocus()}
+                   )
+
+                )
 
                 OutlinedTextField(
-                    value = SignupEmailText,
-                    onValueChange = { SignupEmailText = it },
-                    label = { Text(text = "Email") },
+                    value = SignupNumberText,
+                    onValueChange = { SignupNumberText = it },
+                    label = { Text(text = "Number") },
                     placeholder = { Text(text = "...") },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Email,
+                        keyboardType = KeyboardType.Number,
                         imeAction = ImeAction.Next
                     ),
                     keyboardActions = KeyboardActions(
@@ -95,44 +114,6 @@ fun SignupScreenUI(navController: NavController = NavController(LocalContext.cur
                     )
 
                 )
-                OutlinedTextField(
-                    value = SignupPasswordText,
-                    onValueChange = { SignupPasswordText = it },
-                    label = { Text(text = "Password") },
-                    trailingIcon = { IconButton(onClick = { passwordVisibility=!passwordVisibility }) {
-                        Icon(painter = icon, contentDescription ="Password visibility icon " )
-
-                    }},
-                    visualTransformation = if(passwordVisibility) VisualTransformation.None
-                    else PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Password
-                    ),
-                    keyboardActions = KeyboardActions {
-
-                    }
-
-                )
-               OutlinedTextField(
-                   value = ConfirmSignupPasswordText,
-                   onValueChange = { ConfirmSignupPasswordText = it },
-                   label = { Text(text = "Re-Password") },
-                   placeholder = { Text(text = "...") },
-                   trailingIcon = { IconButton(onClick = { passwordVisibility2=!passwordVisibility2 }) {
-                       Icon(painter = icon2, contentDescription ="Password visibility icon " )
-                       
-                   }},
-                   visualTransformation = if(passwordVisibility2) VisualTransformation.None
-                                          else PasswordVisualTransformation(),
-                   keyboardOptions = KeyboardOptions(
-                       keyboardType = KeyboardType.Password,
-                       imeAction = ImeAction.Done
-                   ),
-                   keyboardActions = KeyboardActions(
-                       onDone = {keyboardController?.hide()}
-                   )
-
-               )
                 Spacer(modifier = Modifier.height(10.dp))
                 Button(
                     onClick = { /*TODO*/ },
