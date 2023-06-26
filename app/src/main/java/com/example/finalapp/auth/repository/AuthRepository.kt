@@ -12,6 +12,7 @@ import com.example.finalapp.auth.authViewModel.ApiState
 import com.example.finalapp.auth.authViewModel.AuthViewModel
 import com.example.finalapp.model.LoginModel
 import com.example.finalapp.model.RegisterUserModel
+import com.example.finalapp.model.User
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.network.ApiService
 import kotlinx.coroutines.Dispatchers
@@ -21,7 +22,7 @@ import kotlinx.coroutines.flow.flowOn
 
 
 class AuthRepository {
-    fun sendPost(post: LoginModel): Flow<LoginModel> = flow  {
+    fun sendPost(post: LoginModel): Flow<User> = flow  {
         emit(ApiService.getInstance().postData(post))
     }.flowOn(Dispatchers.IO)
 }
