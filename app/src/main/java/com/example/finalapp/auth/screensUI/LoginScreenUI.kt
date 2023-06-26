@@ -23,6 +23,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -38,12 +39,20 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.finalapp.R
 import com.example.finalapp.auth.CameroonNumberVisualTransformation
+import com.example.finalapp.auth.authViewModel.AuthViewModel
+import com.example.finalapp.auth.repository.AuthRepository
+
+import com.example.finalapp.auth.repository.SendLoginData
+import com.example.finalapp.model.LoginModel
 import com.example.finalapp.navigation.SCREENS
 
 @Preview(showBackground = true)
@@ -51,11 +60,16 @@ import com.example.finalapp.navigation.SCREENS
 @SuppressLint("UnrememberedMutableState")
 @Composable
 fun LoginScreenUI(navController: NavController= NavController(LocalContext.current)) {
-
+    val authViewModel=AuthViewModel();
+    val authRepository=AuthRepository();
     var loginNumberText by remember { mutableStateOf("") }
+    var loginPasswordText by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
     val maxLength=10;
     val mContext= LocalContext.current
+    var passwordVisibility by remember { mutableStateOf(false) }
+    val icon=if(passwordVisibility) painterResource(id = R.drawable.round_visibility_24)
+             else painterResource(id = R.drawable.round_visibility_off_24)
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(
             verticalArrangement = Arrangement.Center,
@@ -91,17 +105,32 @@ fun LoginScreenUI(navController: NavController= NavController(LocalContext.curre
                     visualTransformation = CameroonNumberVisualTransformation()
 
                 )
+                OutlinedTextField(
+                    value = loginPasswordText,
+                    onValueChange = { loginPasswordText = it },
+                    label = { Text(text = "Password") },
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Password,
+                        imeAction = ImeAction.Done
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {keyboardController?.hide()}
+                    ),
+                    visualTransformation = if(passwordVisibility) VisualTransformation.None
+                                            else PasswordVisualTransformation()
+                )
 
                 Spacer(modifier = Modifier.height(10.dp))
                 Button(
                     onClick = {
-                        navController.navigate(SCREENS.ENTER_OTP.route)
-                        Log.d("Number Entered while login",loginNumberText) },
+                        authViewModel.loginUser(LoginModel(loginNumberText,loginPasswordText))
+                        Log.d("Number Entered while login",loginNumberText.toString()) },
                     modifier = Modifier.width(120.dp),
                     shape = RoundedCornerShape(6.dp)
                 ) {
                     Text(text = "Get OTP")
                 }
+                SendLoginData(authViewModel = authViewModel, navController =navController )
                 TextButton(onClick = { navController.navigate(SCREENS.SIGNUP.route) }) {
                     Text(text = "New member?, SIGN-UP", color = Color.Black)
 

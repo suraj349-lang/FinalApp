@@ -14,12 +14,11 @@ import kotlinx.coroutines.launch
 class AuthViewModel: ViewModel() {
     private val repository= AuthRepository()
     val myResponse: MutableState<ApiState> = mutableStateOf(ApiState.Empty)
-    val registerUserResponse:MutableState<RegisterUserApiState> = mutableStateOf(RegisterUserApiState.Empty)
 //  init {
     //    pushPost(Post("",""))
 //  }
 
-    fun pushPost(loginModel: LoginModel)=viewModelScope.launch {
+    fun loginUser(loginModel: LoginModel)=viewModelScope.launch {
         repository.sendPost(loginModel)
             .onStart {
                 myResponse.value=ApiState.Loading
@@ -29,19 +28,6 @@ class AuthViewModel: ViewModel() {
 
             }.collect{
                 myResponse.value=ApiState.Success(it)
-
-            }
-    }
-    fun registerUser(registerUserModel: RegisterUserModel)=viewModelScope.launch {
-        repository.registerUser(registerUserModel)
-            .onStart {
-                registerUserResponse.value=RegisterUserApiState.Loading
-
-            }.catch {
-                registerUserResponse.value=RegisterUserApiState.Failure(it)
-
-            }.collect{
-                registerUserResponse.value=RegisterUserApiState.Success(it)
 
             }
     }

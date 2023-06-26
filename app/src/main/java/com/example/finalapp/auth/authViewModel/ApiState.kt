@@ -11,10 +11,3 @@ sealed class ApiState{
 
 }
 
-sealed class RegisterUserApiState{
-    class Success(val data: ApiResponse) :RegisterUserApiState()
-    class Failure(val msg:Throwable) : RegisterUserApiState()
-    object Loading : RegisterUserApiState()
-    object Empty: RegisterUserApiState()
-
-}
