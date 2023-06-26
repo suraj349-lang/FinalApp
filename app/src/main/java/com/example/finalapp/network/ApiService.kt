@@ -1,0 +1,32 @@
+package com.example.finalapp.network
+
+import com.example.finalapp.model.ApiResponse
+import com.example.finalapp.model.LoginModel
+import com.example.finalapp.model.RegisterUserModel
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import retrofit2.http.Body
+import retrofit2.http.POST
+
+interface ApiService {
+
+    @POST("/api/posts")
+    suspend fun postData(@Body post:LoginModel): LoginModel
+
+    @POST("/api/v1/auth/register")
+    suspend fun registerUser(@Body registerUserModel: RegisterUserModel): ApiResponse
+
+
+
+    companion object{
+        var apiService:ApiService? = null
+        fun getInstance():ApiService{
+            if(apiService==null){
+                apiService= Retrofit.Builder().baseUrl("http://10.0.2.2:5000/").addConverterFactory(
+                    GsonConverterFactory.create()).build().create(ApiService::class.java)
+            }
+            return apiService!!
+        }
+    }
+
+}
