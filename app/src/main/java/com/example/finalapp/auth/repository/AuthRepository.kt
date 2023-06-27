@@ -10,10 +10,8 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.finalapp.auth.authViewModel.ApiState
 import com.example.finalapp.auth.authViewModel.AuthViewModel
+import com.example.finalapp.model.LoginAPIResponse
 import com.example.finalapp.model.LoginModel
-import com.example.finalapp.model.RegisterUserModel
-import com.example.finalapp.model.User
-import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.network.ApiService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -22,7 +20,7 @@ import kotlinx.coroutines.flow.flowOn
 
 
 class AuthRepository {
-    fun sendPost(post: LoginModel): Flow<User> = flow  {
+    fun sendLoginData(post: LoginModel): Flow<LoginAPIResponse> = flow  {
         emit(ApiService.getInstance().postData(post))
     }.flowOn(Dispatchers.IO)
 }

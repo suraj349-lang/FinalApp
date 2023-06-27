@@ -19,7 +19,7 @@ class AuthViewModel: ViewModel() {
 //  }
 
     fun loginUser(loginModel: LoginModel)=viewModelScope.launch {
-        repository.sendPost(loginModel)
+        repository.sendLoginData(loginModel)
             .onStart {
                 myResponse.value=ApiState.Loading
 

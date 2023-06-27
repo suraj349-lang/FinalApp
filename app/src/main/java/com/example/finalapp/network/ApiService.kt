@@ -1,9 +1,8 @@
 package com.example.finalapp.network
 
 import com.example.finalapp.model.ApiResponse
+import com.example.finalapp.model.LoginAPIResponse
 import com.example.finalapp.model.LoginModel
-import com.example.finalapp.model.RegisterUserModel
-import com.example.finalapp.model.User
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
@@ -12,7 +11,7 @@ import retrofit2.http.POST
 interface ApiService {
 
     @POST("/api/v1/auth/login")
-    suspend fun postData(@Body post:LoginModel): User
+    suspend fun postData(@Body post:LoginModel): LoginAPIResponse
 
 
 
