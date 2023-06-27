@@ -5,7 +5,7 @@ import androidx.compose.ui.text.input.OffsetMapping
 import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 
-class CameroonNumberVisualTransformation: VisualTransformation {
+class  CameroonNumberVisualTransformation: VisualTransformation {
     override fun filter(text: AnnotatedString): TransformedText {
         // Make the string XXX-XXX-XXXX
         val trimmed = if (text.text.length >= 10) text.text.substring(0..9) else text.text
@@ -13,6 +13,7 @@ class CameroonNumberVisualTransformation: VisualTransformation {
         for (i in trimmed.indices) {
             output += trimmed[i]
             if (i% 3 == 2 && i != 8) output +="-"
+
         }
 
 

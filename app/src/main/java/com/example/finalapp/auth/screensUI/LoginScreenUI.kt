@@ -101,8 +101,8 @@ fun LoginScreenUI(navController: NavController= NavController(LocalContext.curre
                     ),
                     keyboardActions = KeyboardActions(
                         onDone = {keyboardController?.hide()}
-                        ),
-                    visualTransformation = CameroonNumberVisualTransformation()
+                        )
+                 //   visualTransformation = CameroonNumberVisualTransformation()
 
                 )
                 OutlinedTextField(
@@ -113,6 +113,9 @@ fun LoginScreenUI(navController: NavController= NavController(LocalContext.curre
                         keyboardType = KeyboardType.Password,
                         imeAction = ImeAction.Done
                     ),
+                    trailingIcon={ IconButton(onClick = { passwordVisibility=!passwordVisibility }) {
+                        Icon(painter = icon, contentDescription ="Password visibility icon" )
+                    }},
                     keyboardActions = KeyboardActions(
                         onDone = {keyboardController?.hide()}
                     ),
