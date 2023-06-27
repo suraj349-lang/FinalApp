@@ -11,7 +11,7 @@ import retrofit2.http.POST
 interface ApiService {
 
     @POST("/api/v1/auth/login")
-    suspend fun postData(@Body post:LoginModel): LoginAPIResponse
+    suspend fun postLoginData(@Body loginData:LoginModel): LoginAPIResponse
 
 
 

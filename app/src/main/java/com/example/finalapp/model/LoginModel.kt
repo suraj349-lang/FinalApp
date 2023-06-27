@@ -7,5 +7,5 @@ data class LoginModel(
 data class LoginAPIResponse(
   val success:Boolean,
   val code:Int,
-  val data:String
+  val token:String
 )

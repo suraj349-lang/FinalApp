@@ -27,6 +27,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -49,27 +50,26 @@ import androidx.navigation.NavController
 import com.example.finalapp.R
 import com.example.finalapp.auth.CameroonNumberVisualTransformation
 import com.example.finalapp.auth.authViewModel.AuthViewModel
-import com.example.finalapp.auth.repository.AuthRepository
-
-import com.example.finalapp.auth.repository.SendLoginData
+import com.example.finalapp.auth.authViewModel.LoginResponseData
 import com.example.finalapp.model.LoginModel
 import com.example.finalapp.navigation.SCREENS
+import kotlinx.coroutines.launch
 
 @Preview(showBackground = true)
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @SuppressLint("UnrememberedMutableState")
 @Composable
 fun LoginScreenUI(navController: NavController= NavController(LocalContext.current)) {
-    val authViewModel=AuthViewModel();
-    val authRepository=AuthRepository();
+    val scope= rememberCoroutineScope()
+    val authViewModel = AuthViewModel();
     var loginNumberText by remember { mutableStateOf("") }
     var loginPasswordText by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
-    val maxLength=10;
-    val mContext= LocalContext.current
+    val maxLength = 10;
+    val mContext = LocalContext.current
     var passwordVisibility by remember { mutableStateOf(false) }
-    val icon=if(passwordVisibility) painterResource(id = R.drawable.round_visibility_24)
-             else painterResource(id = R.drawable.round_visibility_off_24)
+    val icon = if (passwordVisibility) painterResource(id = R.drawable.round_visibility_24)
+    else painterResource(id = R.drawable.round_visibility_off_24)
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(
             verticalArrangement = Arrangement.Center,
@@ -80,8 +80,13 @@ fun LoginScreenUI(navController: NavController= NavController(LocalContext.curre
                 contentDescription = "",
                 modifier = Modifier.size(100.dp)
 
-                )
-            Text(text = "CHAT RADAR", fontSize = 40.sp, fontWeight = FontWeight.Bold, color = Color.DarkGray)
+            )
+            Text(
+                text = "CHAT RADAR",
+                fontSize = 40.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.DarkGray
+            )
             Spacer(modifier = Modifier.height(10.dp))
 
             Column(
@@ -90,19 +95,28 @@ fun LoginScreenUI(navController: NavController= NavController(LocalContext.curre
             ) {
                 OutlinedTextField(
                     value = loginNumberText,
-                    onValueChange = { if (it.length <= maxLength) loginNumberText = it
-                                      else Toast.makeText(mContext, "Can be 10 digits only !", Toast.LENGTH_SHORT).show()
-                                    },
+                    onValueChange = {
+                        if (it.length <= maxLength) loginNumberText = it
+                        else Toast.makeText(mContext, "Can be 10 digits only !", Toast.LENGTH_SHORT)
+                            .show()
+                    },
                     label = { Text(text = "Number") },
-                    leadingIcon = { Text(text = "+91", fontWeight = FontWeight.Bold, fontSize =20.sp, color = Color(0xFF035206))},
+                    leadingIcon = {
+                        Text(
+                            text = "+91",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 20.sp,
+                            color = Color(0xFF035206)
+                        )
+                    },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number,
                         imeAction = ImeAction.Done
                     ),
                     keyboardActions = KeyboardActions(
-                        onDone = {keyboardController?.hide()}
-                        )
-                 //   visualTransformation = CameroonNumberVisualTransformation()
+                        onDone = { keyboardController?.hide() }
+                    )
+                    //   visualTransformation = CameroonNumberVisualTransformation()
 
                 )
                 OutlinedTextField(
@@ -113,27 +127,31 @@ fun LoginScreenUI(navController: NavController= NavController(LocalContext.curre
                         keyboardType = KeyboardType.Password,
                         imeAction = ImeAction.Done
                     ),
-                    trailingIcon={ IconButton(onClick = { passwordVisibility=!passwordVisibility }) {
-                        Icon(painter = icon, contentDescription ="Password visibility icon" )
-                    }},
+                    trailingIcon = {
+                        IconButton(onClick = { passwordVisibility = !passwordVisibility }) {
+                            Icon(painter = icon, contentDescription = "Password visibility icon")
+                        }
+                    },
                     keyboardActions = KeyboardActions(
-                        onDone = {keyboardController?.hide()}
+                        onDone = { keyboardController?.hide() }
                     ),
-                    visualTransformation = if(passwordVisibility) VisualTransformation.None
-                                            else PasswordVisualTransformation()
+                    visualTransformation = if (passwordVisibility) VisualTransformation.None
+                    else PasswordVisualTransformation()
                 )
 
                 Spacer(modifier = Modifier.height(10.dp))
                 Button(
                     onClick = {
-                        authViewModel.loginUser(LoginModel(loginNumberText,loginPasswordText))
-                        Log.d("Number Entered while login",loginNumberText.toString()) },
+                        scope.launch {
+                           authViewModel.loginUser(LoginModel(loginNumberText, loginPasswordText))
+                        }
+                    },
                     modifier = Modifier.width(120.dp),
                     shape = RoundedCornerShape(6.dp)
                 ) {
                     Text(text = "Get OTP")
                 }
-                SendLoginData(authViewModel = authViewModel, navController =navController )
+                LoginResponseData(authViewModel = authViewModel, navController = navController)
                 TextButton(onClick = { navController.navigate(SCREENS.SIGNUP.route) }) {
                     Text(text = "New member?, SIGN-UP", color = Color.Black)
 
