@@ -39,28 +39,4 @@ class AuthViewModel: ViewModel() {
             }
     }
 }
-@Composable
-fun LoginResponseData(authViewModel: AuthViewModel, navController: NavController){
-    val context= LocalContext.current
-    when (val result=authViewModel.myResponse.value){
-        is ApiState.Success->{
-//            navController.navigate(SCREENS.HOME.route)
-            Log.d("Data Received",result.data.toString())
 
-        }
-        is ApiState.Failure->{
-            Toast.makeText(context,"${result.msg}", Toast.LENGTH_SHORT).show()
-        }
-        ApiState.Loading->{
-            CircularProgressIndicator(color = Color.Red)
-            // Toast.makeText(context,"Loading the data", Toast.LENGTH_SHORT).show()
-        }
-        ApiState.Empty->{
-            //  Toast.makeText(context,"Empty Data", Toast.LENGTH_SHORT).show()
-        }
-
-        else -> {}
-    }
-
-
-}

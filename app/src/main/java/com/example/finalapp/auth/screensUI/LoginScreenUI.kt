@@ -1,6 +1,7 @@
 package com.example.finalapp.auth.screensUI
 
 import android.annotation.SuppressLint
+import android.media.MediaPlayer
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -15,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -23,6 +25,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
@@ -45,12 +48,11 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.finalapp.R
 import com.example.finalapp.auth.CameroonNumberVisualTransformation
+import com.example.finalapp.auth.authViewModel.ApiState
 import com.example.finalapp.auth.authViewModel.AuthViewModel
-import com.example.finalapp.auth.authViewModel.LoginResponseData
 import com.example.finalapp.model.LoginModel
 import com.example.finalapp.navigation.SCREENS
 import kotlinx.coroutines.launch
@@ -62,7 +64,7 @@ import kotlinx.coroutines.launch
 fun LoginScreenUI(navController: NavController= NavController(LocalContext.current)) {
     val scope= rememberCoroutineScope()
     val authViewModel = AuthViewModel();
-    var loginNumberText by remember { mutableStateOf("") }
+    var loginNumberText by rememberSaveable { mutableStateOf("") }
     var loginPasswordText by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
     val maxLength = 10;
@@ -70,6 +72,10 @@ fun LoginScreenUI(navController: NavController= NavController(LocalContext.curre
     var passwordVisibility by remember { mutableStateOf(false) }
     val icon = if (passwordVisibility) painterResource(id = R.drawable.round_visibility_24)
     else painterResource(id = R.drawable.round_visibility_off_24)
+    var key by remember {
+        mutableStateOf(0)
+    }
+
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(
             verticalArrangement = Arrangement.Center,
@@ -115,8 +121,7 @@ fun LoginScreenUI(navController: NavController= NavController(LocalContext.curre
                     ),
                     keyboardActions = KeyboardActions(
                         onDone = { keyboardController?.hide() }
-                    )
-                    //   visualTransformation = CameroonNumberVisualTransformation()
+                    ), visualTransformation = CameroonNumberVisualTransformation()
 
                 )
                 OutlinedTextField(
@@ -142,8 +147,9 @@ fun LoginScreenUI(navController: NavController= NavController(LocalContext.curre
                 Spacer(modifier = Modifier.height(10.dp))
                 Button(
                     onClick = {
+                        key=1;
                         scope.launch {
-                           authViewModel.loginUser(LoginModel(loginNumberText, loginPasswordText))
+                            authViewModel.loginUser(LoginModel(loginNumberText, loginPasswordText))
                         }
                     },
                     modifier = Modifier.width(120.dp),
@@ -151,7 +157,11 @@ fun LoginScreenUI(navController: NavController= NavController(LocalContext.curre
                 ) {
                     Text(text = "Get OTP")
                 }
-                LoginResponseData(authViewModel = authViewModel, navController = navController)
+                if(key==1){
+                    LoginResponseDataAndAction(authViewModel,navController)
+                }
+               // MediaPlayerSuraj()
+
                 TextButton(onClick = { navController.navigate(SCREENS.SIGNUP.route) }) {
                     Text(text = "New member?, SIGN-UP", color = Color.Black)
 
@@ -162,5 +172,41 @@ fun LoginScreenUI(navController: NavController= NavController(LocalContext.curre
 
         }
 
+    }
+}
+@Composable
+fun LoginResponseDataAndAction(authViewModel: AuthViewModel, navController: NavController){
+    val context= LocalContext.current
+    when (val result=authViewModel.myResponse.value){
+        is ApiState.Success->{
+//            navController.navigate(SCREENS.HOME.route)
+            Log.d("Data Received",result.data.toString())
+
+        }
+        is ApiState.Failure->{
+            Toast.makeText(context,"${result.msg}", Toast.LENGTH_SHORT).show()
+        }
+        ApiState.Loading->{
+            CircularProgressIndicator(color = Color(0xFF1289BE))
+        }
+        ApiState.Empty->{
+            Toast.makeText(context,"Empty Data", Toast.LENGTH_SHORT).show()
+        }
+
+    }
+
+
+}
+@Composable
+fun MediaPlayerSuraj(){
+    val context= LocalContext.current;
+    DisposableEffect(key1 = true ){
+        val media= MediaPlayer.create(context,R.raw.music)
+
+        media.start()
+        onDispose {
+            media.stop();
+            media.release();
+        }
     }
 }
