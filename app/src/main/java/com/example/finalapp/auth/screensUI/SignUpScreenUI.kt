@@ -53,6 +53,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.finalapp.R
+import com.example.finalapp.auth.repository.FirebaseRepository
 import com.example.finalapp.navigation.SCREENS
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.FirebaseAuth
@@ -69,7 +70,7 @@ import java.util.concurrent.TimeUnit
 @Composable
 fun SignupScreenUI(navController: NavController = NavController(LocalContext.current)) {
 
-    var SignupNumberText by remember { mutableStateOf("") }
+    val firebaseRepository=FirebaseRepository()
     val focusManager = LocalFocusManager.current
     val passwordVisibility by rememberSaveable{mutableStateOf(false)}
     val icon=if (passwordVisibility)
@@ -130,7 +131,7 @@ fun SignupScreenUI(navController: NavController = NavController(LocalContext.cur
 
                            val number = "+91${phoneNumber.value}"
                            // on below line calling method to generate verification code.
-                           sendVerificationCode(number, mAuth, context as Activity, callbacks)
+                           firebaseRepository.sendVerificationCode(number, mAuth, context as Activity, callbacks)
                        }
                    },
                    // on below line we are
@@ -195,7 +196,7 @@ fun SignupScreenUI(navController: NavController = NavController(LocalContext.cur
                            )
 
                            // on below line signing within credentials.
-                           signInWithPhoneAuthCredential(
+                           firebaseRepository.signInWithPhoneAuthCredential(
                                credential,
                                mAuth,
                                context as Activity,
@@ -245,66 +246,10 @@ fun SignupScreenUI(navController: NavController = NavController(LocalContext.cur
                 super.onCodeSent(verificationId, p1)
                 verificationID.value = verificationId
             }
-
-
-
-
-
         }
 
         }
 
     }
 
-// on below line creating method to
-// sign in with phone credentuals.
-private fun signInWithPhoneAuthCredential(
-    credential: PhoneAuthCredential,
-    auth: FirebaseAuth,
-    activity: Activity,
-    context: Context,
-    message: MutableState<String>,
-    navController: NavController
-) {
-    // on below line signing with credentials.
-    auth.signInWithCredential(credential)
-        .addOnCompleteListener(activity) { task ->
-            // displaying toast message when
-            // verification is successful
-            if (task.isSuccessful) {
-                message.value = "Verification successful"
-                Toast.makeText(context, "Verification successful..", Toast.LENGTH_SHORT).show()
-                navController.navigate(SCREENS.HOME.route)
-            } else {
-                // Sign in failed, display a message
-                if (task.exception is FirebaseAuthInvalidCredentialsException) {
-                    // The verification code
-                    // entered was invalid
-                    Toast.makeText(
-                        context,
-                        "Verification failed.." + (task.exception as FirebaseAuthInvalidCredentialsException).message,
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            }
-        }
-}
-
-// below method is use to send
-// verification code to user phone number.
-private fun sendVerificationCode(
-    number: String,
-    auth: FirebaseAuth,
-    activity: Activity,
-    callbacks: PhoneAuthProvider.OnVerificationStateChangedCallbacks
-) {
-    // on below line generating options for verification code
-    val options = PhoneAuthOptions.newBuilder(auth)
-        .setPhoneNumber(number) // Phone number to verify
-        .setTimeout(60L, TimeUnit.SECONDS) // Timeout and unit
-        .setActivity(activity) // Activity (for callback binding)
-        .setCallbacks(callbacks) // OnVerificationStateChangedCallbacks
-        .build()
-    PhoneAuthProvider.verifyPhoneNumber(options)
-}
 
