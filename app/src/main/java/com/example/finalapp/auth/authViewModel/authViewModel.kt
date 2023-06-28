@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
-class AuthViewModel: ViewModel() {
+class AuthViewModel2: ViewModel() {
     private val repository= AuthRepository()
     val myResponse: MutableState<ApiState> = mutableStateOf(ApiState.Empty)
 //  init {

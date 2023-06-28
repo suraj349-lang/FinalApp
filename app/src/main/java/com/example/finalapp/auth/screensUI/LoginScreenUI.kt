@@ -52,7 +52,7 @@ import androidx.navigation.NavController
 import com.example.finalapp.R
 import com.example.finalapp.auth.CameroonNumberVisualTransformation
 import com.example.finalapp.auth.authViewModel.ApiState
-import com.example.finalapp.auth.authViewModel.AuthViewModel
+import com.example.finalapp.auth.authViewModel.AuthViewModel2
 import com.example.finalapp.model.LoginModel
 import com.example.finalapp.navigation.SCREENS
 import kotlinx.coroutines.launch
@@ -63,7 +63,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun LoginScreenUI(navController: NavController= NavController(LocalContext.current)) {
     val scope= rememberCoroutineScope()
-    val authViewModel = AuthViewModel();
+    val authViewModel = AuthViewModel2();
     var loginNumberText by rememberSaveable { mutableStateOf("") }
     var loginPasswordText by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -175,7 +175,7 @@ fun LoginScreenUI(navController: NavController= NavController(LocalContext.curre
     }
 }
 @Composable
-fun LoginResponseDataAndAction(authViewModel: AuthViewModel, navController: NavController){
+fun LoginResponseDataAndAction(authViewModel: AuthViewModel2, navController: NavController){
     val context= LocalContext.current
     when (val result=authViewModel.myResponse.value){
         is ApiState.Success->{

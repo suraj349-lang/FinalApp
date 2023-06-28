@@ -1,5 +1,9 @@
 package com.example.finalapp.auth.screensUI
 
+import android.app.Activity
+import android.content.Context
+import android.text.TextUtils
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -14,6 +18,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,13 +37,22 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.finalapp.R
 import com.example.finalapp.auth.screensUI.otp.OtpInputField
+import com.example.finalapp.navigation.SCREENS
+import com.google.firebase.FirebaseException
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.PhoneAuthCredential
+import com.google.firebase.auth.PhoneAuthProvider
 
 
 @Composable
 fun EnterOTPScreenUI(navController: NavController= NavController(LocalContext.current)){
-    var otpValue by remember {
-        mutableStateOf("")
-    }
+    var otpValue by remember { mutableStateOf("") }
+    val verificationID = remember { mutableStateOf("") }
+    val message = remember { mutableStateOf("") }
+    val context= LocalContext.current
+    val mAuth: FirebaseAuth = FirebaseAuth.getInstance();
+    lateinit var callbacks: PhoneAuthProvider.OnVerificationStateChangedCallbacks
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
             Image(
@@ -53,7 +67,7 @@ fun EnterOTPScreenUI(navController: NavController= NavController(LocalContext.cu
             )
             )
             Spacer(modifier = Modifier.height(16.dp))
-            OtpInputField(otpLength = 4, onOtpChanged ={otp->otpValue=otp} )
+            OtpInputField(otpLength = 6, onOtpChanged ={otp->otpValue=otp} )
             Spacer(modifier = Modifier.height(16.dp))
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
                 Text(text = "Didn't Receive OTP?")
@@ -67,12 +81,14 @@ fun EnterOTPScreenUI(navController: NavController= NavController(LocalContext.cu
             }
 
             Button(
-                onClick = { /*TODO*/ },
+                onClick = {  },
                 shape = RoundedCornerShape(6.dp)
                // colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray, contentColor = Color.Black)
                 ) {
                 Text(text = "Verify OTP")
             }
+
+
 
 
         }
