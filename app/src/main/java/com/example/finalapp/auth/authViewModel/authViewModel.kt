@@ -18,9 +18,9 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
-class AuthViewModel2: ViewModel() {
+class AuthViewModel: ViewModel() {
     private val repository= AuthRepository()
-    val myResponse: MutableState<ApiState> = mutableStateOf(ApiState.Empty)
+    val myLoginResponse: MutableState<LoginApiState> = mutableStateOf(LoginApiState.Empty)
 //  init {
     //    pushPost(Post("",""))
 //  }
@@ -28,13 +28,31 @@ class AuthViewModel2: ViewModel() {
     fun loginUser(loginModel: LoginModel)=viewModelScope.launch {
         repository.sendLoginData(loginModel)
             .onStart {
-                myResponse.value=ApiState.Loading
+                myLoginResponse.value=LoginApiState.Loading
 
             }.catch {
-                myResponse.value=ApiState.Failure(it)
+                myLoginResponse.value=LoginApiState.Failure(it)
 
             }.collect{
-                myResponse.value=ApiState.Success(it)
+                myLoginResponse.value=LoginApiState.Success(it)
+
+            }
+    }
+    val mySignupResponse: MutableState<SignupApiState> = mutableStateOf(SignupApiState.Empty)
+//  init {
+    //    pushPost(Post("",""))
+//  }
+
+    fun RegisterUser(registerUserModel : RegisterUserModel)=viewModelScope.launch {
+        repository.sendSignupData(registerUserModel)
+            .onStart {
+                mySignupResponse.value=SignupApiState.Loading
+
+            }.catch {
+                mySignupResponse.value=SignupApiState.Failure(it)
+
+            }.collect{
+                mySignupResponse.value=SignupApiState.Success(it)
 
             }
     }

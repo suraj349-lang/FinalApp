@@ -51,8 +51,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.finalapp.R
 import com.example.finalapp.auth.CameroonNumberVisualTransformation
-import com.example.finalapp.auth.authViewModel.ApiState
-import com.example.finalapp.auth.authViewModel.AuthViewModel2
+import com.example.finalapp.auth.authViewModel.AuthViewModel
+import com.example.finalapp.auth.authViewModel.LoginApiState
 import com.example.finalapp.model.LoginModel
 import com.example.finalapp.navigation.SCREENS
 import kotlinx.coroutines.launch
@@ -63,8 +63,11 @@ import kotlinx.coroutines.launch
 @Composable
 fun LoginScreenUI(navController: NavController= NavController(LocalContext.current)) {
     val scope= rememberCoroutineScope()
-    val authViewModel = AuthViewModel2();
+    val authViewModel = AuthViewModel();
     var loginNumberText by rememberSaveable { mutableStateOf("") }
+    val addString by remember {
+        mutableStateOf("+91")
+    }
     var loginPasswordText by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
     val maxLength = 10;
@@ -149,7 +152,7 @@ fun LoginScreenUI(navController: NavController= NavController(LocalContext.curre
                     onClick = {
                         key=1;
                         scope.launch {
-                            authViewModel.loginUser(LoginModel(loginNumberText, loginPasswordText))
+                            authViewModel.loginUser(LoginModel("$addString$loginNumberText", loginPasswordText))
                         }
                     },
                     modifier = Modifier.width(120.dp),
@@ -175,21 +178,21 @@ fun LoginScreenUI(navController: NavController= NavController(LocalContext.curre
     }
 }
 @Composable
-fun LoginResponseDataAndAction(authViewModel: AuthViewModel2, navController: NavController){
+fun LoginResponseDataAndAction(authViewModel: AuthViewModel, navController: NavController){
     val context= LocalContext.current
-    when (val result=authViewModel.myResponse.value){
-        is ApiState.Success->{
-//            navController.navigate(SCREENS.HOME.route)
+    when (val result=authViewModel.myLoginResponse.value){
+        is LoginApiState.Success->{
+            navController.navigate(SCREENS.HOME.route)
             Log.d("Data Received",result.data.toString())
 
         }
-        is ApiState.Failure->{
+        is LoginApiState.Failure->{
             Toast.makeText(context,"${result.msg}", Toast.LENGTH_SHORT).show()
         }
-        ApiState.Loading->{
+        LoginApiState.Loading->{
             CircularProgressIndicator(color = Color(0xFF1289BE))
         }
-        ApiState.Empty->{
+        LoginApiState.Empty->{
             Toast.makeText(context,"Empty Data", Toast.LENGTH_SHORT).show()
         }
 

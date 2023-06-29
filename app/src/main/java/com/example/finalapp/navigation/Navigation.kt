@@ -9,6 +9,7 @@ import com.example.finalapp.auth.screensUI.EnterOTPScreenUI
 
 import com.example.finalapp.auth.screensUI.LoginScreenUI
 import com.example.finalapp.auth.screensUI.SignupScreenUI
+import com.example.finalapp.screens.FinalUserCreation
 import com.example.finalapp.screens.HomeScreenUI
 
 
@@ -17,12 +18,13 @@ sealed class SCREENS(val route:String){
     object SIGNUP:SCREENS("signup_screen")
     object HOME:SCREENS("home_screen")
     object ENTER_OTP:SCREENS("enter-otp")
+    object FINALUSERCREATION:SCREENS("final_user_creation")
 
 }
 @Composable
 fun Navigation(){
     val navController= rememberNavController();
-    NavHost(navController = navController, startDestination =SCREENS.SIGNUP.route){
+    NavHost(navController = navController, startDestination =SCREENS.LOGIN.route){
         composable(SCREENS.LOGIN.route){
          LoginScreenUI(navController)
         }
@@ -34,6 +36,9 @@ fun Navigation(){
         }
         composable(SCREENS.HOME.route){
             HomeScreenUI(navController)
+        }
+        composable(SCREENS.FINALUSERCREATION.route){
+            FinalUserCreation(navController)
         }
     }
 

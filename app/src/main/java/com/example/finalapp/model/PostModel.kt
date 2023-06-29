@@ -2,7 +2,7 @@ package com.example.finalapp.model
 
 import java.util.Date
 
-data class Post(
+data class PostModel(
   val id:String,
   val image:String,
   val validTime:Date,
