@@ -17,15 +17,23 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -41,15 +49,22 @@ import com.example.finalapp.R
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true)
+//@Preview(showBackground = true)
 @Composable
 fun HomeScreenUI(navController: NavController= NavController(LocalContext.current)){
-    val color=0xFFF7F7FA
+
         Box(modifier = Modifier
             .fillMaxSize()
             .padding(10.dp),
         ) {
-            ProfileItem(color )
+            LazyColumn {
+                item {
+                    PostItem2()
+                    PostItem3()
+                }
+
+            }
+
 
         }
         
@@ -60,9 +75,12 @@ fun HomeScreenUI(navController: NavController= NavController(LocalContext.curren
 fun ProfileItem(color: Long){
 
     Card(modifier = Modifier
-        .height(420.dp)
+        .height(300.dp)
         .fillMaxWidth(),
-        shape = RoundedCornerShape(6.dp)
+        shape = RoundedCornerShape(6.dp),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 10.dp
+        )
     ) {
         Column(modifier=Modifier.fillMaxSize(), verticalArrangement = Arrangement.Top) {
 //            Box(
@@ -92,7 +110,7 @@ fun ProfileItem(color: Long){
                     .fillMaxSize()
                     .background(color = Color(color))) {
                     Box(modifier = Modifier
-                        .background(color = Color(color ))
+                        .background(color = Color(color))
                         .wrapContentHeight()
                         .fillMaxWidth()
                         .padding(start = 8.dp, 4.dp, 4.dp, 4.dp), contentAlignment = Alignment.CenterStart) {
@@ -133,43 +151,43 @@ fun ProfileItem(color: Long){
                         .padding(start = 8.dp, 4.dp, 4.dp, 4.dp), contentAlignment = Alignment.CenterStart) {
                         Column(modifier = Modifier.fillMaxWidth()) {
                             Text(text = "OFFER:", fontSize = 16.sp, fontWeight = FontWeight.Bold,color = Color.Black)
-                            Row() {
-                                Column(modifier = Modifier
-                                    .wrapContentSize()
-                                    .padding(0.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-                                    IconButton(onClick = { /*TODO*/ }) {
-                                        Icon(painterResource(id =R.drawable.chat_24 ),
-                                            contentDescription ="Chat icon" ,
-                                            tint = Color(0xFFEB410B),
-                                            modifier = Modifier.size(30.dp) )
-                                    }
-                                    Text(text = "Chat", fontSize = 13.sp,fontWeight = FontWeight.Bold)
-                                }
-                                Column(modifier = Modifier
-                                    .wrapContentSize()
-                                    .padding(0.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-                                    IconButton(onClick = { /*TODO*/ }) {
-                                        Icon(painterResource(id =R.drawable.video_24 ),
-                                            contentDescription ="Video icon" ,
-                                            tint = Color(0xFF0A1A72),
-                                            modifier = Modifier.size(37.dp) )
-                                    }
-                                    Text(text = "Video", fontSize = 13.sp,fontWeight = FontWeight.Bold)
-                                }
-                                Column(modifier = Modifier
-                                    .wrapContentSize()
-                                    .padding(0.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-                                    IconButton(onClick = { /*TODO*/ }) {
-                                        Icon(painterResource(id =R.drawable.call_24 ),
-                                            contentDescription ="Audio icon" ,
-                                            tint = Color(0xFF08B10E),
-                                            modifier = Modifier.size(35.dp) )
-                                    }
-                                    Text(text = "Audio", fontSize = 13.sp,fontWeight = FontWeight.Bold)
-                                }
-
-
-                            }
+//                            Row() {
+//                                Column(modifier = Modifier
+//                                    .wrapContentSize()
+//                                    .padding(0.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+//                                    IconButton(onClick = { /*TODO*/ }) {
+//                                        Icon(painterResource(id =R.drawable.chat_24 ),
+//                                            contentDescription ="Chat icon" ,
+//                                            tint = Color(0xFFEB410B),
+//                                            modifier = Modifier.size(30.dp) )
+//                                    }
+//                                    Text(text = "Chat", fontSize = 13.sp,fontWeight = FontWeight.Bold)
+//                                }
+//                                Column(modifier = Modifier
+//                                    .wrapContentSize()
+//                                    .padding(0.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+//                                    IconButton(onClick = { /*TODO*/ }) {
+//                                        Icon(painterResource(id =R.drawable.video_24 ),
+//                                            contentDescription ="Video icon" ,
+//                                            tint = Color(0xFF0A1A72),
+//                                            modifier = Modifier.size(37.dp) )
+//                                    }
+//                                    Text(text = "Video", fontSize = 13.sp,fontWeight = FontWeight.Bold)
+//                                }
+//                                Column(modifier = Modifier
+//                                    .wrapContentSize()
+//                                    .padding(0.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+//                                    IconButton(onClick = { /*TODO*/ }) {
+//                                        Icon(painterResource(id =R.drawable.call_24 ),
+//                                            contentDescription ="Audio icon" ,
+//                                            tint = Color(0xFF08B10E),
+//                                            modifier = Modifier.size(35.dp) )
+//                                    }
+//                                    Text(text = "Audio", fontSize = 13.sp,fontWeight = FontWeight.Bold)
+//                                }
+//
+//
+//                            }
                             Row() {
                                 Column(modifier = Modifier
                                     .wrapContentSize()
@@ -242,3 +260,204 @@ fun ProfileItem(color: Long){
     }
 
 }
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true)
+@Composable
+fun PostItem2(){
+    var key by remember { mutableStateOf(false) }
+    var icon=if(key)
+        painterResource(id = R.drawable.favorite_border_24)
+    else
+        painterResource(id = R.drawable.personal_24)
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(450.dp),
+        shape = RoundedCornerShape(6.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFFFFFFFF),
+        ),
+        elevation = CardDefaults.cardElevation(10.dp)
+
+    ) {
+
+        Column(modifier = Modifier.fillMaxSize()) {
+            Card(modifier= Modifier
+                .padding(start = 6.dp, top = 6.dp, end = 6.dp, bottom = 0.dp)
+                .fillMaxWidth()
+                .height(280.dp),
+                elevation = CardDefaults.cardElevation(10.dp),
+                shape = RoundedCornerShape(6.dp)) {
+
+                Image(
+                    painter = painterResource(id =R.drawable.hd_girl ),
+                    contentDescription ="",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize() )
+
+            }
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
+                Card(
+                    modifier = Modifier
+                        .wrapContentSize()
+                        .padding(top = 4.dp),
+                    shape = RoundedCornerShape(6.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color(0xFFFFFFFF)
+                    ),
+                    elevation = CardDefaults.cardElevation(10.dp)
+                ) {
+                    Text(
+                        text = "Dedicate me a song",
+                        fontSize =20.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(4.dp),
+                        color = Color(0xFFE4420E)
+                    )
+                }
+            }
+            Text(text = "Offer:",color= Color(0xFF2A7BBB), fontSize = 14.sp,fontWeight = FontWeight.Bold, modifier = Modifier.padding(start =4.dp, top = 4.dp))
+
+                Card() {
+                    Row(modifier=Modifier.padding(8.dp),verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.coffee_24),
+                        contentDescription ="Coffee",
+                        tint = Color(0xFF0E0D0C),
+                        modifier = Modifier.size(25.dp)
+
+                    )
+                    Text(text = "at Starbucks", color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 16.sp, modifier = Modifier.padding(start = 2.dp))
+                }
+
+            }
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
+                Card(
+                    modifier = Modifier
+                        .padding(2.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color(0xFFFFFFFF),
+                    ), elevation = CardDefaults.cardElevation(2.dp)) {
+                    Icon(painterResource(id = R.drawable.reject_24), contentDescription ="Like Button",tint= Color(0xFF817676), modifier = Modifier.size(40.dp) )
+                }
+                Spacer(modifier = Modifier.width(32.dp))
+                Card(
+                    modifier = Modifier
+                        .padding(2.dp),
+                    onClick={key=!key},
+                    colors = CardDefaults.cardColors(
+                    containerColor = Color(0xFFFFFFFF)), elevation = CardDefaults.cardElevation(2.dp)) {
+                    Icon(painter = icon , contentDescription ="Like Button",tint= Color(0xFF990707), modifier = Modifier.size(40.dp) )
+
+                }
+
+
+            }
+
+
+            
+        }
+
+        
+    }
+}
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true)
+@Composable
+fun PostItem3(){
+    var key by remember { mutableStateOf(false) }
+    var icon=if(key)
+        painterResource(id = R.drawable.favorite_border_24)
+    else
+        painterResource(id = R.drawable.personal_24)
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(450.dp),
+        shape = RoundedCornerShape(6.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFFFFFFFF),
+        ),
+        elevation = CardDefaults.cardElevation(10.dp)
+
+    ) {
+
+        Column(modifier = Modifier.fillMaxSize()) {
+            Card(modifier= Modifier
+                .padding(start = 6.dp, top = 6.dp, end = 6.dp, bottom = 0.dp)
+                .fillMaxWidth()
+                .height(280.dp),
+                elevation = CardDefaults.cardElevation(10.dp),
+                shape = RoundedCornerShape(6.dp)) {
+
+                Image(
+                    painter = painterResource(id =R.drawable.indian_girl ),
+                    contentDescription ="",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize() )
+
+            }
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
+                Card(
+                    modifier = Modifier
+                        .wrapContentSize()
+                        .padding(top = 4.dp),
+                    shape = RoundedCornerShape(6.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color(0xFFFFFFFF)
+                    ),
+                    elevation = CardDefaults.cardElevation(10.dp)
+                ) {
+                    Text(
+                        text = "Dance for me",
+                        fontSize =20.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(4.dp),
+                        color = Color(0xFFE4420E)
+                    )
+                }
+            }
+            Text(text = "Offer:",color= Color(0xFF2A7BBB), fontSize = 14.sp,fontWeight = FontWeight.Bold, modifier = Modifier.padding(start =4.dp, top = 4.dp))
+
+            Card() {
+                Row(modifier=Modifier.padding(8.dp),verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.coffee_24),
+                        contentDescription ="Coffee",
+                        tint = Color(0xFF0E0D0C),
+                        modifier = Modifier.size(25.dp)
+
+                    )
+                    Text(text = "at Cafeteria", color = Color.Black, fontWeight = FontWeight.Bold, fontSize = 16.sp, modifier = Modifier.padding(start = 2.dp))
+                }
+
+            }
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
+                Card(
+                    modifier = Modifier
+                        .padding(2.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = Color(0xFFFFFFFF),
+                    ), elevation = CardDefaults.cardElevation(2.dp)) {
+                    Icon(painterResource(id = R.drawable.reject_24), contentDescription ="Like Button",tint= Color(0xFF817676), modifier = Modifier.size(40.dp) )
+                }
+                Spacer(modifier = Modifier.width(16.dp))
+                Button(
+                    onClick = {key=!key },
+                    colors = ButtonDefaults.buttonColors(Color(0xFFFFFFFF)),
+                    modifier=Modifier.wrapContentSize(), shape = CircleShape
+
+                ) {
+                    Icon(painter = icon , contentDescription ="Like Button",tint= Color(0xFF990707), modifier = Modifier.size(40.dp) )
+
+                }
+
+
+            }
+
+
+
+        }
+
+
+    }}

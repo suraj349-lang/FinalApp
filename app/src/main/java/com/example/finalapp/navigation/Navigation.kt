@@ -24,7 +24,7 @@ sealed class SCREENS(val route:String){
 @Composable
 fun Navigation(){
     val navController= rememberNavController();
-    NavHost(navController = navController, startDestination =SCREENS.HOME.route){
+    NavHost(navController = navController, startDestination =SCREENS.LOGIN.route){
         composable(SCREENS.LOGIN.route){
          LoginScreenUI(navController)
         }

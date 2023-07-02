@@ -14,6 +14,7 @@ import androidx.navigation.NavController
 import com.example.finalapp.auth.repository.AuthRepository
 import com.example.finalapp.model.LoginModel
 import com.example.finalapp.model.RegisterUserModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
@@ -23,9 +24,9 @@ class AuthViewModel: ViewModel() {
     val myLoginResponse: MutableState<LoginApiState> = mutableStateOf(LoginApiState.Empty)
 //  init {
     //    pushPost(Post("",""))
-//  }
+//
 
-    fun loginUser(loginModel: LoginModel)=viewModelScope.launch {
+    fun loginUser(loginModel: LoginModel)=viewModelScope.launch(Dispatchers.IO) {
         repository.sendLoginData(loginModel)
             .onStart {
                 myLoginResponse.value=LoginApiState.Loading
@@ -43,7 +44,7 @@ class AuthViewModel: ViewModel() {
     //    pushPost(Post("",""))
 //  }
 
-    fun RegisterUser(registerUserModel : RegisterUserModel)=viewModelScope.launch {
+    fun RegisterUser(registerUserModel : RegisterUserModel)=viewModelScope.launch(Dispatchers.IO) {
         repository.sendSignupData(registerUserModel)
             .onStart {
                 mySignupResponse.value=SignupApiState.Loading
