@@ -82,6 +82,26 @@ fun LoginScreenUI(navController: NavController= NavController(LocalContext.curre
     val icon = if (passwordVisibility) painterResource(id = R.drawable.round_visibility_24)
     else painterResource(id = R.drawable.round_visibility_off_24)
 
+    val lifecycleOwner= LocalLifecycleOwner.current
+    // If `lifecycleOwner` changes, dispose and reset the effect
+    DisposableEffect(lifecycleOwner) {
+        // Create an observer that triggers our remembered callbacks
+        // for sending analytics events
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_STOP) {
+                authViewModel.key.value=0
+            }
+        }
+
+        // Add the observer to the lifecycle
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        // When the effect leaves the Composition, remove the observer
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(
             verticalArrangement = Arrangement.Center,
@@ -163,25 +183,7 @@ fun LoginScreenUI(navController: NavController= NavController(LocalContext.curre
                 ) {
                     Text(text = "Get OTP")
                 }
-                val lifecycleOwner= LocalLifecycleOwner.current
-                // If `lifecycleOwner` changes, dispose and reset the effect
-                DisposableEffect(lifecycleOwner) {
-                    // Create an observer that triggers our remembered callbacks
-                    // for sending analytics events
-                    val observer = LifecycleEventObserver { _, event ->
-                        if (event == Lifecycle.Event.ON_STOP) {
-                            authViewModel.key.value=0
-                        }
-                    }
 
-                    // Add the observer to the lifecycle
-                    lifecycleOwner.lifecycle.addObserver(observer)
-
-                    // When the effect leaves the Composition, remove the observer
-                    onDispose {
-                        lifecycleOwner.lifecycle.removeObserver(observer)
-                    }
-                }
                 if(authViewModel.key.value==1) {
                     LoginResponseDataAndAction(authViewModel, navController)
                 }
