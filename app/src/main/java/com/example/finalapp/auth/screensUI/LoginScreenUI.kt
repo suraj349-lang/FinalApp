@@ -38,6 +38,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -48,6 +49,9 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavController
 import com.example.finalapp.R
 import com.example.finalapp.auth.CameroonNumberVisualTransformation
@@ -57,13 +61,15 @@ import com.example.finalapp.model.LoginModel
 import com.example.finalapp.navigation.SCREENS
 import kotlinx.coroutines.launch
 
-@Preview(showBackground = true)
+
+
+
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @SuppressLint("UnrememberedMutableState")
 @Composable
-fun LoginScreenUI(navController: NavController= NavController(LocalContext.current)) {
+fun LoginScreenUI(navController: NavController= NavController(LocalContext.current),authViewModel: AuthViewModel) {
     val scope= rememberCoroutineScope()
-    val authViewModel = AuthViewModel();
+
     var loginNumberText by rememberSaveable { mutableStateOf("") }
     val addString by remember {
         mutableStateOf("+91")
@@ -75,9 +81,6 @@ fun LoginScreenUI(navController: NavController= NavController(LocalContext.curre
     var passwordVisibility by remember { mutableStateOf(false) }
     val icon = if (passwordVisibility) painterResource(id = R.drawable.round_visibility_24)
     else painterResource(id = R.drawable.round_visibility_off_24)
-    var key by remember {
-        mutableStateOf(0)
-    }
 
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -150,7 +153,7 @@ fun LoginScreenUI(navController: NavController= NavController(LocalContext.curre
                 Spacer(modifier = Modifier.height(10.dp))
                 Button(
                     onClick = {
-                        key=1;
+                        authViewModel.key.value=1;
                         scope.launch {
                             authViewModel.loginUser(LoginModel("$addString$loginNumberText", loginPasswordText))
                         }
@@ -160,8 +163,29 @@ fun LoginScreenUI(navController: NavController= NavController(LocalContext.curre
                 ) {
                     Text(text = "Get OTP")
                 }
-                if(key==1){
-                    LoginResponseDataAndAction(authViewModel,navController)
+                val lifecycleOwner= LocalLifecycleOwner.current
+                // If `lifecycleOwner` changes, dispose and reset the effect
+                DisposableEffect(lifecycleOwner) {
+                    // Create an observer that triggers our remembered callbacks
+                    // for sending analytics events
+                    val observer = LifecycleEventObserver { _, event ->
+                        if (event == Lifecycle.Event.ON_STOP) {
+                            authViewModel.key.value=0
+                        }
+                    }
+
+                    // Add the observer to the lifecycle
+                    lifecycleOwner.lifecycle.addObserver(observer)
+
+                    // When the effect leaves the Composition, remove the observer
+                    onDispose {
+                        lifecycleOwner.lifecycle.removeObserver(observer)
+                    }
+                }
+                if(authViewModel.key.value==1) {
+                    LoginResponseDataAndAction(authViewModel, navController)
+                }
+
                 }
                // MediaPlayerSuraj()
 
@@ -176,7 +200,9 @@ fun LoginScreenUI(navController: NavController= NavController(LocalContext.curre
         }
 
     }
-}
+
+
+
 @Composable
 fun LoginResponseDataAndAction(authViewModel: AuthViewModel, navController: NavController){
     val context= LocalContext.current

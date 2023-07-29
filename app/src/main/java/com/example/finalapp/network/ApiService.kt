@@ -19,15 +19,4 @@ interface ApiService {
 
 
 
-    companion object{
-        var apiService:ApiService? = null
-        fun getInstance():ApiService{
-            if(apiService==null){
-                apiService= Retrofit.Builder().baseUrl("http://192.168.29.95:5000/").addConverterFactory(
-                    GsonConverterFactory.create()).build().create(ApiService::class.java)
-            }
-            return apiService!!
-        }
-    }
-
 }

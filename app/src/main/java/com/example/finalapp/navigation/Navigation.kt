@@ -2,9 +2,11 @@ package com.example.finalapp.navigation
 
 import androidx.compose.foundation.interaction.HoverInteraction
 import androidx.compose.runtime.Composable
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.finalapp.auth.authViewModel.AuthViewModel
 import com.example.finalapp.auth.screensUI.EnterOTPScreenUI
 
 import com.example.finalapp.auth.screensUI.LoginScreenUI
@@ -26,7 +28,8 @@ fun Navigation(){
     val navController= rememberNavController();
     NavHost(navController = navController, startDestination =SCREENS.LOGIN.route){
         composable(SCREENS.LOGIN.route){
-         LoginScreenUI(navController)
+            val authViewModel= hiltViewModel<AuthViewModel>()
+            LoginScreenUI(navController,authViewModel)
         }
         composable(SCREENS.SIGNUP.route){
             SignupScreenUI(navController)
@@ -38,7 +41,8 @@ fun Navigation(){
             HomeScreenUI(navController)
         }
         composable(SCREENS.FINALUSERCREATION.route){
-            FinalUserCreation(navController)
+            val authViewModel= hiltViewModel<AuthViewModel>()
+            FinalUserCreation(navController,authViewModel)
         }
     }
 

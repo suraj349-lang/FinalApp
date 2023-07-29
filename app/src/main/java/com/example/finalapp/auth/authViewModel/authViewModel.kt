@@ -14,14 +14,19 @@ import androidx.navigation.NavController
 import com.example.finalapp.auth.repository.AuthRepository
 import com.example.finalapp.model.LoginModel
 import com.example.finalapp.model.RegisterUserModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class AuthViewModel: ViewModel() {
-    private val repository= AuthRepository()
+@HiltViewModel
+class AuthViewModel @Inject constructor(private val repository: AuthRepository): ViewModel() {
+
     val myLoginResponse: MutableState<LoginApiState> = mutableStateOf(LoginApiState.Empty)
+    var key= mutableStateOf(0)
 //  init {
     //    pushPost(Post("",""))
 //
@@ -40,9 +45,7 @@ class AuthViewModel: ViewModel() {
             }
     }
     val mySignupResponse: MutableState<SignupApiState> = mutableStateOf(SignupApiState.Empty)
-//  init {
-    //    pushPost(Post("",""))
-//  }
+
 
     fun RegisterUser(registerUserModel : RegisterUserModel)=viewModelScope.launch(Dispatchers.IO) {
         repository.sendSignupData(registerUserModel)

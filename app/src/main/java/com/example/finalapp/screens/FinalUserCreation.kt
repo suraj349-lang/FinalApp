@@ -44,11 +44,12 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
-fun FinalUserCreation(navController:NavController){
+fun FinalUserCreation (navController:NavController,authViewModel: AuthViewModel){
     val firebaseAuth= FirebaseAuth.getInstance();
     val number by remember {
         mutableStateOf(firebaseAuth.currentUser?.phoneNumber.toString())
@@ -57,7 +58,6 @@ fun FinalUserCreation(navController:NavController){
         mutableStateOf(0)
     }
     val scope= rememberCoroutineScope()
-    val authViewModel=AuthViewModel()
     var nameTextFieldData by remember {
         mutableStateOf("")
     }

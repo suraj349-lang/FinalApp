@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit
 
 class FirebaseRepository {
     // on below line creating method to
-// sign in with phone credentuals.
+// sign in with phone credentials.
      fun signInWithPhoneAuthCredential(
         credential: PhoneAuthCredential,
         auth: FirebaseAuth,
