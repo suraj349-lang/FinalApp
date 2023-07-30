@@ -11,11 +11,13 @@ import com.example.finalapp.auth.screensUI.EnterOTPScreenUI
 
 import com.example.finalapp.auth.screensUI.LoginScreenUI
 import com.example.finalapp.auth.screensUI.SignupScreenUI
+import com.example.finalapp.auth.screensUI.SplashScreenUI
 import com.example.finalapp.screens.FinalUserCreation
 import com.example.finalapp.screens.HomeScreenUI
 
 
 sealed class SCREENS(val route:String){
+    object SPLASH:SCREENS("splash_Screen")
     object LOGIN:SCREENS("login_Screen")
     object SIGNUP:SCREENS("signup_screen")
     object HOME:SCREENS("home_screen")
@@ -26,7 +28,10 @@ sealed class SCREENS(val route:String){
 @Composable
 fun Navigation(){
     val navController= rememberNavController();
-    NavHost(navController = navController, startDestination =SCREENS.LOGIN.route){
+    NavHost(navController = navController, startDestination =SCREENS.SPLASH.route){
+        composable(SCREENS.SPLASH.route){
+            SplashScreenUI(navController)
+        }
         composable(SCREENS.LOGIN.route){
             val authViewModel= hiltViewModel<AuthViewModel>()
             LoginScreenUI(navController,authViewModel)
