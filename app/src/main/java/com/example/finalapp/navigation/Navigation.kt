@@ -14,6 +14,8 @@ import com.example.finalapp.auth.screensUI.SignupScreenUI
 import com.example.finalapp.auth.screensUI.SplashScreenUI
 import com.example.finalapp.screens.FinalUserCreation
 import com.example.finalapp.screens.HomeScreenUI
+import com.example.finalapp.screens.offer.OfferRow
+import com.example.finalapp.screens.offer.OfferScreenUI
 
 
 sealed class SCREENS(val route:String){
@@ -23,12 +25,13 @@ sealed class SCREENS(val route:String){
     object HOME:SCREENS("home_screen")
     object ENTER_OTP:SCREENS("enter-otp")
     object FINALUSERCREATION:SCREENS("final_user_creation")
+    object OFFER:SCREENS("offer_creation")
 
 }
 @Composable
 fun Navigation(){
     val navController= rememberNavController();
-    NavHost(navController = navController, startDestination =SCREENS.SPLASH.route){
+    NavHost(navController = navController, startDestination =SCREENS.HOME.route){
         composable(SCREENS.SPLASH.route){
             SplashScreenUI(navController)
         }
@@ -48,6 +51,9 @@ fun Navigation(){
         composable(SCREENS.FINALUSERCREATION.route){
             val authViewModel= hiltViewModel<AuthViewModel>()
             FinalUserCreation(navController,authViewModel)
+        }
+        composable(SCREENS.OFFER.route){
+            OfferScreenUI(navController)
         }
     }
 
