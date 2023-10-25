@@ -27,9 +27,6 @@ class AuthViewModel @Inject constructor(private val repository: AuthRepository):
 
     val myLoginResponse: MutableState<LoginApiState> = mutableStateOf(LoginApiState.Empty)
     var key= mutableStateOf(0)
-//  init {
-    //    pushPost(Post("",""))
-//
 
     fun loginUser(loginModel: LoginModel)=viewModelScope.launch(Dispatchers.IO) {
         repository.sendLoginData(loginModel)
