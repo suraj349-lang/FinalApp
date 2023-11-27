@@ -75,7 +75,7 @@ val Typography = Typography(
         fontFamily = Dongle,
         fontWeight = FontWeight.Medium,
         fontSize = 12.sp,
-        lineHeight = 2.sp,
+        lineHeight = 14.sp,
         letterSpacing = 0.5.sp
     ),
     labelSmall = TextStyle(
@@ -83,6 +83,13 @@ val Typography = Typography(
         fontWeight = FontWeight.Medium,
         fontSize = 11.sp,
         lineHeight = 16.sp,
+        letterSpacing = 0.5.sp
+    ),
+    displayMedium = TextStyle(
+        fontFamily = Dongle,
+        fontWeight = FontWeight.Medium,
+        fontSize = 24.sp,
+        lineHeight = 20.sp,
         letterSpacing = 0.5.sp
     )
 

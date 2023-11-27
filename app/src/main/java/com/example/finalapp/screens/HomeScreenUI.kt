@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -38,6 +39,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -125,14 +127,18 @@ fun HomeFloatingActionButton(  ) {
     val context = LocalContext.current
     var showCustomDialog by remember { mutableStateOf(false) }
 
-    ExtendedFloatingActionButton(
+    FloatingActionButton(
         onClick = { showCustomDialog = !showCustomDialog},
-        shape = RoundedCornerShape(90.dp),
-        containerColor = Color(0xFFF7E655),
-        contentColor = Color(0xFFE60854),
+        Modifier.size(75.dp),
+        shape= CircleShape,
+        containerColor = statusAndTopAppBarColor, //0xFFEBDB55
+        contentColor = Color(0xFFEBDB55),//0xFF090200
     ) {
-        Icon(imageVector = Icons.Rounded.Add, contentDescription = "Add",Modifier.size(30.dp))
-        Text(text = "Raise Offer")
+        Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
+            Icon(painterResource(id = R.drawable.up_arrow), contentDescription = "Add",Modifier.padding(top=4.dp).size(32.dp))
+            Text(text = "Raise Offer", fontSize = 12.sp, modifier = Modifier.padding(top=0.dp))
+        }
+
 
     }
     if (showCustomDialog) {
