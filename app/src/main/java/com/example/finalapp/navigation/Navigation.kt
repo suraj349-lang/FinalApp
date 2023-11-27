@@ -3,6 +3,7 @@ package com.example.finalapp.navigation
 import androidx.compose.foundation.interaction.HoverInteraction
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -32,8 +33,8 @@ sealed class SCREENS(val route:String){
 }
 @Composable
 fun Navigation(){
-    val navController= rememberNavController();
-    NavHost(navController = navController, startDestination =SCREENS.PROFILE.route){
+    val navController:NavHostController= rememberNavController();
+    NavHost(navController = navController, startDestination =SCREENS.HOME.route){
         composable(SCREENS.SPLASH.route){
             SplashScreenUI(navController)
         }
