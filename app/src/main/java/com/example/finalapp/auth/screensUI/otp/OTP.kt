@@ -46,9 +46,7 @@ fun OtpInputField(
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     // 0998779
-    var otpValue by remember {
-        mutableStateOf("")
-    }
+    var otpValue by remember { mutableStateOf("") }
 
     val keyboardState = keyboardAsState(KeyboardStatus.Closed)
 
@@ -64,9 +62,7 @@ fun OtpInputField(
         }
     }
 
-    val focusRequester = remember {
-        FocusRequester()
-    }
+    val focusRequester = remember { FocusRequester() }
 
     BasicTextField(
         modifier = Modifier.focusRequester(focusRequester),
@@ -167,7 +163,7 @@ fun OtpCellFocusPreview(
 
     MaterialTheme {
         Box(modifier = Modifier.padding(24.dp)) {
-            OtpCell(char = "7", isFocus = true, isShowWarning = false)
+            OtpCell(char = "6", isFocus = true, isShowWarning = false)
         }
     }
 

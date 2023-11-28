@@ -205,7 +205,10 @@ fun LoginScreenUI(navController: NavController= NavController(LocalContext.curre
                     LoginResponseDataAndAction(authViewModel, navController)
                 }
             }
-            Row(modifier = Modifier.fillMaxWidth().wrapContentHeight().padding(top=8.dp), horizontalArrangement = Arrangement.Center) {
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .padding(top = 8.dp), horizontalArrangement = Arrangement.Center) {
                 Text(text = "New member ? ", color = statusAndTopAppBarColor, style = MaterialTheme.typography.bodyMedium)
                 Text(
                     text = "Create Account", color = DarkBlue,

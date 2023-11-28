@@ -23,9 +23,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.finalapp.R
 import com.example.finalapp.navigation.SCREENS
+import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 
@@ -51,25 +55,22 @@ fun SplashScreenUI(navController: NavController){
             .size(330.dp)
             .scale(scale.value),
         shape = CircleShape,
-        color = Color.White,
-        border = BorderStroke(width = 2.dp, color = Color.LightGray  )
-    ) {
+        color = Color.White)
+    {
         Column(
             modifier = Modifier.padding(1.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
             Image(
-                imageVector = Icons.Default.Call,
-                contentDescription ="Sun",
+                painterResource(id = R.drawable.tree ),
+                contentDescription ="Tree" +
+                        "",
                 contentScale= ContentScale.Fit,
                 modifier = Modifier.size(95.dp)
             )
-            Text(
-                text = "Find the Sun?",
-                style = MaterialTheme.typography.headlineMedium,
-                color = Color.LightGray
-            )
+            Text(text="FRISBEE", fontSize = 45.sp, modifier = Modifier.padding(top=8.dp, bottom = 0.dp), color = statusAndTopAppBarColor, style = MaterialTheme.typography.titleMedium)
+
 
         }
 
