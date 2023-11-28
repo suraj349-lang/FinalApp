@@ -13,9 +13,12 @@ import com.example.finalapp.auth.screensUI.EnterOTPScreenUI
 import com.example.finalapp.auth.screensUI.LoginScreenUI
 import com.example.finalapp.auth.screensUI.SignupScreenUI
 import com.example.finalapp.auth.screensUI.SplashScreenUI
+import com.example.finalapp.screens.ChatScreenUI
 import com.example.finalapp.screens.FinalUserCreation
 import com.example.finalapp.screens.HomeScreenUI
+import com.example.finalapp.screens.NotificationsScreenUI
 import com.example.finalapp.screens.ProfileScreenUI
+import com.example.finalapp.screens.SettingsScreenUI
 import com.example.finalapp.screens.offer.OfferRow
 import com.example.finalapp.screens.offer.OfferScreenUI
 
@@ -29,12 +32,15 @@ sealed class SCREENS(val route:String){
     object ENTER_OTP:SCREENS("enter-otp")
     object FINALUSERCREATION:SCREENS("final_user_creation")
     object OFFER:SCREENS("offer_creation")
+    object SETTINGS:SCREENS("settings_screen")
+    object NOTIFICATIONS:SCREENS("notifications_screen")
+    object CHAT:SCREENS("chat_screen")
 
 }
 @Composable
 fun Navigation(){
     val navController:NavHostController= rememberNavController();
-    NavHost(navController = navController, startDestination =SCREENS.HOME.route){
+    NavHost(navController = navController, startDestination =SCREENS.SIGNUP.route){
         composable(SCREENS.SPLASH.route){
             SplashScreenUI(navController)
         }
@@ -60,6 +66,15 @@ fun Navigation(){
         }
         composable(SCREENS.PROFILE.route){
             ProfileScreenUI(navController)
+        }
+        composable(SCREENS.SETTINGS.route){
+            SettingsScreenUI(navController)
+        }
+        composable(SCREENS.NOTIFICATIONS.route){
+            NotificationsScreenUI(navController)
+        }
+        composable(SCREENS.CHAT.route){
+            ChatScreenUI(navController)
         }
     }
 

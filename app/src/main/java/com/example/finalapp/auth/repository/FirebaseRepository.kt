@@ -34,7 +34,7 @@ class FirebaseRepository {
                 if (task.isSuccessful) {
                     message.value = "Verification successful"
                     Toast.makeText(context, "Verification successful..", Toast.LENGTH_SHORT).show()
-                    navController.navigate(SCREENS.HOME.route)
+                    navController.navigate(SCREENS.FINALUSERCREATION.route)
                 } else {
                     // Sign in failed, display a message
                     if (task.exception is FirebaseAuthInvalidCredentialsException) {
@@ -48,6 +48,10 @@ class FirebaseRepository {
                     }
                 }
             }
+    }
+    fun LogoutUser(auth: FirebaseAuth){
+        auth.signOut();
+
     }
 
     // below method is use to send

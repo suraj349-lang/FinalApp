@@ -5,6 +5,8 @@ import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.Notifications
+import androidx.compose.material.icons.rounded.Person
+import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -21,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.ui.theme.DarkBlue
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.ui.theme.topAppBarTextColor
@@ -30,18 +33,21 @@ sealed class Destinations(
     val icon: ImageVector? = null
 ) {
     object HomeScreen : Destinations(
-        route = "home_screen",
+        route = SCREENS.HOME.route,
         icon = Icons.Rounded.Home
     )
 
-    object Favourite : Destinations(
-        route = "profile_screen",
-        icon = Icons.Rounded.Favorite
+    object ProfileScreen : Destinations(
+        route = SCREENS.PROFILE.route,
+        icon = Icons.Rounded.Person
     )
-
-    object Notification : Destinations(
-        route = "profile_screen",
+    object NotificationsScreen : Destinations(
+        route = SCREENS.NOTIFICATIONS.route,
         icon = Icons.Rounded.Notifications
+    )
+    object SettingsScreen : Destinations(
+        route = SCREENS.SETTINGS.route,
+        icon = Icons.Rounded.Settings
     )
 
 }
@@ -51,7 +57,7 @@ fun BottomBar(
     navController: NavHostController, state: MutableState<Boolean>, modifier: Modifier = Modifier
 ) {
     val screens = listOf(
-        Destinations.HomeScreen, Destinations.Favourite, Destinations.Notification
+        Destinations.HomeScreen, Destinations.ProfileScreen, Destinations.NotificationsScreen,Destinations.SettingsScreen
     )
 
     NavigationBar(

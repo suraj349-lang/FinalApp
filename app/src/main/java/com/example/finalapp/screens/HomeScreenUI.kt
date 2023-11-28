@@ -6,6 +6,7 @@ import android.annotation.SuppressLint
 import android.app.Activity
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.clipScrollableContainer
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -59,8 +60,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.modifier.modifierLocalConsumer
@@ -79,9 +82,11 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.finalapp.R
+import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens.offer.OfferScreenUI
 import com.example.finalapp.ui.theme.DarkBlue
 import com.example.finalapp.ui.theme.LightBlueBkg
+import com.example.finalapp.ui.theme.floatingActionBtnTextColor
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.ui.theme.topAppBarTextColor
 
@@ -96,7 +101,7 @@ fun HomeScreenUI(navController: NavHostController= NavHostController(LocalContex
 
 
     Scaffold(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-             topBar = { HomeTopBar()},
+             topBar = { HomeTopBar("Frisbee", navController )},
              bottomBar = { BottomBar(
                 navController = navController,
                 state = buttonsVisible,
@@ -132,18 +137,14 @@ fun HomeFloatingActionButton(  ) {
         Modifier.size(75.dp),
         shape= CircleShape,
         containerColor = statusAndTopAppBarColor, //0xFFEBDB55
-        contentColor = Color(0xFFEBDB55),//0xFF090200
+        contentColor = floatingActionBtnTextColor,//0xFF090200
     ) {
         Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
             Icon(painterResource(id = R.drawable.up_arrow), contentDescription = "Add",Modifier.padding(top=4.dp).size(32.dp))
             Text(text = "Raise Offer", fontSize = 12.sp, modifier = Modifier.padding(top=0.dp))
         }
-
-
     }
-    if (showCustomDialog) {
-        CustomAlertDialog { showCustomDialog = !showCustomDialog }
-    }
+    if (showCustomDialog) { CustomAlertDialog { showCustomDialog = !showCustomDialog } }
 }
 
 @Composable
@@ -243,7 +244,7 @@ fun HomeScreenOffer(){
 fun ImageScreen() {
     val configuration = LocalConfiguration.current
     val widthInDp = configuration.screenWidthDp.dp
-    val heightInDp = configuration.screenHeightDp.dp * 0.65f
+    val heightInDp = configuration.screenHeightDp.dp * 0.58f
    Box(modifier = Modifier
        .background(color = Color.Transparent, shape = RoundedCornerShape(6.dp))
        .padding(top = 2.dp, bottom = 2.dp, start = 2.dp, end = 2.dp)
@@ -266,7 +267,8 @@ fun ImageScreen() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeTopBar(){
+fun HomeTopBar(title:String,navController: NavHostController){
+
 
     TopAppBar(
         colors = TopAppBarDefaults.smallTopAppBarColors(
@@ -274,14 +276,15 @@ fun HomeTopBar(){
         ),
         title = {
             Text(
-                "FRISBEE",
+                title,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top=8.dp), color = Color(0xFFE8E9E2), style = MaterialTheme.typography.titleMedium
             )
         },
         navigationIcon = {
             Icon(
-                painter = painterResource(id = R.drawable.baseline_bakery_dining_24),
+                painter = painterResource(
+                    id = R.drawable.baseline_bakery_dining_24),
                 tint = Color(0xFFE8E9E2),
                 contentDescription ="" ,
                 modifier = Modifier
@@ -290,7 +293,7 @@ fun HomeTopBar(){
         }, actions = {
             Icon(painter = painterResource(id = R.drawable.send_24), contentDescription ="", tint = Color(0xFFE8E9E2), modifier = Modifier
                 .size(28.dp)
-                .rotate(-40f) )
+                .rotate(-40f).shadow(elevation = 12.dp, shape = CircleShape, spotColor = Color.White).clickable { navController.navigate(SCREENS.CHAT.route) })
         }
     )
 }

@@ -20,10 +20,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -59,6 +61,8 @@ import com.example.finalapp.auth.authViewModel.AuthViewModel
 import com.example.finalapp.auth.authViewModel.SignupApiState
 import com.example.finalapp.auth.repository.FirebaseRepository
 import com.example.finalapp.navigation.SCREENS
+import com.example.finalapp.ui.theme.statusAndTopAppBarColor
+import com.example.finalapp.ui.theme.topAppBarTextColor
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
@@ -81,21 +85,10 @@ fun SignupScreenUI(navController: NavController = NavController(LocalContext.cur
         painterResource(id =R.drawable.round_visibility_24 )
     else
         painterResource(id = R.drawable.round_visibility_off_24)
-    val phoneNumber = remember {
-        mutableStateOf("")
-    }
-
-    val otp = remember {
-        mutableStateOf("")
-    }
-
-    val verificationID = remember {
-        mutableStateOf("")
-    }
-
-    val message = remember {
-        mutableStateOf("")
-    }
+    val phoneNumber = remember { mutableStateOf("") }
+    val otp = remember { mutableStateOf("") }
+    val verificationID = remember { mutableStateOf("") }
+    val message = remember { mutableStateOf("") }
     val mAuth: FirebaseAuth = FirebaseAuth.getInstance();
     lateinit var callbacks: PhoneAuthProvider.OnVerificationStateChangedCallbacks
     val context= LocalContext.current
@@ -108,11 +101,15 @@ fun SignupScreenUI(navController: NavController = NavController(LocalContext.cur
                            painter = painterResource(id = R.drawable.tree),
                            contentDescription = "",
                            modifier = Modifier.size(100.dp))
-                Text(text = "CHAT RADAR", fontSize = 30.sp, fontWeight = FontWeight.Bold, color = Color.DarkGray)
+               Text(text="FRISBEE", fontSize = 45.sp, modifier = Modifier.padding(top=8.dp, bottom = 0.dp), color = statusAndTopAppBarColor, style = MaterialTheme.typography.titleMedium)
+               Text(text="date your way...", fontSize = 18.sp, modifier = Modifier.padding(top=0.dp, start = 120.dp), color = Color(
+                   0xFFE71708),
+                   style = MaterialTheme.typography.titleMedium
+               )
                 OutlinedTextField(
                    value = phoneNumber.value,
                    onValueChange = { phoneNumber.value = it },
-                   label = { Text(text = "Phone Number") },
+                   label = { Text(text = "Enter number", style = MaterialTheme.typography.bodyMedium) },
                    singleLine = true,
                    keyboardOptions = KeyboardOptions(
                        keyboardType = KeyboardType.Number,
@@ -138,11 +135,10 @@ fun SignupScreenUI(navController: NavController = NavController(LocalContext.cur
                            firebaseRepository.sendVerificationCode(number, mAuth, context as Activity, callbacks)
                        }
                    },
-                   // on below line we are
-                   // adding modifier to our button.
-                   modifier = Modifier
-                       .fillMaxWidth()
-                       .padding(16.dp)
+                   modifier = Modifier.width(160.dp), colors = ButtonDefaults.buttonColors(
+                       containerColor = statusAndTopAppBarColor,
+                       contentColor = topAppBarTextColor
+                   )
                ) {
                    // on below line we are adding text for our button
                    Text(text = "Generate OTP", modifier = Modifier.padding(8.dp))
@@ -151,48 +147,18 @@ fun SignupScreenUI(navController: NavController = NavController(LocalContext.cur
                Spacer(modifier = Modifier.height(10.dp))
 
                // on below line creating text field for otp
-               TextField(
-                   // on below line we are specifying
-                   // value for our course duration text field.
+               OutlinedTextField(
                    value = otp.value,
-                   //specifying key board on below line.
-                   keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                   // on below line we are adding on
-                   // value change for text field.
                    onValueChange = { otp.value = it },
-
-                   // on below line we are adding place holder
-                   // as text as "Enter your course duration"
-                   placeholder = { Text(text = "Enter your otp") },
-
-                   // on below line we are adding modifier to it
-                   // and adding padding to it and filling max width
-                   modifier = Modifier
-                       .padding(16.dp)
-                       .fillMaxWidth(),
-
-                   // on below line we are adding text style
-                   // specifying color and font size to it.
+                   keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                   modifier = Modifier.width(150.dp),
                    textStyle = TextStyle(color = Color.Black, fontSize = 15.sp),
-
-                   // on below line we are adding
-                   // single line to it.
                    singleLine = true,
                )
-
-               // adding spacer on below line.
-               Spacer(modifier = Modifier.height(10.dp))
-
-               // on below line creating button to add
-               // data to firebase firestore database.
                Button(
                    onClick = {
-                       // on below line we are validating
-                       // user input parameters.
-                       if (TextUtils.isEmpty(otp.value.toString())) {
-                           // displaying toast message on below line.
-                           Toast.makeText(context, "Please enter otp..", Toast.LENGTH_SHORT)
-                               .show()
+                       if (TextUtils.isEmpty(otp.value)) {
+                           Toast.makeText(context, "Please enter otp..", Toast.LENGTH_SHORT).show()
                        } else {
                            // on below line generating phone credentials.
                            val credential: PhoneAuthCredential = PhoneAuthProvider.getCredential(
@@ -210,17 +176,15 @@ fun SignupScreenUI(navController: NavController = NavController(LocalContext.cur
                            )
                        }
                    },
-                   // on below line we are
-                   // adding modifier to our button.
-                   modifier = Modifier
-                       .fillMaxWidth()
-                       .padding(16.dp)
+                   modifier = Modifier.width(95.dp),
+                   colors = ButtonDefaults.buttonColors(
+                       contentColor = topAppBarTextColor,
+                       containerColor = statusAndTopAppBarColor
+                   )
                ) {
-                   // on below line we are adding text for our button
-                   Text(text = "Verify OTP", modifier = Modifier.padding(8.dp))
+                   Text(text = "Submit")
                }
 
-               // on below line adding spacer.
                Spacer(modifier = Modifier.height(5.dp))
 
                Text(
@@ -237,6 +201,7 @@ fun SignupScreenUI(navController: NavController = NavController(LocalContext.cur
                 // and displaying toast message
                 message.value = "Verification successful"
                 Toast.makeText(context, "Verification successful..", Toast.LENGTH_SHORT).show()
+
             }
 
             override fun onVerificationFailed(p0: FirebaseException) {

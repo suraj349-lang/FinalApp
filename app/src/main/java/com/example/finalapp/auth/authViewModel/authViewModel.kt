@@ -14,6 +14,7 @@ import androidx.navigation.NavController
 import com.example.finalapp.auth.repository.AuthRepository
 import com.example.finalapp.model.LoginModel
 import com.example.finalapp.model.RegisterUserModel
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.catch
@@ -32,12 +33,15 @@ class AuthViewModel @Inject constructor(private val repository: AuthRepository):
         repository.sendLoginData(loginModel)
             .onStart {
                 myLoginResponse.value=LoginApiState.Loading
+                Log.d("Data received",myLoginResponse.value.toString())
 
             }.catch {
                 myLoginResponse.value=LoginApiState.Failure(it)
+                Log.d("Data received",myLoginResponse.value.toString())
 
             }.collect{
                 myLoginResponse.value=LoginApiState.Success(it)
+                Log.d("Data received",myLoginResponse.value.toString())
 
             }
     }
@@ -56,6 +60,11 @@ class AuthViewModel @Inject constructor(private val repository: AuthRepository):
                 mySignupResponse.value=SignupApiState.Success(it)
 
             }
+    }
+    fun LogoutUser(){
+        val auth:FirebaseAuth=FirebaseAuth.getInstance();
+        auth.signOut()
+
     }
 }
 

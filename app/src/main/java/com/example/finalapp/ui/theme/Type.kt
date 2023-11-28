@@ -55,14 +55,14 @@ val Typography = Typography(
         lineHeight = 24.sp,
         letterSpacing = 0.sp
     ),
-    bodyLarge = TextStyle(
-        fontFamily = Dongle,
-        fontWeight = FontWeight.Medium,
-        fontSize = 40.sp,
-        lineHeight = 2.sp,
-        letterSpacing = 0.5.sp
-
-    ),
+//    bodyLarge = TextStyle(
+//        fontFamily = Dongle,
+//        fontWeight = FontWeight.Medium,
+//        fontSize = 40.sp,
+//        lineHeight = 2.sp,
+//        letterSpacing = 0.5.sp
+//
+//    ),
     bodyMedium = TextStyle(
         fontFamily = OfferFont,
         fontWeight = FontWeight.Medium,
@@ -82,9 +82,8 @@ val Typography = Typography(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Medium,
         fontSize = 11.sp,
-        lineHeight = 16.sp,
         letterSpacing = 0.5.sp
-    ),
+     ),
     displayMedium = TextStyle(
         fontFamily = Dongle,
         fontWeight = FontWeight.Medium,

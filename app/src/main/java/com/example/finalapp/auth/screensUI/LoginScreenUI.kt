@@ -5,21 +5,29 @@ import android.media.MediaPlayer
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -41,11 +49,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -59,6 +70,9 @@ import com.example.finalapp.auth.authViewModel.AuthViewModel
 import com.example.finalapp.auth.authViewModel.LoginApiState
 import com.example.finalapp.model.LoginModel
 import com.example.finalapp.navigation.SCREENS
+import com.example.finalapp.ui.theme.DarkBlue
+import com.example.finalapp.ui.theme.statusAndTopAppBarColor
+import com.example.finalapp.ui.theme.topAppBarTextColor
 import kotlinx.coroutines.launch
 
 
@@ -113,11 +127,10 @@ fun LoginScreenUI(navController: NavController= NavController(LocalContext.curre
                 modifier = Modifier.size(100.dp)
 
             )
-            Text(
-                text = "CHAT RADAR",
-                fontSize = 40.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.DarkGray
+            Text(text="FRISBEE", fontSize = 45.sp, modifier = Modifier.padding(top=8.dp, bottom = 0.dp), color = statusAndTopAppBarColor, style = MaterialTheme.typography.titleMedium)
+            Text(text="date your way...", fontSize = 18.sp, modifier = Modifier.padding(top=0.dp, start = 120.dp), color = Color(
+                0xFFE71708),
+                style = MaterialTheme.typography.titleMedium
             )
             Spacer(modifier = Modifier.height(10.dp))
 
@@ -125,35 +138,35 @@ fun LoginScreenUI(navController: NavController= NavController(LocalContext.curre
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                OutlinedTextField(
+               OutlinedTextField(
                     value = loginNumberText,
                     onValueChange = {
                         if (it.length <= maxLength) loginNumberText = it
-                        else Toast.makeText(mContext, "Can be 10 digits only !", Toast.LENGTH_SHORT)
-                            .show()
+                        else Toast.makeText(mContext, "Can be 10 digits only !", Toast.LENGTH_SHORT).show()
                     },
-                    label = { Text(text = "Number") },
+//                    textStyle = LocalTextStyle.current.copy(fontSize = 22.sp),
+                    label = { Text(text = "Number", style = MaterialTheme.typography.bodyMedium) },
                     leadingIcon = {
                         Text(
                             text = "+91",
                             fontWeight = FontWeight.Bold,
-                            fontSize = 20.sp,
+                            fontSize = 18.sp,textAlign=TextAlign.Justify,
                             color = Color(0xFF035206)
                         )
                     },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number,
-                        imeAction = ImeAction.Done
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onDone = { keyboardController?.hide() }
-                    ), visualTransformation = CameroonNumberVisualTransformation()
+                        imeAction = ImeAction.Done)
+                    ,keyboardActions = KeyboardActions(
+                        onDone = { keyboardController?.hide() })
+                    //visualTransformation = CameroonNumberVisualTransformation(),
+
 
                 )
                 OutlinedTextField(
                     value = loginPasswordText,
                     onValueChange = { loginPasswordText = it },
-                    label = { Text(text = "Password") },
+                    label = { Text(text = "Password", style = MaterialTheme.typography.bodyMedium) },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Password,
                         imeAction = ImeAction.Done
@@ -179,22 +192,33 @@ fun LoginScreenUI(navController: NavController= NavController(LocalContext.curre
                         }
                     },
                     modifier = Modifier.width(120.dp),
-                    shape = RoundedCornerShape(6.dp)
+                    shape = RoundedCornerShape(6.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = statusAndTopAppBarColor,
+                        contentColor = topAppBarTextColor
+                    )
                 ) {
-                    Text(text = "Get OTP")
+                    Text(text = "LOGIN")
                 }
 
                 if(authViewModel.key.value==1) {
                     LoginResponseDataAndAction(authViewModel, navController)
                 }
+            }
+            Row(modifier = Modifier.fillMaxWidth().wrapContentHeight().padding(top=8.dp), horizontalArrangement = Arrangement.Center) {
+                Text(text = "New member ? ", color = statusAndTopAppBarColor, style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    text = "Create Account", color = DarkBlue,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.ExtraBold,
+                    modifier = Modifier.clickable {
+                        navController.navigate(SCREENS.SIGNUP.route)
 
-                }
-               // MediaPlayerSuraj()
+                    }
+                )
 
-                TextButton(onClick = { navController.navigate(SCREENS.SIGNUP.route) }) {
-                    Text(text = "New member?, SIGN-UP", color = Color.Black)
+            }
 
-                }
 
 
             }

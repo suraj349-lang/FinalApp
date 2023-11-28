@@ -26,10 +26,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.finalapp.navigation.SCREENS
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 
 @Composable
 fun SplashScreenUI(navController: NavController){
+    val auth=FirebaseAuth.getInstance().currentUser;
+
     val scale= remember {
         Animatable(0f)
     }
@@ -38,8 +41,8 @@ fun SplashScreenUI(navController: NavController){
             OvershootInterpolator(8f).getInterpolation(it)
         }))
         delay(2000L)
-        navController.navigate(SCREENS.LOGIN.route)
-
+        if(auth!=null) navController.navigate(SCREENS.HOME.route);
+        else navController.navigate(SCREENS.LOGIN.route)
 
     } )
     Surface(
