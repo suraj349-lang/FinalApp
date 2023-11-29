@@ -17,9 +17,10 @@ import androidx.navigation.NavHostController
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ChatScreenUI(navController: NavHostController){
+    val buttonVisible=remember { mutableStateOf(false)};
     Scaffold(
         topBar = { HomeTopBar(title = "Chat", navController )},
-        bottomBar = {BottomBar(navController = navController, state = remember { mutableStateOf(false)}, modifier = Modifier.height(45.dp))})
+        bottomBar = {BottomBar(navController = navController, state = buttonVisible, modifier = Modifier.height(45.dp))})
     {
         Surface() {
 

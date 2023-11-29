@@ -45,8 +45,8 @@ fun SplashScreenUI(navController: NavController){
             OvershootInterpolator(8f).getInterpolation(it)
         }))
         delay(2000L)
-        if(auth!=null) navController.navigate(SCREENS.HOME.route);
-        else navController.navigate(SCREENS.LOGIN.route)
+        if(auth!=null) navController.navigate(SCREENS.HOME.route){popUpTo(0) };
+        else navController.navigate(SCREENS.LOGIN.route){ popUpTo(0); }
 
     } )
     Surface(

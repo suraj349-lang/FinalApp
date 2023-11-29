@@ -78,11 +78,11 @@ import java.util.concurrent.TimeUnit
 @Composable
 fun SignupScreenUI(navController: NavController = NavController(LocalContext.current)) {
 
-    val firebaseRepository=FirebaseRepository()
+    val firebaseRepository = FirebaseRepository()
     val focusManager = LocalFocusManager.current
-    val passwordVisibility by rememberSaveable{mutableStateOf(false)}
-    val icon=if (passwordVisibility)
-        painterResource(id =R.drawable.round_visibility_24 )
+    val passwordVisibility by rememberSaveable { mutableStateOf(false) }
+    val icon = if (passwordVisibility)
+        painterResource(id = R.drawable.round_visibility_24)
     else
         painterResource(id = R.drawable.round_visibility_off_24)
     val phoneNumber = remember { mutableStateOf("") }
@@ -91,108 +91,146 @@ fun SignupScreenUI(navController: NavController = NavController(LocalContext.cur
     val message = remember { mutableStateOf("") }
     val mAuth: FirebaseAuth = FirebaseAuth.getInstance();
     lateinit var callbacks: PhoneAuthProvider.OnVerificationStateChangedCallbacks
-    val context= LocalContext.current
+    val context = LocalContext.current
+    var key = remember { mutableStateOf(0) }
     Surface(modifier = Modifier.fillMaxSize()) {
-           Column(
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Image(
-                           painter = painterResource(id = R.drawable.tree),
-                           contentDescription = "",
-                           modifier = Modifier.size(100.dp))
-               Text(text="FRISBEE", fontSize = 45.sp, modifier = Modifier.padding(top=8.dp, bottom = 0.dp), color = statusAndTopAppBarColor, style = MaterialTheme.typography.titleMedium)
-               Text(text="date your way...", fontSize = 18.sp, modifier = Modifier.padding(top=0.dp, start = 120.dp), color = Color(
-                   0xFFE71708),
-                   style = MaterialTheme.typography.titleMedium
-               )
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.tree),
+                contentDescription = "",
+                modifier = Modifier.size(100.dp)
+            )
+            Text(
+                text = "FRISBEE",
+                fontSize = 45.sp,
+                modifier = Modifier.padding(top = 8.dp, bottom = 0.dp),
+                color = statusAndTopAppBarColor,
+                style = MaterialTheme.typography.titleMedium
+            )
+            Text(
+                text = "date your way...",
+                fontSize = 18.sp,
+                modifier = Modifier.padding(top = 0.dp, start = 120.dp),
+                color = Color(
+                    0xFFE71708
+                ),
+                style = MaterialTheme.typography.titleMedium
+            )
+            if (key.value==0) {
                 OutlinedTextField(
-                   value = phoneNumber.value,
-                   onValueChange = { phoneNumber.value = it },
-                   label = { Text(text = "Enter number", style = MaterialTheme.typography.bodyMedium) },
-                   singleLine = true,
-                   keyboardOptions = KeyboardOptions(
-                       keyboardType = KeyboardType.Number,
-                       imeAction = ImeAction.Next
-                   ),
-                   keyboardActions = KeyboardActions(
-                       onNext = {focusManager.clearFocus()}
-                   )
+                    value = phoneNumber.value,
+                    onValueChange = { phoneNumber.value = it },
+                    label = {
+                        Text(
+                            text = "Enter number",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Next
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onNext = { focusManager.clearFocus() }
+                    )
 
                 )
 
                 Spacer(modifier = Modifier.height(10.dp))
-               Button(
-                   onClick = {
-                       // on below line we are validating user inputs
-                       if (TextUtils.isEmpty(phoneNumber.value.toString())) {
-                           Toast.makeText(context, "Please enter phone number..", Toast.LENGTH_SHORT)
-                               .show()
-                       } else {
+                Button(
+                    onClick = {
+                        // on below line we are validating user inputs
+                        if (TextUtils.isEmpty(phoneNumber.value.toString())) {
+                            Toast.makeText(
+                                context,
+                                "Please enter phone number..",
+                                Toast.LENGTH_SHORT
+                            )
+                                .show()
+                        } else {
 
-                           val number = "+91${phoneNumber.value}"
-                           // on below line calling method to generate verification code.
-                           firebaseRepository.sendVerificationCode(number, mAuth, context as Activity, callbacks)
-                       }
-                   },
-                   modifier = Modifier.width(160.dp), colors = ButtonDefaults.buttonColors(
-                       containerColor = statusAndTopAppBarColor,
-                       contentColor = topAppBarTextColor
-                   )
-               ) {
-                   // on below line we are adding text for our button
-                   Text(text = "Generate OTP", modifier = Modifier.padding(8.dp))
-               }
-               // adding spacer on below line.
-               Spacer(modifier = Modifier.height(10.dp))
+                            val number = "+91${phoneNumber.value}"
+                            key.value = 1;
+                            // on below line calling method to generate verification code.
+                            firebaseRepository.sendVerificationCode(
+                                number,
+                                mAuth,
+                                context as Activity,
+                                callbacks
+                            )
+                        }
+                    },
+                    modifier = Modifier.width(160.dp), colors = ButtonDefaults.buttonColors(
+                        containerColor = statusAndTopAppBarColor,
+                        contentColor = topAppBarTextColor
+                    )
+                ) {
+                    // on below line we are adding text for our button
+                    Text(text = "Generate OTP", modifier = Modifier.padding(8.dp))
+                }
+            }
+            // adding spacer on below line.
+            Spacer(modifier = Modifier.height(10.dp))
 
-               // on below line creating text field for otp
-               OutlinedTextField(
-                   value = otp.value,
-                   onValueChange = { otp.value = it },
-                   keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                   modifier = Modifier.width(150.dp),
-                   textStyle = TextStyle(color = Color.Black, fontSize = 15.sp),
-                   singleLine = true,
-               )
-               Button(
-                   onClick = {
-                       if (TextUtils.isEmpty(otp.value)) {
-                           Toast.makeText(context, "Please enter otp..", Toast.LENGTH_SHORT).show()
-                       } else {
-                           // on below line generating phone credentials.
-                           val credential: PhoneAuthCredential = PhoneAuthProvider.getCredential(
-                               verificationID.value, otp.value
-                           )
+            if (key.value==1) {
+                OutlinedTextField(
+                    value = otp.value,
+                    onValueChange = { otp.value = it },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.width(150.dp),
+                    textStyle = TextStyle(color = Color.Black, fontSize = 15.sp),
+                    singleLine = true,
+                )
+                Button(
+                    onClick = {
+                        if (TextUtils.isEmpty(otp.value)) {
+                            Toast.makeText(context, "Please enter otp..", Toast.LENGTH_SHORT)
+                                .show()
+                        } else {
+                            // on below line generating phone credentials.
+                            val credential: PhoneAuthCredential =
+                                PhoneAuthProvider.getCredential(
+                                    verificationID.value, otp.value
+                                )
 
-                           // on below line signing within credentials.
-                           firebaseRepository.signInWithPhoneAuthCredential(
-                               credential,
-                               mAuth,
-                               context as Activity,
-                               context,
-                               message,
-                               navController
-                           )
-                       }
-                   },
-                   modifier = Modifier.width(95.dp),
-                   colors = ButtonDefaults.buttonColors(
-                       contentColor = topAppBarTextColor,
-                       containerColor = statusAndTopAppBarColor
-                   )
-               ) {
-                   Text(text = "Submit")
-               }
+                            // on below line signing within credentials.
+                            firebaseRepository.signInWithPhoneAuthCredential(
+                                credential,
+                                mAuth,
+                                context as Activity,
+                                context,
+                                message,
+                                navController
+                            )
+                        }
+                    },
+                    modifier = Modifier.width(95.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        contentColor = topAppBarTextColor,
+                        containerColor = statusAndTopAppBarColor
+                    )
+                ) {
+                    Text(text = "Submit")
+                }
+            }
 
-               Spacer(modifier = Modifier.height(5.dp))
+            Spacer(modifier = Modifier.height(5.dp))
 
-               Text(
-                   // on below line displaying message for verification status.
-                   text = message.value,
-                   style = TextStyle(color = Color.Green, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-               )
-           }
+
+            Text(
+                // on below line displaying message for verification status.
+                text = message.value,
+                style = TextStyle(
+                    color = Color.Green,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            )
+        }
 
         // on below line creating callback
         callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
@@ -210,15 +248,18 @@ fun SignupScreenUI(navController: NavController = NavController(LocalContext.cur
                 Toast.makeText(context, "Verification failed..", Toast.LENGTH_SHORT).show()
             }
 
-            override fun onCodeSent(verificationId: String, p1: PhoneAuthProvider.ForceResendingToken) {
+            override fun onCodeSent(
+                verificationId: String,
+                p1: PhoneAuthProvider.ForceResendingToken
+            ) {
                 // this method is called when code is send
                 super.onCodeSent(verificationId, p1)
                 verificationID.value = verificationId
             }
         }
 
-        }
-
     }
+
+}
 
 

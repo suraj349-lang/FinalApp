@@ -11,6 +11,7 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
+import dagger.hilt.android.lifecycle.HiltViewModel
 import java.util.concurrent.TimeUnit
 
 
@@ -56,7 +57,7 @@ class FirebaseRepository {
 
     // below method is use to send
 // verification code to user phone number.
-     fun sendVerificationCode(
+     fun  sendVerificationCode(
         number: String,
         auth: FirebaseAuth,
         activity: Activity,

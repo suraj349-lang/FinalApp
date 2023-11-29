@@ -173,8 +173,9 @@ fun SignupResponseDataAndAction(authViewModel: AuthViewModel, navController: Nav
     when (val result=authViewModel.mySignupResponse.value){
         is SignupApiState.Success->{
             Log.d("Data Received2",result.data.toString())
-            navController.navigate(SCREENS.HOME.route)
-
+            navController.navigate(SCREENS.HOME.route){
+                popUpTo(0);
+            }
         }
         is SignupApiState.Failure->{
             Toast.makeText(context,"${result.msg}", Toast.LENGTH_SHORT).show()
