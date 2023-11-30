@@ -72,13 +72,14 @@ fun BottomBar(
                     Icon(imageVector = screen.icon!!, contentDescription = "", tint = statusAndTopAppBarColor)
                 },
                 onClick = {
-                    navController.navigate(screen.route) {
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true
-                        }
-                        launchSingleTop = true
-                        restoreState = true
-                    }
+                    navController.navigate(screen.route)
+//                    {
+//                        popUpTo(navController.graph.findStartDestination().id) {
+//                            saveState = true
+//                        }
+//                        launchSingleTop = true
+//                        restoreState = true
+//                    }
                 },
                 colors = NavigationBarItemDefaults.colors(
                     selectedIconColor = Color.Red,
