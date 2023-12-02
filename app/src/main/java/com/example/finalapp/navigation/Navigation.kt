@@ -29,7 +29,7 @@ sealed class SCREENS(val route:String){
     object SIGNUP:SCREENS("signup_screen")
     object HOME:SCREENS("home_screen")
     object PROFILE:SCREENS("profile_screen")
-    object ENTER_OTP:SCREENS("enter-otp")
+    object OTP:SCREENS("enter-otp")
     object FINALUSERCREATION:SCREENS("final_user_creation")
     object OFFER:SCREENS("offer_creation")
     object SETTINGS:SCREENS("settings_screen")
@@ -40,7 +40,7 @@ sealed class SCREENS(val route:String){
 @Composable
 fun Navigation(){
     val navController:NavHostController= rememberNavController();
-    NavHost(navController = navController, startDestination =SCREENS.SPLASH.route){
+    NavHost(navController = navController, startDestination =SCREENS.FINALUSERCREATION.route){
         composable(SCREENS.SPLASH.route){
             SplashScreenUI(navController)
         }
@@ -51,7 +51,7 @@ fun Navigation(){
         composable(SCREENS.SIGNUP.route){
             SignupScreenUI(navController)
         }
-        composable(SCREENS.ENTER_OTP.route){
+        composable(SCREENS.OTP.route){
            EnterOTPScreenUI(navController)
         }
         composable(SCREENS.HOME.route){
@@ -71,7 +71,7 @@ fun Navigation(){
             SettingsScreenUI(navController)
         }
         composable(SCREENS.NOTIFICATIONS.route){
-            NotificationsScreenUI(navController)
+            OfferScreenUI(navController)
         }
         composable(SCREENS.CHAT.route){
             ChatScreenUI(navController)

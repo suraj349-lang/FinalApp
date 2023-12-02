@@ -50,10 +50,6 @@ class FirebaseRepository {
                 }
             }
     }
-    fun LogoutUser(auth: FirebaseAuth){
-        auth.signOut();
-
-    }
 
     // below method is use to send
 // verification code to user phone number.

@@ -13,6 +13,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.finalapp.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -21,7 +22,7 @@ fun NotificationsScreenUI(navController:NavHostController){
     val buttonVisible=remember { mutableStateOf(false)};
 
     Scaffold(
-        topBar = { HomeTopBar(title = "Notifications",navController)},
+        topBar = { HomeTopBar(title = "Notifications",navController,false, R.drawable.settings)},
         bottomBar = { BottomBar(navController =navController , state = buttonVisible,modifier = Modifier.height(45.dp)) }
     ) {
         Surface(Modifier.fillMaxSize()) {

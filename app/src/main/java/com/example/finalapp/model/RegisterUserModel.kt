@@ -9,5 +9,13 @@ data class RegisterUserModel(
 data class SignupAPIResponse(
   val success:Boolean,
   val code:Int,
-  val token:String
+  val token:String,
+  val data:User,
+  val _id:String
+)
+data class User(
+  val name:String,
+  val number:String,
+  val username: String,
+  val _id:String
 )

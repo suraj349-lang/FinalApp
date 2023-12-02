@@ -1,5 +1,6 @@
 package com.example.finalapp.screens.offer
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -17,6 +18,11 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,13 +36,20 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.example.finalapp.R
+import com.example.finalapp.model.OfferModel
+import com.example.finalapp.offer.OfferViewModel
+import com.example.finalapp.screens.OfferResponseDataAndAction
+import kotlinx.coroutines.launch
 
 
 @Preview(showBackground = true)
 @Composable
-fun OfferScreenUI(navController: NavController= NavController(LocalContext.current)) {
-   val viewModel:OfferViewModel= viewModel()
+fun OfferScreenUI(navController: NavHostController= NavHostController(LocalContext.current)) {
+   val offerViewModel:OfferViewModel= hiltViewModel<OfferViewModel>()
+    var key by remember { mutableStateOf(0) }
+    val scope= rememberCoroutineScope()
 
     Column(modifier= Modifier
         .fillMaxSize()
@@ -52,10 +65,23 @@ fun OfferScreenUI(navController: NavController= NavController(LocalContext.curre
                     Text(text = "Your offer", fontWeight = FontWeight.Bold, color = Color.Black, style = MaterialTheme.typography.headlineMedium, fontFamily = FontFamily.Serif)
                     ImageSurface()
                     OfferRow()
-                    DescriptionRow(viewModel)
-                    SubmitButton(navController,viewModel)
+                    Button(onClick = {
+
+                        scope.launch {
+                            offerViewModel.createOffer(OfferModel("8765vnbm","65692fe3d203dbf0e3ddcb17"));
+                            key = 1;
+                        }
+                    }) {
+                        Text(text = "CREATE OFFER")
+                    }
 
 
+
+                }
+                if(key==1){
+                    Log.d("Data received","runned this")
+                    OfferResponseDataAndAction(offerViewModel,navController);
+                    key=0;
                 }
                 
             }
@@ -67,24 +93,8 @@ fun OfferScreenUI(navController: NavController= NavController(LocalContext.curre
 
 @Composable
 fun SubmitButton(navController: NavController, viewModel: OfferViewModel) {
-    Button(onClick = { navController.popBackStack() }) {
-        Text(text = "CREATE OFFER")
-        
-    }
 
-}
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DescriptionRow(viewModel: OfferViewModel) {
-
-    OutlinedTextField(
-        value =viewModel.descriptionText.value ,
-        onValueChange ={viewModel.descriptionText.value=it},
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(80.dp).padding(start=4.dp, end=4.dp)
-    )
 }
 
 @Composable

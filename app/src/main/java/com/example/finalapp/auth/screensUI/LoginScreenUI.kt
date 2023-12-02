@@ -26,15 +26,12 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -49,25 +46,20 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.NavController
 import com.example.finalapp.R
-import com.example.finalapp.auth.CameroonNumberVisualTransformation
 import com.example.finalapp.auth.authViewModel.AuthViewModel
-import com.example.finalapp.auth.authViewModel.LoginApiState
+import com.example.finalapp.apiState.LoginApiState
 import com.example.finalapp.model.LoginModel
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.ui.theme.DarkBlue
@@ -216,19 +208,13 @@ fun LoginScreenUI(navController: NavController= NavController(LocalContext.curre
                     fontWeight = FontWeight.ExtraBold,
                     modifier = Modifier.clickable {
                         navController.navigate(SCREENS.SIGNUP.route)
-
-                    }
-                )
+                    })
 
             }
-
-
-
-            }
-
         }
-
     }
+
+}
 
 
 
@@ -237,6 +223,7 @@ fun LoginResponseDataAndAction(authViewModel: AuthViewModel, navController: NavC
     val context= LocalContext.current
     when (val result=authViewModel.myLoginResponse.value){
         is LoginApiState.Success->{
+            authViewModel.key.value=0;
             navController.navigate(SCREENS.HOME.route)
             Log.d("Data Received",result.data.toString())
 

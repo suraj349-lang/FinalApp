@@ -45,10 +45,6 @@ sealed class Destinations(
         route = SCREENS.NOTIFICATIONS.route,
         icon = Icons.Rounded.Notifications
     )
-    object SettingsScreen : Destinations(
-        route = SCREENS.SETTINGS.route,
-        icon = Icons.Rounded.Settings
-    )
 
 }
 
@@ -57,7 +53,7 @@ fun BottomBar(
     navController: NavHostController, state: MutableState<Boolean>, modifier: Modifier = Modifier
 ) {
     val screens = listOf(
-        Destinations.HomeScreen, Destinations.ProfileScreen, Destinations.NotificationsScreen,Destinations.SettingsScreen
+        Destinations.HomeScreen, Destinations.ProfileScreen, Destinations.NotificationsScreen
     )
 
     NavigationBar(

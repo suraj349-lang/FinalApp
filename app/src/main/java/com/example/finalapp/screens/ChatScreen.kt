@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.finalapp.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -25,7 +26,7 @@ import androidx.navigation.NavHostController
 fun ChatScreenUI(navController: NavHostController){
     val buttonVisible=remember { mutableStateOf(true)};
     Scaffold(
-        topBar = { HomeTopBar(title = "Chat", navController )},
+        topBar = { HomeTopBar(title = "Chat", navController , actionIcon = false, icon = R.drawable.settings)},
         bottomBar = {BottomBar(navController = navController, state = buttonVisible, modifier = Modifier.height(45.dp))})
     {
         Surface(modifier = Modifier.fillMaxSize()) {

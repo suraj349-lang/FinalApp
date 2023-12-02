@@ -1,6 +1,7 @@
-package com.example.finalapp.auth.authViewModel
+package com.example.finalapp.apiState
 
 import com.example.finalapp.model.LoginAPIResponse
+import com.example.finalapp.model.OfferResponseModel
 import com.example.finalapp.model.SignupAPIResponse
 
 
@@ -17,5 +18,12 @@ sealed class SignupApiState{
     class Failure(val msg:Throwable) : SignupApiState()
     object Loading : SignupApiState()
     object Empty: SignupApiState()
+
+}
+sealed class OfferApiState{
+    class Success(val data: OfferResponseModel) : OfferApiState()
+    class Failure(val msg:Throwable) : OfferApiState()
+    object Loading : OfferApiState()
+    object Empty: OfferApiState()
 
 }

@@ -25,6 +25,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -34,6 +36,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
@@ -45,6 +48,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
@@ -59,9 +64,12 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.finalapp.R
+import com.example.finalapp.auth.authViewModel.AuthViewModel
 import com.example.finalapp.auth.repository.FirebaseRepository
+import com.example.finalapp.model.SignupAPIResponse
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens.DialogBOX.DialogBoxForImageEdit
 import com.example.finalapp.ui.theme.DarkBlue
@@ -78,8 +86,9 @@ fun ProfileScreenUI(navController: NavHostController ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val buttonsVisible = remember { mutableStateOf(false) }
     val profileImage=true;
+
     Scaffold(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        topBar = { HomeTopBar("Profile", navController )},
+        topBar = { HomeTopBar("Profile", navController,true,R.drawable.settings ) },
         bottomBar = {
             BottomBar(navController = navController, state = buttonsVisible, modifier = Modifier.height(45.dp))
         }) {
@@ -117,8 +126,14 @@ fun ProfileImages() {
     if(key==1) image=R.drawable.profile_image_1
     if(key==2) image=R.drawable.profile_image_2
     if(key==3) image=R.drawable.profile_image_3
-    Row(modifier = Modifier.fillMaxWidth().height(200.dp).padding(4.dp)) {
-        Surface(modifier = Modifier.fillMaxHeight().width(width / 3).padding(2.dp), color = topAppBarTextColor) {
+    Row(modifier = Modifier
+        .fillMaxWidth()
+        .height(200.dp)
+        .padding(4.dp)) {
+        Surface(modifier = Modifier
+            .fillMaxHeight()
+            .width(width / 3)
+            .padding(2.dp), color = topAppBarTextColor) {
             Image(painter = painterResource(id = R.drawable.profile_image_1), contentDescription ="" , contentScale = ContentScale.Crop, modifier = Modifier.clickable {
                 key=1;
                 showCustomDialog=!showCustomDialog
@@ -139,7 +154,10 @@ fun ProfileImages() {
                     key=-1;
                 })
         }
-        Surface(modifier = Modifier.fillMaxHeight().width(width / 3).padding(2.dp), color = topAppBarTextColor) {
+        Surface(modifier = Modifier
+            .fillMaxHeight()
+            .width(width / 3)
+            .padding(2.dp), color = topAppBarTextColor) {
             Image(painter = painterResource(id = R.drawable.profile_image_3), contentDescription ="" , contentScale = ContentScale.Crop, modifier = Modifier.clickable {
                 key=3;
                 showCustomDialog=!showCustomDialog;
@@ -185,8 +203,7 @@ fun ProfileBio() {
 
 @Composable
 fun LogOut(navController:NavHostController) {
-    val repository=FirebaseRepository();
-    val auth=FirebaseAuth.getInstance();
+    val authViewModel= hiltViewModel<AuthViewModel>()
     Surface(
         Modifier
             .fillMaxWidth()
@@ -197,7 +214,7 @@ fun LogOut(navController:NavHostController) {
             .fillMaxWidth()
             .wrapContentHeight()
             .clickable {
-                repository.LogoutUser(auth);
+                authViewModel.LogoutUser();
                 navController.navigate(SCREENS.LOGIN.route);
             }) {
             Text(text = "Log Out", color = statusAndTopAppBarColor, style = MaterialTheme.typography.displayMedium, fontSize = 28.sp)
@@ -299,7 +316,7 @@ fun ProfileName() {
         .height(45.dp)){
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
             Text(
-                text = "Jiya Shankar,",
+                text ="Jiya Shankar",
                 style = MaterialTheme.typography.displayMedium,
                 fontSize = 38.sp,
                 color = statusAndTopAppBarColor)
@@ -325,4 +342,5 @@ fun ProfileIcon(profileImage:Boolean) {
             Image(painter = painterResource(id = R.drawable.girl), contentDescription ="" , contentScale = ContentScale.Crop)
     }
 }
+
 

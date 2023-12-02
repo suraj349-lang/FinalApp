@@ -13,6 +13,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.finalapp.R
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -22,7 +23,7 @@ fun SettingsScreenUI(navController: NavHostController){
     val buttonVisible= remember { mutableStateOf(false) };
 
     Scaffold(
-        topBar = { HomeTopBar(title = "Settings",navController)},
+        topBar = { HomeTopBar(title = "Settings",navController,false, R.drawable.settings)},
         bottomBar = { BottomBar(navController =navController , state = buttonVisible,modifier = Modifier.height(45.dp)) }
     ) {
         Surface(Modifier.fillMaxSize()) {

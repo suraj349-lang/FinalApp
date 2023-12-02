@@ -63,8 +63,8 @@ fun SplashScreenUI(navController: NavController){
             verticalArrangement = Arrangement.Center
         ) {
             Image(
-                painterResource(id = R.drawable.tree ),
-                contentDescription ="Tree" +
+                painterResource(id = R.drawable.frisbee ),
+                contentDescription ="App Icon" +
                         "",
                 contentScale= ContentScale.Fit,
                 modifier = Modifier.size(95.dp)

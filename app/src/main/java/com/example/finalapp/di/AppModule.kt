@@ -15,7 +15,7 @@ import javax.inject.Singleton
 class AppModule {
     @Provides
     @Singleton
-    fun provideOpenWeatherApi():ApiService{
+    fun provideOfferApi():ApiService{
         return Retrofit.Builder().baseUrl(Constants.BASE_URL).addConverterFactory(
             GsonConverterFactory.create()
         ).build().create(ApiService::class.java)

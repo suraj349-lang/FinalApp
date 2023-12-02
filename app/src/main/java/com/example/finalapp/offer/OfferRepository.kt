@@ -1,11 +1,9 @@
-package com.example.finalapp.auth.repository
+package com.example.finalapp.offer
 
 import com.example.finalapp.model.LoginAPIResponse
 import com.example.finalapp.model.LoginModel
 import com.example.finalapp.model.OfferModel
 import com.example.finalapp.model.OfferResponseModel
-import com.example.finalapp.model.RegisterUserModel
-import com.example.finalapp.model.SignupAPIResponse
 import com.example.finalapp.network.ApiService
 import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.Dispatchers
@@ -15,15 +13,10 @@ import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
 @ViewModelScoped
-class AuthRepository @Inject constructor(private val api:ApiService){
-    fun sendLoginData(loginData: LoginModel): Flow<LoginAPIResponse> = flow  {
-        emit(api.postLoginData(loginData))
+class OfferRepository @Inject constructor(private val api: ApiService) {
+
+    fun sendCreateOfferData(offerData: OfferModel): Flow<OfferResponseModel> = flow  {
+        emit(api.createOffer(offerData))
     }.flowOn(Dispatchers.IO)
-
-    fun sendSignupData(signupData: RegisterUserModel): Flow<SignupAPIResponse> = flow  {
-        emit(api.postSignupData(signupData))
-    }.flowOn(Dispatchers.IO)
-
-
 }
 

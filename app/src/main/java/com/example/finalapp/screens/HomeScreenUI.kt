@@ -3,6 +3,8 @@ package com.example.finalapp.screens
 
 import BottomBar
 import android.annotation.SuppressLint
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -24,6 +26,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -54,13 +57,20 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.finalapp.R
+import com.example.finalapp.apiState.OfferApiState
+import com.example.finalapp.apiState.SignupApiState
+import com.example.finalapp.auth.authViewModel.AuthViewModel
 import com.example.finalapp.navigation.SCREENS
+import com.example.finalapp.offer.OfferViewModel
 import com.example.finalapp.screens.DialogBOX.CustomAlertDialog
 import com.example.finalapp.ui.theme.DarkBlue
 import com.example.finalapp.ui.theme.floatingActionBtnTextColor
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
+import com.example.finalapp.ui.theme.topAppBarTextColor
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -70,17 +80,18 @@ import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 fun HomeScreenUI(navController: NavHostController= NavHostController(LocalContext.current)) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val buttonsVisible = remember { mutableStateOf(true) }
+    val offerViewModel= hiltViewModel<OfferViewModel>()
 
 
     Scaffold(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-             topBar = { HomeTopBar("Frisbee", navController )},
+             topBar = { HomeTopBar("Frisbee", navController,true ,R.drawable.send_24)},
              bottomBar = { BottomBar(
                 navController = navController,
                 state = buttonsVisible,
                 modifier = Modifier.height(45.dp))
              },
              floatingActionButton = {
-                 HomeFloatingActionButton();
+                 HomeFloatingActionButton(offerViewModel , navController );
              }
             ){
             Column(
@@ -100,7 +111,7 @@ fun HomeScreenUI(navController: NavHostController= NavHostController(LocalContex
     }
 
 @Composable
-fun HomeFloatingActionButton(  ) {
+fun HomeFloatingActionButton(offerViewModel: OfferViewModel,navController: NavHostController  ) {
     val context = LocalContext.current
     var showCustomDialog by remember { mutableStateOf(false) }
 
@@ -112,11 +123,14 @@ fun HomeFloatingActionButton(  ) {
         contentColor = floatingActionBtnTextColor,//0xFF090200
     ) {
         Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(painterResource(id = R.drawable.up_arrow), contentDescription = "Add",Modifier.padding(top=4.dp).size(32.dp))
+            Icon(painterResource(id = R.drawable.up_arrow), contentDescription = "Add",
+                Modifier
+                    .padding(top = 4.dp)
+                    .size(32.dp))
             Text(text = "Raise Offer", fontSize = 12.sp, modifier = Modifier.padding(top=0.dp))
         }
     }
-    if (showCustomDialog) { CustomAlertDialog { showCustomDialog = !showCustomDialog } }
+    if (showCustomDialog) { CustomAlertDialog(offerViewModel , navController ) { showCustomDialog = !showCustomDialog } }
 }
 
 @Composable
@@ -239,7 +253,7 @@ fun ImageScreen() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeTopBar(title:String,navController: NavHostController){
+fun HomeTopBar(title:String,navController: NavHostController,actionIcon:Boolean,icon:Int){
 
 
     TopAppBar(
@@ -256,20 +270,61 @@ fun HomeTopBar(title:String,navController: NavHostController){
         navigationIcon = {
             Icon(
                 painter = painterResource(
-                    id = R.drawable.baseline_bakery_dining_24),
-                tint = Color(0xFFE8E9E2),
+                    id = R.drawable.baseline_bakery_dining_24
+                ),
+                tint = Color.White,
                 contentDescription ="" ,
                 modifier = Modifier
                     .padding(top = 6.dp)
                     .size(40.dp))
         }, actions = {
-            Icon(painter = painterResource(id = R.drawable.send_24), contentDescription ="", tint = Color(0xFFE8E9E2), modifier = Modifier
-                .size(28.dp)
-                .rotate(-40f).shadow(elevation = 12.dp, shape = CircleShape, spotColor = Color.White).clickable { navController.navigate(SCREENS.CHAT.route){
-                    popUpTo(SCREENS.CHAT.route)
-                } })
+            if (actionIcon) {
+                Icon(painter = painterResource(id = icon),
+                    contentDescription = "",
+                    tint = Color(0xFFE8E9E2),
+                    modifier = Modifier
+                        .size(28.dp)
+                        .rotate(-40f)
+                        .shadow(elevation = 12.dp, shape = CircleShape, spotColor = Color.White)
+                        .clickable {
+                            navController.navigate(SCREENS.CHAT.route) {
+                                popUpTo(SCREENS.CHAT.route)
+                            }
+                        })
+            }
         }
     )
 }
 
+
+
+@Composable
+fun OfferResponseDataAndAction(offerViewModel: OfferViewModel,navController: NavHostController){
+    val context= LocalContext.current
+    Log.d("Data received","Into the function")
+    when (val result=offerViewModel.offerResponse.value){
+        is OfferApiState.Success->{
+            offerViewModel.key.value=0;
+            Log.d("Suraj",result.data.toString())
+            Toast.makeText(context,"${result.data}", Toast.LENGTH_SHORT).show()
+            navController.navigate(SCREENS.HOME.route){
+                popUpTo(0)
+            }
+
+        }
+        is OfferApiState.Failure->{
+            Log.d("Data received","error final found")
+            Toast.makeText(context,"${result.msg}", Toast.LENGTH_SHORT).show()
+        }
+        OfferApiState.Loading->{
+            CircularProgressIndicator(color = Color(0xFF1289BE))
+        }
+        OfferApiState.Empty->{
+            Log.d("Data ","empty data")
+        }
+
+    }
+
+
+}
 
