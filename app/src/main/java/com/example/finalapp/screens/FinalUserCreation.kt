@@ -138,7 +138,6 @@ fun FinalUserCreation (navController:NavController,authViewModel: AuthViewModel)
            
             Button(
                 onClick = {
-
                         keyboardController?.hide()
                         scope.launch {
                             authViewModel.keyForFinalUserCreation.value=1;

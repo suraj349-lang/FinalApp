@@ -41,9 +41,13 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.finalapp.R
+import com.example.finalapp.auth.authViewModel.AuthViewModel
+import com.example.finalapp.auth.repository.AuthRepository
 import com.example.finalapp.auth.repository.FirebaseRepository
+import com.example.finalapp.model.RegisterUserModel
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.ui.theme.topAppBarTextColor
 import com.google.firebase.FirebaseException
@@ -59,6 +63,7 @@ import com.google.firebase.auth.PhoneAuthProvider
 fun SignupScreenUI(navController: NavController = NavController(LocalContext.current)) {
 
     val firebaseRepository = FirebaseRepository()
+    val authViewModel= hiltViewModel<AuthViewModel>()
     val focusManager = LocalFocusManager.current
     val passwordVisibility by rememberSaveable { mutableStateOf(false) }
     val icon = if (passwordVisibility)

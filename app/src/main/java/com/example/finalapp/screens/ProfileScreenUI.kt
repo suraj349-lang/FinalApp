@@ -88,7 +88,7 @@ fun ProfileScreenUI(navController: NavHostController ) {
     val profileImage=true;
 
     Scaffold(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        topBar = { HomeTopBar("Profile", navController,true,R.drawable.settings ) },
+        topBar = { ProfileTopBar(navController  ) },
         bottomBar = {
             BottomBar(navController = navController, state = buttonsVisible, modifier = Modifier.height(45.dp))
         }) {
@@ -342,5 +342,51 @@ fun ProfileIcon(profileImage:Boolean) {
             Image(painter = painterResource(id = R.drawable.girl), contentDescription ="" , contentScale = ContentScale.Crop)
     }
 }
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ProfileTopBar(navController: NavHostController){
+
+
+    TopAppBar(
+        colors = TopAppBarDefaults.smallTopAppBarColors(
+            containerColor = statusAndTopAppBarColor
+        ),
+        title = {
+            Text(
+                "Profile",
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top=8.dp), color = Color(0xFFE8E9E2), style = MaterialTheme.typography.titleMedium
+            )
+        },
+        navigationIcon = {
+            Icon(
+                painter = painterResource(
+                    id = R.drawable.baseline_bakery_dining_24
+                ),
+                tint = Color.White,
+                contentDescription ="" ,
+                modifier = Modifier
+                    .padding(top = 6.dp)
+                    .size(40.dp))
+        }, actions = {
+                Icon(painter = painterResource(id = R.drawable.settings),
+                    contentDescription = "",
+                    tint = Color(0xFFE8E9E2),
+                    modifier = Modifier
+                        .size(28.dp)
+                        .rotate(-40f)
+                        .shadow(elevation = 12.dp, shape = CircleShape, spotColor = Color.White)
+                        .clickable {
+                            navController.navigate(SCREENS.SETTINGS.route) {
+                                popUpTo(SCREENS.CHAT.route)
+                            }
+                        })
+
+        }
+    )
+}
+
 
 
