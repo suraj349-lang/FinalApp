@@ -23,6 +23,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
@@ -39,7 +41,9 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.example.finalapp.auth.authViewModel.AuthViewModel
 import com.example.finalapp.apiState.SignupApiState
 import com.example.finalapp.model.RegisterUserModel
@@ -50,28 +54,45 @@ import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 
 
+@Composable
+fun FinalUserCreation(navController: NavHostController){
+    val firebaseAuth= FirebaseAuth.getInstance();
+
+    var name by remember { mutableStateOf("") }
+    val number by remember { mutableStateOf(firebaseAuth.currentUser?.phoneNumber.toString()) }
+    var username by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    val authViewModel= hiltViewModel<AuthViewModel>()
+    FinalUserCreationUI(
+        navController,
+        authViewModel,
+        name,
+        number,
+        username,
+        password,
+        onNameChange = {name=it},
+        onUsernameChange = {username=it},
+        onPasswordChange = {password=it},
+        onClick =  { authViewModel.RegisterUser(RegisterUserModel(name, number,username,password))  }
+    )
+}
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
-fun FinalUserCreation (navController:NavController,authViewModel: AuthViewModel){
-    val firebaseAuth= FirebaseAuth.getInstance();
-    val number by remember {
-        mutableStateOf(firebaseAuth.currentUser?.phoneNumber.toString())
-    }
-    var key by remember {
-        mutableStateOf(0)
-    }
-    val scope= rememberCoroutineScope()
-    var nameTextFieldData by remember {
-        mutableStateOf("")
-    }
-    var usernameTextFieldData by remember {
-        mutableStateOf("")
-    }
-    var passwordTextFieldData by remember {
-        mutableStateOf("")
-    }
-    val keyboardController = LocalSoftwareKeyboardController.current
-    var checked= remember { mutableStateOf(true) };
+fun FinalUserCreationUI (
+    navController:NavController,
+    authViewModel: AuthViewModel,
+    name:String,
+    number:String,
+    username:String,
+    password:String,
+    onNameChange:(String)->Unit,
+    onUsernameChange:(String)->Unit,
+    onPasswordChange:(String)->Unit,
+    onClick:()-> Unit)
+     {
+      val keyboardController = LocalSoftwareKeyboardController.current
+      var checked= remember { mutableStateOf(true) };
+         val scope= rememberCoroutineScope()
 
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()) {
@@ -82,8 +103,8 @@ fun FinalUserCreation (navController:NavController,authViewModel: AuthViewModel)
             )
             Spacer(modifier = Modifier.height(16.dp))
             OutlinedTextField(
-                value =nameTextFieldData ,
-                onValueChange ={nameTextFieldData=it},
+                value =name ,
+                onValueChange =onNameChange,
                 label = { Text(text = "Name", style = MaterialTheme.typography.bodyMedium)},
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
@@ -95,8 +116,8 @@ fun FinalUserCreation (navController:NavController,authViewModel: AuthViewModel)
                 modifier = Modifier.height(60.dp)
             )
             OutlinedTextField(
-                value =usernameTextFieldData ,
-                onValueChange ={usernameTextFieldData=it},
+                value =username ,
+                onValueChange =onUsernameChange,
                 label = { Text(text = "Username", style = MaterialTheme.typography.bodyMedium)},
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
@@ -108,8 +129,8 @@ fun FinalUserCreation (navController:NavController,authViewModel: AuthViewModel)
                 modifier = Modifier.height(60.dp)
             )
             OutlinedTextField(
-                value =passwordTextFieldData ,
-                onValueChange ={passwordTextFieldData=it},
+                value =password ,
+                onValueChange =onPasswordChange,
                 label = { Text(text = "Password", style = MaterialTheme.typography.bodyMedium)},
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
@@ -131,18 +152,14 @@ fun FinalUserCreation (navController:NavController,authViewModel: AuthViewModel)
                     checkmarkColor = Color.White                )
                 )
                 Text(text = "By clicking on create account you agree to our user policy.Click here to know Our USER POLICY.", maxLines = 2, overflow = TextOverflow.Visible, style = MaterialTheme.typography.bodySmall)
-
-
-
             }
            
             Button(
                 onClick = {
                         keyboardController?.hide()
-                        scope.launch {
-                            authViewModel.keyForFinalUserCreation.value=1;
-                            authViewModel.RegisterUser(RegisterUserModel(nameTextFieldData, number,usernameTextFieldData,passwordTextFieldData)) }
-               },
+                        authViewModel.keyForFinalUserCreation.value=1;
+                        onClick();
+                      },
                 colors = ButtonDefaults.buttonColors(containerColor = statusAndTopAppBarColor, contentColor = topAppBarTextColor),
                 modifier = Modifier.padding(top = 8.dp)
 
@@ -150,31 +167,32 @@ fun FinalUserCreation (navController:NavController,authViewModel: AuthViewModel)
                 Text(text = "Create Account",style = MaterialTheme.typography.bodyMedium)
             }
             if(authViewModel.keyForFinalUserCreation.value==1){
-                SignupResponseDataAndAction(authViewModel, navController );
-
+                SignupResponseDataAndAction(authViewModel, navController )
+                }
             }
 
         }
 
     }
-}
 
-@Composable
+
 fun SignupResponseDataAndAction(authViewModel: AuthViewModel, navController: NavController){
-    val context= LocalContext.current
+//    val context= LocalContext.current
     when (val result=authViewModel.mySignupResponse.value){
         is SignupApiState.Success->{
             authViewModel.keyForFinalUserCreation.value=0;
-            Log.d("Data Received2",result.data.toString())
+            authViewModel.name.value = result.data.data.name;
+            Log.d("User Data",authViewModel.name.value)
+            Log.d("Data Received2",result.data.data.name)
             navController.navigate(SCREENS.HOME.route){
                 popUpTo(0);
             }
         }
         is SignupApiState.Failure->{
-            Toast.makeText(context,"${result.msg}", Toast.LENGTH_SHORT).show()
+           // Toast.makeText(context,"${result.msg}", Toast.LENGTH_SHORT).show()
         }
         SignupApiState.Loading->{
-            CircularProgressIndicator(color = Color(0xFF1289BE))
+          //  CircularProgressIndicator(color = Color(0xFF1289BE))
         }
         SignupApiState.Empty->{
            // Toast.makeText(context,"Empty Data", Toast.LENGTH_SHORT).show()

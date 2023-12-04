@@ -38,7 +38,7 @@ sealed class SCREENS(val route:String){
 @Composable
 fun Navigation(){
     val navController:NavHostController= rememberNavController();
-    NavHost(navController = navController, startDestination =SCREENS.SIGNUP.route){
+    NavHost(navController = navController, startDestination =SCREENS.PROFILE.route){
         composable(SCREENS.SPLASH.route){
             SplashScreenUI(navController)
         }
@@ -56,8 +56,7 @@ fun Navigation(){
             HomeScreenUI(navController)
         }
         composable(SCREENS.FINALUSERCREATION.route){
-            val authViewModel= hiltViewModel<AuthViewModel>()
-            FinalUserCreation(navController,authViewModel)
+            FinalUserCreation(navController)
         }
         composable(SCREENS.PROFILE.route){
             ProfileScreenUI(navController)

@@ -2,6 +2,7 @@ package com.example.finalapp.screens
 
 import BottomBar
 import android.annotation.SuppressLint
+import android.util.Log
 import android.widget.EditText
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -76,6 +77,7 @@ import com.example.finalapp.ui.theme.DarkBlue
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.ui.theme.topAppBarTextColor
 import com.google.firebase.auth.FirebaseAuth
+import org.jetbrains.annotations.Nullable
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -88,10 +90,19 @@ fun ProfileScreenUI(navController: NavHostController ) {
     val profileImage=true;
 
     Scaffold(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        topBar = { ProfileTopBar(navController  ) },
+        topBar = {
+            ProfileTopBar(
+                navIcon = R.drawable.arrow_back,
+                actIcon = R.drawable.arrow_back,
+                showActIcon=false,
+                onNavIconClick = {navController.popBackStack()},
+                onActIconClick = {navController.popBackStack()},
+                )
+        },
         bottomBar = {
             BottomBar(navController = navController, state = buttonsVisible, modifier = Modifier.height(45.dp))
-        }) {
+        }
+        ) {
         Surface(modifier = Modifier.fillMaxSize()) {
                 Column(modifier = Modifier
                     .padding(it)
@@ -310,13 +321,15 @@ fun FrisbeeInfo() {
 
 @Composable
 fun ProfileName() {
+
+
     Surface(modifier = Modifier
         .fillMaxWidth()
         .padding(8.dp)
         .height(45.dp)){
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
             Text(
-                text ="Jiya Shankar",
+                text ="Jiya Shankar , ",
                 style = MaterialTheme.typography.displayMedium,
                 fontSize = 38.sp,
                 color = statusAndTopAppBarColor)
@@ -346,7 +359,7 @@ fun ProfileIcon(profileImage:Boolean) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileTopBar(navController: NavHostController){
+fun ProfileTopBar(navIcon:Int,actIcon:Int,showActIcon:Boolean,onNavIconClick:()-> Unit,onActIconClick:()-> Unit){
 
 
     TopAppBar(
@@ -363,15 +376,16 @@ fun ProfileTopBar(navController: NavHostController){
         navigationIcon = {
             Icon(
                 painter = painterResource(
-                    id = R.drawable.baseline_bakery_dining_24
+                    id = navIcon
                 ),
                 tint = Color.White,
                 contentDescription ="" ,
                 modifier = Modifier
-                    .padding(top = 6.dp)
-                    .size(40.dp))
+                    .padding(top = 6.dp, start = 6.dp)
+                    .size(24.dp).clickable { onNavIconClick.invoke() })
         }, actions = {
-                Icon(painter = painterResource(id = R.drawable.settings),
+            if(showActIcon){
+                Icon(painter = painterResource(id = actIcon),
                     contentDescription = "",
                     tint = Color(0xFFE8E9E2),
                     modifier = Modifier
@@ -379,10 +393,10 @@ fun ProfileTopBar(navController: NavHostController){
                         .rotate(-40f)
                         .shadow(elevation = 12.dp, shape = CircleShape, spotColor = Color.White)
                         .clickable {
-                            navController.navigate(SCREENS.SETTINGS.route) {
-                                popUpTo(SCREENS.CHAT.route)
-                            }
+                           onActIconClick.invoke()
+
                         })
+                }
 
         }
     )

@@ -242,16 +242,3 @@ fun LoginResponseDataAndAction(authViewModel: AuthViewModel, navController: NavC
 
 
 }
-@Composable
-fun MediaPlayerSuraj(){
-    val context= LocalContext.current;
-    DisposableEffect(key1 = true ){
-        val media= MediaPlayer.create(context,R.raw.music)
-
-        media.start()
-        onDispose {
-            media.stop();
-            media.release();
-        }
-    }
-}

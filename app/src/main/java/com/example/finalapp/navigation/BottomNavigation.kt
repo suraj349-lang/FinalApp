@@ -68,7 +68,9 @@ fun BottomBar(
                     Icon(imageVector = screen.icon!!, contentDescription = "", tint = statusAndTopAppBarColor)
                 },
                 onClick = {
-                    navController.navigate(screen.route)
+                    if(currentRoute!=screen.route) {
+                        navController.navigate(screen.route)
+                    }
 //                    {
 //                        popUpTo(navController.graph.findStartDestination().id) {
 //                            saveState = true
