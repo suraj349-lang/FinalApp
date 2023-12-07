@@ -181,9 +181,6 @@ fun SignupResponseDataAndAction(authViewModel: AuthViewModel, navController: Nav
     when (val result=authViewModel.mySignupResponse.value){
         is SignupApiState.Success->{
             authViewModel.keyForFinalUserCreation.value=0;
-            authViewModel.name.value = result.data.data.name;
-            Log.d("User Data",authViewModel.name.value)
-            Log.d("Data Received2",result.data.data.name)
             navController.navigate(SCREENS.HOME.route){
                 popUpTo(0);
             }

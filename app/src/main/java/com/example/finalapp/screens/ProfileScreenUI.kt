@@ -322,14 +322,15 @@ fun FrisbeeInfo() {
 @Composable
 fun ProfileName() {
 
-
+    val viewmodel= hiltViewModel<AuthViewModel>()
+    val name by viewmodel.name
     Surface(modifier = Modifier
         .fillMaxWidth()
         .padding(8.dp)
         .height(45.dp)){
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
             Text(
-                text ="Jiya Shankar , ",
+                text =name,
                 style = MaterialTheme.typography.displayMedium,
                 fontSize = 38.sp,
                 color = statusAndTopAppBarColor)
@@ -382,7 +383,8 @@ fun ProfileTopBar(navIcon:Int,actIcon:Int,showActIcon:Boolean,onNavIconClick:()-
                 contentDescription ="" ,
                 modifier = Modifier
                     .padding(top = 6.dp, start = 6.dp)
-                    .size(24.dp).clickable { onNavIconClick.invoke() })
+                    .size(24.dp)
+                    .clickable { onNavIconClick.invoke() })
         }, actions = {
             if(showActIcon){
                 Icon(painter = painterResource(id = actIcon),
@@ -393,7 +395,7 @@ fun ProfileTopBar(navIcon:Int,actIcon:Int,showActIcon:Boolean,onNavIconClick:()-
                         .rotate(-40f)
                         .shadow(elevation = 12.dp, shape = CircleShape, spotColor = Color.White)
                         .clickable {
-                           onActIconClick.invoke()
+                            onActIconClick.invoke()
 
                         })
                 }

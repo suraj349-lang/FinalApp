@@ -25,7 +25,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class OfferViewModel @Inject constructor(private val repository: OfferRepository): ViewModel() {
-     val offerResponse:MutableState<OfferApiState> = mutableStateOf(OfferApiState.Empty)
+    val offerResponse:MutableState<OfferApiState> = mutableStateOf(OfferApiState.Empty)
     var key :MutableState<Int> = mutableStateOf(0);
     fun createOffer(offerData:OfferModel)=viewModelScope.launch(Dispatchers.IO) {
         repository.sendCreateOfferData(offerData)
