@@ -8,20 +8,29 @@ import androidx.lifecycle.viewModelScope
 import com.example.finalapp.apiState.LoginApiState
 import com.example.finalapp.apiState.SignupApiState
 import com.example.finalapp.auth.repository.AuthRepository
+import com.example.finalapp.database.DatabaseRepository
+import com.example.finalapp.database.Profile
 import com.example.finalapp.model.LoginModel
 import com.example.finalapp.model.RegisterUserModel
 import com.example.finalapp.model.User
+import com.example.finalapp.utils.RequestState
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import java.net.UnknownServiceException
 import javax.inject.Inject
 
 @HiltViewModel
-class AuthViewModel @Inject constructor(private val repository: AuthRepository): ViewModel() {
+class AuthViewModel @Inject constructor(
+    private val repository: AuthRepository,
+    private val databaseRepository: DatabaseRepository
+): ViewModel() {
 
     val myLoginResponse: MutableState<LoginApiState> = mutableStateOf(LoginApiState.Empty)
     val mySignupResponse: MutableState<SignupApiState> = mutableStateOf(SignupApiState.Empty)
@@ -66,5 +75,26 @@ class AuthViewModel @Inject constructor(private val repository: AuthRepository):
         auth.signOut()
 
     }
+
+    //-----------------------------------------------------------------------------------------------------------//
+    fun saveProfileData(profile: Profile){
+        viewModelScope.launch {
+            databaseRepository.saveProfileData(profile = profile)
+        }
+
+    }
+    private var _profileData= MutableStateFlow<RequestState<Profile>> (RequestState.Idle)
+    val profileData: StateFlow<RequestState<Profile>> = _profileData
+    fun getProfileData(profile: Profile){
+        _profileData.value=RequestState.Loading
+            try {
+                viewModelScope.launch {
+                    databaseRepository.getProfileData().collect{}
+
+                }
+            }catch (e:Exception){
+                _profileData.value=RequestState.Error(e)
+            }
+       }
 }
 

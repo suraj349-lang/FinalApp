@@ -99,8 +99,7 @@ fun HomeScreenUI2(navController: NavController= NavController(LocalContext.curre
                     columns = StaggeredGridCells.Adaptive(150.dp),
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     items(items) { item ->
                         RandomColorBox(item = item)
