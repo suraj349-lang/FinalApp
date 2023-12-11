@@ -327,7 +327,7 @@ fun FrisbeeInfo() {
 fun ProfileName() {
 
     val viewmodel= hiltViewModel<AuthViewModel>()
-    val name by viewmodel.profileData.collectAsState()
+    val name by viewmodel._profileName
 
     LaunchedEffect(key1 = true){
         viewmodel.getProfileData()
@@ -340,7 +340,7 @@ fun ProfileName() {
         .height(45.dp)){
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
             Text(
-                text =name.toString(),
+                text =name,
                 style = MaterialTheme.typography.displayMedium,
                 fontSize = 38.sp,
                 color = statusAndTopAppBarColor)

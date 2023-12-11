@@ -85,19 +85,19 @@ class AuthViewModel @Inject constructor(
         }
 
     }
-    private var _profileData=MutableStateFlow<RequestState<Profile>> (RequestState.Idle)
-    val profileData : StateFlow<RequestState<Profile>> =_profileData
+    var _profileName:MutableState<String> = mutableStateOf("")
+
     fun getProfileData(){
-            _profileData.value=RequestState.Loading
+
             try {
                 viewModelScope.launch {
                     databaseRepository.getProfileData().collect{
-                        _profileData.value=RequestState.Success(it )
+                        _profileName.value=it.name
                     }
 
                 }
             }catch (e:Exception){
-                _profileData.value=RequestState.Error(e)
+                _profileName.value=e.toString()
             }
        }
 }
