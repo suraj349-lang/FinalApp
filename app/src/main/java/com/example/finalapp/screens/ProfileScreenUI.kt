@@ -41,6 +41,9 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -66,6 +69,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.finalapp.R
 import com.example.finalapp.auth.authViewModel.AuthViewModel
@@ -323,14 +327,20 @@ fun FrisbeeInfo() {
 fun ProfileName() {
 
     val viewmodel= hiltViewModel<AuthViewModel>()
-    val name by viewmodel.name
+    val name by viewmodel.profileData.collectAsState()
+
+    LaunchedEffect(key1 = true){
+        viewmodel.getProfileData()
+        Log.d("name",name.toString())
+    }
+
     Surface(modifier = Modifier
         .fillMaxWidth()
         .padding(8.dp)
         .height(45.dp)){
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
             Text(
-                text =name,
+                text =name.toString(),
                 style = MaterialTheme.typography.displayMedium,
                 fontSize = 38.sp,
                 color = statusAndTopAppBarColor)

@@ -57,12 +57,12 @@ import kotlinx.coroutines.launch
 @Composable
 fun FinalUserCreation(navController: NavHostController){
     val firebaseAuth= FirebaseAuth.getInstance();
-
-    var name by remember { mutableStateOf("") }
+    val authViewModel= hiltViewModel<AuthViewModel>()
+    var name by authViewModel.profileName
     val number by remember { mutableStateOf(firebaseAuth.currentUser?.phoneNumber.toString()) }
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    val authViewModel= hiltViewModel<AuthViewModel>()
+
     FinalUserCreationUI(
         navController,
         authViewModel,
@@ -73,7 +73,9 @@ fun FinalUserCreation(navController: NavHostController){
         onNameChange = {name=it},
         onUsernameChange = {username=it},
         onPasswordChange = {password=it},
-        onClick =  { authViewModel.RegisterUser(RegisterUserModel(name, number,username,password))  }
+        onClick =  {
+            authViewModel.saveProfileData()
+            authViewModel.RegisterUser(RegisterUserModel(name, number,username,password))  }
     )
 }
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)

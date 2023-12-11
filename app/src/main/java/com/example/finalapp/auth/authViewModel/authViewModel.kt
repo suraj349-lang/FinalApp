@@ -37,6 +37,7 @@ class AuthViewModel @Inject constructor(
     var key= mutableStateOf(0)
     var keyForFinalUserCreation= mutableStateOf(0)
     var name= mutableStateOf("Suraj")
+    var profileName:MutableState<String> = mutableStateOf("")
 
     fun loginUser(loginModel: LoginModel)=viewModelScope.launch(Dispatchers.IO) {
         repository.sendLoginData(loginModel)
@@ -77,19 +78,22 @@ class AuthViewModel @Inject constructor(
     }
 
     //-----------------------------------------------------------------------------------------------------------//
-    fun saveProfileData(profile: Profile){
+    fun saveProfileData(){
+        val profile=Profile(name=profileName.value)
         viewModelScope.launch {
             databaseRepository.saveProfileData(profile = profile)
         }
 
     }
-    private var _profileData= MutableStateFlow<RequestState<Profile>> (RequestState.Idle)
-    val profileData: StateFlow<RequestState<Profile>> = _profileData
-    fun getProfileData(profile: Profile){
-        _profileData.value=RequestState.Loading
+    private var _profileData=MutableStateFlow<RequestState<Profile>> (RequestState.Idle)
+    val profileData : StateFlow<RequestState<Profile>> =_profileData
+    fun getProfileData(){
+            _profileData.value=RequestState.Loading
             try {
                 viewModelScope.launch {
-                    databaseRepository.getProfileData().collect{}
+                    databaseRepository.getProfileData().collect{
+                        _profileData.value=RequestState.Success(it )
+                    }
 
                 }
             }catch (e:Exception){
