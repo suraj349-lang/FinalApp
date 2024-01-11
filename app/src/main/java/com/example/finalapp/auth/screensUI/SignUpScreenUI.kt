@@ -3,6 +3,7 @@ package com.example.finalapp.auth.screensUI
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.text.TextUtils
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -23,9 +24,11 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -33,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -55,6 +59,7 @@ import com.google.firebase.FirebaseException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthProvider
+import kotlinx.coroutines.launch
 
 
 @Preview(showBackground = true)
@@ -71,6 +76,7 @@ fun SignupScreenUI(navController: NavController = NavController(LocalContext.cur
         painterResource(id = R.drawable.round_visibility_24)
     else
         painterResource(id = R.drawable.round_visibility_off_24)
+    val keyboardController = LocalSoftwareKeyboardController.current
     val phoneNumber = remember { mutableStateOf("") }
     val otp = remember { mutableStateOf("") }
     val verificationID = remember { mutableStateOf("") }
@@ -79,6 +85,7 @@ fun SignupScreenUI(navController: NavController = NavController(LocalContext.cur
     lateinit var callbacks: PhoneAuthProvider.OnVerificationStateChangedCallbacks
     val context = LocalContext.current
     var key = remember { mutableStateOf(0) }
+    val scope=rememberCoroutineScope()
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(
             verticalArrangement = Arrangement.Center,
@@ -163,28 +170,24 @@ fun SignupScreenUI(navController: NavController = NavController(LocalContext.cur
             Spacer(modifier = Modifier.height(10.dp))
 
             if (key.value==1) {
-//                OutlinedTextField(
-//                    value = otp.value,
-//                    onValueChange = { otp.value = it },
-//                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-//                    modifier = Modifier.width(150.dp),
-//                    textStyle = TextStyle(color = Color.Black, fontSize = 15.sp),
-//                    singleLine = true,
-//                )
-
-
                 OtpBox()
                 Button(
                     onClick = {
                         if (TextUtils.isEmpty(authViewModel.otp)) {
-                            Toast.makeText(context, "Please enter otp..", Toast.LENGTH_SHORT)
-                                .show()
+                            Toast.makeText(context, "Please enter otp..", Toast.LENGTH_SHORT).show()
+                            scope.launch {
+                                keyboardController?.hide()
+                            }
+
+
                         } else {
                             // on below line generating phone credentials.
+                            scope.launch {
+                                keyboardController?.hide()
+                            }
+
                             val credential: PhoneAuthCredential =
-                                PhoneAuthProvider.getCredential(
-                                    verificationID.value, authViewModel.otp
-                                )
+                                PhoneAuthProvider.getCredential(verificationID.value, authViewModel.otp)
 
                             // on below line signing within credentials.
                             firebaseRepository.signInWithPhoneAuthCredential(
@@ -207,18 +210,7 @@ fun SignupScreenUI(navController: NavController = NavController(LocalContext.cur
                 }
             }
 
-            Spacer(modifier = Modifier.height(5.dp))
-
-
-            Text(
-                // on below line displaying message for verification status.
-                text = message.value,
-                style = TextStyle(
-                    color = Color.Green,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            )
+          //  if(message.value!="" && message.value !="Verification successful") Toast.makeText(context,message.value,Toast.LENGTH_SHORT).show()
         }
 
         // on below line creating callback
