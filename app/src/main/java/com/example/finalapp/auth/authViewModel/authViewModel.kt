@@ -1,10 +1,14 @@
 package com.example.finalapp.auth.authViewModel
 
+import android.content.Context
 import android.util.Log
+import android.widget.Toast
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
 import com.example.finalapp.apiState.LoginApiState
 import com.example.finalapp.apiState.SignupApiState
 import com.example.finalapp.auth.repository.AuthRepository
@@ -13,9 +17,11 @@ import com.example.finalapp.database.Profile
 import com.example.finalapp.model.LoginModel
 import com.example.finalapp.model.RegisterUserModel
 import com.example.finalapp.model.User
+import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.utils.RequestState
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -29,7 +35,8 @@ import javax.inject.Inject
 @HiltViewModel
 class AuthViewModel @Inject constructor(
     private val repository: AuthRepository,
-    private val databaseRepository: DatabaseRepository
+    private val databaseRepository: DatabaseRepository,
+    @ApplicationContext private val context: Context
 ): ViewModel() {
 
     val myLoginResponse: MutableState<LoginApiState> = mutableStateOf(LoginApiState.Empty)
@@ -70,6 +77,30 @@ class AuthViewModel @Inject constructor(
                 mySignupResponse.value= SignupApiState.Success(it)
 
             }
+    }
+    fun signupResponseDataAndAction(navController: NavController){
+
+        when (val result=mySignupResponse.value){
+            is SignupApiState.Success->{
+                keyForFinalUserCreation.value=0;
+                Toast.makeText(context,"Welcome to Active Dating", Toast.LENGTH_SHORT).show()
+                navController.navigate(SCREENS.HOME.route){
+                    popUpTo(0);
+                }
+            }
+            is SignupApiState.Failure->{
+                Toast.makeText(context,"${result.msg}", Toast.LENGTH_SHORT).show()
+            }
+            SignupApiState.Loading->{
+              //  CircularProgressIndicator(color = Color(0xFF1289BE))
+            }
+            SignupApiState.Empty->{
+                Toast.makeText(context,"Empty Data", Toast.LENGTH_SHORT).show()
+            }
+
+        }
+
+
     }
     fun LogoutUser(){
         val auth:FirebaseAuth=FirebaseAuth.getInstance();

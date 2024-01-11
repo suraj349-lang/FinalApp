@@ -169,7 +169,7 @@ fun FinalUserCreationUI (
                 Text(text = "Create Account",style = MaterialTheme.typography.bodyMedium)
             }
             if(authViewModel.keyForFinalUserCreation.value==1){
-                SignupResponseDataAndAction(authViewModel, navController )
+                authViewModel.signupResponseDataAndAction(navController )
                 }
             }
 
@@ -178,26 +178,3 @@ fun FinalUserCreationUI (
     }
 
 
-fun SignupResponseDataAndAction(authViewModel: AuthViewModel, navController: NavController){
-//    val context= LocalContext.current
-    when (val result=authViewModel.mySignupResponse.value){
-        is SignupApiState.Success->{
-            authViewModel.keyForFinalUserCreation.value=0;
-            navController.navigate(SCREENS.HOME.route){
-                popUpTo(0);
-            }
-        }
-        is SignupApiState.Failure->{
-           // Toast.makeText(context,"${result.msg}", Toast.LENGTH_SHORT).show()
-        }
-        SignupApiState.Loading->{
-          //  CircularProgressIndicator(color = Color(0xFF1289BE))
-        }
-        SignupApiState.Empty->{
-           // Toast.makeText(context,"Empty Data", Toast.LENGTH_SHORT).show()
-        }
-
-    }
-
-
-}
