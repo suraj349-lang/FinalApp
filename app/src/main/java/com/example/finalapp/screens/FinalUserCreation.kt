@@ -1,7 +1,5 @@
 package com.example.finalapp.screens
 
-import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -45,13 +43,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.finalapp.auth.authViewModel.AuthViewModel
-import com.example.finalapp.apiState.SignupApiState
 import com.example.finalapp.model.RegisterUserModel
-import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.ui.theme.topAppBarTextColor
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.launch
 
 
 @Composable

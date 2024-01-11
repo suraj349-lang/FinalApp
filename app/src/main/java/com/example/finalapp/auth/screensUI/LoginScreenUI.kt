@@ -59,12 +59,12 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavController
 import com.example.finalapp.R
 import com.example.finalapp.auth.authViewModel.AuthViewModel
-import com.example.finalapp.apiState.LoginApiState
 import com.example.finalapp.model.LoginModel
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.ui.theme.DarkBlue
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.ui.theme.topAppBarTextColor
+import com.example.finalapp.utils.RequestState
 import kotlinx.coroutines.launch
 
 
@@ -77,9 +77,7 @@ fun LoginScreenUI(navController: NavController= NavController(LocalContext.curre
     val scope= rememberCoroutineScope()
 
     var loginNumberText by rememberSaveable { mutableStateOf("") }
-    val addString by remember {
-        mutableStateOf("+91")
-    }
+    val addString="+91";
     var loginPasswordText by remember { mutableStateOf("") }
     val keyboardController = LocalSoftwareKeyboardController.current
     val maxLength = 10;
@@ -94,7 +92,7 @@ fun LoginScreenUI(navController: NavController= NavController(LocalContext.curre
         // Create an observer that triggers our remembered callbacks
         // for sending analytics events
         val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_STOP) {
+            if (event == Lifecycle.Event.ON_STOP || event== Lifecycle.Event.ON_PAUSE ||event== Lifecycle.Event.ON_DESTROY ) {
                 authViewModel.key.value=0
             }
         }
@@ -222,19 +220,19 @@ fun LoginScreenUI(navController: NavController= NavController(LocalContext.curre
 fun LoginResponseDataAndAction(authViewModel: AuthViewModel, navController: NavController){
     val context= LocalContext.current
     when (val result=authViewModel.myLoginResponse.value){
-        is LoginApiState.Success->{
+        is RequestState.Success->{
             authViewModel.key.value=0;
             navController.navigate(SCREENS.HOME.route)
             Log.d("Data Received",result.data.toString())
 
         }
-        is LoginApiState.Failure->{
-            Toast.makeText(context,"${result.msg}", Toast.LENGTH_SHORT).show()
+        is RequestState.Error->{
+            Toast.makeText(context,"$result", Toast.LENGTH_SHORT).show()
         }
-        LoginApiState.Loading->{
+        RequestState.Loading->{
             CircularProgressIndicator(color = Color(0xFF1289BE))
         }
-        LoginApiState.Empty->{
+        RequestState.Idle->{
             Toast.makeText(context,"Empty Data", Toast.LENGTH_SHORT).show()
         }
 

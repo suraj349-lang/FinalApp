@@ -47,6 +47,7 @@ import com.example.finalapp.R
 import com.example.finalapp.auth.authViewModel.AuthViewModel
 import com.example.finalapp.auth.repository.AuthRepository
 import com.example.finalapp.auth.repository.FirebaseRepository
+import com.example.finalapp.auth.screensUI.otp.OtpBox
 import com.example.finalapp.model.RegisterUserModel
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.ui.theme.topAppBarTextColor
@@ -162,24 +163,27 @@ fun SignupScreenUI(navController: NavController = NavController(LocalContext.cur
             Spacer(modifier = Modifier.height(10.dp))
 
             if (key.value==1) {
-                OutlinedTextField(
-                    value = otp.value,
-                    onValueChange = { otp.value = it },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.width(150.dp),
-                    textStyle = TextStyle(color = Color.Black, fontSize = 15.sp),
-                    singleLine = true,
-                )
+//                OutlinedTextField(
+//                    value = otp.value,
+//                    onValueChange = { otp.value = it },
+//                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+//                    modifier = Modifier.width(150.dp),
+//                    textStyle = TextStyle(color = Color.Black, fontSize = 15.sp),
+//                    singleLine = true,
+//                )
+
+
+                OtpBox()
                 Button(
                     onClick = {
-                        if (TextUtils.isEmpty(otp.value)) {
+                        if (TextUtils.isEmpty(authViewModel.otp)) {
                             Toast.makeText(context, "Please enter otp..", Toast.LENGTH_SHORT)
                                 .show()
                         } else {
                             // on below line generating phone credentials.
                             val credential: PhoneAuthCredential =
                                 PhoneAuthProvider.getCredential(
-                                    verificationID.value, otp.value
+                                    verificationID.value, authViewModel.otp
                                 )
 
                             // on below line signing within credentials.

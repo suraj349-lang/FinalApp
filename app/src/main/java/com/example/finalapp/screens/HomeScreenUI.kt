@@ -61,16 +61,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.finalapp.R
-import com.example.finalapp.apiState.OfferApiState
-import com.example.finalapp.apiState.SignupApiState
-import com.example.finalapp.auth.authViewModel.AuthViewModel
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.offer.OfferViewModel
 import com.example.finalapp.screens.DialogBOX.CustomAlertDialog
 import com.example.finalapp.ui.theme.DarkBlue
 import com.example.finalapp.ui.theme.floatingActionBtnTextColor
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
-import com.example.finalapp.ui.theme.topAppBarTextColor
+import com.example.finalapp.utils.RequestState
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -303,7 +300,7 @@ fun OfferResponseDataAndAction(offerViewModel: OfferViewModel,navController: Nav
     val context= LocalContext.current
     Log.d("Data received","Into the function")
     when (val result=offerViewModel.offerResponse.value){
-        is OfferApiState.Success->{
+        is RequestState.Success->{
             offerViewModel.key.value=0;
             Log.d("Suraj",result.data.toString())
             Toast.makeText(context,"${result.data}", Toast.LENGTH_SHORT).show()
@@ -312,15 +309,15 @@ fun OfferResponseDataAndAction(offerViewModel: OfferViewModel,navController: Nav
             }
 
         }
-        is OfferApiState.Failure->{
+        is RequestState.Error->{
             Log.d("Data received","error final found")
-            Toast.makeText(context,"${result.msg}", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context,"$result", Toast.LENGTH_SHORT).show()
         }
-        OfferApiState.Loading->{
+        RequestState.Loading->{
             CircularProgressIndicator(color = Color(0xFF1289BE))
         }
-        OfferApiState.Empty->{
-            Log.d("Data ","empty data")
+        RequestState.Idle->{
+
         }
 
     }

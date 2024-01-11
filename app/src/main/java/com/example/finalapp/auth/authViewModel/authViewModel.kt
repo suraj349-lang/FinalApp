@@ -3,33 +3,34 @@ package com.example.finalapp.auth.authViewModel
 import android.content.Context
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.material3.CircularProgressIndicator
+
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
-import com.example.finalapp.apiState.LoginApiState
-import com.example.finalapp.apiState.SignupApiState
+
 import com.example.finalapp.auth.repository.AuthRepository
 import com.example.finalapp.database.DatabaseRepository
 import com.example.finalapp.database.Profile
+import com.example.finalapp.model.LoginAPIResponse
 import com.example.finalapp.model.LoginModel
 import com.example.finalapp.model.RegisterUserModel
-import com.example.finalapp.model.User
+import com.example.finalapp.model.SignupAPIResponse
+
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.utils.RequestState
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
+
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
-import java.net.UnknownServiceException
+
 import javax.inject.Inject
 
 @HiltViewModel
@@ -39,25 +40,26 @@ class AuthViewModel @Inject constructor(
     @ApplicationContext private val context: Context
 ): ViewModel() {
 
-    val myLoginResponse: MutableState<LoginApiState> = mutableStateOf(LoginApiState.Empty)
-    val mySignupResponse: MutableState<SignupApiState> = mutableStateOf(SignupApiState.Empty)
+    val myLoginResponse: MutableState<RequestState<LoginAPIResponse>> = mutableStateOf(RequestState.Idle)
+    val mySignupResponse: MutableState<RequestState<SignupAPIResponse>> = mutableStateOf(RequestState.Idle)
     var key= mutableStateOf(0)
     var keyForFinalUserCreation= mutableStateOf(0)
     var name= mutableStateOf("Suraj")
     var profileName:MutableState<String> = mutableStateOf("")
+    var otp=" "
 
     fun loginUser(loginModel: LoginModel)=viewModelScope.launch(Dispatchers.IO) {
         repository.sendLoginData(loginModel)
             .onStart {
-                myLoginResponse.value= LoginApiState.Loading
+                myLoginResponse.value= RequestState.Loading
                 Log.d("Data received",myLoginResponse.value.toString())
 
             }.catch {
-                myLoginResponse.value= LoginApiState.Failure(it)
+                myLoginResponse.value= RequestState.Error(it)
                 Log.d("Data received",myLoginResponse.value.toString())
 
             }.collect{
-                myLoginResponse.value= LoginApiState.Success(it)
+                myLoginResponse.value= RequestState.Success(it)
                 Log.d("Data received",myLoginResponse.value.toString())
 
             }
@@ -68,34 +70,34 @@ class AuthViewModel @Inject constructor(
     fun RegisterUser(registerUserModel : RegisterUserModel)=viewModelScope.launch(Dispatchers.IO) {
         repository.sendSignupData(registerUserModel)
             .onStart {
-                mySignupResponse.value= SignupApiState.Loading
+                mySignupResponse.value= RequestState.Loading
 
             }.catch {
-                mySignupResponse.value= SignupApiState.Failure(it)
+                mySignupResponse.value= RequestState.Error(it)
 
             }.collect{
-                mySignupResponse.value= SignupApiState.Success(it)
+                mySignupResponse.value= RequestState.Success(it)
 
             }
     }
     fun signupResponseDataAndAction(navController: NavController){
 
         when (val result=mySignupResponse.value){
-            is SignupApiState.Success->{
+            is RequestState.Success->{
                 keyForFinalUserCreation.value=0;
                 Toast.makeText(context,"Welcome to Active Dating", Toast.LENGTH_SHORT).show()
                 navController.navigate(SCREENS.HOME.route){
                     popUpTo(0);
                 }
             }
-            is SignupApiState.Failure->{
-                Toast.makeText(context,"${result.msg}", Toast.LENGTH_SHORT).show()
+            is RequestState.Error->{
+                Toast.makeText(context,"$result", Toast.LENGTH_SHORT).show()
             }
-            SignupApiState.Loading->{
+            RequestState.Loading->{
               //  CircularProgressIndicator(color = Color(0xFF1289BE))
             }
-            SignupApiState.Empty->{
-                Toast.makeText(context,"Empty Data", Toast.LENGTH_SHORT).show()
+            RequestState.Idle->{
+                Toast.makeText(context,"Registering...", Toast.LENGTH_SHORT).show()
             }
 
         }

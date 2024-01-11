@@ -38,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.NavHostController
 import com.example.finalapp.R
 import com.example.finalapp.model.OfferModel
@@ -48,12 +49,13 @@ import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.ui.theme.topAppBarTextColor
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun CustomAlertDialog(offerViewModel: OfferViewModel,navController: NavHostController,onDismiss: () -> Unit) {
     var offerTextField:String by remember{ mutableStateOf("") }
 
     val scope= rememberCoroutineScope()
+    var enabled=true;
 
     Dialog(onDismissRequest = { onDismiss() }, properties = DialogProperties(
         dismissOnBackPress = true,dismissOnClickOutside = true
@@ -107,6 +109,7 @@ fun CustomAlertDialog(offerViewModel: OfferViewModel,navController: NavHostContr
                     Button(
                         onClick = {
                             offerViewModel.key.value = 1;
+                            enabled=false;
                             scope.launch {
                                 offerViewModel.createOffer(OfferModel("SURAJ","65692fe3d203dbf0e3ddcb17"));
 
@@ -117,6 +120,7 @@ fun CustomAlertDialog(offerViewModel: OfferViewModel,navController: NavHostContr
                             .fillMaxWidth()
                             .padding(8.dp)
                             .weight(1F),
+                        enabled=enabled,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = statusAndTopAppBarColor,
                             contentColor = topAppBarTextColor,
