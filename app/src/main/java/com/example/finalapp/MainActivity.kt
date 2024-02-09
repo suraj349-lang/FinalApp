@@ -22,21 +22,34 @@ import androidx.core.app.ActivityCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.finalapp.navigation.Navigation
 import com.example.finalapp.ui.theme.FinalAppTheme
+import com.example.finalapp.utils.Constants.Constants
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import dagger.hilt.android.AndroidEntryPoint
+import io.socket.client.IO
+import io.socket.client.Socket
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.IOException
 import java.util.Locale
+import kotlin.math.log
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    private lateinit var mSocket:Socket
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     var mainViewModel= MainViewModel()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
+            try {
+                mSocket= IO.socket(Constants.BASE_URL)
+            }catch (e:Exception){
+                Log.d("Error in socket",e.message.toString())
+            }
+
+            mSocket.connect()
+            mSocket.emit("message","hello from android")
             FinalApp{ getLocation() }
 
         }
@@ -64,11 +77,19 @@ class MainActivity : ComponentActivity() {
 //                Log.d("Coordinate", if(mainViewModel.address.value != "") mainViewModel.address.value else "No data")
 //
 //                Log.d("Coordinates",it.latitude.toString()+"   "+ it.longitude.toString())
+                mSocket.emit("location",it.latitude.toString() + " " + it.longitude.toString())
+                mSocket.on("location"){data->
+                    Log.d("Coordinates received from node", data[0].toString())
+                }
                 mainViewModel.latitude.value=it.latitude
                 mainViewModel.longitude.value=it.longitude
                 Log.d("Coordinates", mainViewModel.latitude.value.toString() + "    "+mainViewModel.longitude.value.toString())
                 mainViewModel.address.value= getReadableLocation(mainViewModel.latitude.value,mainViewModel.longitude.value,this@MainActivity)
                 Log.d("Coordinates", mainViewModel.address.value)
+                mSocket.emit("address",mainViewModel.address.value)
+                mSocket.on("address"){data->
+                    Log.d("Coordinates changed to address", data[0].toString())
+                }
             }else{
                 Log.d("Coordinates","error fetching location")
             }
