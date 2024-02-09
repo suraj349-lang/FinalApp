@@ -89,7 +89,6 @@ fun FinalUserCreationUI (
      {
       val keyboardController = LocalSoftwareKeyboardController.current
       var checked= remember { mutableStateOf(true) };
-         val scope= rememberCoroutineScope()
 
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()) {

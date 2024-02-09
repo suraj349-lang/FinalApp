@@ -1,6 +1,5 @@
 package com.example.finalapp.navigation
 
-import androidx.compose.foundation.interaction.HoverInteraction
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -41,7 +40,7 @@ sealed class SCREENS(val route:String){
 @Composable
 fun Navigation(){
     val navController:NavHostController= rememberNavController();
-    NavHost(navController = navController, startDestination =SCREENS.SIGNUP.route){
+    NavHost(navController = navController, startDestination =SCREENS.LOGIN.route){
         composable(SCREENS.SPLASH.route){
             SplashScreenUI(navController)
         }
