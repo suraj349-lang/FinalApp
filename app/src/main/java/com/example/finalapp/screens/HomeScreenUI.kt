@@ -41,6 +41,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -84,12 +85,13 @@ fun HomeScreenUI(navController: NavHostController) {
     val offerViewModel= hiltViewModel<OfferViewModel>()
 
 
+
     Scaffold(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-             topBar = {
-                 HomeTopBar(
-                    "Frisbee",
+             topBar = { HomeTopBar(
+                 "Frisbee",
                      navController,
-                     true ,R.drawable.send_24)
+                     true ,
+                     R.drawable.send_24)
                       },
              bottomBar = { BottomBar(
                 navController = navController,
@@ -263,7 +265,7 @@ fun HomeTopBar(title:String,navController: NavHostController,actionIcon:Boolean,
 
 
     TopAppBar(
-        colors = TopAppBarDefaults.smallTopAppBarColors(
+        colors = TopAppBarDefaults.topAppBarColors(
             containerColor = statusAndTopAppBarColor
         ),
         title = {

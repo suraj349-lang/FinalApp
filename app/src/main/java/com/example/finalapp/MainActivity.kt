@@ -58,12 +58,17 @@ class MainActivity : ComponentActivity() {
         val location=fusedLocationProviderClient.getCurrentLocation(100,null)
         location.addOnSuccessListener {
             if(it!=null){
-                mainViewModel.updateCoordinates(LatLng(it.latitude,it.longitude))
-                Log.d("Coordinates from VM", mainViewModel.coordinates.value.latitude.toString())
-                mainViewModel.updateAddress(getReadableLocation(it.latitude,it.longitude,this@MainActivity))
-                Log.d("Coordinate", if(mainViewModel.address.value != "") mainViewModel.address.value else "No data")
-
-                Log.d("Coordinates",it.latitude.toString()+"   "+ it.longitude.toString())
+//                mainViewModel.updateCoordinates(LatLng(it.latitude,it.longitude))
+//                Log.d("Coordinates from VM", mainViewModel.coordinates.value.latitude.toString())
+//                mainViewModel.updateAddress(getReadableLocation(it.latitude,it.longitude,this@MainActivity))
+//                Log.d("Coordinate", if(mainViewModel.address.value != "") mainViewModel.address.value else "No data")
+//
+//                Log.d("Coordinates",it.latitude.toString()+"   "+ it.longitude.toString())
+                mainViewModel.latitude.value=it.latitude
+                mainViewModel.longitude.value=it.longitude
+                Log.d("Coordinates", mainViewModel.latitude.value.toString() + "    "+mainViewModel.longitude.value.toString())
+                mainViewModel.address.value= getReadableLocation(mainViewModel.latitude.value,mainViewModel.longitude.value,this@MainActivity)
+                Log.d("Coordinates", mainViewModel.address.value)
             }else{
                 Log.d("Coordinates","error fetching location")
             }
