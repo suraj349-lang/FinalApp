@@ -83,6 +83,8 @@ fun HomeScreenUI(navController: NavHostController) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val buttonsVisible = remember { mutableStateOf(true) }
     val offerViewModel= hiltViewModel<OfferViewModel>()
+   
+
 
 
 

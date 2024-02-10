@@ -1,12 +1,16 @@
 package com.example.finalapp
 
+import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Geocoder
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.finalapp.navigation.Navigation
 import com.example.finalapp.ui.theme.FinalAppTheme
@@ -42,6 +47,7 @@ class MainActivity : ComponentActivity() {
     private lateinit var mSocket:Socket
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     var mainViewModel= MainViewModel()
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -59,18 +65,22 @@ class MainActivity : ComponentActivity() {
         }
         fusedLocationProviderClient= LocationServices.getFusedLocationProviderClient(this)
     }
+
+
+
     private fun getLocation(){
         // check location permission
-        if(ActivityCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_FINE_LOCATION)
+        if(ActivityCompat.checkSelfPermission(this,Manifest.permission.ACCESS_FINE_LOCATION)
             != PackageManager.PERMISSION_GRANTED
             &&
-            ActivityCompat.checkSelfPermission(this,android.Manifest.permission.ACCESS_COARSE_LOCATION)
+            ActivityCompat.checkSelfPermission(this,Manifest.permission.ACCESS_COARSE_LOCATION)
             != PackageManager.PERMISSION_GRANTED
         ){
             ActivityCompat.requestPermissions(this,
-                arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),100)
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),100)
             return
         }
+
         //get latitude and longitude
         val location=fusedLocationProviderClient.getCurrentLocation(100,null)
         location.addOnSuccessListener {
