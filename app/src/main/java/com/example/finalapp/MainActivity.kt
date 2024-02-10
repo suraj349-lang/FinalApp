@@ -30,6 +30,9 @@ import io.socket.client.IO
 import io.socket.client.Socket
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import java.io.IOException
 import java.util.Locale
 import kotlin.math.log
@@ -49,7 +52,8 @@ class MainActivity : ComponentActivity() {
             }
 
             mSocket.connect()
-            mSocket.emit("message","hello from android")
+            mSocket.emit("user",Constants.DEVICE_NAME)
+            mSocket.emit("message","hello from ${Constants.DEVICE_NAME}")
             FinalApp{ getLocation() }
 
         }
@@ -77,7 +81,7 @@ class MainActivity : ComponentActivity() {
 //                Log.d("Coordinate", if(mainViewModel.address.value != "") mainViewModel.address.value else "No data")
 //
 //                Log.d("Coordinates",it.latitude.toString()+"   "+ it.longitude.toString())
-                mSocket.emit("location",it.latitude.toString() + " " + it.longitude.toString())
+                mSocket.emit("location",Constants.DEVICE_NAME + "  "+it.latitude.toString() + " " + it.longitude.toString())
                 mSocket.on("location"){data->
                     Log.d("Coordinates received from node", data[0].toString())
                 }
@@ -86,9 +90,11 @@ class MainActivity : ComponentActivity() {
                 Log.d("Coordinates", mainViewModel.latitude.value.toString() + "    "+mainViewModel.longitude.value.toString())
                 mainViewModel.address.value= getReadableLocation(mainViewModel.latitude.value,mainViewModel.longitude.value,this@MainActivity)
                 Log.d("Coordinates", mainViewModel.address.value)
-                mSocket.emit("address",mainViewModel.address.value)
+                val user=User(user=Constants.DEVICE_NAME, address = mainViewModel.address.value)
+                mSocket.emit("address",Json.encodeToString(user))
                 mSocket.on("address"){data->
-                    Log.d("Coordinates changed to address", data[0].toString())
+                  Log.d("Coordinates changed to address", data[0].toString())
+                   // Log.d("Coordinates changed to address","no address")
                 }
             }else{
                 Log.d("Coordinates","error fetching location")
@@ -155,3 +161,7 @@ fun getReadableLocation(latitude: Double, longitude: Double, context: Context): 
     return addressText
 
 }
+
+@Serializable
+data class User(val user: String, val address: String)
+
