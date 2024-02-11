@@ -330,8 +330,13 @@ fun ProfileName() {
     val name by viewmodel._profileName
 
     LaunchedEffect(key1 = true){
-        viewmodel.getProfileData()
-        Log.d("name",name.toString())
+        try {
+            viewmodel.getProfileData()
+          //  Log.d("name",name)
+        }catch (e:Exception){
+            Log.d("Error in profile name", e.message.toString())
+        }
+
     }
 
     Surface(modifier = Modifier
@@ -340,7 +345,7 @@ fun ProfileName() {
         .height(45.dp)){
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
             Text(
-                text =name,
+                text =if (name!= "") name else "Default Name",
                 style = MaterialTheme.typography.displayMedium,
                 fontSize = 38.sp,
                 color = statusAndTopAppBarColor)

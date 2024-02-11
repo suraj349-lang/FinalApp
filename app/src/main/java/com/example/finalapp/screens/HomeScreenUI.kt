@@ -74,6 +74,7 @@ import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.utils.RequestState
 
 
+
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "StateFlowValueCalledInComposition")
@@ -82,16 +83,6 @@ fun HomeScreenUI(navController: NavHostController) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val buttonsVisible = remember { mutableStateOf(true) }
     val offerViewModel= hiltViewModel<OfferViewModel>()
-    val notificationLauncher=
-        rememberLauncherForActivityResult(contract = ActivityResultContracts.RequestPermission() ){
-
-    }
-    LaunchedEffect(true ){
-        notificationLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-    }
-
-   
-
 
 
     Scaffold(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
