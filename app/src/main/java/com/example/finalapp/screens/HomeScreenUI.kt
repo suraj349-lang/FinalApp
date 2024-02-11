@@ -75,7 +75,7 @@ import com.example.finalapp.utils.RequestState
 
 
 
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "StateFlowValueCalledInComposition")
 @Composable

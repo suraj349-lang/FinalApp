@@ -327,17 +327,17 @@ fun FrisbeeInfo() {
 fun ProfileName() {
 
     val viewmodel= hiltViewModel<AuthViewModel>()
-    val name by viewmodel._profileName
-
-    LaunchedEffect(key1 = true){
-        try {
-            viewmodel.getProfileData()
-          //  Log.d("name",name)
-        }catch (e:Exception){
-            Log.d("Error in profile name", e.message.toString())
-        }
-
-    }
+//    val name by viewmodel._profileName
+//
+//    LaunchedEffect(key1 = true){
+//        try {
+//            viewmodel.getProfileData()
+//          //  Log.d("name",name)
+//        }catch (e:Exception){
+//            Log.d("Error in profile name", e.message.toString())
+//        }
+//
+//    }
 
     Surface(modifier = Modifier
         .fillMaxWidth()
@@ -345,7 +345,7 @@ fun ProfileName() {
         .height(45.dp)){
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
             Text(
-                text =if (name!= "") name else "Default Name",
+                text ="Default name",
                 style = MaterialTheme.typography.displayMedium,
                 fontSize = 38.sp,
                 color = statusAndTopAppBarColor)
