@@ -30,6 +30,7 @@ import androidx.navigation.NavController
 import com.example.finalapp.R
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
+import com.example.finalapp.utils.Constants.Constants
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 
@@ -63,13 +64,13 @@ fun SplashScreenUI(navController: NavController){
             verticalArrangement = Arrangement.Center
         ) {
             Image(
-                painterResource(id = R.drawable.frisbee ),
+                painterResource(id = R.drawable.tree ),
                 contentDescription ="App Icon" +
                         "",
                 contentScale= ContentScale.Fit,
                 modifier = Modifier.size(95.dp)
             )
-            Text(text="FRISBEE", fontSize = 45.sp, modifier = Modifier.padding(top=8.dp, bottom = 0.dp), color = statusAndTopAppBarColor, style = MaterialTheme.typography.titleMedium)
+            Text(text=Constants.APP_NAME, fontSize = 45.sp, modifier = Modifier.padding(top=8.dp, bottom = 0.dp), color = statusAndTopAppBarColor, style = MaterialTheme.typography.titleMedium)
 
 
         }

@@ -8,5 +8,7 @@ import androidx.room.PrimaryKey
 data class Profile(
     @PrimaryKey(autoGenerate = true)
     val id:Int=0,
-    val name:String
+    val name:String,
+    val number:String,
+    val token:String
 )

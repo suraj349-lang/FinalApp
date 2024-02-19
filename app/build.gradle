@@ -108,6 +108,11 @@ dependencies {
 
     implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1"
 
+    //firebase FCM
+    implementation "com.google.firebase:firebase-messaging:23.4.1"
+
+    implementation("com.google.firebase:firebase-core:21.1.1")
+
 
 
 

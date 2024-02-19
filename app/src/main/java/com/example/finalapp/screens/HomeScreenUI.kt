@@ -71,6 +71,7 @@ import com.example.finalapp.screens.DialogBOX.CustomAlertDialog
 import com.example.finalapp.ui.theme.DarkBlue
 import com.example.finalapp.ui.theme.floatingActionBtnTextColor
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
+import com.example.finalapp.utils.Constants.Constants
 import com.example.finalapp.utils.RequestState
 
 
@@ -87,7 +88,7 @@ fun HomeScreenUI(navController: NavHostController) {
 
     Scaffold(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
              topBar = { HomeTopBar(
-                 "Frisbee",
+                 Constants.APP_NAME,
                      navController,
                      true ,
                      R.drawable.send_24)
@@ -275,11 +276,10 @@ fun HomeTopBar(title:String,navController: NavHostController,actionIcon:Boolean,
             )
         },
         navigationIcon = {
-            Icon(
+            Image(
                 painter = painterResource(
-                    id = R.drawable.baseline_bakery_dining_24
+                    id = R.drawable.tree
                 ),
-                tint = Color.White,
                 contentDescription ="" ,
                 modifier = Modifier
                     .padding(top = 6.dp)

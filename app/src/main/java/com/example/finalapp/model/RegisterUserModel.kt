@@ -4,7 +4,9 @@ data class RegisterUserModel(
   val name:String,
   val number:String,
   val username:String,
-  val password:String
+  val password:String,
+  val token:String,
+  val address:String
 )
 data class SignupAPIResponse(
   val success:Boolean,

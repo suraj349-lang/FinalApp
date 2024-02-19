@@ -14,14 +14,11 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,7 +29,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -46,17 +42,35 @@ import com.example.finalapp.auth.authViewModel.AuthViewModel
 import com.example.finalapp.model.RegisterUserModel
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.ui.theme.topAppBarTextColor
+import com.example.finalapp.utils.Constants.Constants
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.ktx.messaging
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 
 @Composable
-fun FinalUserCreation(navController: NavHostController){
+fun FinalUserCreation(authViewModel: AuthViewModel, navController: NavHostController){
     val firebaseAuth= FirebaseAuth.getInstance();
-    val authViewModel= hiltViewModel<AuthViewModel>()
     var name by authViewModel.profileName
-    val number by remember { mutableStateOf(firebaseAuth.currentUser?.phoneNumber.toString()) }
+    var number by remember { mutableStateOf("") }
+
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var token by remember { mutableStateOf("") }
+    val scope= rememberCoroutineScope()
+    var address=authViewModel.address.value
+
+
+    LaunchedEffect(key1 =true){
+        scope.launch(Dispatchers.IO) {
+            token = Firebase.messaging.token.await()
+            number=firebaseAuth.currentUser?.phoneNumber.toString()
+        }
+    }
+
 
     FinalUserCreationUI(
         navController,
@@ -69,11 +83,11 @@ fun FinalUserCreation(navController: NavHostController){
         onUsernameChange = {username=it},
         onPasswordChange = {password=it},
         onClick =  {
-            authViewModel.saveProfileData()
-            authViewModel.RegisterUser(RegisterUserModel(name, number,username,password))  }
+            authViewModel.saveProfileData(name,number,token)
+            authViewModel.RegisterUser(RegisterUserModel(name.trim(), number,username,password,token,address))  }
     )
 }
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun FinalUserCreationUI (
     navController:NavController,
@@ -92,12 +106,13 @@ fun FinalUserCreationUI (
 
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()) {
-            Text(text="FRISBEE", fontSize = 45.sp, modifier = Modifier.padding(top=8.dp, bottom = 0.dp), color = statusAndTopAppBarColor, style = MaterialTheme.typography.titleMedium)
+            Text(text=Constants.APP_NAME, fontSize = 45.sp, modifier = Modifier.padding(top=8.dp, bottom = 0.dp), color = statusAndTopAppBarColor, style = MaterialTheme.typography.titleMedium)
             Text(text="date your way...", fontSize = 18.sp, modifier = Modifier.padding(top=0.dp, start = 120.dp), color = Color(
                 0xFFE71708),
                 style = MaterialTheme.typography.titleMedium
             )
             Spacer(modifier = Modifier.height(16.dp))
+            Text(text = "Creating account for number $number")
             OutlinedTextField(
                 value =name ,
                 onValueChange =onNameChange,

@@ -172,7 +172,7 @@ fun ProfileItem(color: Long){
                     .background(color = Color.White)
                 ) {
                     Image(
-                        painter = painterResource(id =R.drawable.hd_girl ),
+                        painter = painterResource(id =R.drawable.tree ),
                         contentDescription ="" ,
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.fillMaxSize()
@@ -362,7 +362,7 @@ fun PostItem2(){
                 shape = RoundedCornerShape(6.dp)) {
 
                 Image(
-                    painter = painterResource(id =R.drawable.hd_girl ),
+                    painter = painterResource(id =R.drawable.tree ),
                     contentDescription ="",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize() )
@@ -463,7 +463,7 @@ fun PostItem3(){
                 shape = RoundedCornerShape(6.dp)) {
 
                 Image(
-                    painter = painterResource(id =R.drawable.indian_girl ),
+                    painter = painterResource(id =R.drawable.tree ),
                     contentDescription ="",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize() )

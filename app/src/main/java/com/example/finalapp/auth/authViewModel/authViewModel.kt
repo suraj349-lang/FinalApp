@@ -1,6 +1,7 @@
 package com.example.finalapp.auth.authViewModel
 
 import android.content.Context
+import android.util.JsonToken
 import android.util.Log
 import android.widget.Toast
 
@@ -25,6 +26,8 @@ import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 import kotlinx.coroutines.flow.catch
 
@@ -39,6 +42,13 @@ class AuthViewModel @Inject constructor(
     private val databaseRepository: DatabaseRepository,
     @ApplicationContext private val context: Context
 ): ViewModel() {
+    var latitude= mutableStateOf(0.0)
+    var longitude= mutableStateOf(0.0)
+    var address= mutableStateOf("")
+
+
+
+
 
     val myLoginResponse: MutableState<RequestState<LoginAPIResponse>> = mutableStateOf(RequestState.Idle)
     val mySignupResponse: MutableState<RequestState<SignupAPIResponse>> = mutableStateOf(RequestState.Idle)
@@ -91,7 +101,10 @@ class AuthViewModel @Inject constructor(
                 }
             }
             is RequestState.Error->{
-                Toast.makeText(context,"$result", Toast.LENGTH_SHORT).show()
+
+                val msg=if(result.error.message.toString() =="HTTP 400 Bad Request") "Number already exists" else result.error.message
+                Log.d("signupResponseDataAndAction", msg.toString())
+                Toast.makeText(context,msg, Toast.LENGTH_SHORT).show()
             }
             RequestState.Loading->{
               //  CircularProgressIndicator(color = Color(0xFF1289BE))
@@ -111,8 +124,8 @@ class AuthViewModel @Inject constructor(
     }
 
     //-----------------------------------------------------------------------------------------------------------//
-    fun saveProfileData(){
-        val profile=Profile(name=profileName.value)
+    fun saveProfileData(name:String,number:String,token: String){
+        val profile=Profile(name=name,number=number,token=token)
         viewModelScope.launch {
             databaseRepository.saveProfileData(profile = profile)
         }

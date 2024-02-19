@@ -55,6 +55,7 @@ import com.example.finalapp.auth.screensUI.otp.OtpBox
 import com.example.finalapp.model.RegisterUserModel
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.ui.theme.topAppBarTextColor
+import com.example.finalapp.utils.Constants.Constants
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.PhoneAuthCredential
@@ -97,7 +98,7 @@ fun SignupScreenUI(navController: NavController = NavController(LocalContext.cur
                 modifier = Modifier.size(100.dp)
             )
             Text(
-                text = "FRISBEE",
+                text = Constants.APP_NAME,
                 fontSize = 45.sp,
                 modifier = Modifier.padding(top = 8.dp, bottom = 0.dp),
                 color = statusAndTopAppBarColor,
