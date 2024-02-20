@@ -124,8 +124,7 @@ class AuthViewModel @Inject constructor(
     }
 
     //-----------------------------------------------------------------------------------------------------------//
-    fun saveProfileData(name:String,number:String,token: String){
-        val profile=Profile(name=name,number=number,token=token)
+    fun saveProfileData(profile: Profile){
         viewModelScope.launch {
             databaseRepository.saveProfileData(profile = profile)
         }

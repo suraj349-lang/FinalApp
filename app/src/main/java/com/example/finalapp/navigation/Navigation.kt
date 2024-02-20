@@ -14,6 +14,7 @@ import com.example.finalapp.auth.screensUI.SignupScreenUI
 import com.example.finalapp.auth.screensUI.SplashScreenUI
 import com.example.finalapp.auth.screensUI.otp.OtpBox
 import com.example.finalapp.fcm.screen.ChatScreenUIFCM
+import com.example.finalapp.screens.ChatScreenUI
 import com.example.finalapp.screens.FinalUserCreation
 import com.example.finalapp.screens.HomeScreenUI
 import com.example.finalapp.screens.NotificationsScreenUI
@@ -39,12 +40,11 @@ sealed class SCREENS(val route:String){
 @Composable
 fun Navigation(authViewModel: AuthViewModel) {
     val navController:NavHostController= rememberNavController();
-    NavHost(navController = navController, startDestination =SCREENS.LOGIN.route){
+    NavHost(navController = navController, startDestination =SCREENS.SIGNUP.route){
         composable(SCREENS.SPLASH.route){
             SplashScreenUI(navController)
         }
         composable(SCREENS.LOGIN.route){
-            val authViewModel= hiltViewModel<AuthViewModel>()
             LoginScreenUI(navController,authViewModel)
         }
         composable(SCREENS.SIGNUP.route){
@@ -69,7 +69,7 @@ fun Navigation(authViewModel: AuthViewModel) {
             NotificationsScreenUI(navController)
         }
         composable(SCREENS.CHAT.route){
-            ChatScreenUIFCM()
+            ChatScreenUI(navController)
         }
         composable(SCREENS.OTP2.route){
             OtpBox()

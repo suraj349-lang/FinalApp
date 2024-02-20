@@ -13,6 +13,6 @@ interface ProfileDao {
     @Query("SELECT * FROM profile_table ORDER BY id ASC")
     fun getProfileData(): Flow<Profile>
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun saveProfileData(profile: Profile)
 }

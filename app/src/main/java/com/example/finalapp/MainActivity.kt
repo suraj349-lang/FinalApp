@@ -105,31 +105,26 @@ class MainActivity : ComponentActivity() {
         val location=fusedLocationProviderClient.getCurrentLocation(100,null)
         location.addOnSuccessListener {
             if(it!=null){
-//                mainViewModel.updateCoordinates(LatLng(it.latitude,it.longitude))
-//                Log.d("Coordinates from VM", mainViewModel.coordinates.value.latitude.toString())
-//                mainViewModel.updateAddress(getReadableLocation(it.latitude,it.longitude,this@MainActivity))
-//                Log.d("Coordinate", if(mainViewModel.address.value != "") mainViewModel.address.value else "No data")
-//
-//                Log.d("Coordinates",it.latitude.toString()+"   "+ it.longitude.toString())
-                mSocket.emit("location",Constants.APP_NAME + "  "+it.latitude.toString() + " " + it.longitude.toString())
-                mSocket.on("location"){data->
-                    Log.d("Coordinates received from node", data[0].toString())
-                }
+
+//                mSocket.emit("location",Constants.APP_NAME + "  "+it.latitude.toString() + " " + it.longitude.toString())
+//                mSocket.on("location"){data->
+//                    Log.d("Coordinates received from node", data[0].toString())
+//                }
                 authViewModel.latitude.value=it.latitude
                 authViewModel.longitude.value=it.longitude
-                Log.d("Coordinates", authViewModel.latitude.value.toString() + "    "+authViewModel.longitude.value.toString())
+//                Log.d("Coordinates", authViewModel.latitude.value.toString() + "    "+authViewModel.longitude.value.toString())
                 authViewModel.address.value= getReadableLocation(authViewModel.latitude.value,authViewModel.longitude.value,this@MainActivity)
-                Log.d("Coordinates", authViewModel.address.value)
-
-
-                val userTokenAndAddress=User(token = localToken.value, address = authViewModel.address.value)
-                mSocket.emit("address",Json.encodeToString(userTokenAndAddress))
-
-
-                mSocket.on("address"){data->
-                  Log.d("Coordinates changed to address", data[0].toString())
+//                Log.d("Coordinates", authViewModel.address.value)
+//
+//
+//                val userTokenAndAddress=User(token = localToken.value, address = authViewModel.address.value)
+//                mSocket.emit("address",Json.encodeToString(userTokenAndAddress))
+//
+//
+//                mSocket.on("address"){data->
+//                  Log.d("Coordinates changed to address", data[0].toString())
                    // Log.d("Coordinates changed to address","no address")
-                }
+              //  }
             }else{
                 Log.d("Coordinates","error fetching location")
             }
@@ -168,10 +163,6 @@ fun FinalApp(authViewModel: AuthViewModel, getLocation: () -> Unit) {
     }
 }
 
-data class LatLng(
-    val latitude:Double,
-    val longitude:Double
-)
 fun getReadableLocation(latitude: Double, longitude: Double, context: Context): String {
     var addressText = ""
     val geocoder = Geocoder(context, Locale.getDefault())

@@ -1,5 +1,6 @@
 package com.example.finalapp.screens
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -39,6 +40,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.finalapp.auth.authViewModel.AuthViewModel
+import com.example.finalapp.database.Profile
 import com.example.finalapp.model.RegisterUserModel
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.ui.theme.topAppBarTextColor
@@ -61,7 +63,8 @@ fun FinalUserCreation(authViewModel: AuthViewModel, navController: NavHostContro
     var password by remember { mutableStateOf("") }
     var token by remember { mutableStateOf("") }
     val scope= rememberCoroutineScope()
-    var address=authViewModel.address.value
+    val address=authViewModel.address.value
+
 
 
     LaunchedEffect(key1 =true){
@@ -83,8 +86,18 @@ fun FinalUserCreation(authViewModel: AuthViewModel, navController: NavHostContro
         onUsernameChange = {username=it},
         onPasswordChange = {password=it},
         onClick =  {
-            authViewModel.saveProfileData(name,number,token)
-            authViewModel.RegisterUser(RegisterUserModel(name.trim(), number,username,password,token,address))  }
+            scope.launch(Dispatchers.IO) {
+                try {
+                    authViewModel.saveProfileData(Profile(name=name, username = username, number=number,token=token, address = address))
+                }catch (e:Exception){
+                    Log.d("FinalUserCreation",e.message.toString())
+                }
+            }
+            scope.launch(Dispatchers.IO) {
+                authViewModel.RegisterUser(RegisterUserModel(name.trim(), number,username,password,token,address))  }
+            }
+
+
     )
 }
 @OptIn(ExperimentalComposeUiApi::class)
