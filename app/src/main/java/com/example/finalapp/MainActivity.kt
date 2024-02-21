@@ -38,8 +38,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 import java.io.IOException
 import java.util.Locale
 
@@ -76,7 +74,7 @@ class MainActivity : ComponentActivity() {
             mSocket.connect()
             mSocket.emit("user",Constants.APP_NAME)
             mSocket.emit("message","hello from ${Constants.APP_NAME}")
-            FinalApp(authViewModel){ getLocation(authViewModel) }
+            FinalApp(mSocket,authViewModel){ getLocation(authViewModel) }
 
         }
         fusedLocationProviderClient= LocationServices.getFusedLocationProviderClient(this)
@@ -134,7 +132,7 @@ class MainActivity : ComponentActivity() {
 
 }
 @Composable
-fun FinalApp(authViewModel: AuthViewModel, getLocation: () -> Unit) {
+fun FinalApp(mSocket: Socket, authViewModel: AuthViewModel, getLocation: () -> Unit) {
     val scope= rememberCoroutineScope()
     LaunchedEffect(key1 = true ){
         scope.launch(Dispatchers.IO) {
@@ -155,7 +153,7 @@ fun FinalApp(authViewModel: AuthViewModel, getLocation: () -> Unit) {
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Navigation(authViewModel)
+                Navigation(mSocket,authViewModel)
 
             }
 

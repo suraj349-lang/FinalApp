@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ProfileDao {
-    @Query("SELECT * FROM profile_table ORDER BY id ASC")
+    @Query("SELECT * FROM profile_table where id=1")
     fun getProfileData(): Flow<Profile>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)

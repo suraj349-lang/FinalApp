@@ -130,19 +130,19 @@ class AuthViewModel @Inject constructor(
         }
 
     }
-    var _profileName:MutableState<String> = mutableStateOf("")
+    var nameFromDb:MutableState<String> = mutableStateOf("")
 
     fun getProfileData(){
 
             try {
                 viewModelScope.launch {
                     databaseRepository.getProfileData().collect{
-                        _profileName.value=it.name
+                        nameFromDb.value=it.number
                     }
 
                 }
             }catch (e:Exception){
-                _profileName.value=e.toString()
+                nameFromDb.value=e.toString()
             }
        }
 
