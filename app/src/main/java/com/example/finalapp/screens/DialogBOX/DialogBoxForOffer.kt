@@ -152,7 +152,7 @@ fun SuggestionsUI() {
 //            offerTextField = "Coffee Date"
         }, verticalAlignment = Alignment.Bottom)
     {
-        Icon(painter = painterResource(id = R.drawable.coffee), contentDescription ="coffee", modifier = Modifier.size(21.dp), tint = Color(
+        Icon(painter = painterResource(id = R.drawable.coffeecup), contentDescription ="coffee", modifier = Modifier.size(21.dp), tint = Color(
             0xFFD1830F
         )
         )
@@ -167,7 +167,7 @@ fun SuggestionsUI() {
 //            offerTextField = "Movie Date"
         }, verticalAlignment = Alignment.Bottom)
     {
-        Icon(painter = painterResource(id = R.drawable.popcorn_24), contentDescription ="MOvie", modifier = Modifier.size(21.dp), tint = Color(
+        Icon(painter = painterResource(id = R.drawable.cinema), contentDescription ="MOvie", modifier = Modifier.size(21.dp), tint = Color(
             0xFFDB2261
         )
         )
@@ -182,7 +182,7 @@ fun SuggestionsUI() {
 //            offerTextField = "Trip Date"
         }, verticalAlignment = Alignment.Bottom)
     {
-        Icon(painter = painterResource(id = R.drawable.luggage), contentDescription ="Trip", modifier = Modifier.size(21.dp), tint = Color(
+        Icon(painter = painterResource(id = R.drawable.dinner), contentDescription ="Trip", modifier = Modifier.size(21.dp), tint = Color(
             0xFF0683E6
         )
         )
@@ -197,7 +197,7 @@ fun SuggestionsUI() {
 //            offerTextField = " Figure Out Date"
         }, verticalAlignment = Alignment.Bottom)
     {
-        Icon(painter = painterResource(id = R.drawable.meeting), contentDescription ="Figure Out Date", modifier = Modifier.size(21.dp), tint = Color(
+        Icon(painter = painterResource(id = R.drawable.heart), contentDescription ="Figure Out Date", modifier = Modifier.size(21.dp), tint = Color(
             0xFFE71808
         )
         )

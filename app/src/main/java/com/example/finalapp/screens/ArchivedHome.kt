@@ -265,7 +265,7 @@ fun ProfileItem(color: Long){
                                     .wrapContentSize()
                                     .padding(0.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
                                     IconButton(onClick = { /*TODO*/ }) {
-                                        Icon(painterResource(id =R.drawable.coffee_24 ),
+                                        Icon(painterResource(id =R.drawable.coffeecup ),
                                             contentDescription ="Coffee icon" ,
                                             tint = Color(0xFF000000),
                                             modifier = Modifier.size(35.dp) )
@@ -277,7 +277,7 @@ fun ProfileItem(color: Long){
                                     .padding(0.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
                                     IconButton(onClick = { /*TODO*/ }) {
                                         Icon(
-                                            painterResource(id =R.drawable.personal_24 ),
+                                            painterResource(id =R.drawable.heart ),
                                             contentDescription ="chat icon" ,
                                             tint = Color(0xFF990707),
                                             modifier = Modifier.size(35.dp)
@@ -290,7 +290,7 @@ fun ProfileItem(color: Long){
                                     .padding(0.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
                                     IconButton(onClick = { /*TODO*/ }) {
                                         Icon(
-                                            painterResource(id =R.drawable.food_24 ),
+                                            painterResource(id =R.drawable.dinner ),
                                             contentDescription ="Food icon" ,
                                             tint = Color(0xFFFFBD20),
                                             modifier = Modifier.size(35.dp)
@@ -338,9 +338,9 @@ fun ProfileItem(color: Long){
 fun PostItem2(){
     var key by remember { mutableStateOf(false) }
     var icon=if(key)
-        painterResource(id = R.drawable.favorite_border_24)
+        painterResource(id = R.drawable.heart)
     else
-        painterResource(id = R.drawable.personal_24)
+        painterResource(id = R.drawable.dinner)
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -393,7 +393,7 @@ fun PostItem2(){
                 Card() {
                     Row(modifier=Modifier.padding(8.dp),verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
                     Icon(
-                        painter = painterResource(id = R.drawable.coffee_24),
+                        painter = painterResource(id = R.drawable.coffeecup),
                         contentDescription ="Coffee",
                         tint = Color(0xFF0E0D0C),
                         modifier = Modifier.size(25.dp)
@@ -439,9 +439,9 @@ fun PostItem2(){
 fun PostItem3(){
     var key by remember { mutableStateOf(false) }
     var icon=if(key)
-        painterResource(id = R.drawable.favorite_border_24)
+        painterResource(id = R.drawable.heart)
     else
-        painterResource(id = R.drawable.personal_24)
+        painterResource(id = R.drawable.heart)
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -494,7 +494,7 @@ fun PostItem3(){
             Card() {
                 Row(modifier=Modifier.padding(8.dp),verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
                     Icon(
-                        painter = painterResource(id = R.drawable.coffee_24),
+                        painter = painterResource(id = R.drawable.coffeecup),
                         contentDescription ="Coffee",
                         tint = Color(0xFF0E0D0C),
                         modifier = Modifier.size(25.dp)

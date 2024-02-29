@@ -53,16 +53,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val scope= rememberCoroutineScope()
             val authViewModel= hiltViewModel<AuthViewModel>()
-            LaunchedEffect(key1 =true){
-                scope.launch {
-                    localToken.value=Firebase.messaging.token.await()
-                    if(localToken.value==""){
-                        localToken.value="adarsh123"
-                    }
-                }
-            }
+
 
 
             try {
@@ -137,6 +129,7 @@ fun FinalApp(mSocket: Socket, authViewModel: AuthViewModel, getLocation: () -> U
     LaunchedEffect(key1 = true ){
         scope.launch(Dispatchers.IO) {
             getLocation()
+            authViewModel.getProfileData()
         }
 
     }
@@ -153,7 +146,7 @@ fun FinalApp(mSocket: Socket, authViewModel: AuthViewModel, getLocation: () -> U
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Navigation(mSocket,authViewModel)
+                Navigation(authViewModel)
 
             }
 
@@ -174,6 +167,13 @@ fun getReadableLocation(latitude: Double, longitude: Double, context: Context): 
             addressText = "${address.getAddressLine(0)}, ${address.locality}"
             // Use the addressText in your app
             Log.d("geolocation", addressText)
+            val addressComponents = addressText.split(", ")
+
+            // Check if there are enough components
+            if (addressComponents.size >= 2) {
+                // The state is the second component
+                Log.d("Coordinates state",addressComponents[1])
+            }
         }
 
     } catch (e: IOException) {

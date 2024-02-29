@@ -95,7 +95,7 @@ fun SignupScreenUI(navController: NavController = NavController(LocalContext.cur
             Image(
                 painter = painterResource(id = R.drawable.tree),
                 contentDescription = "",
-                modifier = Modifier.size(100.dp)
+                modifier = Modifier.size(20.dp)
             )
             Text(
                 text = Constants.APP_NAME,

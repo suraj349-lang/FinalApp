@@ -4,20 +4,28 @@ package com.example.finalapp.screens
 import BottomBar
 import android.annotation.SuppressLint
 import android.util.Log
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -30,6 +38,7 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -46,12 +55,19 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -61,6 +77,7 @@ import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.offer.OfferViewModel
 import com.example.finalapp.screens.DialogBOX.CustomAlertDialog
 import com.example.finalapp.ui.theme.DarkBlue
+import com.example.finalapp.ui.theme.LightBlueBkg
 import com.example.finalapp.ui.theme.floatingActionBtnTextColor
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.utils.Constants.Constants
@@ -76,6 +93,7 @@ fun HomeScreenUI(navController: NavHostController) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val buttonsVisible = remember { mutableStateOf(true) }
     val offerViewModel= hiltViewModel<OfferViewModel>()
+    val homeData = listOf(R.drawable.profile_image_1,R.drawable.profile_image_2,R.drawable.profile_image_3,R.drawable.girl)
 
 
     Scaffold(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -93,22 +111,28 @@ fun HomeScreenUI(navController: NavHostController) {
              floatingActionButton = {
                  HomeFloatingActionButton(offerViewModel , navController );
              }
-            ){
-            Column(
-                verticalArrangement = Arrangement.Top,
-                modifier = Modifier
-                    .padding(it)
-                    .height(5000.dp)
-                    .fillMaxWidth()
-                    .verticalScroll(rememberScrollState())
+            ) { it->
+        Surface(modifier = Modifier
+            .fillMaxSize()
+            .background(color = Color.LightGray)) {
+            LazyColumn(
+                modifier = Modifier.padding(it)
             ) {
-                ImageScreen()
-                HomeScreenOffer()
-                ProfileData()
+                items(homeData) { image ->
+                    ImageScreen(image = image)
+                    Spacer(modifier = Modifier.height(20.dp))
 
+                }
             }
         }
     }
+    }
+
+@Composable
+fun HomeItem(image:Int){
+    Image(painter = painterResource(id = image) , contentDescription = "")
+}
+
 
 @Composable
 fun HomeFloatingActionButton(offerViewModel: OfferViewModel,navController: NavHostController  ) {
@@ -227,25 +251,125 @@ fun HomeScreenOffer(){
 //0xFFEEF3B9 -> yellow   0xFFE8E9E2  -> grey  
 
 @Composable
-fun ImageScreen() {
+fun ImageScreen(image: Int) {
     val configuration = LocalConfiguration.current
     val widthInDp = configuration.screenWidthDp.dp
-    val heightInDp = configuration.screenHeightDp.dp * 0.58f
+    val heightInDp = configuration.screenHeightDp.dp * 0.78f
    Box(modifier = Modifier
-       .background(color = Color.Transparent, shape = RoundedCornerShape(6.dp))
-       .padding(top = 2.dp, bottom = 2.dp, start = 2.dp, end = 2.dp)
+       .border(width = 1.dp, color = Color.LightGray)
+       .padding(start = 2.dp, end = 2.dp)
        .fillMaxWidth()
-       .height(heightInDp), contentAlignment = Alignment.BottomStart,)
+       .height(heightInDp)
+       //.clip(shape = RoundedCornerShape(12.dp)).border(width=1.dp, color = Color.Black)
+       , contentAlignment = Alignment.BottomStart)
+
    {
-       Image(painter = painterResource(id = R.drawable.girl),
-           contentDescription ="" ,
-           modifier = Modifier
-               .fillMaxWidth()
-               .height(heightInDp)
-               .clip(shape = RoundedCornerShape(12.dp)),
-           contentScale = ContentScale.Crop
-       )
-       Text(text = "Kiran JayShankar", style = MaterialTheme.typography.bodyMedium, color = Color.Black)
+       Column(modifier = Modifier
+           .fillMaxSize()
+           .border(
+               width = 0.5.dp, color = Color.DarkGray
+           )) {
+           Row(verticalAlignment = Alignment.CenterVertically) {
+               Image(
+                   painter = painterResource(id = image),
+                   contentDescription = "Round Image",
+                   contentScale = ContentScale.FillBounds,
+                   modifier = Modifier
+                       .padding(2.dp)
+                       .size(30.dp)
+                       .clip(CircleShape)
+                       .border(1.dp, Color.DarkGray, CircleShape)
+               )
+           Column(
+               modifier = Modifier
+                   .padding(2.dp)
+                   .fillMaxWidth()
+                   .wrapContentHeight()
+                   .padding(start = 4.dp),
+               verticalArrangement=Arrangement.Center,
+               horizontalAlignment = Alignment.Start
+           ) {
+               Text(
+                   text = "Kiran JayShankar ,24",
+                   style = MaterialTheme.typography.bodyMedium,
+                   modifier = Modifier.fillMaxWidth(),
+                   fontSize = 15.sp,
+                   color = Color.Black
+               )
+               Text(
+                   text = "Botanical Garden",
+                   style = MaterialTheme.typography.bodyMedium,
+                   modifier = Modifier.fillMaxWidth(),
+                   fontSize = 6.sp,
+                   color = Color.Black
+               )
+           }
+           }
+           Image(
+               painter = painterResource(id = image),
+               contentDescription = "",
+               modifier = Modifier
+                   .fillMaxWidth()
+                   .height(heightInDp - 80.dp)
+               // .clip(shape = RoundedCornerShape(12.dp))
+               , contentScale = ContentScale.Crop
+           )
+           Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
+               Row(modifier = Modifier
+                   .fillMaxWidth(0.33f)
+                   .fillMaxHeight(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+                   Text(text = "Raise offer for: ", textAlign = TextAlign.Start)
+               }
+               Row(modifier = Modifier
+                   .fillMaxWidth(0.7f)
+                   .fillMaxHeight(), horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
+                   Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(top=3.dp)) {
+                       Image(painter = painterResource(id = R.drawable.heart), contentDescription = "", modifier = Modifier
+                           .padding( end = 8.dp)
+                           .size(24.dp))
+                       Text(text = "Like", fontSize = 8.sp, fontWeight = FontWeight.Bold)
+
+                   }
+                   Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                       Image(painter = painterResource(id = R.drawable.cinema), contentDescription = "", modifier = Modifier
+                           .padding(end = 8.dp)
+                           .size(30.dp))
+                       Text(text = "Movie", fontSize = 8.sp, fontWeight = FontWeight.Bold)
+
+                   }
+                   Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                       Image(painter = painterResource(id = R.drawable.coffeecup), contentDescription = "", modifier = Modifier
+                           .padding( end = 8.dp)
+                           .size(30.dp))
+                       Text(text = "Coffee", fontSize = 8.sp, fontWeight = FontWeight.Bold)
+
+                   }
+
+
+
+//                   Image(painter = painterResource(id = R.drawable.dinner), contentDescription = "", modifier = Modifier
+//                       .padding(end = 8.dp)
+//                       .size(32.dp))
+
+               }
+               Row(modifier = Modifier.padding(2.dp)
+                   .fillMaxWidth(1f)
+                   .fillMaxHeight(), horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
+                   Column() {
+                       Image(painter = painterResource(id = R.drawable.instant), contentDescription ="", modifier = Modifier
+                           .size(30.dp))
+                       Text(text = "Instant Chat", fontSize = 8.sp, fontWeight = FontWeight.Bold)
+                       
+                   }
+
+               }
+
+
+               
+           }
+
+       }
+
 
    }
 }
