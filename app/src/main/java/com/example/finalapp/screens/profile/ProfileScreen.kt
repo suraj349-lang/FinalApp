@@ -1,4 +1,4 @@
-package com.example.finalapp.screens
+package com.example.finalapp.screens.profile
 
 import BottomBar
 import android.annotation.SuppressLint
@@ -43,8 +43,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -60,8 +62,8 @@ import com.example.finalapp.ui.theme.topAppBarTextColor
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-
-fun ProfileScreenUI(navController: NavHostController ) {
+@Preview
+fun ProfileScreenUI(navController: NavHostController= NavHostController(LocalContext.current) ) {
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val buttonsVisible = remember { mutableStateOf(false) }
@@ -89,12 +91,11 @@ fun ProfileScreenUI(navController: NavHostController ) {
                     ,horizontalAlignment = Alignment.CenterHorizontally) {
                     ProfileIcon(profileImage)
                     ProfileName()
+                    EditProfile(navController)
                     ProfileImages()
-                    EditableProfileScreen()
                     FrisbeeInfo()
                     PersonalInfo()
                     ProfileBio()
-
                     LogOut(navController)
                 }
         }
@@ -102,9 +103,26 @@ fun ProfileScreenUI(navController: NavHostController ) {
 }
 
 @Composable
-fun EditableProfileScreen() {
+fun EditProfile(navController: NavHostController) {
+    var key by remember {
+        mutableStateOf(false)
+    }
+    if(key){
+        ImageCaptureFromCamera()
+
+    }
+    Row(modifier = Modifier
+        .fillMaxWidth()
+        .wrapContentHeight().padding(16.dp)) {
+        Text(text = "Edit Profile", modifier = Modifier.clickable { navController.navigate(SCREENS.GALLERY.route) })
+        Text(text = "Open camera ", modifier = Modifier.padding(start = 14.dp).clickable { key=true})
+    }
+
+
 
 }
+
+
 
 @Composable
 fun ProfileImages() {

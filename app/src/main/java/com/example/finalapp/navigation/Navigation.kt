@@ -14,11 +14,11 @@ import com.example.finalapp.auth.screensUI.SplashScreenUI
 import com.example.finalapp.auth.screensUI.otp.OtpBox
 import com.example.finalapp.screens.ChatScreenUI
 import com.example.finalapp.auth.screensUI.FinalUserCreation
+import com.example.finalapp.screens.profile.GalleryPicker
 import com.example.finalapp.screens.HomeScreenUI
 import com.example.finalapp.screens.NotificationsScreenUI
-import com.example.finalapp.screens.ProfileScreenUI
+import com.example.finalapp.screens.profile.ProfileScreenUI
 import com.example.finalapp.screens.SettingsScreenUI
-import io.socket.client.Socket
 
 
 sealed class SCREENS(val route:String){
@@ -33,12 +33,13 @@ sealed class SCREENS(val route:String){
     object NOTIFICATIONS:SCREENS("notifications_screen")
     object CHAT:SCREENS("chat_screen")
     object  OTP2:SCREENS("otp")
+    object GALLERY:SCREENS("gallery_picker")
 
 }
 @Composable
 fun Navigation(authViewModel: AuthViewModel) {
     val navController:NavHostController= rememberNavController();
-    NavHost(navController = navController, startDestination =SCREENS.HOME.route){
+    NavHost(navController = navController, startDestination =SCREENS.PROFILE.route){
         composable(SCREENS.SPLASH.route){
             SplashScreenUI(navController)
         }
@@ -71,6 +72,9 @@ fun Navigation(authViewModel: AuthViewModel) {
         }
         composable(SCREENS.OTP2.route){
             OtpBox()
+        }
+        composable(SCREENS.GALLERY.route){
+            GalleryPicker()
         }
     }
 
