@@ -55,7 +55,7 @@ class AuthViewModel @Inject constructor(
     val mySignupResponse: MutableState<RequestState<SignupAPIResponse>> = mutableStateOf(RequestState.Idle)
     var key= mutableStateOf(0)
     var keyForFinalUserCreation= mutableStateOf(0)
-    var name= mutableStateOf("Suraj")
+    var name= mutableStateOf("")
     var profileName:MutableState<String> = mutableStateOf("")
     var otp=" "
 

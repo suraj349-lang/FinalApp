@@ -2,6 +2,7 @@ package com.example.finalapp.screens.profile
 
 import BottomBar
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -20,6 +21,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -30,6 +32,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -58,6 +61,7 @@ import com.example.finalapp.screens.DialogBOX.DialogBoxForImageEdit
 import com.example.finalapp.ui.theme.DarkBlue
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.ui.theme.topAppBarTextColor
+import com.example.finalapp.utils.Constants.Constants.TAG
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -113,9 +117,13 @@ fun EditProfile(navController: NavHostController) {
     }
     Row(modifier = Modifier
         .fillMaxWidth()
-        .wrapContentHeight().padding(16.dp)) {
+        .wrapContentHeight()
+        .padding(16.dp)) {
         Text(text = "Edit Profile", modifier = Modifier.clickable { navController.navigate(SCREENS.GALLERY.route) })
-        Text(text = "Open camera ", modifier = Modifier.padding(start = 14.dp).clickable { key=true})
+        Button(onClick = {key = !key}, modifier = Modifier.padding(start = 30.dp)) {
+            Text(text = "Open camera ")
+        }
+
     }
 
 
@@ -319,17 +327,17 @@ fun FrisbeeInfo() {
 fun ProfileName() {
 
     val viewmodel= hiltViewModel<AuthViewModel>()
-//    val name by viewmodel._profileName
-//
-//    LaunchedEffect(key1 = true){
-//        try {
-//            viewmodel.getProfileData()
-//          //  Log.d("name",name)
-//        }catch (e:Exception){
-//            Log.d("Error in profile name", e.message.toString())
-//        }
-//
-//    }
+    val name by viewmodel.name
+
+    LaunchedEffect(key1 = true){
+        try {
+            viewmodel.getProfileData()
+            Log.d(TAG,"name is $name")
+        }catch (e:Exception){
+            Log.d(TAG,"Error in profile name${e.message.toString()}")
+        }
+
+    }
 
     Surface(modifier = Modifier
         .fillMaxWidth()
@@ -337,7 +345,7 @@ fun ProfileName() {
         .height(45.dp)){
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
             Text(
-                text ="Default name",
+                text =if(name!="") name else "Default name",
                 style = MaterialTheme.typography.displayMedium,
                 fontSize = 38.sp,
                 color = statusAndTopAppBarColor)
