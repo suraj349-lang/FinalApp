@@ -28,10 +28,10 @@ import javax.inject.Inject
 class ProfileRepository @Inject constructor(private val api: ApiService) {
 
 
-   suspend fun uploadImage(context: Context, imageUri: Uri): String {
+   suspend fun uploadImage(context: Context, imageUri: String?): String {
 
        return withContext(Dispatchers.IO) {
-           val imageFile = File(imageUri.path!!)
+           val imageFile = File(imageUri)
            val requestBody = imageFile.asRequestBody("image/*".toMediaTypeOrNull())
            val requestBodyPart =
                MultipartBody.Part.createFormData("image", imageFile.name, requestBody)

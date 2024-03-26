@@ -49,11 +49,11 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import coil.compose.rememberImagePainter
 import com.example.finalapp.R
 import com.example.finalapp.auth.authViewModel.AuthViewModel
 import com.example.finalapp.navigation.SCREENS
@@ -66,8 +66,10 @@ import com.example.finalapp.utils.Constants.Constants.TAG
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-@Preview
-fun ProfileScreenUI(navController: NavHostController= NavHostController(LocalContext.current) ) {
+fun ProfileScreenUI(
+    navController: NavHostController = NavHostController(LocalContext.current),
+    profileViewModel: ProfileViewModel
+) {
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val buttonsVisible = remember { mutableStateOf(false) }
@@ -95,7 +97,7 @@ fun ProfileScreenUI(navController: NavHostController= NavHostController(LocalCon
                     ,horizontalAlignment = Alignment.CenterHorizontally) {
                     ProfileIcon(profileImage)
                     ProfileName()
-                    EditProfile(navController)
+                    EditProfile(navController,profileViewModel)
                     ProfileImages()
                     FrisbeeInfo()
                     PersonalInfo()
@@ -107,27 +109,29 @@ fun ProfileScreenUI(navController: NavHostController= NavHostController(LocalCon
 }
 
 @Composable
-fun EditProfile(navController: NavHostController) {
+fun EditProfile(navController: NavHostController, profileViewModel: ProfileViewModel) {
     var key by remember {
         mutableStateOf(false)
     }
     if(key){
-        ImageCaptureFromCamera()
+        ImageCaptureFromCamera(profileViewModel)
 
     }
-    Row(modifier = Modifier
-        .fillMaxWidth()
-        .wrapContentHeight()
-        .padding(16.dp)) {
-        Text(text = "Edit Profile", modifier = Modifier.clickable { navController.navigate(SCREENS.GALLERY.route) })
-        Button(onClick = {key = !key}, modifier = Modifier.padding(start = 30.dp)) {
-            Text(text = "Open camera ")
+    Column(verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.Start, modifier = Modifier
+        .height(400.dp)
+        .fillMaxWidth()) {
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .padding(16.dp)) {
+            Text(text = "Edit Profile", modifier = Modifier.clickable { navController.navigate(SCREENS.GALLERY.route) })
+            Button(onClick = {key = !key}, modifier = Modifier.padding(start = 30.dp)) {
+                Text(text = "Open camera ")
+            }
         }
+        Image(painter = rememberImagePainter(data =profileViewModel.imageUri.value ), contentDescription ="" )
 
     }
-
-
-
 }
 
 

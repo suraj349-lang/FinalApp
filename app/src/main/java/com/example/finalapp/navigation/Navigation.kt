@@ -1,6 +1,7 @@
 package com.example.finalapp.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -19,6 +20,7 @@ import com.example.finalapp.screens.HomeScreenUI
 import com.example.finalapp.screens.NotificationsScreenUI
 import com.example.finalapp.screens.profile.ProfileScreenUI
 import com.example.finalapp.screens.SettingsScreenUI
+import com.example.finalapp.screens.profile.ProfileViewModel
 
 
 sealed class SCREENS(val route:String){
@@ -59,7 +61,8 @@ fun Navigation(authViewModel: AuthViewModel) {
             FinalUserCreation(authViewModel,navController)
         }
         composable(SCREENS.PROFILE.route){
-            ProfileScreenUI(navController)
+            val profileViewModel= hiltViewModel<ProfileViewModel>()
+            ProfileScreenUI(navController,profileViewModel)
         }
         composable(SCREENS.SETTINGS.route){
             SettingsScreenUI(navController)
