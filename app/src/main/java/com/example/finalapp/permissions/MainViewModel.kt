@@ -1,4 +1,4 @@
-package com.plcoding.permissionsguidecompose
+package com.example.finalapp.permissions
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel

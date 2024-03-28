@@ -1,4 +1,4 @@
-package com.plcoding.permissionsguidecompose
+package com.example.finalapp.permissions
 
 import android.Manifest
 import androidx.compose.foundation.clickable
@@ -69,38 +69,27 @@ interface PermissionTextProvider {
     fun getDescription(isPermanentlyDeclined: Boolean): String
 }
 
-class CameraPermissionTextProvider: PermissionTextProvider {
+class LocationPermissionTextProvider: PermissionTextProvider {
     override fun getDescription(isPermanentlyDeclined: Boolean): String {
         return if(isPermanentlyDeclined) {
             "It seems you permanently declined Location permission. " +
                     "You can go to the app settings to grant it."
         } else {
-            "This app needs access to your Location so that your friends " +
-                    "can see you in a call."
+            "This app needs access to your Location so that we can show  " +
+                    "you potential friends."
         }
     }
 }
 
-class RecordAudioPermissionTextProvider: PermissionTextProvider {
+class NotificationPermissionTextProvider: PermissionTextProvider {
     override fun getDescription(isPermanentlyDeclined: Boolean): String {
         return if(isPermanentlyDeclined) {
             "It seems you permanently declined Notification permission. " +
                     "You can go to the app settings to grant it."
         } else {
-            "This app needs access to your Notification so that your friends " +
-                    "can hear you in a call."
+            "This app needs post Notifications so that you " +
+                    "can get the latest updates."
         }
     }
 }
 
-class PhoneCallPermissionTextProvider: PermissionTextProvider {
-    override fun getDescription(isPermanentlyDeclined: Boolean): String {
-        return if(isPermanentlyDeclined) {
-            "It seems you permanently declined phone calling permission. " +
-                    "You can go to the app settings to grant it."
-        } else {
-            "This app needs phone calling permission so that you can talk " +
-                    "to your friends."
-        }
-    }
-}

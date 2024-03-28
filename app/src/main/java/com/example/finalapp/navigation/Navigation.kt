@@ -41,7 +41,7 @@ sealed class SCREENS(val route:String){
 @Composable
 fun Navigation(authViewModel: AuthViewModel) {
     val navController:NavHostController= rememberNavController();
-    NavHost(navController = navController, startDestination =SCREENS.PROFILE.route){
+    NavHost(navController = navController, startDestination =SCREENS.SPLASH.route){
         composable(SCREENS.SPLASH.route){
             SplashScreenUI(navController)
         }

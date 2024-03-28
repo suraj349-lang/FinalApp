@@ -12,7 +12,6 @@ import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -20,7 +19,6 @@ import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -31,28 +29,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.finalapp.auth.authViewModel.AuthViewModel
-import com.example.finalapp.location.LocationPermissionText
-import com.example.finalapp.location.LocationViewModel
-import com.example.finalapp.location.NotificationPermissionText
-import com.example.finalapp.location.PermissionDialog
 import com.example.finalapp.navigation.Navigation
+import com.example.finalapp.permissions.LocationPermissionTextProvider
+import com.example.finalapp.permissions.MainViewModel
+import com.example.finalapp.permissions.NotificationPermissionTextProvider
+import com.example.finalapp.permissions.PermissionDialog
+import com.example.finalapp.permissions.PermissionsUI
 import com.example.finalapp.ui.theme.FinalAppTheme
-import com.example.finalapp.utils.Constants.Constants
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.messaging.ktx.messaging
 import dagger.hilt.android.AndroidEntryPoint
-import io.socket.client.IO
-import io.socket.client.Socket
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.Serializable
 import java.io.IOException
 import java.util.Locale
@@ -69,34 +61,26 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            FinalAppTheme() {
-                // A surface container using the 'background' color from the theme
-
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+            FinalAppTheme {
+                if (ActivityCompat.checkSelfPermission(
+                        this,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                    ) == PackageManager.PERMISSION_GRANTED
                 ) {
                     val authViewModel = hiltViewModel<AuthViewModel>()
-                    val locationViewModel = viewModel<LocationViewModel>()
-                    val dialogQueue = locationViewModel.visiblePermissionDialogQueue
+                    FinalApp(authViewModel) { getLocation(this, authViewModel) }
+                } else {
+                    PermissionsUI(onGoToAppSettingsClick = ::openAppSettings)
+                    val permissionViewModel = viewModel<MainViewModel>()
+                    val dialogQueue = permissionViewModel.visiblePermissionDialogQueue
                     val run by remember { mutableStateOf(0) }
 
 
-//
-//            try {
-//                mSocket= IO.socket(Constants.BASE_URL)
-//            }catch (e:Exception){
-//                Log.d("Error in socket",e.message.toString())
-//            }
-//
-//            mSocket.connect()
-//            mSocket.emit("user",Constants.APP_NAME)
-//            mSocket.emit("message","hello from ${Constants.APP_NAME}")
                     val multiplePermissionResultLauncher = rememberLauncherForActivityResult(
                         contract = ActivityResultContracts.RequestMultiplePermissions(),
                         onResult = { perms ->
                             permissionsToRequest.forEach { permission ->
-                                locationViewModel.onPermissionResult(
+                                permissionViewModel.onPermissionResult(
                                     permission = permission,
                                     isGranted = perms[permission] == true
                                 )
@@ -106,20 +90,17 @@ class MainActivity : ComponentActivity() {
                     LaunchedEffect(key1 = run) {
                         multiplePermissionResultLauncher.launch(permissionsToRequest)
                     }
-
-
-
                     dialogQueue
                         .reversed()
                         .forEach { permission ->
                             PermissionDialog(
                                 permissionTextProvider = when (permission) {
                                     Manifest.permission.ACCESS_FINE_LOCATION -> {
-                                        LocationPermissionText()
+                                        LocationPermissionTextProvider()
                                     }
 
                                     Manifest.permission.POST_NOTIFICATIONS -> {
-                                        NotificationPermissionText()
+                                        NotificationPermissionTextProvider()
                                     }
 
                                     else -> return@forEach
@@ -127,10 +108,9 @@ class MainActivity : ComponentActivity() {
                                 isPermanentlyDeclined = !shouldShowRequestPermissionRationale(
                                     permission
                                 ),
-                                onDismiss = locationViewModel::dismissDialog,
+                                onDismiss = permissionViewModel::dismissDialog,
                                 onOkClick = {
-                                    locationViewModel.dismissDialog()
-                                    locationViewModel::dismissDialog
+                                    permissionViewModel.dismissDialog()
                                     multiplePermissionResultLauncher.launch(
                                         arrayOf(permission)
                                     )
@@ -138,13 +118,13 @@ class MainActivity : ComponentActivity() {
                                 onGoToAppSettingsClick = ::openAppSettings
                             )
                         }
-                    FinalApp(authViewModel) { getLocation(this, authViewModel) }
 
 
                 }
             }
         }
     }
+
 }
 
 fun Activity.openAppSettings() {
@@ -165,23 +145,18 @@ fun FinalApp(
     val value by remember{ mutableStateOf(false) }
     LaunchedEffect(value ){
         scope.launch(Dispatchers.IO) {
-          //  getLocation()
+             getLocation()
             authViewModel.getProfileData()
         }
 
     }
-
-
-
-            Column(
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Navigation(authViewModel)
-
-            }
-
+    Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
+        Column(verticalArrangement = Arrangement.Center,horizontalAlignment = Alignment.CenterHorizontally)
+        {
+            Navigation(authViewModel)
         }
+    }
+}
 
 fun getReadableLocation(latitude: Double, longitude: Double, context: Context): String {
     var addressText = ""
@@ -268,3 +243,16 @@ private fun getLocation(context: Context, authViewModel:AuthViewModel){
     }
 }
 
+
+/*
+//
+//            try {
+//                mSocket= IO.socket(Constants.BASE_URL)
+//            }catch (e:Exception){
+//                Log.d("Error in socket",e.message.toString())
+//            }
+//
+//            mSocket.connect()
+//            mSocket.emit("user",Constants.APP_NAME)
+//            mSocket.emit("message","hello from ${Constants.APP_NAME}")
+ */
