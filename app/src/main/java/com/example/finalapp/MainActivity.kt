@@ -49,6 +49,9 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 import java.io.IOException
 import java.util.Locale
+import android.location.LocationManager
+import androidx.activity.result.ActivityResultLauncher
+
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 @AndroidEntryPoint
@@ -57,12 +60,22 @@ class MainActivity : ComponentActivity() {
         Manifest.permission.ACCESS_FINE_LOCATION,
         Manifest.permission.POST_NOTIFICATIONS
     )
-
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
             FinalAppTheme {
+                val authViewModel= hiltViewModel<AuthViewModel>()
+                val locationSettingsLauncher = rememberLauncherForActivityResult(
+                    contract = ActivityResultContracts.StartActivityForResult()
+                ) { result ->
+                    // Handle the activity result here
+                }
+                LaunchedEffect(key1 = true){
+
+                    enableLocationSettings(this@MainActivity, launcher = locationSettingsLauncher, authViewModel)
+                }
+
                 if (ActivityCompat.checkSelfPermission(
                         this,
                         Manifest.permission.ACCESS_FINE_LOCATION
@@ -142,15 +155,15 @@ fun FinalApp(
     authViewModel: AuthViewModel,
     getLocation: () -> Unit
 ) {
-    val scope= rememberCoroutineScope()
-    val value by remember{ mutableStateOf(false) }
-    LaunchedEffect(value ){
-        scope.launch(Dispatchers.IO) {
-             getLocation()
-             authViewModel.getProfileData()
-        }
-
-    }
+//    val scope= rememberCoroutineScope()
+//    val value by remember{ mutableStateOf(false) }
+//    LaunchedEffect(value ){
+//        scope.launch(Dispatchers.IO) {
+//             getLocation()
+//             authViewModel.getProfileData()
+//        }
+//
+//    }
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Column(verticalArrangement = Arrangement.Center,horizontalAlignment = Alignment.CenterHorizontally)
         {
@@ -159,45 +172,26 @@ fun FinalApp(
     }
 }
 
-fun getReadableLocation(latitude: Double, longitude: Double, context: Context): String {
-    var addressText = ""
-    val geocoder = Geocoder(context, Locale.getDefault())
 
-    try {
 
-        val addresses = geocoder.getFromLocation(latitude, longitude, 1)
 
-        if (addresses?.isNotEmpty() == true) {
-            val address = addresses[0]
-            addressText = "${address.getAddressLine(0)}, ${address.locality}"
-            // Use the addressText in your app
-            Log.d(TAG, addressText)
-            val addressComponents = addressText.split(", ")
-
-            // Check if there are enough components
-            if (addressComponents.size >= 2) {
-                // The state is the second component
-                Log.d(TAG,addressComponents[1])
-            }
-        }
-
-    } catch (e: IOException) {
-        Log.d(TAG, e.message.toString())
+@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+private fun enableLocationSettings(context: Context, launcher: ActivityResultLauncher<Intent>,authViewModel: AuthViewModel) {
+    val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+    if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+        // GPS is not enabled, prompt the user to enable it
+        val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+        launcher.launch(intent)
+    } else {
+        // GPS is already enabled
+        // Handle this case if needed
+        getLocation(context,authViewModel )
 
     }
-
-    return addressText
-
 }
-
-@Serializable
-data class User(val token: String, val address: String)
-
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
-private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 private fun getLocation(context: Context, authViewModel:AuthViewModel){
-    fusedLocationProviderClient= LocationServices.getFusedLocationProviderClient(context)
+    val fusedLocationProviderClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
     // check location permission
     if(ActivityCompat.checkSelfPermission(context,Manifest.permission.ACCESS_FINE_LOCATION)
         != PackageManager.PERMISSION_GRANTED
@@ -240,8 +234,40 @@ private fun getLocation(context: Context, authViewModel:AuthViewModel){
         }
     }
 }
+fun getReadableLocation(latitude: Double, longitude: Double, context: Context): String {
+    var addressText = ""
+    val geocoder = Geocoder(context, Locale.getDefault())
+
+    try {
+
+        val addresses = geocoder.getFromLocation(latitude, longitude, 1)
+
+        if (addresses?.isNotEmpty() == true) {
+            val address = addresses[0]
+            addressText = "${address.getAddressLine(0)}, ${address.locality}"
+            // Use the addressText in your app
+            Log.d(TAG, addressText)
+            val addressComponents = addressText.split(", ")
+
+            // Check if there are enough components
+            if (addressComponents.size >= 2) {
+                // The state is the second component
+                Log.d(TAG,addressComponents[1])
+            }
+        }
+
+    } catch (e: IOException) {
+        Log.d(TAG, e.message.toString())
+
+    }
+
+    return addressText
+
+}
 
 
+@Serializable
+data class User(val token: String, val address: String)
 /*
 //
 //            try {
@@ -254,3 +280,5 @@ private fun getLocation(context: Context, authViewModel:AuthViewModel){
 //            mSocket.emit("user",Constants.APP_NAME)
 //            mSocket.emit("message","hello from ${Constants.APP_NAME}")
  */
+
+
