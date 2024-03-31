@@ -40,6 +40,7 @@ import com.example.finalapp.permissions.NotificationPermissionTextProvider
 import com.example.finalapp.permissions.PermissionDialog
 import com.example.finalapp.permissions.PermissionsUI
 import com.example.finalapp.ui.theme.FinalAppTheme
+import com.example.finalapp.utils.Constants.Constants.TAG
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import dagger.hilt.android.AndroidEntryPoint
@@ -146,7 +147,7 @@ fun FinalApp(
     LaunchedEffect(value ){
         scope.launch(Dispatchers.IO) {
              getLocation()
-            authViewModel.getProfileData()
+             authViewModel.getProfileData()
         }
 
     }
@@ -170,18 +171,18 @@ fun getReadableLocation(latitude: Double, longitude: Double, context: Context): 
             val address = addresses[0]
             addressText = "${address.getAddressLine(0)}, ${address.locality}"
             // Use the addressText in your app
-            Log.d("geolocation", addressText)
+            Log.d(TAG, addressText)
             val addressComponents = addressText.split(", ")
 
             // Check if there are enough components
             if (addressComponents.size >= 2) {
                 // The state is the second component
-                Log.d("Coordinates state",addressComponents[1])
+                Log.d(TAG,addressComponents[1])
             }
         }
 
     } catch (e: IOException) {
-        Log.d("geolocation", e.message.toString())
+        Log.d(TAG, e.message.toString())
 
     }
 
@@ -202,9 +203,6 @@ private fun getLocation(context: Context, authViewModel:AuthViewModel){
         != PackageManager.PERMISSION_GRANTED
         &&
         ActivityCompat.checkSelfPermission(context,Manifest.permission.ACCESS_COARSE_LOCATION)
-        != PackageManager.PERMISSION_GRANTED
-        &&
-        ActivityCompat.checkSelfPermission(context,Manifest.permission.POST_NOTIFICATIONS)
         != PackageManager.PERMISSION_GRANTED
     ){
         ActivityCompat.requestPermissions(
@@ -238,7 +236,7 @@ private fun getLocation(context: Context, authViewModel:AuthViewModel){
             // Log.d("Coordinates changed to address","no address")
             //  }
         }else{
-            Log.d("Coordinates","error fetching location")
+            Log.d(TAG,"error fetching location")
         }
     }
 }

@@ -75,6 +75,7 @@ fun ImageCaptureFromCamera(profileViewModel: ProfileViewModel) {
                 cameraLauncher.launch(uri)
             } else {
                 permissionLauncher.launch(Manifest.permission.CAMERA)
+                cameraLauncher.launch(uri)
 
             }
         }
