@@ -1,4 +1,4 @@
-package com.example.finalapp.screens.onboarding.onboarding2.data
+package com.example.finalapp.screens.onboarding.data
 
 import android.content.Context
 import androidx.datastore.core.DataStore

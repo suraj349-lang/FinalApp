@@ -1,6 +1,8 @@
 package com.example.finalapp.auth.authViewModel
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
 import android.util.JsonToken
 import android.util.Log
 import android.widget.Toast
@@ -8,6 +10,7 @@ import android.widget.Toast
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -46,6 +49,13 @@ class AuthViewModel @Inject constructor(
     var latitude= mutableStateOf(0.0)
     var longitude= mutableStateOf(0.0)
     var address= mutableStateOf("")
+    var permission= mutableStateOf(
+        ActivityCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED)
+
+
 
 
 

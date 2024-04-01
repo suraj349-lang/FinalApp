@@ -1,8 +1,8 @@
-package com.example.finalapp.screens.onboarding.onboarding2.viewmodel
+package com.example.finalapp.screens.onboarding.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.finalapp.screens.onboarding.onboarding2.data.DataStoreRepository
+import com.example.finalapp.screens.onboarding.data.DataStoreRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

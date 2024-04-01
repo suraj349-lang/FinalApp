@@ -21,7 +21,7 @@ import com.example.finalapp.screens.HomeScreenUI
 import com.example.finalapp.screens.NotificationsScreenUI
 import com.example.finalapp.screens.profile.ProfileScreenUI
 import com.example.finalapp.screens.SettingsScreenUI
-import com.example.finalapp.screens.onboarding.onboarding2.screen.WelcomeScreen
+import com.example.finalapp.screens.onboarding.screen.WelcomeScreen
 import com.example.finalapp.screens.profile.ProfileViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 

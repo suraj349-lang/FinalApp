@@ -1,4 +1,4 @@
-package com.example.finalapp.screens.onboarding.onboarding2.screen
+package com.example.finalapp.screens.onboarding.screen
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -20,8 +20,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.finalapp.navigation.SCREENS
-import com.example.finalapp.screens.onboarding.onboarding2.util.OnBoardingPage
-import com.example.finalapp.screens.onboarding.onboarding2.viewmodel.WelcomeViewModel
+import com.example.finalapp.screens.onboarding.util.OnBoardingPage
+import com.example.finalapp.screens.onboarding.viewmodel.WelcomeViewModel
 import com.google.accompanist.pager.*
 
 @ExperimentalAnimationApi
@@ -34,14 +34,15 @@ fun WelcomeScreen(
     val pages = listOf(
         OnBoardingPage.First,
         OnBoardingPage.Second,
-        OnBoardingPage.Third
+        OnBoardingPage.Third,
+        OnBoardingPage.Fourth
     )
     val pagerState = rememberPagerState()
 
     Column(modifier = Modifier.fillMaxSize()) {
         HorizontalPager(
             modifier = Modifier.weight(10f),
-            count = 3,
+            count = 4,
             state = pagerState,
             verticalAlignment = Alignment.Top
         ) { position ->
@@ -116,7 +117,7 @@ fun FinishButton(
     ) {
         AnimatedVisibility(
             modifier = Modifier.fillMaxWidth(),
-            visible = pagerState.currentPage == 2
+            visible = pagerState.currentPage == 3
         ) {
             Button(
                 onClick = onClick,
@@ -130,26 +131,26 @@ fun FinishButton(
     }
 }
 
-@Composable
-@Preview(showBackground = true)
-fun FirstOnBoardingScreenPreview() {
-    Column(modifier = Modifier.fillMaxSize()) {
-        PagerScreen(onBoardingPage = OnBoardingPage.First)
-    }
-}
-
-@Composable
-@Preview(showBackground = true)
-fun SecondOnBoardingScreenPreview() {
-    Column(modifier = Modifier.fillMaxSize()) {
-        PagerScreen(onBoardingPage = OnBoardingPage.Second)
-    }
-}
-
-@Composable
-@Preview(showBackground = true)
-fun ThirdOnBoardingScreenPreview() {
-    Column(modifier = Modifier.fillMaxSize()) {
-        PagerScreen(onBoardingPage = OnBoardingPage.Third)
-    }
-}
+//@Composable
+//@Preview(showBackground = true)
+//fun FirstOnBoardingScreenPreview() {
+//    Column(modifier = Modifier.fillMaxSize()) {
+//        PagerScreen(onBoardingPage = OnBoardingPage.First)
+//    }
+//}
+//
+//@Composable
+//@Preview(showBackground = true)
+//fun SecondOnBoardingScreenPreview() {
+//    Column(modifier = Modifier.fillMaxSize()) {
+//        PagerScreen(onBoardingPage = OnBoardingPage.Second)
+//    }
+//}
+//
+//@Composable
+//@Preview(showBackground = true)
+//fun ThirdOnBoardingScreenPreview() {
+//    Column(modifier = Modifier.fillMaxSize()) {
+//        PagerScreen(onBoardingPage = OnBoardingPage.Third)
+//    }
+//}

@@ -1,4 +1,4 @@
-package com.example.finalapp.screens.onboarding.onboarding2.viewmodel
+package com.example.finalapp.screens.onboarding.viewmodel
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
@@ -6,7 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.finalapp.navigation.SCREENS
-import com.example.finalapp.screens.onboarding.onboarding2.data.DataStoreRepository
+import com.example.finalapp.screens.onboarding.data.DataStoreRepository
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 

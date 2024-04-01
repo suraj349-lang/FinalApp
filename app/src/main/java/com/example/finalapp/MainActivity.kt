@@ -1,6 +1,7 @@
 package com.example.finalapp
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -51,8 +52,13 @@ import java.io.IOException
 import java.util.Locale
 import android.location.LocationManager
 import androidx.activity.result.ActivityResultLauncher
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.ui.platform.LocalContext
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import com.example.finalapp.screens.onboarding.onboarding2.viewmodel.SplashViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
+import com.example.finalapp.screens.onboarding.viewmodel.SplashViewModel
 import javax.inject.Inject
 
 
@@ -63,9 +69,11 @@ class MainActivity : ComponentActivity() {
         Manifest.permission.ACCESS_FINE_LOCATION,
         Manifest.permission.POST_NOTIFICATIONS
     )
+
     @Inject
     lateinit var splashViewModel: SplashViewModel
 
+    @SuppressLint("UnrememberedMutableState")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         installSplashScreen().setKeepOnScreenCondition {
@@ -81,19 +89,14 @@ class MainActivity : ComponentActivity() {
                     // Handle the activity result here
                 }
                 LaunchedEffect(key1 = true){
-
                     enableLocationSettings(this@MainActivity, launcher = locationSettingsLauncher, authViewModel)
                 }
 
-                if (ActivityCompat.checkSelfPermission(
-                        this,
-                        Manifest.permission.ACCESS_FINE_LOCATION
-                    ) == PackageManager.PERMISSION_GRANTED
-                ) {
+                if (authViewModel.permission.value) {
                     val screen by splashViewModel.startDestination
                     FinalApp(authViewModel,screen) { getLocation(this, authViewModel) }
                 } else {
-                    PermissionsUI(onGoToAppSettingsClick = ::openAppSettings)
+                    PermissionsUI(authViewModel,onGoToAppSettingsClick = ::openAppSettings)
                     val permissionViewModel = viewModel<MainViewModel>()
                     val dialogQueue = permissionViewModel.visiblePermissionDialogQueue
                     val run by remember { mutableStateOf(0) }
@@ -146,7 +149,9 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+
     }
+
 
 }
 
@@ -183,7 +188,49 @@ fun FinalApp(
 }
 
 
+@Composable
+fun Disposable(authViewModel: AuthViewModel, lifecycleOwner: LifecycleOwner){
+    val context= LocalContext.current
+    DisposableEffect(lifecycleOwner) {
 
+        // Create an observer that triggers our remembered callbacks
+        // for sending analytics events
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_START) {
+                Log.d(TAG,"Starting the Home")
+
+            } else if (event == Lifecycle.Event.ON_STOP) {
+                Log.d(TAG,"Stopping the Home")
+            }
+            else if (event == Lifecycle.Event.ON_PAUSE) {
+                Log.d(TAG,"on Pause")
+
+            }
+            else if (event == Lifecycle.Event.ON_CREATE) {
+                Log.d("LOGS","On Create")
+
+            }
+            else if (event == Lifecycle.Event.ON_DESTROY) {
+                Log.d("LOGS","On Destroy")
+            }
+            else if (event == Lifecycle.Event.ON_RESUME) {
+                authViewModel.permission.value=ActivityCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED
+                Log.d(TAG,"on Resume")
+            }
+        }
+
+        // Add the observer to the lifecycle
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        // When the effect leaves the Composition, remove the observer
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+}
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 private fun enableLocationSettings(context: Context, launcher: ActivityResultLauncher<Intent>,authViewModel: AuthViewModel) {

@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import com.example.finalapp.database.FrisbeeDatabase
 import com.example.finalapp.network.ApiService
-import com.example.finalapp.screens.onboarding.onboarding2.data.DataStoreRepository
+import com.example.finalapp.screens.onboarding.data.DataStoreRepository
 import com.example.finalapp.utils.Constants.Constants
 import dagger.Module
 import dagger.Provides
