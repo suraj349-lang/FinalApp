@@ -1,5 +1,6 @@
 package com.example.finalapp.navigation
 
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
@@ -20,7 +21,9 @@ import com.example.finalapp.screens.HomeScreenUI
 import com.example.finalapp.screens.NotificationsScreenUI
 import com.example.finalapp.screens.profile.ProfileScreenUI
 import com.example.finalapp.screens.SettingsScreenUI
+import com.example.finalapp.screens.onboarding.onboarding2.screen.WelcomeScreen
 import com.example.finalapp.screens.profile.ProfileViewModel
+import com.google.accompanist.pager.ExperimentalPagerApi
 
 
 sealed class SCREENS(val route:String){
@@ -36,14 +39,16 @@ sealed class SCREENS(val route:String){
     object CHAT:SCREENS("chat_screen")
     object  OTP2:SCREENS("otp")
     object GALLERY:SCREENS("gallery_picker")
+    object WELCOME:SCREENS("gallery_picker")
 
 }
+@OptIn(ExperimentalAnimationApi::class, ExperimentalPagerApi::class)
 @Composable
-fun Navigation(authViewModel: AuthViewModel) {
+fun Navigation(authViewModel: AuthViewModel, screen: String) {
     val navController:NavHostController= rememberNavController();
     NavHost(navController = navController, startDestination =SCREENS.SPLASH.route){
         composable(SCREENS.SPLASH.route){
-            SplashScreenUI(navController)
+            SplashScreenUI(navController,screen)
         }
         composable(SCREENS.LOGIN.route){
             LoginScreenUI(navController,authViewModel)
@@ -78,6 +83,9 @@ fun Navigation(authViewModel: AuthViewModel) {
         }
         composable(SCREENS.GALLERY.route){
             GalleryPicker()
+        }
+        composable(SCREENS.WELCOME.route){
+            WelcomeScreen(navController)
         }
     }
 

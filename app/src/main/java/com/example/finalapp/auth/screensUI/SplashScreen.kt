@@ -3,15 +3,12 @@ package com.example.finalapp.auth.screensUI
 import android.view.animation.OvershootInterpolator
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Call
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -35,7 +32,7 @@ import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 
 @Composable
-fun SplashScreenUI(navController: NavController){
+fun SplashScreenUI(navController: NavController, screen: String){
     val auth=FirebaseAuth.getInstance().currentUser;
 
     val scale= remember {
@@ -47,7 +44,7 @@ fun SplashScreenUI(navController: NavController){
         }))
         delay(2000L)
         if(auth!=null) navController.navigate(SCREENS.HOME.route){popUpTo(0) };
-        else navController.navigate(SCREENS.LOGIN.route){ popUpTo(0); }
+        else navController.navigate(screen){ popUpTo(0); }
 
     } )
     Surface(

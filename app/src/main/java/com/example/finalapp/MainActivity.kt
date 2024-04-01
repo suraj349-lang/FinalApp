@@ -51,6 +51,9 @@ import java.io.IOException
 import java.util.Locale
 import android.location.LocationManager
 import androidx.activity.result.ActivityResultLauncher
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import com.example.finalapp.screens.onboarding.onboarding2.viewmodel.SplashViewModel
+import javax.inject.Inject
 
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -60,8 +63,14 @@ class MainActivity : ComponentActivity() {
         Manifest.permission.ACCESS_FINE_LOCATION,
         Manifest.permission.POST_NOTIFICATIONS
     )
+    @Inject
+    lateinit var splashViewModel: SplashViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        installSplashScreen().setKeepOnScreenCondition {
+            !splashViewModel.isLoading.value
+        }
 
         setContent {
             FinalAppTheme {
@@ -81,8 +90,8 @@ class MainActivity : ComponentActivity() {
                         Manifest.permission.ACCESS_FINE_LOCATION
                     ) == PackageManager.PERMISSION_GRANTED
                 ) {
-                    val authViewModel = hiltViewModel<AuthViewModel>()
-                    FinalApp(authViewModel) { getLocation(this, authViewModel) }
+                    val screen by splashViewModel.startDestination
+                    FinalApp(authViewModel,screen) { getLocation(this, authViewModel) }
                 } else {
                     PermissionsUI(onGoToAppSettingsClick = ::openAppSettings)
                     val permissionViewModel = viewModel<MainViewModel>()
@@ -153,21 +162,22 @@ fun Activity.openAppSettings() {
 @Composable
 fun FinalApp(
     authViewModel: AuthViewModel,
+    screen: String,
     getLocation: () -> Unit
 ) {
-//    val scope= rememberCoroutineScope()
-//    val value by remember{ mutableStateOf(false) }
-//    LaunchedEffect(value ){
-//        scope.launch(Dispatchers.IO) {
-//             getLocation()
-//             authViewModel.getProfileData()
-//        }
-//
-//    }
+    val scope= rememberCoroutineScope()
+    val value by remember{ mutableStateOf(false) }
+    LaunchedEffect(value ){
+        scope.launch(Dispatchers.IO) {
+             getLocation()
+             authViewModel.getProfileData()
+        }
+
+    }
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Column(verticalArrangement = Arrangement.Center,horizontalAlignment = Alignment.CenterHorizontally)
         {
-            Navigation(authViewModel)
+            Navigation(authViewModel,screen)
         }
     }
 }
@@ -185,7 +195,7 @@ private fun enableLocationSettings(context: Context, launcher: ActivityResultLau
     } else {
         // GPS is already enabled
         // Handle this case if needed
-        getLocation(context,authViewModel )
+      //  getLocation(context,authViewModel )
 
     }
 }
