@@ -34,15 +34,7 @@ import kotlinx.coroutines.launch
 import java.io.File
 import java.util.Objects
 import javax.inject.Inject
-@HiltViewModel
-class ProfileViewModel @Inject constructor(private val repository: ProfileRepository):ViewModel(){
 
-    val imageUri= mutableStateOf<Uri>(Uri.EMPTY)
-    suspend fun uploadImage(context: Context,uri: String?):String{
-       return repository.uploadImage(context,uri)
-    }
-
-}
 @Composable
 fun ImageCaptureFromCamera(profileViewModel: ProfileViewModel) {
     val context = LocalContext.current

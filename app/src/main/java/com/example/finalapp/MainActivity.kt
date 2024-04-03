@@ -196,24 +196,7 @@ fun Disposable(authViewModel: AuthViewModel, lifecycleOwner: LifecycleOwner){
         // Create an observer that triggers our remembered callbacks
         // for sending analytics events
         val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_START) {
-                Log.d(TAG,"Starting the Home")
-
-            } else if (event == Lifecycle.Event.ON_STOP) {
-                Log.d(TAG,"Stopping the Home")
-            }
-            else if (event == Lifecycle.Event.ON_PAUSE) {
-                Log.d(TAG,"on Pause")
-
-            }
-            else if (event == Lifecycle.Event.ON_CREATE) {
-                Log.d("LOGS","On Create")
-
-            }
-            else if (event == Lifecycle.Event.ON_DESTROY) {
-                Log.d("LOGS","On Destroy")
-            }
-            else if (event == Lifecycle.Event.ON_RESUME) {
+             if (event == Lifecycle.Event.ON_RESUME) {
                 authViewModel.permission.value=ActivityCompat.checkSelfPermission(
                     context,
                     Manifest.permission.ACCESS_FINE_LOCATION

@@ -19,5 +19,13 @@ data class User(
   val name:String,
   val number:String,
   val username: String,
-  val _id:String
+  val _id:String,
+  val token: String,
+  val address: String,
+  val offers:List<String>
+)
+
+data class ProfileResponse(
+  val success: Boolean,
+  val data: List<User>
 )

@@ -16,12 +16,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -33,9 +36,11 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,12 +61,15 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberImagePainter
 import com.example.finalapp.R
 import com.example.finalapp.auth.authViewModel.AuthViewModel
+import com.example.finalapp.model.User
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens.DialogBOX.DialogBoxForImageEdit
 import com.example.finalapp.ui.theme.DarkBlue
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.ui.theme.topAppBarTextColor
 import com.example.finalapp.utils.Constants.Constants.TAG
+import com.example.finalapp.utils.RequestState
+import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -74,6 +82,9 @@ fun ProfileScreenUI(
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val buttonsVisible = remember { mutableStateOf(false) }
     val profileImage=true;
+
+
+
 
     Scaffold(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
@@ -97,8 +108,30 @@ fun ProfileScreenUI(
                     ,horizontalAlignment = Alignment.CenterHorizontally) {
                     ProfileIcon(profileImage)
                     ProfileName()
+                    if(profileViewModel.key.value==1) {
+                        profileViewModel.profileResponseDataAndAction(navController)
+
+                        Log.d(TAG, "Users list: ${profileViewModel.usersList}")                      
+                    }
+                    Button(onClick = {
+                        try {
+                            profileViewModel.getAllProfiles()
+                        }catch (e:Exception){
+                            Log.d(TAG, "ProfileScreenUI: ")
+
+                        }
+                         }) {
+                        Text(text = "Get All profiles")
+
+
+                    }
+
+
+
+
                     EditProfile(navController,profileViewModel)
                     ProfileImages()
+
                     FrisbeeInfo()
                     PersonalInfo()
                     ProfileBio()
@@ -107,6 +140,30 @@ fun ProfileScreenUI(
         }
     }
 }
+
+@Composable
+fun AllProfiles(profileViewModel: ProfileViewModel) {
+    val user by remember{ mutableStateOf(profileViewModel.usersList.value) }
+    Log.d(TAG, "AllProfiles: ran up to here 1")
+    Log.d(TAG, "AllProfiles: $user")
+    LazyColumn(modifier = Modifier.fillMaxSize()) {
+        items(user){ user->
+            UsersItem(user)
+        }
+    }
+    Log.d(TAG, "AllProfiles: ran up to here 2")
+}
+
+@Composable
+fun UsersItem(user: User) {
+    Log.d(TAG, "AllProfiles: ran up to here 3")
+    Card(modifier = Modifier.fillMaxSize()) {
+        Text(text = user.name)
+
+    }
+    Log.d(TAG, "AllProfiles: ran up to here 4")
+}
+
 
 @Composable
 fun EditProfile(navController: NavHostController, profileViewModel: ProfileViewModel) {

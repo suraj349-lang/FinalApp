@@ -58,16 +58,16 @@ class AuthViewModel @Inject constructor(
 
 
 
-
-
-
-    val myLoginResponse: MutableState<RequestState<LoginAPIResponse>> = mutableStateOf(RequestState.Idle)
-    val mySignupResponse: MutableState<RequestState<SignupAPIResponse>> = mutableStateOf(RequestState.Idle)
     var key= mutableStateOf(0)
     var keyForFinalUserCreation= mutableStateOf(0)
     var name= mutableStateOf("")
     var profileName:MutableState<String> = mutableStateOf("")
     var otp=" "
+
+
+    val myLoginResponse: MutableState<RequestState<LoginAPIResponse>> = mutableStateOf(RequestState.Idle)
+    val mySignupResponse: MutableState<RequestState<SignupAPIResponse>> = mutableStateOf(RequestState.Idle)
+
 
     fun loginUser(loginModel: LoginModel)=viewModelScope.launch(Dispatchers.IO) {
         repository.sendLoginData(loginModel)
