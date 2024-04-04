@@ -21,6 +21,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,12 +33,15 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.finalapp.auth.authViewModel.AuthViewModel
@@ -122,7 +126,6 @@ fun FinalUserCreationUI (
     onClick:()-> Unit) {
     val keyboardController = LocalSoftwareKeyboardController.current
     var checked = true
-
     Surface(modifier = Modifier.fillMaxSize()) {
         Log.d(TAG, "FinalUserCreationUI: called")
         Column(
@@ -216,7 +219,7 @@ fun FinalUserCreationUI (
                 onClick = {
                     onClick()
                     keyboardController?.hide()
-                    authViewModel.keyForFinalUserCreation.value = 1;
+                    authViewModel.keyForFinalUserCreation.value = RESPONSE.KEY_ON;
 
                 },
                 colors = ButtonDefaults.buttonColors(
@@ -230,10 +233,10 @@ fun FinalUserCreationUI (
             }
             val context = LocalContext.current
           //  LaunchedEffect(key1 = authViewModel.keyForFinalUserCreation.value) {
-                if (authViewModel.keyForFinalUserCreation.value == 1) {
+                if (authViewModel.keyForFinalUserCreation.value == RESPONSE.KEY_ON) {
                     when (val result = authViewModel.mySignupResponse.value) {
                         is RequestState.Success -> {
-                             authViewModel.keyForFinalUserCreation.value=0;
+                             authViewModel.keyForFinalUserCreation.value=RESPONSE.KEY_OFF;
                             Toast.makeText(context, "Welcome to Active Dating", Toast.LENGTH_SHORT)
                                 .show()
                             navController.navigate(SCREENS.HOME.route) {
@@ -267,3 +270,8 @@ fun FinalUserCreationUI (
     }
 
 
+
+enum class RESPONSE(){
+    KEY_ON,
+    KEY_OFF
+}

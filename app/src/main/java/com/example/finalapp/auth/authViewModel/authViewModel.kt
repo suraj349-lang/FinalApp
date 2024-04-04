@@ -17,6 +17,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 
 import com.example.finalapp.auth.repository.AuthRepository
+import com.example.finalapp.auth.screensUI.RESPONSE
 import com.example.finalapp.database.DatabaseRepository
 import com.example.finalapp.database.Profile
 import com.example.finalapp.model.LoginAPIResponse
@@ -59,7 +60,7 @@ class AuthViewModel @Inject constructor(
 
 
     var key= mutableStateOf(0)
-    var keyForFinalUserCreation= mutableStateOf(0)
+    var keyForFinalUserCreation:MutableState<RESPONSE> = mutableStateOf( RESPONSE.KEY_OFF)
     var name= mutableStateOf("")
     var profileName:MutableState<String> = mutableStateOf("")
     var otp=" "
