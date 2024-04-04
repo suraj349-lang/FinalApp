@@ -42,6 +42,7 @@ import androidx.compose.ui.input.key.onKeyEvent
 import androidx.core.text.isDigitsOnly
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.finalapp.auth.authViewModel.AuthViewModel
+import com.example.finalapp.utils.Constants.Constants.TAG
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
@@ -62,6 +63,7 @@ fun OtpBox(){
         horizontalArrangement = Arrangement.Center,
 
     ) {
+        Log.d(TAG, "OtpBox: called")
         OutlinedBox(otp = otp1){
             otp1=it
         }

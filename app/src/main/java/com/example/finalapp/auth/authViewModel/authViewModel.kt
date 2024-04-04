@@ -101,33 +101,6 @@ class AuthViewModel @Inject constructor(
 
             }
     }
-    fun signupResponseDataAndAction(navController: NavController){
-
-        when (val result=mySignupResponse.value){
-            is RequestState.Success->{
-                keyForFinalUserCreation.value=0;
-                Toast.makeText(context,"Welcome to Active Dating", Toast.LENGTH_SHORT).show()
-                navController.navigate(SCREENS.HOME.route){
-                    popUpTo(0);
-                }
-            }
-            is RequestState.Error->{
-
-                val msg=if(result.error.message.toString() =="HTTP 400 Bad Request") "Number already exists" else result.error.message
-                Log.d("signupResponseDataAndAction", msg.toString())
-                Toast.makeText(context,msg, Toast.LENGTH_SHORT).show()
-            }
-            RequestState.Loading->{
-              //  CircularProgressIndicator(color = Color(0xFF1289BE))
-            }
-            RequestState.Idle->{
-                Toast.makeText(context,"Registering...", Toast.LENGTH_SHORT).show()
-            }
-
-        }
-
-
-    }
     fun LogoutUser(){
         val auth:FirebaseAuth=FirebaseAuth.getInstance();
         auth.signOut()

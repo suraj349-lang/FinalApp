@@ -1,6 +1,7 @@
 package com.example.finalapp.auth.screensUI
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -30,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -41,9 +43,12 @@ import androidx.navigation.NavHostController
 import com.example.finalapp.auth.authViewModel.AuthViewModel
 import com.example.finalapp.database.Profile
 import com.example.finalapp.model.RegisterUserModel
+import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.ui.theme.topAppBarTextColor
 import com.example.finalapp.utils.Constants.Constants
+import com.example.finalapp.utils.Constants.Constants.TAG
+import com.example.finalapp.utils.RequestState
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.ktx.messaging
@@ -72,6 +77,7 @@ fun FinalUserCreation(authViewModel: AuthViewModel, navController: NavHostContro
             number=firebaseAuth.currentUser?.phoneNumber.toString()
         }
     }
+    Log.d(TAG, "FinalUserCreation: called")
 
 
     FinalUserCreationUI(
@@ -85,7 +91,9 @@ fun FinalUserCreation(authViewModel: AuthViewModel, navController: NavHostContro
         onUsernameChange = {username=it},
         onPasswordChange = {password=it},
         onClick =  {
+
             scope.launch(Dispatchers.IO) {
+                // TODO("the code to save data in SQLITE should be once the response have been returned from api")TODO("the code to save data in SQLITE should be once the response have been returned from api")
                 try {
                     authViewModel.saveProfileData(Profile(name=name, username = username, number=number,token=token, address = address))
                 }catch (e:Exception){
@@ -111,86 +119,146 @@ fun FinalUserCreationUI (
     onNameChange:(String)->Unit,
     onUsernameChange:(String)->Unit,
     onPasswordChange:(String)->Unit,
-    onClick:()-> Unit)
-     {
-      val keyboardController = LocalSoftwareKeyboardController.current
-      var checked= remember { mutableStateOf(true) };
+    onClick:()-> Unit) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+    var checked = true
 
     Surface(modifier = Modifier.fillMaxSize()) {
-        Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()) {
-            Text(text=Constants.APP_NAME, fontSize = 45.sp, modifier = Modifier.padding(top=8.dp, bottom = 0.dp), color = statusAndTopAppBarColor, style = MaterialTheme.typography.titleMedium)
-            Text(text="date your way...", fontSize = 18.sp, modifier = Modifier.padding(top=0.dp, start = 120.dp), color = Color(
-                0xFFE71708),
+        Log.d(TAG, "FinalUserCreationUI: called")
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Text(
+                text = Constants.APP_NAME,
+                fontSize = 45.sp,
+                modifier = Modifier.padding(top = 8.dp, bottom = 0.dp),
+                color = statusAndTopAppBarColor,
+                style = MaterialTheme.typography.titleMedium
+            )
+            Text(
+                text = "date your way...",
+                fontSize = 18.sp,
+                modifier = Modifier.padding(top = 0.dp, start = 120.dp),
+                color = Color(
+                    0xFFE71708
+                ),
                 style = MaterialTheme.typography.titleMedium
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(text = "Creating account for number $number")
             OutlinedTextField(
-                value =name ,
-                onValueChange =onNameChange,
-                label = { Text(text = "Name", style = MaterialTheme.typography.bodyMedium)},
+                value = name,
+                onValueChange = onNameChange,
+                label = { Text(text = "Name", style = MaterialTheme.typography.bodyMedium) },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Next
                 ),
                 keyboardActions = KeyboardActions(
-                    onNext = {keyboardController?.hide()}
+                    onNext = { keyboardController?.hide() }
                 ),
                 modifier = Modifier.height(60.dp)
             )
             OutlinedTextField(
-                value =username ,
-                onValueChange =onUsernameChange,
-                label = { Text(text = "Username", style = MaterialTheme.typography.bodyMedium)},
+                value = username,
+                onValueChange = onUsernameChange,
+                label = { Text(text = "Username", style = MaterialTheme.typography.bodyMedium) },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Next
                 ),
                 keyboardActions = KeyboardActions(
-                    onNext = {keyboardController?.hide()}
+                    onNext = { keyboardController?.hide() }
                 ),
                 modifier = Modifier.height(60.dp)
             )
             OutlinedTextField(
-                value =password ,
-                onValueChange =onPasswordChange,
-                label = { Text(text = "Password", style = MaterialTheme.typography.bodyMedium)},
+                value = password,
+                onValueChange = onPasswordChange,
+                label = { Text(text = "Password", style = MaterialTheme.typography.bodyMedium) },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Next
                 ),
                 keyboardActions = KeyboardActions(
-                    onNext = {keyboardController?.hide()}
+                    onNext = { keyboardController?.hide() }
                 ),
                 modifier = Modifier.height(60.dp)
             )
 
-            Row(modifier = Modifier
-                .padding(top = 8.dp, end = 4.dp)
-                .width(280.dp)
-                .height(30.dp),
-                verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
-                Checkbox(checked = checked.value, onCheckedChange ={ checked.value=it } , colors = CheckboxDefaults.colors(
-                    checkedColor = Color(0xFF023304),
-                    checkmarkColor = Color.White                )
+            Row(
+                modifier = Modifier
+                    .padding(top = 8.dp, end = 4.dp)
+                    .width(280.dp)
+                    .height(30.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start
+            ) {
+                Checkbox(
+                    checked = checked,
+                    onCheckedChange = { checked = it },
+                    colors = CheckboxDefaults.colors(
+                        checkedColor = Color(0xFF023304),
+                        checkmarkColor = Color.White
+                    )
                 )
-                Text(text = "By clicking on create account you agree to our user policy.Click here to know Our USER POLICY.", maxLines = 2, overflow = TextOverflow.Visible, style = MaterialTheme.typography.bodySmall)
+                Text(
+                    text = "By clicking on create account you agree to our user policy.Click here to know Our USER POLICY.",
+                    maxLines = 2,
+                    overflow = TextOverflow.Visible,
+                    style = MaterialTheme.typography.bodySmall
+                )
             }
-           
+
             Button(
                 onClick = {
-                        keyboardController?.hide()
-                        authViewModel.keyForFinalUserCreation.value=1;
-                        onClick();
-                      },
-                colors = ButtonDefaults.buttonColors(containerColor = statusAndTopAppBarColor, contentColor = topAppBarTextColor),
+                    onClick()
+                    keyboardController?.hide()
+                    authViewModel.keyForFinalUserCreation.value = 1;
+
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = statusAndTopAppBarColor,
+                    contentColor = topAppBarTextColor
+                ),
                 modifier = Modifier.padding(top = 8.dp)
 
             ) {
-                Text(text = "Create Account",style = MaterialTheme.typography.bodyMedium)
+                Text(text = "Create Account", style = MaterialTheme.typography.bodyMedium)
             }
-            if(authViewModel.keyForFinalUserCreation.value==1){
-                authViewModel.signupResponseDataAndAction(navController )
+            val context = LocalContext.current
+          //  LaunchedEffect(key1 = authViewModel.keyForFinalUserCreation.value) {
+                if (authViewModel.keyForFinalUserCreation.value == 1) {
+                    when (val result = authViewModel.mySignupResponse.value) {
+                        is RequestState.Success -> {
+                             authViewModel.keyForFinalUserCreation.value=0;
+                            Toast.makeText(context, "Welcome to Active Dating", Toast.LENGTH_SHORT)
+                                .show()
+                            navController.navigate(SCREENS.HOME.route) {
+                                popUpTo(0);
+                            }
+                        }
+
+                        is RequestState.Error -> {
+
+                            val msg =
+                                if (result.error.message.toString() == "HTTP 400 Bad Request") "Number already exists" else result.error.message
+                            Log.d("signupResponseDataAndAction", msg.toString())
+                            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                        }
+
+                        RequestState.Loading -> {
+                            //  CircularProgressIndicator(color = Color(0xFF1289BE))
+                        }
+
+                        RequestState.Idle -> {
+                            Toast.makeText(context, "Registering...", Toast.LENGTH_SHORT).show()
+                        }
+
+                    }
+
                 }
             }
 

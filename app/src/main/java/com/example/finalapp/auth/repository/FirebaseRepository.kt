@@ -2,10 +2,12 @@ package com.example.finalapp.auth.repository
 
 import android.app.Activity
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.MutableState
 import androidx.navigation.NavController
 import com.example.finalapp.navigation.SCREENS
+import com.example.finalapp.utils.Constants.Constants.TAG
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.PhoneAuthCredential
@@ -35,12 +37,14 @@ class FirebaseRepository {
                 if (task.isSuccessful) {
                     message.value = "Verification successful"
                     Toast.makeText(context, "Verification successful..", Toast.LENGTH_SHORT).show()
-                    navController.navigate(SCREENS.FINALUSERCREATION.route)
+                    Log.d(TAG, "signInWithPhoneAuthCredential: called")
+                    navController.navigate(SCREENS.FINALUSERCREATION.route){popUpTo(0)}
                 } else {
                     // Sign in failed, display a message
                     if (task.exception is FirebaseAuthInvalidCredentialsException) {
                         // The verification code
                         // entered was invalid
+                        Log.d(TAG, "signInWithPhoneAuthCredential: ${task.exception}")
                         Toast.makeText(
                             context,
                             "Verification failed.." + (task.exception as FirebaseAuthInvalidCredentialsException).message,

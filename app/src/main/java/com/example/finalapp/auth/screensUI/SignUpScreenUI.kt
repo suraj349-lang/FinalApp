@@ -56,6 +56,7 @@ import com.example.finalapp.model.RegisterUserModel
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.ui.theme.topAppBarTextColor
 import com.example.finalapp.utils.Constants.Constants
+import com.example.finalapp.utils.Constants.Constants.TAG
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.PhoneAuthCredential
@@ -113,7 +114,9 @@ fun SignupScreenUI(navController: NavController = NavController(LocalContext.cur
                 ),
                 style = MaterialTheme.typography.titleMedium
             )
+            Log.d(TAG, "SignupScreenUI: called")
             if (key.value==0) {
+                Log.d(TAG, "SignupScreenUI  in key.value==0 called: ")
                 OutlinedTextField(
                     value = phoneNumber.value,
                     onValueChange = { phoneNumber.value = it },
@@ -172,6 +175,7 @@ fun SignupScreenUI(navController: NavController = NavController(LocalContext.cur
 
             if (key.value==1) {
                 OtpBox()
+                Log.d(TAG, "SignupScreenUI  in key.value===1 called: ")
                 Button(
                     onClick = {
                         if (TextUtils.isEmpty(authViewModel.otp)) {

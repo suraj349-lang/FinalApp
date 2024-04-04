@@ -50,7 +50,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
     val navController:NavHostController= rememberNavController();
     val profileViewModel= hiltViewModel<ProfileViewModel>()
 
-    NavHost(navController = navController, startDestination =SCREENS.HOME.route){
+    NavHost(navController = navController, startDestination =SCREENS.SIGNUP.route){
         composable(SCREENS.SPLASH.route){
             SplashScreenUI(navController,screen)
         }
