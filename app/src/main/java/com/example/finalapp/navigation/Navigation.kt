@@ -49,7 +49,8 @@ sealed class SCREENS(val route:String){
 fun Navigation(authViewModel: AuthViewModel, screen: String) {
     val navController:NavHostController= rememberNavController();
     val profileViewModel= hiltViewModel<ProfileViewModel>()
-    NavHost(navController = navController, startDestination =SCREENS.PROFILE.route){
+
+    NavHost(navController = navController, startDestination =SCREENS.HOME.route){
         composable(SCREENS.SPLASH.route){
             SplashScreenUI(navController,screen)
         }
@@ -63,7 +64,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
            EnterOTPScreenUI(navController)
         }
         composable(SCREENS.HOME.route){
-            HomeScreenUI( profileViewModel ,navController)
+            HomeScreenUI( navController,profileViewModel)
         }
         composable(SCREENS.FINALUSERCREATION.route){
             FinalUserCreation(authViewModel,navController)

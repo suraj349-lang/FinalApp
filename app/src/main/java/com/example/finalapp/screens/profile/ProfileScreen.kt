@@ -36,11 +36,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -68,8 +66,6 @@ import com.example.finalapp.ui.theme.DarkBlue
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.ui.theme.topAppBarTextColor
 import com.example.finalapp.utils.Constants.Constants.TAG
-import com.example.finalapp.utils.RequestState
-import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -82,8 +78,6 @@ fun ProfileScreenUI(
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val buttonsVisible = remember { mutableStateOf(false) }
     val profileImage=true;
-
-
 
 
     Scaffold(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -108,30 +102,8 @@ fun ProfileScreenUI(
                     ,horizontalAlignment = Alignment.CenterHorizontally) {
                     ProfileIcon(profileImage)
                     ProfileName()
-                    if(profileViewModel.key.value==1) {
-                        profileViewModel.profileResponseDataAndAction(navController)
-
-                        Log.d(TAG, "Users list: ${profileViewModel.usersList}")                      
-                    }
-                    Button(onClick = {
-                        try {
-                            profileViewModel.getAllProfiles()
-                        }catch (e:Exception){
-                            Log.d(TAG, "ProfileScreenUI: ")
-
-                        }
-                         }) {
-                        Text(text = "Get All profiles")
-
-
-                    }
-
-
-
-
                     EditProfile(navController,profileViewModel)
                     ProfileImages()
-
                     FrisbeeInfo()
                     PersonalInfo()
                     ProfileBio()
@@ -143,6 +115,7 @@ fun ProfileScreenUI(
 
 @Composable
 fun AllProfiles(profileViewModel: ProfileViewModel) {
+    val profileViewModel= hiltViewModel<ProfileViewModel>()
     val user by remember{ mutableStateOf(profileViewModel.usersList.value) }
     Log.d(TAG, "AllProfiles: ran up to here 1")
     Log.d(TAG, "AllProfiles: $user")

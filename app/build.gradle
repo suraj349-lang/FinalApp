@@ -112,7 +112,6 @@ dependencies {
 
     //firebase FCM
     implementation "com.google.firebase:firebase-messaging:23.4.1"
-
     implementation("com.google.firebase:firebase-core:21.1.1")
 
     //coil
@@ -135,6 +134,8 @@ dependencies {
 
     // DataStore Preferences
     implementation("androidx.datastore:datastore-preferences:1.0.0")
+
+
 
 
 
