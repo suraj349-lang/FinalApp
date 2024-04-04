@@ -4,13 +4,11 @@ package com.example.finalapp.screens
 import BottomBar
 import android.annotation.SuppressLint
 import android.util.Log
-import android.widget.ImageButton
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -26,10 +24,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -55,29 +50,25 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.finalapp.R
+import com.example.finalapp.model.User
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.offer.OfferViewModel
 import com.example.finalapp.screens.DialogBOX.CustomAlertDialog
+import com.example.finalapp.screens.profile.ProfileViewModel
 import com.example.finalapp.ui.theme.DarkBlue
-import com.example.finalapp.ui.theme.LightBlueBkg
 import com.example.finalapp.ui.theme.floatingActionBtnTextColor
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.utils.Constants.Constants
@@ -89,10 +80,11 @@ import com.example.finalapp.utils.RequestState
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "StateFlowValueCalledInComposition")
 @Composable
-fun HomeScreenUI(navController: NavHostController) {
+fun HomeScreenUI(profileViewModel: ProfileViewModel,navController: NavHostController) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val buttonsVisible = remember { mutableStateOf(true) }
     val offerViewModel= hiltViewModel<OfferViewModel>()
+    val usersList=profileViewModel.usersList.value
     val homeData = listOf(R.drawable.profile_image_1,R.drawable.profile_image_2,R.drawable.profile_image_3,R.drawable.girl)
 
 
@@ -115,14 +107,18 @@ fun HomeScreenUI(navController: NavHostController) {
         Surface(modifier = Modifier
             .fillMaxSize()
             .background(color = Color.LightGray)) {
-            LazyColumn(
-                modifier = Modifier.padding(it)
-            ) {
-                items(homeData) { image ->
-                    ImageScreen(image = image)
-                    Spacer(modifier = Modifier.height(20.dp))
+            if(profileViewModel.key.value==2) {
+                LazyColumn(
+                    modifier = Modifier.padding(it)
+                ) {
+                    items(usersList) { user ->
+                        ImageScreen(user, R.drawable.profile_image_1)
+                        Spacer(modifier = Modifier.height(20.dp))
 
+                    }
                 }
+            }else{
+                CircularProgressIndicator()
             }
         }
     }
@@ -251,7 +247,7 @@ fun HomeScreenOffer(){
 //0xFFEEF3B9 -> yellow   0xFFE8E9E2  -> grey  
 
 @Composable
-fun ImageScreen(image: Int) {
+fun ImageScreen(user: User, image: Int) {
     val configuration = LocalConfiguration.current
     val widthInDp = configuration.screenWidthDp.dp
     val heightInDp = configuration.screenHeightDp.dp * 0.78f
@@ -290,14 +286,14 @@ fun ImageScreen(image: Int) {
                horizontalAlignment = Alignment.Start
            ) {
                Text(
-                   text = "Kiran JayShankar ,24",
+                   text = if(user.name!="") user.name else "Suraj",
                    style = MaterialTheme.typography.bodyMedium,
                    modifier = Modifier.fillMaxWidth(),
                    fontSize = 15.sp,
                    color = Color.Black
                )
                Text(
-                   text = "Botanical Garden",
+                   text = if(user.address!="") user.address else "Botanical Garden",
                    style = MaterialTheme.typography.bodyMedium,
                    modifier = Modifier.fillMaxWidth(),
                    fontSize = 6.sp,
@@ -325,7 +321,7 @@ fun ImageScreen(image: Int) {
                    .fillMaxHeight(), horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
                    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(top=3.dp)) {
                        Image(painter = painterResource(id = R.drawable.heart), contentDescription = "", modifier = Modifier
-                           .padding( end = 8.dp)
+                           .padding(end = 8.dp)
                            .size(24.dp))
                        Text(text = "Like", fontSize = 8.sp, fontWeight = FontWeight.Bold)
 
@@ -339,7 +335,7 @@ fun ImageScreen(image: Int) {
                    }
                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
                        Image(painter = painterResource(id = R.drawable.coffeecup), contentDescription = "", modifier = Modifier
-                           .padding( end = 8.dp)
+                           .padding(end = 8.dp)
                            .size(30.dp))
                        Text(text = "Coffee", fontSize = 8.sp, fontWeight = FontWeight.Bold)
 
@@ -352,7 +348,8 @@ fun ImageScreen(image: Int) {
 //                       .size(32.dp))
 
                }
-               Row(modifier = Modifier.padding(2.dp)
+               Row(modifier = Modifier
+                   .padding(2.dp)
                    .fillMaxWidth(1f)
                    .fillMaxHeight(), horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
                    Column() {

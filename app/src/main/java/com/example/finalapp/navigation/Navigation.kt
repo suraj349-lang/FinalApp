@@ -63,7 +63,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
            EnterOTPScreenUI(navController)
         }
         composable(SCREENS.HOME.route){
-            HomeScreenUI(navController)
+            HomeScreenUI( profileViewModel ,navController)
         }
         composable(SCREENS.FINALUSERCREATION.route){
             FinalUserCreation(authViewModel,navController)
