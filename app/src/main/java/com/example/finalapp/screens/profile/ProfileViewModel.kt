@@ -34,11 +34,6 @@ class ProfileViewModel @Inject constructor(private val repository: ProfileReposi
         return repository.uploadImage(context,uri)
     }
     var usersList= mutableStateOf<List<User>>(emptyList())
-    var response:MutableState<Response> = mutableStateOf( Response.IDLE)
-
-
-
-
 
     val allProfiles: MutableState<RequestState<List<User>>> = mutableStateOf(RequestState.Idle)
 
@@ -46,7 +41,6 @@ class ProfileViewModel @Inject constructor(private val repository: ProfileReposi
         repository.getAllProfiles()
             .onStart {
                 allProfiles.value = RequestState.Loading
-                response.value = Response.LOADING
                 Log.d("ZUNE", "all profiles start ${allProfiles.value}")
 
             }.catch {
