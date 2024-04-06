@@ -526,7 +526,7 @@ fun ImageScreen(user: User) {
            }
            }
            GlideImage(
-               model = "http://192.168.29.95:5000/${user.profileImage}",
+               model = "${Constants.BASE_URL}${user.profileImage}",
                contentDescription = "",
                transition=CrossFade,
                modifier = Modifier
