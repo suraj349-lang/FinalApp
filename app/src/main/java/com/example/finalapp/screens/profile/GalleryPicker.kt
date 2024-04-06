@@ -23,10 +23,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
-import com.example.finalapp.navigation.SCREENS
 
 
 //https://www.youtube.com/watch?v=uHX5NB6wHao

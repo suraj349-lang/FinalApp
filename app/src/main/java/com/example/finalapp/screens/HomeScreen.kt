@@ -71,12 +71,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import coil.compose.rememberImagePainter
+import com.bumptech.glide.integration.compose.CrossFade
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
+import com.bumptech.glide.integration.compose.Transition
 import com.example.finalapp.R
 import com.example.finalapp.model.User
 import com.example.finalapp.navigation.SCREENS
@@ -87,8 +89,11 @@ import com.example.finalapp.ui.theme.DarkBlue
 import com.example.finalapp.ui.theme.floatingActionBtnTextColor
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.utils.Constants.Constants
+import com.example.finalapp.utils.Constants.Constants.TAG
 import com.example.finalapp.utils.RequestState
 import kotlinx.coroutines.launch
+
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -133,7 +138,7 @@ fun HomeScreenUI(navController: NavHostController, profileViewModel: ProfileView
                     profileViewModel.usersList.value= result.data
                     LazyColumn(modifier = Modifier.padding(it)) {
                         items(usersList) { user ->
-                            ImageScreen(user, R.drawable.profile_image_1)
+                            ImageScreen(user)
                             Spacer(modifier = Modifier.height(20.dp))
                         }
                     }
@@ -450,11 +455,14 @@ fun HomeScreenOffer(){
 
 //0xFFEEF3B9 -> yellow   0xFFE8E9E2  -> grey  
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun ImageScreen(user: User, image: Int) {
+fun ImageScreen(user: User) {
     val configuration = LocalConfiguration.current
     val widthInDp = configuration.screenWidthDp.dp
     val heightInDp = configuration.screenHeightDp.dp * 0.78f
+    val imageUrl=user.profileImage
+    Log.d(TAG, "ImageScreen:${user.profileImage}")
    Box(modifier = Modifier
        .border(width = 1.dp, color = Color.LightGray)
        .padding(start = 2.dp, end = 2.dp)
@@ -470,9 +478,11 @@ fun ImageScreen(user: User, image: Int) {
                width = 0.5.dp, color = Color.DarkGray
            )) {
            Row(verticalAlignment = Alignment.CenterVertically) {
-               Image(
-                   painter = painterResource(id = image),
-                   contentDescription = "Round Image",
+               Log.d(TAG, "ImageScreen: http://${Constants.BASE_URL}${user.profileImage}")
+               GlideImage(
+                   model ="http://192.168.29.95:5000/${user.profileImage}" ,
+                   contentDescription ="",
+                   transition=CrossFade,
                    contentScale = ContentScale.FillBounds,
                    modifier = Modifier
                        .padding(2.dp)
@@ -480,6 +490,16 @@ fun ImageScreen(user: User, image: Int) {
                        .clip(CircleShape)
                        .border(1.dp, Color.DarkGray, CircleShape)
                )
+//               Image(
+//                   painter = rememberGlidePainter(request ="https://localhost:5000/"+ user.profileImage),
+//                   contentDescription = "Round Image",
+//                   contentScale = ContentScale.FillBounds,
+//                   modifier = Modifier
+//                       .padding(2.dp)
+//                       .size(30.dp)
+//                       .clip(CircleShape)
+//                       .border(1.dp, Color.DarkGray, CircleShape)
+//               )
            Column(
                modifier = Modifier
                    .padding(2.dp)
@@ -505,15 +525,17 @@ fun ImageScreen(user: User, image: Int) {
                )
            }
            }
-           Image(
-               painter = painterResource(id = image),
+           GlideImage(
+               model = "http://192.168.29.95:5000/${user.profileImage}",
                contentDescription = "",
+               transition=CrossFade,
                modifier = Modifier
                    .fillMaxWidth()
                    .height(heightInDp - 80.dp)
                // .clip(shape = RoundedCornerShape(12.dp))
                , contentScale = ContentScale.Crop
            )
+
            Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
                Row(modifier = Modifier
                    .fillMaxWidth(0.33f)

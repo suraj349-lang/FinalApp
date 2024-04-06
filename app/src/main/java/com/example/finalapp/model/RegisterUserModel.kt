@@ -16,13 +16,14 @@ data class SignupAPIResponse(
   val _id:String
 )
 data class User(
+  val _id:String,
   val name:String,
   val number:String,
   val username: String,
-  val _id:String,
   val token: String,
   val address: String,
-  val offers:List<String>
+  val offers:List<String>,
+  val profileImage:String
 )
 
 data class ProfileResponse(
