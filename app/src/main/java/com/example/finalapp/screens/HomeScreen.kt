@@ -27,10 +27,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -71,6 +73,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -145,20 +148,33 @@ fun HomeScreenUI(navController: NavHostController, profileViewModel: ProfileView
 
                 }
                 is RequestState.Error->{
-                    Toast.makeText(LocalContext.current,"${result.error}",Toast.LENGTH_SHORT).show()
+                    HomeError()
+                    Toast.makeText(LocalContext.current,"${result.error.message}",Toast.LENGTH_SHORT).show()
                 }
                 RequestState.Loading->{
-                    LoadingIndicator2(padding)
+                    HomeLoading(padding)
                 }
                 RequestState.Idle->{
-                    LoadingIndicator2(padding)
+                    HomeLoading(padding)
                 }
 
             }
 
         }
     }
+}
+
+@Composable
+fun HomeError(){
+    Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+        Image(painter = painterResource(id = R.drawable.oops), contentDescription = "oops")
+        Text(text = "Error loading Profiles !", fontSize = 20.sp, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, color = Color(
+            0xFFE91E63
+        )
+        )
+        
     }
+}
 
 @Composable
 fun LoadingIndicator(){
@@ -177,131 +193,24 @@ fun LoadingIndicator(){
 
 }
 
+@Preview(showBackground = true)
 @Composable
-fun LoadingIndicator2(padding: PaddingValues){
+fun HomeLoading(padding: PaddingValues= PaddingValues(65.dp)){
     val configuration = LocalConfiguration.current
     val widthInDp = configuration.screenWidthDp.dp
     val heightInDp = configuration.screenHeightDp.dp * 0.78f
-    Box(modifier = Modifier
-        .border(width = 1.dp, color = Color.LightGray)
-        .padding(start = 2.dp, end = 2.dp, top = padding.calculateTopPadding())
-        .fillMaxWidth()
-        .height(heightInDp)
-        .background(brush = ShimmerEffect())
-        //.clip(shape = RoundedCornerShape(12.dp)).border(width=1.dp, color = Color.Black)
-        , contentAlignment = Alignment.BottomStart)
-
-    {
-        Column(modifier = Modifier
-            .fillMaxSize()
-            .border(
-                width = 0.5.dp, color = Color.DarkGray
-            )) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Image(
-                    painter = painterResource(id = R.drawable.femaleprofile),
-                    contentDescription = "Round Image",
-                    contentScale = ContentScale.FillBounds,
-                    modifier = Modifier
-                        .alpha(0.5f)
-                        .padding(2.dp)
-                        .size(30.dp)
-                        .clip(CircleShape)
-                        .border(1.dp, Color.DarkGray, CircleShape)
-                )
-                Column(
-                    modifier = Modifier
-                        .padding(2.dp)
-                        .fillMaxWidth()
-                        .wrapContentHeight()
-                        .padding(start = 4.dp),
-                    verticalArrangement=Arrangement.Center,
-                    horizontalAlignment = Alignment.Start
-                ) {
-                    Text(
-                        text = "______",
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .alpha(0.5f),
-                        fontSize = 15.sp,
-                        color = Color.DarkGray
-                    )
-                    Text(
-                        text = "....................",
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.fillMaxWidth(),
-                        fontSize = 6.sp,
-                        color = Color.Black
-                    )
-                }
-            }
+        Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally) {
             Image(
-                painter = painterResource(id = R.drawable.profile_image_1),
+                painter = painterResource(id = R.drawable.profileloading),
                 contentDescription = "",
-                colorFilter= ColorFilter.tint(color= Color.LightGray),
                 modifier = Modifier
                     .background(brush = ShimmerEffect())
-                    .fillMaxWidth()
-                    .height(heightInDp * 0.9f)
-                    .alpha(0.8f)
+                    .fillMaxHeight()
+                    .width(widthInDp * 0.99f)
                 // .clip(shape = RoundedCornerShape(12.dp))
-                , contentScale = ContentScale.Crop
+                , contentScale = ContentScale.FillBounds
             )
-            Row(modifier = Modifier
-                .fillMaxSize()
-                .padding(top = 8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
-                Row(modifier = Modifier
-                    .fillMaxWidth(0.33f)
-                    .fillMaxHeight(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = "Raise offer", textAlign = TextAlign.Start, color = Color.LightGray, modifier = Modifier.alpha(0.5f))
-                }
-                Row(modifier = Modifier
-                    .fillMaxWidth(0.7f)
-                    .fillMaxHeight(), horizontalArrangement = Arrangement.SpaceEvenly, verticalAlignment = Alignment.CenterVertically) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(top=3.dp)) {
-                        Image(painter = painterResource(id = R.drawable.heart), contentDescription = "", modifier = Modifier
-                            .padding(end = 8.dp)
-                            .size(24.dp), colorFilter = ColorFilter.tint(color = Color.LightGray))
-                        Text(text = "", fontSize = 8.sp, fontWeight = FontWeight.Bold)
-
-                    }
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Image(painter = painterResource(id = R.drawable.cinema), contentDescription = "", modifier = Modifier
-                            .padding(end = 8.dp)
-                            .size(30.dp), colorFilter = ColorFilter.tint(color = Color.LightGray))
-                        Text(text = "", fontSize = 8.sp, fontWeight = FontWeight.Bold)
-
-                    }
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Image(painter = painterResource(id = R.drawable.coffeecup), contentDescription = "", modifier = Modifier
-                            .padding(end = 8.dp)
-                            .size(30.dp), colorFilter = ColorFilter.tint(color = Color.LightGray))
-                        Text(text = "", fontSize = 8.sp, fontWeight = FontWeight.Bold)
-
-                    }
-                }
-                Row(modifier = Modifier
-                    .padding(2.dp)
-                    .fillMaxWidth(1f)
-                    .fillMaxHeight(), horizontalArrangement = Arrangement.End, verticalAlignment = Alignment.CenterVertically) {
-                    Column() {
-                        Image(painter = painterResource(id = R.drawable.instant), contentDescription ="", modifier = Modifier
-                            .size(30.dp), colorFilter = ColorFilter.tint(color = Color.LightGray))
-                        Text(text = ".......", fontSize = 8.sp, fontWeight = FontWeight.Bold)
-
-                    }
-
-                }
-
-
-
-            }
-
         }
-
-
-    }
 }
 @Composable
 fun ShimmerEffect(showShimmer: Boolean = true, targetValue: Float = 10000f): Brush {
@@ -478,9 +387,8 @@ fun ImageScreen(user: User) {
                width = 0.5.dp, color = Color.DarkGray
            )) {
            Row(verticalAlignment = Alignment.CenterVertically) {
-               Log.d(TAG, "ImageScreen: http://${Constants.BASE_URL}${user.profileImage}")
                GlideImage(
-                   model ="http://192.168.29.95:5000/${user.profileImage}" ,
+                   model ="${Constants.BASE_URL}${user.profileImage}" ,
                    contentDescription ="",
                    transition=CrossFade,
                    contentScale = ContentScale.FillBounds,

@@ -159,7 +159,7 @@ fun EditProfile(navController: NavHostController, profileViewModel: ProfileViewM
                 Text(text = "Open camera ")
             }
         }
-        Image(painter = rememberImagePainter(data =profileViewModel.imageUri.value ), contentDescription ="" )
+        Image(painter = rememberImagePainter(data =profileViewModel.imageUri.value ), modifier = Modifier.fillMaxSize(), contentDescription ="", contentScale = ContentScale.Crop )
 
     }
 }

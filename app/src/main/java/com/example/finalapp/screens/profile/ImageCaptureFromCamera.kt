@@ -11,6 +11,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -21,19 +22,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.ViewModel
 import coil.compose.rememberImagePainter
 import com.example.finalapp.utils.Constants.Constants.TAG
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.io.File
 import java.util.Objects
-import javax.inject.Inject
 
 @Composable
 fun ImageCaptureFromCamera(profileViewModel: ProfileViewModel) {
@@ -74,10 +72,11 @@ fun ImageCaptureFromCamera(profileViewModel: ProfileViewModel) {
        if (capturedImageUri.path?.isNotEmpty() == true) {
             val scope= rememberCoroutineScope()
             Image(
-                modifier = Modifier.padding(16.dp, 8.dp),
+                modifier = Modifier.padding(16.dp, 8.dp).fillMaxWidth(),
                 painter = rememberImagePainter(capturedImageUri.path),
                 //painter = painterResource(id = R.drawable.profile_image_1),
-                contentDescription = ""
+                contentDescription = "",
+                contentScale = ContentScale.Crop
             )
            profileViewModel.imageUri.value=capturedImageUri
             Log.d(TAG, "Image captured uri is: ${capturedImageUri}")
@@ -86,7 +85,7 @@ fun ImageCaptureFromCamera(profileViewModel: ProfileViewModel) {
                     Log.d(TAG, "ImageCaptureFromCamera: started")
                     try {
                         imageUploadResponse =
-                            profileViewModel.uploadImage(context, capturedImageUri.path)
+                            profileViewModel.uploadImage(context, profileViewModel.imageUri.value.path)
                         Log.d(TAG, "ImageCaptureFromCamera:${imageUploadResponse} ")
                     }catch (e:Exception){
                         Log.d(TAG, e.message.toString())
