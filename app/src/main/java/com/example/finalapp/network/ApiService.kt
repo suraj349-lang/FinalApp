@@ -1,6 +1,7 @@
 package com.example.finalapp.network
 
 import com.example.finalapp.database.Profile
+import com.example.finalapp.model.ImageUploadResponse
 import com.example.finalapp.model.LoginAPIResponse
 import com.example.finalapp.model.LoginModel
 import com.example.finalapp.model.OfferModel
@@ -34,8 +35,8 @@ interface ApiService {
     suspend fun getAllProfiles():ProfileResponse
 
     @Multipart
-    @POST("/api/v1/profile/upload_image")
-    suspend fun uploadImage(@Part image: MultipartBody.Part): String
+    @POST("/api/v1/profile/uploadImage")
+    suspend fun uploadImage(@Part image: MultipartBody.Part): ImageUploadResponse
 
 
 }

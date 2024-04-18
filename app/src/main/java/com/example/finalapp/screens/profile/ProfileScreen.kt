@@ -154,7 +154,9 @@ fun EditProfile(navController: NavHostController, profileViewModel: ProfileViewM
             .fillMaxWidth()
             .wrapContentHeight()
             .padding(16.dp)) {
-            Text(text = "Edit Profile", modifier = Modifier.clickable { navController.navigate(SCREENS.GALLERY.route) })
+            Button(onClick = {navController.navigate(SCREENS.GALLERY.route)}, modifier = Modifier.padding(start = 30.dp)) {
+                Text(text = "Open Gallery")
+            }
             Button(onClick = {key = !key}, modifier = Modifier.padding(start = 30.dp)) {
                 Text(text = "Open camera ")
             }

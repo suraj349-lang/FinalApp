@@ -4,10 +4,12 @@ package com.example.finalapp.screens.profile
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.finalapp.model.ImageUploadResponse
 import com.example.finalapp.model.User
 import com.example.finalapp.utils.RequestState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,9 +23,35 @@ import javax.inject.Inject
 class ProfileViewModel @Inject constructor(private val repository: ProfileRepository):ViewModel(){
 
     val imageUri= mutableStateOf<Uri>(Uri.EMPTY)
-    suspend fun uploadImage(context: Context, uri: String?):String{
-        return repository.uploadImage(context,uri)
+    val imageUploadResponse: MutableState<RequestState<ImageUploadResponse>> = mutableStateOf(RequestState.Idle)
+//     fun uploadImage(uri: Uri)=viewModelScope.launch(Dispatchers.IO){
+//       repository.uploadImage(uri)
+//           .onStart {
+//               imageUploadResponse.value=RequestState.Loading
+//           }
+//           .catch {
+//               imageUploadResponse.value=RequestState.Error(it)
+//           }
+//           .collect{
+//               imageUploadResponse.value=RequestState.Success(it)
+//           }
+//    }
+     fun uploadImage(uri: Uri,context: Context) {
+        viewModelScope.launch {
+           repository.uploadImage(uri, context )
+                .onStart {
+                    imageUploadResponse.value=RequestState.Loading
+                }
+                .catch {
+                    imageUploadResponse.value=RequestState.Error(it)
+                }
+                .collect{
+                    imageUploadResponse.value=RequestState.Success(it)
+                }
+        }
     }
+
+    //--------------------------------------------------------------------------------------------------------------------//
     var usersList= mutableStateOf<List<User>>(emptyList())
 
     val allProfiles: MutableState<RequestState<List<User>>> = mutableStateOf(RequestState.Idle)

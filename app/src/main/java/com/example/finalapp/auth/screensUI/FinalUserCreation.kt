@@ -1,5 +1,6 @@
 package com.example.finalapp.auth.screensUI
 
+import android.annotation.SuppressLint
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
@@ -111,6 +112,7 @@ fun FinalUserCreation(authViewModel: AuthViewModel, navController: NavHostContro
 
     )
 }
+@SuppressLint("SuspiciousIndentation")
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun FinalUserCreationUI (

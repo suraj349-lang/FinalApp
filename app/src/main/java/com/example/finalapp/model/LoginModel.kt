@@ -9,3 +9,7 @@ data class LoginAPIResponse(
   val code:Int,
   val token:String
 )
+
+data class ImageUploadResponse(
+  val message:String
+)
