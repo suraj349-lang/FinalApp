@@ -24,18 +24,7 @@ class ProfileViewModel @Inject constructor(private val repository: ProfileReposi
 
     val imageUri= mutableStateOf<Uri>(Uri.EMPTY)
     val imageUploadResponse: MutableState<RequestState<ImageUploadResponse>> = mutableStateOf(RequestState.Idle)
-//     fun uploadImage(uri: Uri)=viewModelScope.launch(Dispatchers.IO){
-//       repository.uploadImage(uri)
-//           .onStart {
-//               imageUploadResponse.value=RequestState.Loading
-//           }
-//           .catch {
-//               imageUploadResponse.value=RequestState.Error(it)
-//           }
-//           .collect{
-//               imageUploadResponse.value=RequestState.Success(it)
-//           }
-//    }
+
      fun uploadImage(uri: Uri,context: Context) {
         viewModelScope.launch {
            repository.uploadImage(uri, context )

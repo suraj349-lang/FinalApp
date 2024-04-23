@@ -1,13 +1,17 @@
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Favorite
-import androidx.compose.material.icons.outlined.Home
-import androidx.compose.material.icons.outlined.Notifications
-import androidx.compose.material.icons.rounded.Favorite
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.Notifications
 import androidx.compose.material.icons.rounded.Person
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemColors
@@ -16,13 +20,19 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.Role.Companion.Image
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.finalapp.R
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.ui.theme.DarkBlue
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
@@ -30,20 +40,28 @@ import com.example.finalapp.ui.theme.topAppBarTextColor
 
 sealed class Destinations(
     val route: String,
-    val icon: ImageVector? = null
+    val icon: Int,
+    val name:String
 ) {
     object HomeScreen : Destinations(
         route = SCREENS.HOME.route,
-        icon = Icons.Rounded.Home
+        icon = R.drawable.flash,
+        name = "Flash"
     )
-
-    object ProfileScreen : Destinations(
-        route = SCREENS.PROFILE.route,
-        icon = Icons.Rounded.Person
+    object SearchProfileScreen : Destinations(
+        route = SCREENS.SEARCH.route,
+        icon = R.drawable.search,
+        name = "Search"
     )
-    object NotificationsScreen : Destinations(
-        route = SCREENS.NOTIFICATIONS.route,
-        icon = Icons.Rounded.Notifications
+    object DropProfileScreen : Destinations(
+        route = SCREENS.DROP_PROFILE.route,
+        icon = R.drawable.directchat,
+        name = "Direct Chat"
+    )
+    object RaiseOfferScreen : Destinations(
+        route = SCREENS.RAISE_OFFER.route,
+        icon = R.drawable.raise_offer,
+        name = "Raise Offer"
     )
 
 }
@@ -53,7 +71,7 @@ fun BottomBar(
     navController: NavHostController, state: MutableState<Boolean>, modifier: Modifier = Modifier
 ) {
     val screens = listOf(
-        Destinations.HomeScreen, Destinations.ProfileScreen, Destinations.NotificationsScreen
+        Destinations.HomeScreen, Destinations.SearchProfileScreen,Destinations.RaiseOfferScreen,Destinations.DropProfileScreen
     )
 
     NavigationBar(
@@ -65,7 +83,11 @@ fun BottomBar(
             NavigationBarItem(
                 selected = currentRoute == screen.route,
                 icon = {
-                    Icon(imageVector = screen.icon!!, contentDescription = "", tint = statusAndTopAppBarColor)
+                    Column( verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                        Image(painter = painterResource(id = screen.icon), contentDescription ="",modifier=Modifier.size(24.dp) )
+                        Text(text = screen.name, fontSize = 8.sp, style = MaterialTheme.typography.labelSmall, color = Color.DarkGray)
+                    }
+
                 },
                 onClick = {
                     if(currentRoute!=screen.route) {

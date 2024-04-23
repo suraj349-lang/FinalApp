@@ -10,11 +10,11 @@ val Purple40 = Color(0xFF6650a4)
 val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
-val statusAndTopAppBarColor= Color(0xFF063608);
+val statusAndTopAppBarColor= Color( 0xFFE99923); //0xFF063608  //    0xFFDBD6AA  // green olive 0xFFA7B427
 
 
 //purple=0xFF5D0B6B
-val topAppBarTextColor= Color(0xFFE8E9E2);
+val topAppBarTextColor= Color(0xFFEEE6A2); //
 
 val DarkBlue=Color(0xFF08155E)
 val LightBlueBkg= Color(0xFF3C9BE7)

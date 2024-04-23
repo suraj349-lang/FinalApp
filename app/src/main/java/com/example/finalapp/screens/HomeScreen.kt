@@ -32,6 +32,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -42,6 +43,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -87,10 +89,13 @@ import com.example.finalapp.model.User
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.offer.OfferViewModel
 import com.example.finalapp.screens.DialogBOX.CustomAlertDialog
+import com.example.finalapp.screens.DialogBOX.ShowQRDialog
+import com.example.finalapp.screens.DialogBOX.showDialog
 import com.example.finalapp.screens.profile.ProfileViewModel
 import com.example.finalapp.ui.theme.DarkBlue
 import com.example.finalapp.ui.theme.floatingActionBtnTextColor
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
+import com.example.finalapp.ui.theme.topAppBarTextColor
 import com.example.finalapp.utils.Constants.Constants
 import com.example.finalapp.utils.Constants.Constants.TAG
 import com.example.finalapp.utils.RequestState
@@ -108,7 +113,9 @@ fun HomeScreenUI(navController: NavHostController, profileViewModel: ProfileView
     val offerViewModel= hiltViewModel<OfferViewModel>()
     val usersList=profileViewModel.usersList.value
     val scope= rememberCoroutineScope()
-    val homeData = listOf(R.drawable.profile_image_1,R.drawable.profile_image_2,R.drawable.profile_image_3,R.drawable.girl)
+    var showQR:showDialog by remember {
+        mutableStateOf(showDialog.CLOSE)
+    }
 
 
     Scaffold(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -116,7 +123,7 @@ fun HomeScreenUI(navController: NavHostController, profileViewModel: ProfileView
                  Constants.APP_NAME,
                      navController,
                      true ,
-                     R.drawable.send_24)
+                     R.drawable.chat){showQR=showDialog.OPEN}
                       },
              bottomBar = { BottomBar(
                 navController = navController,
@@ -135,6 +142,12 @@ fun HomeScreenUI(navController: NavHostController, profileViewModel: ProfileView
                 scope.launch {
                     profileViewModel.getAllProfiles()
                 }
+            }
+            if(showQR==showDialog.OPEN) {
+                ShowQRDialog(
+                    image = R.drawable.bigqr,
+                    navController = navController,
+                    onDismiss = {showQR=showDialog.CLOSE})
             }
             when (val result=profileViewModel.allProfiles.value){
                 is RequestState.Success->{
@@ -193,6 +206,7 @@ fun LoadingIndicator(){
 
 }
 
+@SuppressLint("SuspiciousIndentation")
 @Preview(showBackground = true)
 @Composable
 fun HomeLoading(padding: PaddingValues= PaddingValues(65.dp)){
@@ -207,7 +221,6 @@ fun HomeLoading(padding: PaddingValues= PaddingValues(65.dp)){
                     .background(brush = ShimmerEffect())
                     .fillMaxHeight()
                     .width(widthInDp * 0.99f)
-                // .clip(shape = RoundedCornerShape(12.dp))
                 , contentScale = ContentScale.FillBounds
             )
         }
@@ -257,15 +270,17 @@ fun HomeFloatingActionButton(offerViewModel: OfferViewModel,navController: NavHo
         onClick = { showCustomDialog = !showCustomDialog},
         Modifier.size(75.dp),
         shape= CircleShape,
+       // containerColor = Color(0xFFAFD7E9), // 0xFFE4E47F  0xFFFFEB3B
+        contentColor = Color(0xFF000000), //0xFFE4420E
         containerColor = statusAndTopAppBarColor, //0xFFEBDB55
-        contentColor = floatingActionBtnTextColor,//0xFF090200
+//        contentColor = floatingActionBtnTextColor,//0xFF090200
     ) {
         Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(painterResource(id = R.drawable.up_arrow), contentDescription = "Add",
+            Image(painterResource(id = R.drawable.nearby_chat), contentDescription = "Add",
                 Modifier
                     .padding(top = 4.dp)
-                    .size(32.dp))
-            Text(text = "Raise Offer", fontSize = 12.sp, modifier = Modifier.padding(top=0.dp))
+                    .size(50.dp))
+            Text(text = "Drop Profile", fontSize = 8.sp, modifier = Modifier.padding(top=0.dp))
         }
     }
     if (showCustomDialog) { CustomAlertDialog(offerViewModel , navController ) { showCustomDialog = !showCustomDialog } }
@@ -378,13 +393,14 @@ fun ImageScreen(user: User) {
        .fillMaxWidth()
        .height(heightInDp)
        //.clip(shape = RoundedCornerShape(12.dp)).border(width=1.dp, color = Color.Black)
-       , contentAlignment = Alignment.BottomStart)
+       , contentAlignment = Alignment.Center)
 
    {
-       Column(modifier = Modifier
-           .fillMaxSize()
+       Column(verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
+           .fillMaxHeight()
+           .fillMaxWidth(0.90f)
            .border(
-               width = 0.5.dp, color = Color.DarkGray
+               width = 0.5.dp, color = Color.DarkGray, shape = RoundedCornerShape(10.dp)
            )) {
            Row(verticalAlignment = Alignment.CenterVertically) {
                GlideImage(
@@ -508,7 +524,7 @@ fun ImageScreen(user: User) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeTopBar(title:String,navController: NavHostController,actionIcon:Boolean,icon:Int){
+fun HomeTopBar(title:String,navController: NavHostController,actionIcon:Boolean,icon:Int,onQRClicked:()->Unit={}){
 
 
     TopAppBar(
@@ -519,33 +535,44 @@ fun HomeTopBar(title:String,navController: NavHostController,actionIcon:Boolean,
             Text(
                 title,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top=8.dp), color = Color(0xFFE8E9E2), style = MaterialTheme.typography.titleMedium
+                overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top=8.dp), color = Color( 0xFF000000), style = MaterialTheme.typography.titleMedium
             )
         },
         navigationIcon = {
             Image(
                 painter = painterResource(
-                    id = R.drawable.tree
+                    id = R.drawable.boy
                 ),
                 contentDescription ="" ,
                 modifier = Modifier
+                    .clickable { navController.navigate(SCREENS.PROFILE.route) }
                     .padding(top = 6.dp)
                     .size(40.dp))
         }, actions = {
+            Image(painter = painterResource(id = R.drawable.qr), contentDescription ="", modifier = Modifier
+                .padding(end = 16.dp)
+                .size(32.dp)
+                .clickable {
+                   onQRClicked()
+                } )
+            Image(painter = painterResource(id = R.drawable.notification), contentDescription ="", modifier = Modifier
+                .padding(end = 16.dp)
+                .size(32.dp) )
             if (actionIcon) {
-                Icon(painter = painterResource(id = icon),
+                Image(painter = painterResource(id = icon),
                     contentDescription = "",
-                    tint = Color(0xFFE8E9E2),
                     modifier = Modifier
+                        .padding(end = 8.dp)
                         .size(28.dp)
                         .rotate(-40f)
                         .shadow(elevation = 12.dp, shape = CircleShape, spotColor = Color.White)
                         .clickable {
-                            navController.navigate(SCREENS.CHAT.route) {
-                                popUpTo(SCREENS.CHAT.route)
+                            navController.navigate(SCREENS.SETTINGS.route) {
+                                popUpTo(SCREENS.SETTINGS.route)
                             }
                         })
             }
+
         }
     )
 }

@@ -16,9 +16,12 @@ import com.example.finalapp.auth.screensUI.SplashScreenUI
 import com.example.finalapp.auth.screensUI.otp.OtpBox
 import com.example.finalapp.screens.ChatScreenUI
 import com.example.finalapp.auth.screensUI.FinalUserCreation
+import com.example.finalapp.screens.DirectChatScreenUI
 import com.example.finalapp.screens.profile.GalleryPicker
 import com.example.finalapp.screens.HomeScreenUI
 import com.example.finalapp.screens.NotificationsScreenUI
+import com.example.finalapp.screens.RaiseOfferScreenUI
+import com.example.finalapp.screens.SearchScreenUI
 import com.example.finalapp.screens.profile.ProfileScreenUI
 import com.example.finalapp.screens.SettingsScreenUI
 import com.example.finalapp.screens.onboarding.screen.WelcomeScreen
@@ -42,6 +45,9 @@ sealed class SCREENS(val route:String){
     object GALLERY:SCREENS("gallery_picker")
     object WELCOME:SCREENS("welcome")
     object ALL_USERS:SCREENS("all_users")
+    object SEARCH:SCREENS("search")
+    object DROP_PROFILE:SCREENS("drop_profile")
+    object RAISE_OFFER:SCREENS("raise_offer")
 
 }
 @OptIn(ExperimentalAnimationApi::class, ExperimentalPagerApi::class)
@@ -86,13 +92,22 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
             OtpBox()
         }
         composable(SCREENS.GALLERY.route){
-            GalleryPicker(navController)
+            GalleryPicker(navController, profileViewModel )
         }
         composable(SCREENS.WELCOME.route){
             WelcomeScreen(navController)
         }
         composable(SCREENS.ALL_USERS.route){
             AllProfiles(profileViewModel)
+        }
+        composable(SCREENS.SEARCH.route){
+            SearchScreenUI(navController)
+        }
+        composable(SCREENS.DROP_PROFILE.route){
+            DirectChatScreenUI(navController )
+        }
+        composable(SCREENS.RAISE_OFFER.route){
+            RaiseOfferScreenUI(navController )
         }
     }
 

@@ -1,11 +1,13 @@
 package com.example.finalapp.screens.DialogBOX
 
 import android.util.Log
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -204,4 +206,44 @@ fun SuggestionsUI() {
         Text(text = "Figure Out Date", style = MaterialTheme.typography.bodySmall, fontSize = 22.sp, modifier = Modifier.padding(top=3.dp, start = 4.dp), color = statusAndTopAppBarColor)
 
     }
+}
+
+
+
+
+@Composable
+fun ShowQRDialog(image:Int,navController: NavHostController,onDismiss: () -> Unit) {
+
+
+    val scope= rememberCoroutineScope()
+    var enabled=true;
+
+
+    Dialog(onDismissRequest = { onDismiss() }, properties = DialogProperties(
+        dismissOnBackPress = true,dismissOnClickOutside = true
+    )
+    ) {
+        Card(
+            shape = RoundedCornerShape(10.dp),
+            modifier = Modifier
+                .fillMaxWidth().height(400.dp)
+                .padding(8.dp)
+        ) {
+           Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()) {
+               Image(painter = painterResource(id = image), contentDescription ="" )
+               Column(modifier =Modifier.fillMaxSize(), verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally) {
+                   Image(painter = painterResource(id = R.drawable.camera), contentDescription ="", modifier = Modifier.size(40.dp) )
+                   Text("Scan QR")
+               }
+               
+           }
+        }
+    }
+}
+
+
+
+enum class showDialog{
+    OPEN,
+    CLOSE
 }
