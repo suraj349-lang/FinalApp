@@ -25,7 +25,10 @@ data class User(
   val offers:List<String>,
   val profileImage:String
 )
-
+data class ChatUser(
+  val name:String,
+  val profileUrl:String
+)
 data class ProfileResponse(
   val success: Boolean,
   val data: List<User>

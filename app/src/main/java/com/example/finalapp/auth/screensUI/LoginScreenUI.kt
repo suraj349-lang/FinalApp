@@ -59,6 +59,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavController
 import com.example.finalapp.R
 import com.example.finalapp.auth.authViewModel.AuthViewModel
+import com.example.finalapp.datastore.StoreUserData
 import com.example.finalapp.model.LoginModel
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.ui.theme.DarkBlue
@@ -76,6 +77,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun LoginScreenUI(navController: NavController= NavController(LocalContext.current),authViewModel: AuthViewModel) {
     val scope= rememberCoroutineScope()
+    val context= LocalContext.current
+    val datastore=StoreUserData(context )
 
     var loginNumberText by rememberSaveable { mutableStateOf("") }
     val addString="+91";
@@ -179,6 +182,7 @@ fun LoginScreenUI(navController: NavController= NavController(LocalContext.curre
                     onClick = {
                         authViewModel.key.value=1;
                         scope.launch {
+                            datastore.saveUserNumber(loginNumberText)
                             authViewModel.loginUser(LoginModel("$addString$loginNumberText", loginPasswordText))
                         }
                     },

@@ -31,11 +31,14 @@ interface ApiService {
     @POST("/api/v1/offer")
     suspend fun createOffer(@Body offerData:OfferModel):OfferResponseModel
 
-    @GET("/api/v1/profile/all")
+    @GET("/api/v1/user/all")
     suspend fun getAllProfiles():ProfileResponse
 
+    @GET("/api/v1/user")
+    suspend fun getUser():ProfileResponse
+
     @Multipart
-    @POST("/api/v1/profile/uploadImage")
+    @POST("/api/v1/user/uploadImage")
     suspend fun uploadImage(@Part image: MultipartBody.Part): ImageUploadResponse
 
 

@@ -4,9 +4,11 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.finalapp.auth.authViewModel.AuthViewModel
 import com.example.finalapp.auth.screensUI.EnterOTPScreenUI
 
@@ -16,6 +18,7 @@ import com.example.finalapp.auth.screensUI.SplashScreenUI
 import com.example.finalapp.auth.screensUI.otp.OtpBox
 import com.example.finalapp.screens.ChatScreenUI
 import com.example.finalapp.auth.screensUI.FinalUserCreation
+import com.example.finalapp.screens.ChatListScreen
 import com.example.finalapp.screens.DirectChatScreenUI
 import com.example.finalapp.screens.profile.GalleryPicker
 import com.example.finalapp.screens.HomeScreenUI
@@ -29,7 +32,7 @@ import com.example.finalapp.screens.profile.AllProfiles
 import com.example.finalapp.screens.profile.ProfileViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 
-
+const val NavArg="name"
 sealed class SCREENS(val route:String){
     object SPLASH:SCREENS("splash_Screen")
     object LOGIN:SCREENS("login_Screen")
@@ -41,6 +44,7 @@ sealed class SCREENS(val route:String){
     object SETTINGS:SCREENS("settings_screen")
     object NOTIFICATIONS:SCREENS("notifications_screen")
     object CHAT:SCREENS("chat_screen")
+    object SINGLE_CHAT:SCREENS("singleChat/{name}")
     object  OTP2:SCREENS("otp")
     object GALLERY:SCREENS("gallery_picker")
     object WELCOME:SCREENS("welcome")
@@ -56,7 +60,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
     val navController:NavHostController= rememberNavController();
     val profileViewModel= hiltViewModel<ProfileViewModel>()
 
-    NavHost(navController = navController, startDestination =SCREENS.PROFILE.route){
+    NavHost(navController = navController, startDestination =SCREENS.HOME.route){
         composable(SCREENS.SPLASH.route){
             SplashScreenUI(navController,screen)
         }
@@ -76,8 +80,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
             FinalUserCreation(authViewModel,navController)
         }
         composable(SCREENS.PROFILE.route){
-
-            ProfileScreenUI(navController,profileViewModel)
+            ProfileScreenUI(navController,profileViewModel,authViewModel)
         }
         composable(SCREENS.SETTINGS.route){
             SettingsScreenUI(navController)
@@ -86,7 +89,13 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
             NotificationsScreenUI(navController)
         }
         composable(SCREENS.CHAT.route){
-            ChatScreenUI()
+            ChatListScreen(navController)
+        }
+        composable(SCREENS.SINGLE_CHAT.route, arguments = listOf(navArgument("name"){type=
+            NavType.StringType})){navBackStackEntry->
+            val name=navBackStackEntry.arguments?.getString("name")
+            ChatScreenUI(name, navController )
+
         }
         composable(SCREENS.OTP2.route){
             OtpBox()

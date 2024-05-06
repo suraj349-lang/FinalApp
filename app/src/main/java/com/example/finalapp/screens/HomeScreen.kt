@@ -116,13 +116,12 @@ fun HomeScreenUI(navController: NavHostController, profileViewModel: ProfileView
     var showQR:showDialog by remember {
         mutableStateOf(showDialog.CLOSE)
     }
-
-
     Scaffold(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
              topBar = { HomeTopBar(
                  Constants.APP_NAME,
                      navController,
                      true ,
+                 true,
                      R.drawable.chat){showQR=showDialog.OPEN}
                       },
              bottomBar = { BottomBar(
@@ -524,7 +523,7 @@ fun ImageScreen(user: User) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeTopBar(title:String,navController: NavHostController,actionIcon:Boolean,icon:Int,onQRClicked:()->Unit={}){
+fun HomeTopBar(title:String,navController: NavHostController,navIcon:Boolean,actionIcon:Boolean,icon:Int,onQRClicked:()->Unit={}){
 
 
     TopAppBar(
@@ -539,26 +538,35 @@ fun HomeTopBar(title:String,navController: NavHostController,actionIcon:Boolean,
             )
         },
         navigationIcon = {
-            Image(
-                painter = painterResource(
-                    id = R.drawable.boy
-                ),
-                contentDescription ="" ,
-                modifier = Modifier
-                    .clickable { navController.navigate(SCREENS.PROFILE.route) }
-                    .padding(top = 6.dp)
-                    .size(40.dp))
+            if(navIcon) {
+                Image(
+                    painter = painterResource(
+                        id = R.drawable.boy
+                    ),
+                    contentDescription = "",
+                    modifier = Modifier
+                        .clickable { navController.navigate(SCREENS.PROFILE.route) }
+                        .padding(top = 6.dp)
+                        .size(40.dp)
+                )
+            }
         }, actions = {
-            Image(painter = painterResource(id = R.drawable.qr), contentDescription ="", modifier = Modifier
-                .padding(end = 16.dp)
-                .size(32.dp)
-                .clickable {
-                   onQRClicked()
-                } )
-            Image(painter = painterResource(id = R.drawable.notification), contentDescription ="", modifier = Modifier
-                .padding(end = 16.dp)
-                .size(32.dp) )
-            if (actionIcon) {
+            if(actionIcon) {
+                Image(painter = painterResource(id = R.drawable.qr),
+                    contentDescription = "",
+                    modifier = Modifier
+                        .padding(end = 16.dp)
+                        .size(32.dp)
+                        .clickable {
+                            onQRClicked()
+                        })
+                Image(
+                    painter = painterResource(id = R.drawable.notification),
+                    contentDescription = "",
+                    modifier = Modifier.clickable { navController.navigate(SCREENS.NOTIFICATIONS.route) }
+                        .padding(end = 16.dp)
+                        .size(32.dp)
+                )
                 Image(painter = painterResource(id = icon),
                     contentDescription = "",
                     modifier = Modifier
@@ -567,9 +575,7 @@ fun HomeTopBar(title:String,navController: NavHostController,actionIcon:Boolean,
                         .rotate(-40f)
                         .shadow(elevation = 12.dp, shape = CircleShape, spotColor = Color.White)
                         .clickable {
-                            navController.navigate(SCREENS.SETTINGS.route) {
-                                popUpTo(SCREENS.SETTINGS.route)
-                            }
+                            navController.navigate(SCREENS.CHAT.route)
                         })
             }
 

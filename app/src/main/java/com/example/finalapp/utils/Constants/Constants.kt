@@ -1,7 +1,7 @@
 package com.example.finalapp.utils.Constants
 
 object Constants {
-    const val BASE_URL="http://192.168.29.95:5000/"
+    const val BASE_URL="http://192.168.43.95:5000/"
     const val APP_NAME="FLASH"
-    const val TAG="ZUNE"
+    const val TAG="FLASH"
 }

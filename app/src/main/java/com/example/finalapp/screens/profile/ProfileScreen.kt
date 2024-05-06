@@ -20,7 +20,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
@@ -46,6 +48,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
@@ -57,14 +60,19 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberImagePainter
+import com.bumptech.glide.integration.compose.CrossFade
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
 import com.example.finalapp.auth.authViewModel.AuthViewModel
+import com.example.finalapp.datastore.StoreUserData
 import com.example.finalapp.model.User
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens.DialogBOX.DialogBoxForImageEdit
 import com.example.finalapp.ui.theme.DarkBlue
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.ui.theme.topAppBarTextColor
+import com.example.finalapp.utils.Constants.Constants
 import com.example.finalapp.utils.Constants.Constants.TAG
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -72,69 +80,76 @@ import com.example.finalapp.utils.Constants.Constants.TAG
 @Composable
 fun ProfileScreenUI(
     navController: NavHostController = NavHostController(LocalContext.current),
-    profileViewModel: ProfileViewModel
+    profileViewModel: ProfileViewModel,
+    authViewModel: AuthViewModel
 ) {
-
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val buttonsVisible = remember { mutableStateOf(false) }
-    val profileImage=true;
-
+    val width= LocalConfiguration.current.screenWidthDp
+    val context= LocalContext.current
+    val dataStore=StoreUserData(context)
+    var name by remember {
+        mutableStateOf("")
+    }
+    LaunchedEffect(key1 = true){
+        name= dataStore.getUserNumber.toString()
+    }
 
     Scaffold(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             ProfileTopBar(
                 navIcon = R.drawable.arrow_back,
                 actIcon = R.drawable.arrow_back,
-                showActIcon=false,
-                onNavIconClick = {navController.popBackStack()},
-                onActIconClick = {navController.popBackStack()},
-                )
+                showActIcon = false,
+                onNavIconClick = { navController.popBackStack() },
+                onActIconClick = { navController.popBackStack() },
+            )
         },
         bottomBar = {
-            BottomBar(navController = navController, state = buttonsVisible, modifier = Modifier.height(45.dp))
+            BottomBar(
+                navController = navController,
+                state = buttonsVisible,
+                modifier = Modifier.height(45.dp)
+            )
         }
-        ) {
+    ) {
         Surface(modifier = Modifier.fillMaxSize()) {
-                Column(modifier = Modifier
+            Column(
+                modifier = Modifier
                     .padding(it)
                     .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    ,horizontalAlignment = Alignment.CenterHorizontally) {
-                    ProfileIcon(profileImage)
-                    ProfileName()
-                    EditProfile(navController,profileViewModel)
-                    ProfileImages()
-                    FrisbeeInfo()
-                    PersonalInfo()
-                    ProfileBio()
-                    LogOut(navController)
-                }
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                PersonalInfo(profileImage = "")
+                FlashInfo()
+                //EditProfile(navController, profileViewModel)
+               // ProfileImages()
+                ProfileBio(bio="")
+                LogOut(navController, authViewModel )
+            }
         }
     }
 }
+
 
 @Composable
 fun AllProfiles(profileViewModel: ProfileViewModel) {
     val profileViewModel= hiltViewModel<ProfileViewModel>()
     val user by remember{ mutableStateOf(profileViewModel.usersList.value) }
-    Log.d(TAG, "AllProfiles: ran up to here 1")
-    Log.d(TAG, "AllProfiles: $user")
+
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         items(user){ user->
             UsersItem(user)
         }
     }
-    Log.d(TAG, "AllProfiles: ran up to here 2")
 }
 
 @Composable
 fun UsersItem(user: User) {
-    Log.d(TAG, "AllProfiles: ran up to here 3")
     Card(modifier = Modifier.fillMaxSize()) {
         Text(text = user.name)
-
     }
-    Log.d(TAG, "AllProfiles: ran up to here 4")
 }
 
 
@@ -228,183 +243,145 @@ var str="About Me:\n" + "Hey there! I'm Jiya, a 24-year-old actor who's passiona
         " By day, you'll find me 15 july, but by night, I'm sleepy bug."
 
 @Composable
-fun ProfileBio() {
-    Surface(
+fun ProfileBio(bio:String) {
+    Card(
         Modifier
+            .padding(16.dp)
             .fillMaxWidth()
-            .wrapContentHeight(), color = topAppBarTextColor) {
+            .wrapContentHeight()) {
         Column(modifier = Modifier.padding(4.dp)) {
-            Row(modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(text = "BIO:", color = statusAndTopAppBarColor, style = MaterialTheme.typography.displayMedium, fontSize = 24.sp)
-                Icon(imageVector = Icons.Default.Edit, contentDescription ="Edit personal info" ,
-                    modifier = Modifier
-                        .size(18.dp)
-                        .clickable { }
+            Text(text = "BIO:", color = statusAndTopAppBarColor, style = MaterialTheme.typography.displayMedium, fontSize = 24.sp)
+            Text(text =if(bio.isNotEmpty()) bio else str, maxLines = 10, overflow = TextOverflow.Ellipsis, color = Color.Black)
+
+        }
+
+    }
+}
+
+@Composable
+fun LogOut(navController:NavHostController,authViewModel:AuthViewModel) {
+    Card(
+        Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+            .height(45.dp)) {
+            Text(text = "Log Out", color = Color.Black, style = MaterialTheme.typography.displayMedium, fontSize = 28.sp, modifier = Modifier
+                .padding(start = 16.dp)
+                .clickable {
+                    authViewModel.LogoutUser();
+                    navController.navigate(SCREENS.LOGIN.route);
+                })
+    }
+}
+@Composable
+fun PersonalInfo(profileImage:String) {
+    Card(
+        modifier = Modifier
+            .padding(16.dp)
+            .fillMaxWidth()
+            .height(130.dp)
+            , shape = RoundedCornerShape(12.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxSize(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            ProfileIcon(profileImage = profileImage)
+            ProfileName(name = "Suraj")
+        }
+    }
+}
+
+@Composable
+fun FlashInfo() {
+    val width= LocalConfiguration.current.screenWidthDp
+    Row(modifier = Modifier.padding(start=16.dp,end=16.dp,top=4.dp)) {
+        Card(modifier = Modifier
+            .padding(end = 4.dp)
+            .width((width / 3).dp - 16.dp)
+            .height(80.dp), shape = RoundedCornerShape(12.dp))
+        {
+            Column(modifier=Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.thumbsup),
+                    contentDescription = "", modifier = Modifier.size(40.dp)
                 )
+                Text(text = "12", fontSize = 18.sp, style = MaterialTheme.typography.titleMedium)
 
             }
-            Text(text = str, maxLines = 100, overflow = TextOverflow.Ellipsis, color = statusAndTopAppBarColor)
 
         }
-
-    }
-}
-
-@Composable
-fun LogOut(navController:NavHostController) {
-    val authViewModel= hiltViewModel<AuthViewModel>()
-    Surface(
-        Modifier
-            .fillMaxWidth()
-            .padding(top = 8.dp, bottom = 8.dp)
-            .height(45.dp), color = topAppBarTextColor) {
-        Row(modifier = Modifier
-            .padding(4.dp)
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .clickable {
-                authViewModel.LogoutUser();
-                navController.navigate(SCREENS.LOGIN.route);
-            }) {
-            Text(text = "Log Out", color = statusAndTopAppBarColor, style = MaterialTheme.typography.displayMedium, fontSize = 28.sp)
-        }
-
-    }
-}
-@Composable
-fun PersonalInfo() {
-    Surface(
-        Modifier
-            .padding(bottom = 8.dp)
-            .fillMaxWidth()
-            .wrapContentHeight(), color = topAppBarTextColor) {
-        Column(modifier = Modifier.padding(top=4.dp, start = 4.dp)) {
-            Row(modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight(), horizontalArrangement = Arrangement.SpaceBetween) {
-                Text(text = "Personal info :", color = statusAndTopAppBarColor, style = MaterialTheme.typography.displayMedium, fontSize = 28.sp)
-                Icon(imageVector = Icons.Default.Edit, contentDescription ="Edit personal info" ,
-                    modifier = Modifier
-                        .size(18.dp)
-                        .clickable {}
+        Card(modifier = Modifier
+            .padding(end = 4.dp)
+            .width((width / 3).dp - 16.dp)
+            .height(80.dp), shape = RoundedCornerShape(12.dp))
+        {
+            Column(modifier=Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.raise_offer),
+                    contentDescription = "", modifier = Modifier.size(40.dp)
                 )
+                Text(text = "12", fontSize = 18.sp, style = MaterialTheme.typography.titleMedium)
 
             }
-            Row(modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .padding(start = 8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
-                Text(text = "D.O.B.: ", color = statusAndTopAppBarColor, style = MaterialTheme.typography.displayMedium, fontSize = 22.sp)
-                Text(text = "15/07/1999", color = DarkBlue, style = MaterialTheme.typography.displayMedium, fontSize = 22.sp)
-            }
-            Row(modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .padding(start = 8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
-                Text(text = "Email: ", color = statusAndTopAppBarColor, style = MaterialTheme.typography.displayMedium, fontSize = 22.sp)
-                Text(text = "suraj34and94@gmail.com", color = DarkBlue, style = MaterialTheme.typography.displayMedium, fontSize = 22.sp)
-            }
-            Row(modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .padding(start = 8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
-                Text(text = "Contact: ", color = statusAndTopAppBarColor, style = MaterialTheme.typography.displayMedium, fontSize = 22.sp)
-                Text(text = "7250260100", color = DarkBlue, style = MaterialTheme.typography.displayMedium, fontSize = 22.sp)
-            }
-
 
         }
+        Card(modifier = Modifier
+            .width((width / 3).dp - 16.dp)
+            .height(80.dp), shape = RoundedCornerShape(12.dp))
+        {
+            Column(modifier=Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.requests),
+                    contentDescription = "", modifier = Modifier.size(40.dp)
+                )
+                Text(text = "12", fontSize = 18.sp, style = MaterialTheme.typography.titleMedium)
 
+            }
+
+        }
     }
 }
 
 @Composable
-fun FrisbeeInfo() {
-    Surface(
-        Modifier
-            .padding(bottom = 8.dp)
-            .fillMaxWidth()
-            .wrapContentHeight(), color = topAppBarTextColor) {
-        Column(modifier = Modifier.padding(top=4.dp, start = 4.dp, end = 4.dp)) {
-            Text(text = "Frisbee info :", color = statusAndTopAppBarColor, style = MaterialTheme.typography.displayMedium, fontSize = 28.sp)
-            Row(modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .padding(start = 8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
-                Text(text = "Requests: ", color = statusAndTopAppBarColor, style = MaterialTheme.typography.displayMedium, fontSize = 22.sp)
-                Text(text = "102", color = DarkBlue, style = MaterialTheme.typography.displayMedium, fontSize = 22.sp)
-            }
-            Row(modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .padding(start = 8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
-                Text(text = "Offers raised: ", color = statusAndTopAppBarColor, style = MaterialTheme.typography.displayMedium, fontSize = 22.sp)
-                Text(text = "12", color = DarkBlue, style = MaterialTheme.typography.displayMedium, fontSize = 22.sp)
-            }
-            Row(modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .padding(start = 8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
-                Text(text = "Thumbs up: ", color = statusAndTopAppBarColor, style = MaterialTheme.typography.displayMedium, fontSize = 22.sp)
-                Text(text = "5", color = DarkBlue, style = MaterialTheme.typography.displayMedium, fontSize = 22.sp)
-            }
-
-
-
-
-        }
-
-    }
-}
-
-@Composable
-fun ProfileName() {
-
-    val viewmodel= hiltViewModel<AuthViewModel>()
-    val name by viewmodel.name
-
-    LaunchedEffect(key1 = true){
-        try {
-            viewmodel.getProfileData()
-            Log.d(TAG,"name is $name")
-        }catch (e:Exception){
-            Log.d(TAG,"Error in profile name${e.message.toString()}")
-        }
-
-    }
-
-    Surface(modifier = Modifier
-        .fillMaxWidth()
-        .padding(8.dp)
-        .height(45.dp)){
-        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
+fun ProfileName(name:String) {
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
             Text(
-                text =if(name!="") name else "Default name",
+                text =if(name!="") name else "Flash user",
                 style = MaterialTheme.typography.displayMedium,
-                fontSize = 38.sp,
-                color = statusAndTopAppBarColor)
-            Text(
-                text = "24",
-                style = MaterialTheme.typography.displayMedium,
-                fontSize = 38.sp,
-                color = statusAndTopAppBarColor)
+                fontSize = 30.sp,
+                color = Color.Black)
         }
-    }
 }
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun ProfileIcon(profileImage:Boolean) {
+fun ProfileIcon(profileImage:String) {
     Surface(
         Modifier
             .size(120.dp)
-            .padding(top = 8.dp), shape = CircleShape, color = topAppBarTextColor, shadowElevation = 12.dp) {
-        if(!profileImage)
-            Icon(painter = painterResource(id = R.drawable.baseline_person_24), contentDescription ="profile icon", modifier = Modifier.clip(
-                CircleShape), tint = statusAndTopAppBarColor )
+            .padding(8.dp), shape = CircleShape, color = Color.LightGray, shadowElevation = 12.dp) {
+        if(profileImage.isNotEmpty())
+            GlideImage(
+                model = "${Constants.BASE_URL}${profileImage}",
+                contentDescription = "",
+                transition= CrossFade,
+                modifier = Modifier.clip(
+                    CircleShape)
+                , contentScale = ContentScale.Crop
+            )
         else
-            Image(painter = painterResource(id = R.drawable.girl), contentDescription ="" , contentScale = ContentScale.Crop)
+            Image(painter = painterResource(id = R.drawable.baseline_person_24), contentDescription ="" , contentScale = ContentScale.Crop, colorFilter = ColorFilter.tint(color = Color.DarkGray))
     }
 }
 

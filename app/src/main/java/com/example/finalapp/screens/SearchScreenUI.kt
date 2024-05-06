@@ -31,6 +31,7 @@ fun SearchScreenUI(navController:NavHostController) {
                 Constants.APP_NAME,
                 navController,
                 true,
+                true,
                 R.drawable.send_24
             )
         },
