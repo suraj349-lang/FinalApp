@@ -127,7 +127,7 @@ fun ProfileScreenUI(
             ) {
                 PersonalInfo(profileImage = "",profileViewModel,navController)
                 FlashInfo()
-                EditProfile(navController, profileViewModel)
+                //EditProfile(navController, profileViewModel)
                 //ProfileImages()
                 ProfileBio(bio="")
                 LogOut(navController, authViewModel )
