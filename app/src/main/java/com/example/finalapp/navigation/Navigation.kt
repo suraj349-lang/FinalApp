@@ -9,6 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.finalapp.screens.chat.ChatViewModel
 import com.example.finalapp.auth.authViewModel.AuthViewModel
 import com.example.finalapp.auth.screensUI.EnterOTPScreenUI
 
@@ -16,9 +17,9 @@ import com.example.finalapp.auth.screensUI.LoginScreenUI
 import com.example.finalapp.auth.screensUI.SignupScreenUI
 import com.example.finalapp.auth.screensUI.SplashScreenUI
 import com.example.finalapp.auth.screensUI.otp.OtpBox
-import com.example.finalapp.screens.ChatScreenUI
+import com.example.finalapp.screens.chat.ChatScreenUI
 import com.example.finalapp.auth.screensUI.FinalUserCreation
-import com.example.finalapp.screens.ChatListScreen
+import com.example.finalapp.screens.chat.ChatListScreen
 import com.example.finalapp.screens.DirectChatScreenUI
 import com.example.finalapp.screens.profile.GalleryPicker
 import com.example.finalapp.screens.HomeScreenUI
@@ -44,7 +45,7 @@ sealed class SCREENS(val route:String){
     object SETTINGS:SCREENS("settings_screen")
     object NOTIFICATIONS:SCREENS("notifications_screen")
     object CHAT:SCREENS("chat_screen")
-    object SINGLE_CHAT:SCREENS("singleChat/{name}")
+    object SINGLE_CHAT:SCREENS("singleChat/{userNumber}")
     object  OTP2:SCREENS("otp")
     object GALLERY:SCREENS("gallery_picker")
     object WELCOME:SCREENS("welcome")
@@ -59,8 +60,10 @@ sealed class SCREENS(val route:String){
 fun Navigation(authViewModel: AuthViewModel, screen: String) {
     val navController:NavHostController= rememberNavController();
     val profileViewModel= hiltViewModel<ProfileViewModel>()
+    val viewModel = hiltViewModel<ChatViewModel>()
 
-    NavHost(navController = navController, startDestination =SCREENS.HOME.route){
+
+    NavHost(navController = navController, startDestination =SCREENS.PROFILE.route){
         composable(SCREENS.SPLASH.route){
             SplashScreenUI(navController,screen)
         }
@@ -91,10 +94,10 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
         composable(SCREENS.CHAT.route){
             ChatListScreen(navController)
         }
-        composable(SCREENS.SINGLE_CHAT.route, arguments = listOf(navArgument("name"){type=
+        composable(SCREENS.SINGLE_CHAT.route, arguments = listOf(navArgument("userNumber"){type=
             NavType.StringType})){navBackStackEntry->
-            val name=navBackStackEntry.arguments?.getString("name")
-            ChatScreenUI(name, navController )
+            val userNumber=navBackStackEntry.arguments?.getString("userNumber")
+            ChatScreenUI(userNumber, navController, viewModel )
 
         }
         composable(SCREENS.OTP2.route){

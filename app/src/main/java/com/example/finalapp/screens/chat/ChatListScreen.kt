@@ -1,7 +1,8 @@
-package com.example.finalapp.screens
+package com.example.finalapp.screens.chat
+
+
 
 import android.annotation.SuppressLint
-import android.app.Application
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
@@ -47,27 +48,24 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.example.finalapp.ChatViewModel
 import com.example.finalapp.R
 import com.example.finalapp.auth.authViewModel.AuthViewModel
+import com.example.finalapp.database.Chat
 import com.example.finalapp.datastore.StoreUserData
 import com.example.finalapp.model.ChatUser
-import com.example.finalapp.navigation.SCREENS
+import com.example.finalapp.screens.HomeTopBar
 import kotlinx.coroutines.launch
 
 
 val users:List<ChatUser> = listOf (
-    ChatUser("Suraj",""),
-    ChatUser("Nishant",""),
-    ChatUser("Nitish",""),
-    ChatUser("Muskan",""),
-    ChatUser("Bhomi",""),
-    ChatUser("Supriya","")
+    ChatUser("Suraj","1"),
+    ChatUser("Nishant","2"),
+    ChatUser("Nitish","3"),
+    ChatUser("Muskan","4"),
+    ChatUser("Bhomi","5"),
+    ChatUser("Supriya","6")
 
 )
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -87,29 +85,23 @@ fun ChatListScreen(navController: NavHostController) {
     }) {
 
 
-    LazyColumn(modifier = Modifier.padding(it)){
-        itemsIndexed(listOfUsers){ i,users->
-            UserItem(navController , name=users.name,imageUrl = users.profileUrl, lastMessage = "hello")
+        LazyColumn(modifier = Modifier.padding(it)){
+            itemsIndexed(listOfUsers){ i,users->
+                UserItem(navController , name=users.name,userNumber = users.number, lastMessage = "hello")
 
+            }
         }
     }
-//        LazyColumn(modifier = Modifier.padding(it)) {
-//            items(12) {
-//                UserItem(imageUrl = R.drawable.profile_image_1.toString(), lastMessage = "hello")
-//            }
-//
-//        }
-   }
 }
-@OptIn(ExperimentalGlideComposeApi::class)
+
 @Composable
-fun UserItem(navController: NavHostController,name: String,imageUrl:String,lastMessage:String){
+fun UserItem(navController: NavHostController,name: String,userNumber:String,lastMessage:String){
 
     Card(modifier = Modifier
         .padding(start = 8.dp, end = 8.dp, top = 10.dp)
         .fillMaxWidth()
         .wrapContentHeight()
-        .clickable { navController.navigate("singleChat/$name") },
+        .clickable { navController.navigate("singleChat/$userNumber") },
         colors = CardDefaults.cardColors(containerColor = Color(0xFFFFFFFE))
     ) {
         Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
@@ -133,7 +125,7 @@ fun UserItem(navController: NavHostController,name: String,imageUrl:String,lastM
             )
             Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.Start) {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                   Text(text = name, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.titleMedium, fontSize = 20.sp)
+                    Text(text = userNumber, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.titleMedium, fontSize = 20.sp)
                     Text(text = "08:38",style = MaterialTheme.typography.labelSmall, fontSize = 12.sp)
                 }
                 Row() {
@@ -148,59 +140,61 @@ fun UserItem(navController: NavHostController,name: String,imageUrl:String,lastM
 
     }
 }
-@Composable
-fun MessageItem(name:String,msg:String,navController: NavHostController){
-    Card(modifier = Modifier
-        .padding(start = 8.dp, top = 4.dp)
-        .wrapContentSize(),
-        shape= RoundedCornerShape(6.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFFFFF)),
-        border = BorderStroke(1.dp, Color.DarkGray)
 
-        ) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            Text(text =name, modifier = Modifier.padding(4.dp), style = MaterialTheme.typography.titleMedium)
-            Text(text =msg, modifier = Modifier.padding(4.dp), style = MaterialTheme.typography.titleMedium)
-        }
-
-
-
-    }
-}
-
+/*
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun ChatScreenUI(name: String?,navController: NavHostController) {
+fun ChatScreenUI(userNumber: String?,navController: NavHostController,chatViewModel: ChatViewModel) {
     val context= LocalContext.current
     val viewModel = viewModel<ChatViewModel>()
     val authViewModel = hiltViewModel<AuthViewModel>()
     val messages by viewModel.messages.collectAsState()
     val listState = rememberLazyListState()
-    val user by remember {
-        mutableStateOf(authViewModel.userFromDb)
+    var key by remember {
+        mutableStateOf(0)
     }
-
-    val datastore=StoreUserData(context )
-    val number by  datastore.getUserNumber.collectAsState("")
-    LaunchedEffect(key1 = true){
-        datastore.saveUserNumber("+916376099670")
-    }
-
-
-
     var inputText by remember { mutableStateOf("") }
+    val datastore=StoreUserData(context )
+//    val number by  datastore.getUserNumber.collectAsState("")
+//    LaunchedEffect(key1 = true){
+//        datastore.saveUserNumber("+9179034")
+//    }
+
+
+
+
     Scaffold(topBar = { HomeTopBar(
-        title = name!!,
+        title = userNumber!!,
         navController = navController,
         navIcon =false ,
         actionIcon =false,
         icon = R.drawable.profile_image_1
-    )}) {
+    )
+    }) {
 
         // Auto-scroll to the bottom when messages list is updated
         LaunchedEffect(messages) {
             listState.animateScrollToItem(messages.size)
+        }
+        val scope = rememberCoroutineScope()
+        if (key == 1) {
+
+            LaunchedEffect(key1 = true) {
+                scope.launch {
+                    chatViewModel.saveChatToDB(
+                        Chat(
+                            sentTo = userNumber.toString(),
+                            message = inputText,
+                            received = "false",
+                            sent = "Single Tick",
+                            seen = "false",
+                            timeStamp = System.currentTimeMillis()
+                        )
+                    )
+                }
+                key=0
+            }
         }
 
         Column(modifier = Modifier.padding(it)) {
@@ -219,7 +213,8 @@ fun ChatScreenUI(name: String?,navController: NavHostController) {
                     shape = RoundedCornerShape(20.dp)
                 )
                 Button(onClick = {
-                    viewModel.sendMessage(number!!,inputText)
+                    key=1
+                    viewModel.sendMessage(userNumber!!,inputText)
                     viewModel.messages.value
                     inputText = ""
                 }) {
@@ -229,3 +224,24 @@ fun ChatScreenUI(name: String?,navController: NavHostController) {
         }
     }
 }
+
+@Composable
+fun MessageItem(name:String,msg:String,navController: NavHostController){
+    Card(modifier = Modifier
+        .padding(start = 8.dp, top = 4.dp)
+        .wrapContentSize(),
+        shape= RoundedCornerShape(6.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFFFFF)),
+        border = BorderStroke(1.dp, Color.DarkGray)
+
+    ) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            Text(text =name, modifier = Modifier.padding(4.dp), style = MaterialTheme.typography.titleMedium)
+            Text(text =msg, modifier = Modifier.padding(4.dp), style = MaterialTheme.typography.titleMedium)
+        }
+
+
+
+    }
+}
+*/

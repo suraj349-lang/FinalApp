@@ -8,22 +8,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.material.TextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.finalapp.R
-import com.example.finalapp.offer.OfferViewModel
 import com.example.finalapp.utils.Constants.Constants
 
 @Composable
@@ -33,9 +27,9 @@ fun DirectChatScreenUI(navController:NavHostController) {
     Scaffold(
         topBar = {
             HomeTopBar(
-                Constants.APP_NAME,
+                "Direct Chat",
                 navController,
-                true,
+                false,
                 true,
                 R.drawable.send_24
             )
@@ -53,7 +47,7 @@ fun DirectChatScreenUI(navController:NavHostController) {
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(text = "Drop Profile")
+                Text(text = "Direct Chat")
 
             }
 

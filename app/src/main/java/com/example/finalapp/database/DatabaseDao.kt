@@ -16,3 +16,10 @@ interface ProfileDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun saveProfileData(profile: Profile)
 }
+
+
+@Dao
+interface ChatDao {
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun saveChat(chat: Chat)
+}

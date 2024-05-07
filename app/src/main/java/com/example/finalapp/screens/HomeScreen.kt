@@ -388,7 +388,7 @@ fun ImageScreen(user: User) {
     Log.d(TAG, "ImageScreen:${user.profileImage}")
    Box(modifier = Modifier
        .border(width = 1.dp, color = Color.LightGray)
-       .padding(start = 2.dp, end = 2.dp)
+       .padding(start = 2.dp, end = 2.dp,top=8.dp)
        .fillMaxWidth()
        .height(heightInDp)
        //.clip(shape = RoundedCornerShape(12.dp)).border(width=1.dp, color = Color.Black)

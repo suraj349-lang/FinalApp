@@ -57,8 +57,6 @@ fun ImageCaptureFromCamera(profileViewModel: ProfileViewModel) {
             capturedImageUri = uri
             profileViewModel.uploadImage(uri, context )
 
-            // Start uploading the image to the server
-
         } else {
             Toast.makeText(context, "Image capture failed", Toast.LENGTH_SHORT).show()
         }

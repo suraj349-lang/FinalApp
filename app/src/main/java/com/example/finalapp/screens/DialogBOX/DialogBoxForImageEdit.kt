@@ -2,13 +2,17 @@ package com.example.finalapp.screens.DialogBOX
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -26,10 +30,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.navigation.NavHostController
 import com.example.finalapp.R
+import com.example.finalapp.navigation.SCREENS
+import com.example.finalapp.screens.profile.ImageCaptureFromCamera
+import com.example.finalapp.screens.profile.ProfileViewModel
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.ui.theme.topAppBarTextColor
 
@@ -52,7 +62,10 @@ fun DialogBoxForImageEdit(image: Int, onDismiss: () -> Unit) {
                     .background(Color.White),
                 verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.Start
             ) {
-                Image(painterResource(id =image), contentDescription = "", modifier = Modifier.height(300.dp).fillMaxWidth().padding(8.dp), contentScale = ContentScale.Crop)
+                Image(painterResource(id =image), contentDescription = "", modifier = Modifier
+                    .height(300.dp)
+                    .fillMaxWidth()
+                    .padding(8.dp), contentScale = ContentScale.Crop)
 
                 BtnForDialogBoxForImageEdit(onDismiss)
             }
@@ -86,4 +99,55 @@ fun BtnForDialogBoxForImageEdit(onDismiss: () -> Unit){
         }
     }
 
+}
+
+
+@Composable
+fun DialogBoxForCameraAndGallery( profileViewModel:ProfileViewModel,navController:NavHostController,onDismiss: () -> Unit) {
+    var key by remember { mutableStateOf(false) }
+    if (key) {
+        ImageCaptureFromCamera(profileViewModel)
+    }
+
+    Dialog(
+        onDismissRequest = { onDismiss() }, properties = DialogProperties(
+            dismissOnBackPress = true, dismissOnClickOutside = true
+        )
+    ) {
+        Card(
+            shape = RoundedCornerShape(10.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+                .padding(8.dp)
+        ) {
+            Column() {
+                Row(modifier = Modifier.background(color = Color(0xFFFFFFFE)).padding(top=16.dp).fillMaxWidth().wrapContentHeight(), horizontalArrangement = Arrangement.Center) {
+                    Text(text = "Choose from Camera / Gallery.", fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = Color.Black)
+                }
+
+                Row(
+                    Modifier
+                        .fillMaxSize()
+                        .background(Color.White),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+
+                    Image(painterResource(id = R.drawable.camera),
+                        contentDescription = "",
+                        modifier = Modifier
+                            .size(80.dp)
+                            .clickable { key = !key }
+                            .padding(end=25.dp))
+                    Image(painterResource(id = R.drawable.gallery),
+                        contentDescription = "",
+                        modifier = Modifier
+                            .size(50.dp)
+                            .clickable { navController.navigate(SCREENS.GALLERY.route) })
+
+                }
+            }
+        }
+    }
 }

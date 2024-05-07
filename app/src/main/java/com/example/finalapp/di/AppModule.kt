@@ -30,12 +30,15 @@ class AppModule {
     fun provideDatabase(@ApplicationContext context: Context) = Room.databaseBuilder(
         context,
         FrisbeeDatabase::class.java,
-        "Profile"
+        "FlashDatabase"
     ).build()
 
     @Singleton
     @Provides
     fun provideDao(database: FrisbeeDatabase) = database.profileDao()
+    @Singleton
+    @Provides
+    fun chatDao(database: FrisbeeDatabase) = database.chatDao()
     @Provides
     @Singleton
     fun provideDataStoreRepository(

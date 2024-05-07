@@ -3,39 +3,26 @@ package com.example.finalapp.auth.authViewModel
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
-import android.util.JsonToken
 import android.util.Log
-import android.widget.Toast
-
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.app.ActivityCompat
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.navigation.NavController
-
 import com.example.finalapp.auth.repository.AuthRepository
 import com.example.finalapp.auth.screensUI.RESPONSE
-import com.example.finalapp.database.DatabaseRepository
 import com.example.finalapp.database.Profile
+import com.example.finalapp.database.ProfileDatabaseRepository
 import com.example.finalapp.model.LoginAPIResponse
 import com.example.finalapp.model.LoginModel
 import com.example.finalapp.model.RegisterUserModel
 import com.example.finalapp.model.SignupAPIResponse
-
-import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.utils.RequestState
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-
 import kotlinx.coroutines.flow.catch
-
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
@@ -44,9 +31,8 @@ import javax.inject.Inject
 @HiltViewModel
 class AuthViewModel @Inject constructor(
     private val repository: AuthRepository,
-    private val databaseRepository: DatabaseRepository,
-    @ApplicationContext private val context: Context
-): ViewModel() {
+    private val profileDatabaseRepository: ProfileDatabaseRepository,
+    @ApplicationContext private val context: Context): ViewModel() {
     var latitude= mutableStateOf(0.0)
     var longitude= mutableStateOf(0.0)
     var address= mutableStateOf("")
@@ -111,7 +97,7 @@ class AuthViewModel @Inject constructor(
     //-----------------------------------------------------------------------------------------------------------//
     fun saveProfileData(profile: Profile){
         viewModelScope.launch {
-            databaseRepository.saveProfileData(profile = profile)
+            profileDatabaseRepository.saveProfileData(profile = profile)
         }
 
     }
@@ -121,7 +107,7 @@ class AuthViewModel @Inject constructor(
 
             try {
                 viewModelScope.launch {
-                    databaseRepository.getProfileData().collect{
+                    profileDatabaseRepository.getProfileData().collect{
                         userFromDb.value=it
                     }
 

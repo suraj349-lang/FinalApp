@@ -15,3 +15,15 @@ data class Profile(
     val address:String
 
 )
+
+@Entity(tableName = "chat_table")
+data class Chat(
+    @PrimaryKey(autoGenerate = true)
+    val id:Int=0,
+    val sentTo:String,
+    val message:String,
+    val sent:String,
+    val received:String,
+    val seen:String,
+    val timeStamp:Long
+)

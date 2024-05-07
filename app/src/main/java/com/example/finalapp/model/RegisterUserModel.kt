@@ -27,7 +27,7 @@ data class User(
 )
 data class ChatUser(
   val name:String,
-  val profileUrl:String
+  val number:String
 )
 data class ProfileResponse(
   val success: Boolean,

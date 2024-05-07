@@ -22,9 +22,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ModalBottomSheetState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.IconButton
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -37,6 +35,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -53,11 +52,15 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavHostController
 import coil.compose.rememberImagePainter
 import com.bumptech.glide.integration.compose.CrossFade
@@ -68,6 +71,7 @@ import com.example.finalapp.auth.authViewModel.AuthViewModel
 import com.example.finalapp.datastore.StoreUserData
 import com.example.finalapp.model.User
 import com.example.finalapp.navigation.SCREENS
+import com.example.finalapp.screens.DialogBOX.DialogBoxForCameraAndGallery
 import com.example.finalapp.screens.DialogBOX.DialogBoxForImageEdit
 import com.example.finalapp.ui.theme.DarkBlue
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
@@ -121,10 +125,10 @@ fun ProfileScreenUI(
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                PersonalInfo(profileImage = "")
+                PersonalInfo(profileImage = "",profileViewModel,navController)
                 FlashInfo()
-                //EditProfile(navController, profileViewModel)
-               // ProfileImages()
+                EditProfile(navController, profileViewModel)
+                //ProfileImages()
                 ProfileBio(bio="")
                 LogOut(navController, authViewModel )
             }
@@ -274,7 +278,7 @@ fun LogOut(navController:NavHostController,authViewModel:AuthViewModel) {
     }
 }
 @Composable
-fun PersonalInfo(profileImage:String) {
+fun PersonalInfo(profileImage:String,profileViewModel:ProfileViewModel,navController: NavHostController) {
     Card(
         modifier = Modifier
             .padding(16.dp)
@@ -287,7 +291,7 @@ fun PersonalInfo(profileImage:String) {
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            ProfileIcon(profileImage = profileImage)
+            ProfileIcon(profileImage = profileImage, profileViewModel , navController )
             ProfileName(name = "Suraj")
         }
     }
@@ -366,22 +370,57 @@ fun ProfileName(name:String) {
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun ProfileIcon(profileImage:String) {
+fun ProfileIcon(profileImage:String,profileViewModel: ProfileViewModel,navController: NavHostController) {
+    var showCustomDialog by remember {
+        mutableStateOf(false)
+    }
+    val lifecycleOwner= LocalLifecycleOwner.current
     Surface(
         Modifier
             .size(120.dp)
             .padding(8.dp), shape = CircleShape, color = Color.LightGray, shadowElevation = 12.dp) {
-        if(profileImage.isNotEmpty())
-            GlideImage(
-                model = "${Constants.BASE_URL}${profileImage}",
-                contentDescription = "",
-                transition= CrossFade,
-                modifier = Modifier.clip(
-                    CircleShape)
-                , contentScale = ContentScale.Crop
-            )
-        else
-            Image(painter = painterResource(id = R.drawable.baseline_person_24), contentDescription ="" , contentScale = ContentScale.Crop, colorFilter = ColorFilter.tint(color = Color.DarkGray))
+        if(showCustomDialog) DialogBoxForCameraAndGallery(profileViewModel , navController ){ showCustomDialog=!showCustomDialog }
+        DisposableEffect(lifecycleOwner) {
+            val observer = LifecycleEventObserver { _, event ->
+                if (event == Lifecycle.Event.ON_RESUME) {
+                    showCustomDialog=false
+                }
+            }
+            lifecycleOwner.lifecycle.addObserver(observer)
+
+            // When the effect leaves the Composition, remove the observer
+            onDispose {
+                lifecycleOwner.lifecycle.removeObserver(observer)
+            }
+        }
+        Row(
+            modifier = Modifier.fillMaxSize(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            if (profileImage.isNotEmpty())
+                GlideImage(
+                    model = "${Constants.BASE_URL}${profileImage}",
+                    contentDescription = "",
+                    transition = CrossFade,
+                    modifier = Modifier.clip(
+                        CircleShape
+                    ), contentScale = ContentScale.Crop
+                )
+            else {
+                Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                    IconButton(onClick = { showCustomDialog=true }) {
+                        Image(
+                            painter = painterResource(id = R.drawable.camera),
+                            contentDescription = "",
+                            modifier = Modifier.size(40.dp)
+                        )
+                    }
+                    Text(text = "Upload photo", fontSize = 8.sp, fontWeight = FontWeight.SemiBold, color = Color.Black)
+                }
+            }
+
+        }
     }
 }
 
