@@ -135,8 +135,7 @@ fun HomeScreenUI(navController: NavHostController, profileViewModel: ProfileView
             ) { it->
         val padding=it
         Surface(modifier = Modifier
-            .fillMaxSize()
-            .background(color = Color.LightGray)) {
+            .fillMaxSize()) {
             LaunchedEffect(key1 =true){
                 scope.launch {
                     profileViewModel.getAllProfiles()
@@ -362,17 +361,10 @@ fun HomeScreenOffer(){
                     Button(onClick = { /*TODO*/ }, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF063608))) {
                         Text(text = "Accept", style = MaterialTheme.typography.bodySmall, color = Color.White)
                         
-                        
                     }
-
                 }
-              
-
             }
-
         }
-
-
     }
 }
 
@@ -387,11 +379,9 @@ fun ImageScreen(user: User) {
     val imageUrl=user.profileImage
     Log.d(TAG, "ImageScreen:${user.profileImage}")
    Box(modifier = Modifier
-       .border(width = 1.dp, color = Color.LightGray)
        .padding(start = 2.dp, end = 2.dp,top=8.dp)
        .fillMaxWidth()
        .height(heightInDp)
-       //.clip(shape = RoundedCornerShape(12.dp)).border(width=1.dp, color = Color.Black)
        , contentAlignment = Alignment.Center)
 
    {

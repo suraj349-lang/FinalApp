@@ -1,28 +1,18 @@
 package com.example.finalapp.screens.chat
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.Arrangement
+import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -43,14 +33,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.finalapp.R
-import com.example.finalapp.auth.authViewModel.AuthViewModel
 import com.example.finalapp.database.Chat
 import com.example.finalapp.datastore.StoreUserData
 import com.example.finalapp.screens.HomeTopBar
+import com.example.finalapp.utils.Constants.Constants.TAG
 import kotlinx.coroutines.launch
 
 
@@ -64,42 +52,42 @@ fun ChatScreenUI(userNumber: String?,navController: NavHostController,chatViewMo
     var key by remember {
         mutableStateOf(0)
     }
+    val scope = rememberCoroutineScope()
+    var saveToDb by remember {
+        mutableStateOf(false)
+    }
     var inputText by remember { mutableStateOf("") }
     val datastore=StoreUserData(context )
-//    val number by  datastore.getUserNumber.collectAsState("")
-//    LaunchedEffect(key1 = true){
-//        datastore.saveUserNumber("+9179034")
-//    }
+    val number by  datastore.getUserNumber.collectAsState("")
+    Log.d(TAG, "ChatScreenUI: $number")
 
 
 
 
-    Scaffold(topBar = { HomeTopBar(
-        title = userNumber!!,
-        navController = navController,
-        navIcon =false ,
-        actionIcon =false,
-        icon = R.drawable.profile_image_1
-    )
+
+    Scaffold(
+        topBar = {
+           ChatTopBar(title = userNumber.toString(), navController =navController )
     }) {
 
         // Auto-scroll to the bottom when messages list is updated
         LaunchedEffect(messages) {
             listState.animateScrollToItem(messages.size)
         }
-        val scope = rememberCoroutineScope()
+
         if (key == 1) {
 
             LaunchedEffect(key1 = true) {
             scope.launch {
-                chatViewModel.saveChatToDB(
+                saveToDb=chatViewModel.saveChatToDB(
                     Chat(
                         sentTo = userNumber.toString(),
+                        sentFrom="",
                         message = inputText,
-                        received = "false",
-                        sent = "Single Tick",
-                        seen = "false",
-                        timeStamp = System.currentTimeMillis()
+                        received = false,
+                        sent = 0,
+                        seen = false,
+                       // timeStamp = System.currentTimeMillis()
                     )
                 )
             }
@@ -122,11 +110,25 @@ fun ChatScreenUI(userNumber: String?,navController: NavHostController,chatViewMo
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(20.dp)
                 )
+                if(saveToDb) {
+                    Log.d(TAG, "ChatScreenUI:saveToDB -> socket sent ")
+                    chatViewModel.sendMessage(Chat(
+                        id=1,
+                        sentTo = "917250260100",
+                        sentFrom=number.toString(),
+                        message = inputText,
+                        received = false,
+                        sent = 0,
+                        seen = false,
+                      //  timeStamp = System.currentTimeMillis()
+                    ))
+                    inputText = ""
+                    saveToDb=false
+                }
                 Button(onClick = {
                     key=1
-                    chatViewModel.sendMessage(userNumber!!,inputText)
-                    chatViewModel.messages.value
-                    inputText = ""
+//                    chatViewModel.messages.value
+//                    inputText = ""
                 }) {
                     Text("Send")
                 }
@@ -165,8 +167,8 @@ fun MessageItem(name: String, msg: String, isSentByUser: Boolean) {
                     text = "08:38", // Replace with actual timestamp
                     style = MaterialTheme.typography.labelSmall,
                     fontSize = 8.sp,
-                    //textAlign = if (isSentByUser) TextAlign.End else TextAlign.Start
-                    textAlign = TextAlign.Start
+                    textAlign = if (isSentByUser) TextAlign.End else TextAlign.Start
+
                 )
             }
         }

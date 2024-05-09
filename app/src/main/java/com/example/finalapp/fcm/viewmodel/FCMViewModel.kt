@@ -2,7 +2,6 @@ package com.example.finalapp.fcm.viewmodel
 
 
 
-import android.text.BoringLayout
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -25,7 +24,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.IOException
 
-class ChatViewModel: ViewModel() {
+class FCMViewModel: ViewModel() {
 
     var state by mutableStateOf(ChatState())
         private set

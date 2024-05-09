@@ -1,14 +1,13 @@
 package com.example.finalapp.fcm
 
 import android.util.Log
-import androidx.compose.runtime.rememberCoroutineScope
-import com.example.finalapp.fcm.viewmodel.ChatViewModel
+import com.example.finalapp.fcm.viewmodel.FCMViewModel
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import java.lang.Exception
 
 class PushNotificationService: FirebaseMessagingService() {
-    private val viewModel=ChatViewModel()
+    private val viewModel=FCMViewModel()
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)

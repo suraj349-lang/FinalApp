@@ -22,13 +22,18 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -40,11 +45,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -55,17 +63,19 @@ import com.example.finalapp.auth.authViewModel.AuthViewModel
 import com.example.finalapp.database.Chat
 import com.example.finalapp.datastore.StoreUserData
 import com.example.finalapp.model.ChatUser
+import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens.HomeTopBar
+import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import kotlinx.coroutines.launch
 
 
 val users:List<ChatUser> = listOf (
-    ChatUser("Suraj","1"),
-    ChatUser("Nishant","2"),
-    ChatUser("Nitish","3"),
-    ChatUser("Muskan","4"),
-    ChatUser("Bhomi","5"),
-    ChatUser("Supriya","6")
+    ChatUser("Suraj","+917250260100"),
+    ChatUser("Nishant","+918739845788"),
+    ChatUser("Nitish","+918739845789"),
+    ChatUser("Muskan","+918739845790"),
+    ChatUser("Bhomi","+918527796848"),
+    ChatUser("Supriya","+919041012344")
 
 )
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -75,12 +85,9 @@ fun ChatListScreen(navController: NavHostController) {
         mutableStateOf(users)
     }
     Scaffold(topBar = {
-        HomeTopBar(
+        ChatTopBar(
             title = "Chats",
-            navController = navController,
-            actionIcon = false,
-            navIcon=true,
-            icon = R.drawable.profile_image_1
+            navController = navController
         )
     }) {
 
@@ -93,6 +100,36 @@ fun ChatListScreen(navController: NavHostController) {
         }
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ChatTopBar(title: String, navController: NavHostController) {
+        TopAppBar(
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = statusAndTopAppBarColor
+            ),
+            title = {
+                Text(
+                    title,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top=8.dp), color = Color( 0xFF000000), style = MaterialTheme.typography.titleMedium
+                )
+            },
+            navigationIcon = {
+
+                    Image(
+                        imageVector = Icons.Default.ArrowBack,
+                        contentDescription = "",
+                        modifier = Modifier
+                            .clickable { navController.navigate(SCREENS.HOME.route) }
+                            .padding(top = 6.dp)
+                            .size(40.dp)
+                    )
+            }, actions = {
+
+            }
+        )
+    }
 
 @Composable
 fun UserItem(navController: NavHostController,name: String,userNumber:String,lastMessage:String){

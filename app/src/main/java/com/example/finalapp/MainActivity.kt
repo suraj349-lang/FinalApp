@@ -59,6 +59,10 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import com.example.finalapp.screens.onboarding.viewmodel.SplashViewModel
+import com.example.finalapp.utils.Constants.Constants
+import io.socket.client.IO
+import io.socket.client.Socket
+import java.net.URISyntaxException
 import javax.inject.Inject
 
 
@@ -72,14 +76,12 @@ class MainActivity : ComponentActivity() {
 
     @Inject
     lateinit var splashViewModel: SplashViewModel
-
     @SuppressLint("UnrememberedMutableState")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         installSplashScreen().setKeepOnScreenCondition {
             !splashViewModel.isLoading.value
         }
-
         setContent {
             FinalAppTheme {
                 val authViewModel= hiltViewModel<AuthViewModel>()
@@ -179,6 +181,7 @@ fun FinalApp(
         }
 
     }
+
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
         Column(verticalArrangement = Arrangement.Center,horizontalAlignment = Alignment.CenterHorizontally)
         {

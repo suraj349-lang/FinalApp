@@ -1,17 +1,16 @@
 package com.example.finalapp.fcm.screen
 
-import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.example.finalapp.fcm.dialog.EnterTokenDialog
-import com.example.finalapp.fcm.viewmodel.ChatViewModel
+import com.example.finalapp.fcm.viewmodel.FCMViewModel
 
 @Composable
 fun ChatScreenUIFCM(){
-     val viewModel= ChatViewModel()
+     val viewModel= FCMViewModel()
 
     Surface(
         color = MaterialTheme.colorScheme.background,

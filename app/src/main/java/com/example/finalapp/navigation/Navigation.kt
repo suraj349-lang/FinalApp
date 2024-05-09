@@ -25,7 +25,7 @@ import com.example.finalapp.screens.profile.GalleryPicker
 import com.example.finalapp.screens.HomeScreenUI
 import com.example.finalapp.screens.NotificationsScreenUI
 import com.example.finalapp.screens.RaiseOfferScreenUI
-import com.example.finalapp.screens.SearchScreenUI
+import com.example.finalapp.screens.EventsAndPlacesScreen
 import com.example.finalapp.screens.profile.ProfileScreenUI
 import com.example.finalapp.screens.SettingsScreenUI
 import com.example.finalapp.screens.onboarding.screen.WelcomeScreen
@@ -63,7 +63,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
     val viewModel = hiltViewModel<ChatViewModel>()
 
 
-    NavHost(navController = navController, startDestination =SCREENS.PROFILE.route){
+    NavHost(navController = navController, startDestination =SCREENS.CHAT.route){
         composable(SCREENS.SPLASH.route){
             SplashScreenUI(navController,screen)
         }
@@ -76,12 +76,13 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
         composable(SCREENS.OTP.route){
            EnterOTPScreenUI(navController)
         }
-        composable(SCREENS.HOME.route){
-            HomeScreenUI( navController,profileViewModel)
-        }
         composable(SCREENS.FINALUSERCREATION.route){
             FinalUserCreation(authViewModel,navController)
         }
+        composable(SCREENS.HOME.route){
+            HomeScreenUI( navController,profileViewModel)
+        }
+
         composable(SCREENS.PROFILE.route){
             ProfileScreenUI(navController,profileViewModel,authViewModel)
         }
@@ -94,8 +95,8 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
         composable(SCREENS.CHAT.route){
             ChatListScreen(navController)
         }
-        composable(SCREENS.SINGLE_CHAT.route, arguments = listOf(navArgument("userNumber"){type=
-            NavType.StringType})){navBackStackEntry->
+        composable(SCREENS.SINGLE_CHAT.route, arguments = listOf(navArgument("userNumber"){type= NavType.StringType}))
+          {navBackStackEntry->
             val userNumber=navBackStackEntry.arguments?.getString("userNumber")
             ChatScreenUI(userNumber, navController, viewModel )
 
@@ -113,7 +114,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
             AllProfiles(profileViewModel)
         }
         composable(SCREENS.SEARCH.route){
-            SearchScreenUI(navController)
+            EventsAndPlacesScreen(navController)
         }
         composable(SCREENS.DROP_PROFILE.route){
             DirectChatScreenUI(navController )

@@ -1,7 +1,6 @@
 package com.example.finalapp.auth.screensUI
 
 import android.annotation.SuppressLint
-import android.media.MediaPlayer
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -182,7 +181,7 @@ fun LoginScreenUI(navController: NavController= NavController(LocalContext.curre
                     onClick = {
                         authViewModel.key.value=1;
                         scope.launch {
-                            datastore.saveUserNumber(loginNumberText)
+                            datastore.saveUserNumber("+91$loginNumberText")
                             authViewModel.loginUser(LoginModel("$addString$loginNumberText", loginPasswordText))
                         }
                     },

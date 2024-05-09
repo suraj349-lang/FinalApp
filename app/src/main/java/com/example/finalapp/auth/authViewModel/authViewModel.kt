@@ -25,7 +25,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
-
+import java.security.MessageDigest
 import javax.inject.Inject
 
 @HiltViewModel
@@ -76,6 +76,7 @@ class AuthViewModel @Inject constructor(
 
 
     fun RegisterUser(registerUserModel : RegisterUserModel)=viewModelScope.launch(Dispatchers.IO) {
+        registerUserModel.password=hashPassword(registerUserModel.password)
         repository.sendSignupData(registerUserModel)
             .onStart {
                 mySignupResponse.value= RequestState.Loading
@@ -100,6 +101,15 @@ class AuthViewModel @Inject constructor(
             profileDatabaseRepository.saveProfileData(profile = profile)
         }
 
+    }
+    //------------------------------------------------------------------------------------------------------------//
+
+
+    fun hashPassword(password: String): String {
+        val bytes = password.toByteArray()
+        val digest = MessageDigest.getInstance("SHA-256")
+        val hashedBytes = digest.digest(bytes)
+        return hashedBytes.joinToString("") { "%02x".format(it) }
     }
     var userFromDb:MutableState<Profile> = mutableStateOf(Profile(name="", username = "", number = "", token = "", address = ""))
 

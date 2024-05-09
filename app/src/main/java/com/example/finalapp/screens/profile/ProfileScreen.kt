@@ -2,7 +2,6 @@ package com.example.finalapp.screens.profile
 
 import BottomBar
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -47,7 +46,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
@@ -73,11 +71,9 @@ import com.example.finalapp.model.User
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens.DialogBOX.DialogBoxForCameraAndGallery
 import com.example.finalapp.screens.DialogBOX.DialogBoxForImageEdit
-import com.example.finalapp.ui.theme.DarkBlue
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.ui.theme.topAppBarTextColor
 import com.example.finalapp.utils.Constants.Constants
-import com.example.finalapp.utils.Constants.Constants.TAG
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
