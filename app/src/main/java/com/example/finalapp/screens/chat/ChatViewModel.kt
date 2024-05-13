@@ -5,18 +5,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.finalapp.database.Chat
 import com.example.finalapp.database.ChatDatabaseRepository
-import com.example.finalapp.datastore.StoreUserData
 import com.example.finalapp.utils.Constants.Constants
 import com.example.finalapp.utils.Constants.Constants.TAG
+import com.google.gson.Gson
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import io.socket.client.IO
 import io.socket.client.Socket
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.serializer
 import java.net.URISyntaxException
@@ -59,10 +59,17 @@ class ChatViewModel @Inject constructor(
             socket = IO.socket(Constants.BASE_URL)
             socket?.connect()
 
-            socket?.on("+916376099670") { args ->
-                if (args[0] is String) {
-                    val message = args[0] as String
-                    _messages.value = _messages.value + message
+            socket?.on("+916376099670") { data ->
+                val jsonString = data[0].toString()
+
+                val chatMessage = Gson().fromJson(jsonString, Chat::class.java)
+                viewModelScope.async{
+                    saveChatToDB(chatMessage)
+                }.invokeOnCompletion {
+                    if (chatMessage.message.isNotEmpty()) {
+                        val message = chatMessage.message
+                        _messages.value = _messages.value + message
+                    }
                 }
             }
         } catch (e: URISyntaxException) {
@@ -70,9 +77,11 @@ class ChatViewModel @Inject constructor(
         }
     }
 
+
 // this function connects to the main socket of individual chat
     fun sendMessage(chat: Chat) {
 //        val userData= UserData(number = userNumber ,message=message)
+    Log.d(TAG, "sendMessage: called $chat")
         socket?.emit("chatMessage", Json.encodeToString(serializer(),chat))
     }
     suspend fun saveChatToDB(chat: Chat): Boolean {

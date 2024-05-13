@@ -61,14 +61,8 @@ fun ChatScreenUI(userNumber: String?,navController: NavHostController,chatViewMo
     val number by  datastore.getUserNumber.collectAsState("")
     Log.d(TAG, "ChatScreenUI: $number")
 
-
-
-
-
     Scaffold(
-        topBar = {
-           ChatTopBar(title = userNumber.toString(), navController =navController )
-    }) {
+        topBar = { ChatTopBar(title = userNumber.toString(), navController =navController ) }) {
 
         // Auto-scroll to the bottom when messages list is updated
         LaunchedEffect(messages) {
