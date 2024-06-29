@@ -1,7 +1,15 @@
 package com.example.finalapp.navigation
 
+import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
+import androidx.datastore.core.DataStore
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -19,6 +27,8 @@ import com.example.finalapp.auth.screensUI.SplashScreenUI
 import com.example.finalapp.auth.screensUI.otp.OtpBox
 import com.example.finalapp.screens.chat.ChatScreenUI
 import com.example.finalapp.auth.screensUI.FinalUserCreation
+import com.example.finalapp.database.Chat
+import com.example.finalapp.datastore.StoreUserData
 import com.example.finalapp.screens.chat.ChatListScreen
 import com.example.finalapp.screens.DirectChatScreenUI
 import com.example.finalapp.screens.profile.GalleryPicker
@@ -31,7 +41,14 @@ import com.example.finalapp.screens.SettingsScreenUI
 import com.example.finalapp.screens.onboarding.screen.WelcomeScreen
 import com.example.finalapp.screens.profile.AllProfiles
 import com.example.finalapp.screens.profile.ProfileViewModel
+import com.example.finalapp.utils.Constants.Constants
+import com.example.finalapp.utils.Constants.Constants.TAG
 import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.gson.Gson
+import io.socket.client.IO
+import io.socket.client.Socket
+import kotlinx.coroutines.launch
+import java.net.URISyntaxException
 
 const val NavArg="name"
 sealed class SCREENS(val route:String){
@@ -63,7 +80,8 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
     val viewModel = hiltViewModel<ChatViewModel>()
 
 
-    NavHost(navController = navController, startDestination =SCREENS.CHAT.route){
+
+    NavHost(navController = navController, startDestination =SCREENS.SPLASH.route){
         composable(SCREENS.SPLASH.route){
             SplashScreenUI(navController,screen)
         }

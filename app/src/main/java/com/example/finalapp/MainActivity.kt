@@ -51,17 +51,25 @@ import kotlinx.serialization.Serializable
 import java.io.IOException
 import java.util.Locale
 import android.location.LocationManager
+import android.provider.ContactsContract.CommonDataKinds.StructuredName
 import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.viewModelScope
+import com.example.finalapp.database.Chat
+import com.example.finalapp.datastore.StoreUserData
+import com.example.finalapp.screens.chat.ChatViewModel
 import com.example.finalapp.screens.onboarding.viewmodel.SplashViewModel
 import com.example.finalapp.utils.Constants.Constants
+import com.google.gson.Gson
 import io.socket.client.IO
 import io.socket.client.Socket
+import kotlinx.coroutines.async
 import java.net.URISyntaxException
 import javax.inject.Inject
 
@@ -82,6 +90,7 @@ class MainActivity : ComponentActivity() {
         installSplashScreen().setKeepOnScreenCondition {
             !splashViewModel.isLoading.value
         }
+
         setContent {
             FinalAppTheme {
                 val authViewModel= hiltViewModel<AuthViewModel>()

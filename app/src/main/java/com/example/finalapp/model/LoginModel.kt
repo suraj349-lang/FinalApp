@@ -1,8 +1,8 @@
 package com.example.finalapp.model
 
 data class LoginModel(
-  val number:String,
-  val password:String
+    val number:String,
+    var password:String
 )
 data class LoginAPIResponse(
   val success:Boolean,

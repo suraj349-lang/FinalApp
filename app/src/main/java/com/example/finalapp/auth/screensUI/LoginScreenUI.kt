@@ -115,16 +115,12 @@ fun LoginScreenUI(navController: NavController= NavController(LocalContext.curre
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
-                painter = painterResource(id = R.drawable.tree),
+                painter = painterResource(id = R.drawable.flash),
                 contentDescription = "",
                 modifier = Modifier.size(100.dp)
 
             )
             Text(text=Constants.APP_NAME, fontSize = 45.sp, modifier = Modifier.padding(top=8.dp, bottom = 0.dp), color = statusAndTopAppBarColor, style = MaterialTheme.typography.titleMedium)
-            Text(text="date your way...", fontSize = 18.sp, modifier = Modifier.padding(top=0.dp, start = 120.dp), color = Color(
-                0xFFE71708),
-                style = MaterialTheme.typography.titleMedium
-            )
             Spacer(modifier = Modifier.height(10.dp))
 
             Column(

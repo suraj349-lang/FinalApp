@@ -70,12 +70,9 @@ import kotlinx.coroutines.launch
 
 
 val users:List<ChatUser> = listOf (
-    ChatUser("Suraj","+917250260100"),
-    ChatUser("Nishant","+918739845788"),
-    ChatUser("Nitish","+918739845789"),
-    ChatUser("Muskan","+918739845790"),
-    ChatUser("Bhomi","+918527796848"),
-    ChatUser("Supriya","+919041012344")
+    ChatUser("Suraj2","+917250260100"),
+    ChatUser("Suraj","+916376099670"),
+    ChatUser("sudha","+917367984901")
 
 )
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")

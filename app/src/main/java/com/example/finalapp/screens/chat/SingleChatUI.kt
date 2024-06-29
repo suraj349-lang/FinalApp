@@ -45,54 +45,35 @@ import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun ChatScreenUI(userNumber: String?,navController: NavHostController,chatViewModel: ChatViewModel) {
+fun ChatScreenUI(sentTo: String?,navController: NavHostController,chatViewModel: ChatViewModel) {
     val context= LocalContext.current
-    val messages by chatViewModel.messages.collectAsState()
+    val messages by chatViewModel.messagesFromDB.collectAsState()
     val listState = rememberLazyListState()
-    var key by remember {
-        mutableStateOf(0)
-    }
-    val scope = rememberCoroutineScope()
-    var saveToDb by remember {
-        mutableStateOf(false)
-    }
+    val scope= rememberCoroutineScope()
+    var saveToDb by remember { mutableStateOf(false) }
     var inputText by remember { mutableStateOf("") }
-    val datastore=StoreUserData(context )
-    val number by  datastore.getUserNumber.collectAsState("")
-    Log.d(TAG, "ChatScreenUI: $number")
+    val datastore=StoreUserData(context)
+    val loggedInNumber by datastore.getUserNumber.collectAsState(initial = "")
+    chatViewModel.loggedInNumber.value=loggedInNumber.toString()
+
+
+    LaunchedEffect(messages){
+        listState.animateScrollToItem(messages.size)
+        chatViewModel.getChat(sentTo.toString())
+    }
+    LaunchedEffect(key1 = true){
+        chatViewModel.connectToSocket()
+    }
+
+
 
     Scaffold(
-        topBar = { ChatTopBar(title = userNumber.toString(), navController =navController ) }) {
-
-        // Auto-scroll to the bottom when messages list is updated
-        LaunchedEffect(messages) {
-            listState.animateScrollToItem(messages.size)
-        }
-
-        if (key == 1) {
-
-            LaunchedEffect(key1 = true) {
-            scope.launch {
-                saveToDb=chatViewModel.saveChatToDB(
-                    Chat(
-                        sentTo = userNumber.toString(),
-                        sentFrom="",
-                        message = inputText,
-                        received = false,
-                        sent = 0,
-                        seen = false,
-                       // timeStamp = System.currentTimeMillis()
-                    )
-                )
-            }
-                key=0
-        }
-    }
+        topBar = { ChatTopBar(title = sentTo.toString(), navController =navController ) }) {
 
         Column(modifier = Modifier.padding(it)) {
             LazyColumn(state = listState, modifier = Modifier.weight(1f)) {
                 items(messages) { message ->
-                    MessageItem("you", message,false)
+                    MessageItem( message.message, message.sentFrom==loggedInNumber.toString())
                 }
             }
 
@@ -104,25 +85,23 @@ fun ChatScreenUI(userNumber: String?,navController: NavHostController,chatViewMo
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(20.dp)
                 )
-                if(saveToDb) {
-                    Log.d(TAG, "ChatScreenUI:saveToDB -> socket sent ")
-                    chatViewModel.sendMessage(Chat(
-                        id=1,
-                        sentTo = "917250260100",
-                        sentFrom=number.toString(),
+                Button(onClick = {
+                    val chat = Chat(
+                        sentTo = sentTo.toString(),
+                        sentFrom = loggedInNumber.toString(),
                         message = inputText,
                         received = false,
                         sent = 0,
-                        seen = false,
-                      //  timeStamp = System.currentTimeMillis()
-                    ))
-                    inputText = ""
-                    saveToDb=false
-                }
-                Button(onClick = {
-                    key=1
-//                    chatViewModel.messages.value
-//                    inputText = ""
+                        seen = false
+                    )
+                    scope.launch {
+                        saveToDb=chatViewModel.saveChatToDB(chat)
+                        Log.d(TAG, "1: ChatScreenUI:$saveToDb $chat ")
+                        if (saveToDb){
+                            chatViewModel.sendMessage(chat)
+                            inputText=""
+                        }
+                    }
                 }) {
                     Text("Send")
                 }
@@ -134,16 +113,16 @@ fun ChatScreenUI(userNumber: String?,navController: NavHostController,chatViewMo
 
 
 @Composable
-fun MessageItem(name: String, msg: String, isSentByUser: Boolean) {
+fun MessageItem(msg: String,isSentByLoggedInUser:Boolean) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 4.dp),
-        contentAlignment = if (isSentByUser) Alignment.CenterEnd else Alignment.CenterStart
+        contentAlignment = if (isSentByLoggedInUser) Alignment.CenterEnd else Alignment.CenterStart
     ) {
         Surface(
             shape = RoundedCornerShape(16.dp),
-            color = if (isSentByUser) Color.LightGray else Color.White
+            color = if (isSentByLoggedInUser) Color.LightGray else Color.White
         ) {
             Column(
                 modifier = Modifier
@@ -154,14 +133,14 @@ fun MessageItem(name: String, msg: String, isSentByUser: Boolean) {
                     text = msg,
                     style = MaterialTheme.typography.titleMedium,
                     fontSize = 18.sp,
-                    textAlign = if (isSentByUser) TextAlign.End else TextAlign.Start,
+                    textAlign = if (isSentByLoggedInUser) TextAlign.End else TextAlign.Start,
                     softWrap = true // Enable auto line wrapping
                 )
                 Text(
                     text = "08:38", // Replace with actual timestamp
                     style = MaterialTheme.typography.labelSmall,
                     fontSize = 8.sp,
-                    textAlign = if (isSentByUser) TextAlign.End else TextAlign.Start
+                    textAlign = if (isSentByLoggedInUser) TextAlign.End else TextAlign.Start
 
                 )
             }

@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
@@ -142,12 +143,7 @@ fun SignupScreenUI(navController: NavController = NavController(LocalContext.cur
                     onClick = {
                         // on below line we are validating user inputs
                         if (TextUtils.isEmpty(phoneNumber.value.toString())) {
-                            Toast.makeText(
-                                context,
-                                "Please enter phone number..",
-                                Toast.LENGTH_SHORT
-                            )
-                                .show()
+                            Toast.makeText(context, "Please enter phone number..", Toast.LENGTH_SHORT).show()
                         } else {
 
                             val number = "+91${phoneNumber.value}"
@@ -205,7 +201,7 @@ fun SignupScreenUI(navController: NavController = NavController(LocalContext.cur
                             )
                         }
                     },
-                    modifier = Modifier.width(95.dp),
+                    modifier = Modifier.wrapContentWidth(),
                     colors = ButtonDefaults.buttonColors(
                         contentColor = topAppBarTextColor,
                         containerColor = statusAndTopAppBarColor

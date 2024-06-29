@@ -20,7 +20,7 @@ class ChatDatabaseRepository @Inject constructor(private val chatDao: ChatDao){
     suspend fun saveChat(chat: Chat){
         chatDao.saveChat(chat =chat)
     }
-    suspend fun getChat(userNumber: String):List<Chat>{
+     fun getChat(userNumber: String):Flow<List<Chat>>{
         return chatDao.getChat(userNumber)
     }
 }

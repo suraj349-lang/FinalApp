@@ -131,7 +131,25 @@ fun ProfileScreenUI(
         }
     }
 }
-
+@Composable
+fun PersonalInfo(profileImage:String,profileViewModel:ProfileViewModel,navController: NavHostController) {
+    Card(
+        modifier = Modifier
+            .padding(16.dp)
+            .fillMaxWidth()
+            .height(130.dp)
+        , shape = RoundedCornerShape(12.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxSize(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            ProfileIcon(profileImage = profileImage, profileViewModel , navController )
+            ProfileName(name = "Suraj")
+        }
+    }
+}
 
 @Composable
 fun AllProfiles(profileViewModel: ProfileViewModel) {
@@ -273,25 +291,7 @@ fun LogOut(navController:NavHostController,authViewModel:AuthViewModel) {
                 })
     }
 }
-@Composable
-fun PersonalInfo(profileImage:String,profileViewModel:ProfileViewModel,navController: NavHostController) {
-    Card(
-        modifier = Modifier
-            .padding(16.dp)
-            .fillMaxWidth()
-            .height(130.dp)
-            , shape = RoundedCornerShape(12.dp)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxSize(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start
-        ) {
-            ProfileIcon(profileImage = profileImage, profileViewModel , navController )
-            ProfileName(name = "Suraj")
-        }
-    }
-}
+
 
 @Composable
 fun FlashInfo() {

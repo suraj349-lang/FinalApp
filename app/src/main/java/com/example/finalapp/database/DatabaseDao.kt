@@ -23,7 +23,7 @@ interface ChatDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun saveChat(chat: Chat)
 
-    @Query("SELECT * FROM chat_table WHERE sentTo = :userNumber ORDER BY id DESC")
-    suspend fun getChat(userNumber: String): List<Chat>
+    @Query("SELECT * FROM chat_table WHERE sentTo = :userNumber or sentFrom=:userNumber ORDER BY id ASC")
+     fun getChat(userNumber: String): Flow<List<Chat>>
 
 }

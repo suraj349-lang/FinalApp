@@ -57,6 +57,7 @@ class AuthViewModel @Inject constructor(
 
 
     fun loginUser(loginModel: LoginModel)=viewModelScope.launch(Dispatchers.IO) {
+        loginModel.password=hashPassword(loginModel.password)
         repository.sendLoginData(loginModel)
             .onStart {
                 myLoginResponse.value= RequestState.Loading
