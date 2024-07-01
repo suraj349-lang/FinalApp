@@ -1,13 +1,11 @@
 package com.example.finalapp.screens.profile
 
-import okhttp3.MultipartBody
 import android.content.Context
 import android.net.Uri
-import androidx.core.net.toFile
 import com.example.finalapp.model.ImageUploadResponse
-import com.example.finalapp.model.LoginAPIResponse
-import com.example.finalapp.model.LoginModel
 import com.example.finalapp.model.ProfileResponse
+import com.example.finalapp.model.Response
+import com.example.finalapp.model.User
 import com.example.finalapp.network.ApiService
 import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.Dispatchers
@@ -15,11 +13,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
 
-import okhttp3.RequestBody.Companion.asRequestBody
-
-import java.io.File
 import javax.inject.Inject
 
 
@@ -28,6 +22,9 @@ class ProfileRepository @Inject constructor(private val api: ApiService) {
 
     fun getAllProfiles(): Flow<ProfileResponse> = flow {
         emit(api.getAllProfiles())
+    }.flowOn(Dispatchers.IO)
+    fun updateUserImage(number: String, imageUrl: String): Flow<Response> = flow {
+        emit(api.updateUserImage(number,imageUrl))
     }.flowOn(Dispatchers.IO)
 
 

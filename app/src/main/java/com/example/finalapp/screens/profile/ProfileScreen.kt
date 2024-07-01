@@ -2,11 +2,14 @@ package com.example.finalapp.screens.profile
 
 import BottomBar
 import android.annotation.SuppressLint
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,6 +27,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.IconButton
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -36,6 +40,7 @@ import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -71,9 +76,13 @@ import com.example.finalapp.model.User
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens.DialogBOX.DialogBoxForCameraAndGallery
 import com.example.finalapp.screens.DialogBOX.DialogBoxForImageEdit
+import com.example.finalapp.screens.HomeError
+import com.example.finalapp.screens.HomeLoading
+import com.example.finalapp.screens.ImageScreen
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.ui.theme.topAppBarTextColor
 import com.example.finalapp.utils.Constants.Constants
+import com.example.finalapp.utils.RequestState
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -150,6 +159,82 @@ fun PersonalInfo(profileImage:String,profileViewModel:ProfileViewModel,navContro
         }
     }
 }
+@SuppressLint("StateFlowValueCalledInComposition")
+@OptIn(ExperimentalGlideComposeApi::class)
+@Composable
+fun ProfileIcon(profileImage:String,profileViewModel: ProfileViewModel,navController: NavHostController) {
+    var showCustomDialog by remember {
+        mutableStateOf(false)
+    }
+    val userData by  profileViewModel.userData.collectAsState()
+    val lifecycleOwner= LocalLifecycleOwner.current
+    Surface(
+        Modifier
+            .size(120.dp)
+            .padding(8.dp), shape = CircleShape, color = Color.LightGray, shadowElevation = 12.dp) {
+        if(showCustomDialog) DialogBoxForCameraAndGallery(profileViewModel , navController ){ showCustomDialog=!showCustomDialog }
+        DisposableEffect(lifecycleOwner) {
+            val observer = LifecycleEventObserver { _, event ->
+                if (event == Lifecycle.Event.ON_RESUME) {
+                    showCustomDialog=false
+                }
+            }
+            lifecycleOwner.lifecycle.addObserver(observer)
+
+            // When the effect leaves the Composition, remove the observer
+            onDispose {
+                lifecycleOwner.lifecycle.removeObserver(observer)
+            }
+        }
+        when (val result=profileViewModel.user.value){
+            is RequestState.Success->{
+                profileViewModel.userData.value= result.data
+                Log.d("ZUNE", "ProfileIcon: ${profileViewModel.userData.value} ")
+
+            }
+            is RequestState.Error->{
+                Toast.makeText(LocalContext.current,"${result.error.message}", Toast.LENGTH_SHORT).show()
+            }
+            RequestState.Loading->{
+//                CircularProgressIndicator()
+            }
+            RequestState.Idle->{
+//                CircularProgressIndicator()
+            }
+
+        }
+        Row(
+            modifier = Modifier.fillMaxSize(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            if (userData.profileImage != "") {
+                Log.d("ZUNE", "ProfileIcon: ${profileViewModel.userData.value.profileImage}")
+                GlideImage(
+                    model = userData.profileImage,
+                    contentDescription = "",
+                    transition = CrossFade,
+                    modifier = Modifier.clip(
+                        CircleShape
+                    ), contentScale = ContentScale.Crop
+                )
+            }
+            else {
+                Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                    IconButton(onClick = { showCustomDialog=true }) {
+                        Image(
+                            painter = painterResource(id = R.drawable.camera),
+                            contentDescription = "",
+                            modifier = Modifier.size(40.dp)
+                        )
+                    }
+                    Text(text = "Upload photo", fontSize = 8.sp, fontWeight = FontWeight.SemiBold, color = Color.Black)
+                }
+            }
+
+        }
+    }
+}
 
 @Composable
 fun AllProfiles(profileViewModel: ProfileViewModel) {
@@ -194,7 +279,7 @@ fun EditProfile(navController: NavHostController, profileViewModel: ProfileViewM
                 Text(text = "Open camera ")
             }
         }
-        Image(painter = rememberImagePainter(data =profileViewModel.imageUri.value ), modifier = Modifier.fillMaxSize(), contentDescription ="", contentScale = ContentScale.Crop )
+        Image(painter = rememberImagePainter(data ="" ), modifier = Modifier.fillMaxSize(), contentDescription ="", contentScale = ContentScale.Crop )
 
     }
 }
@@ -364,61 +449,7 @@ fun ProfileName(name:String) {
         }
 }
 
-@OptIn(ExperimentalGlideComposeApi::class)
-@Composable
-fun ProfileIcon(profileImage:String,profileViewModel: ProfileViewModel,navController: NavHostController) {
-    var showCustomDialog by remember {
-        mutableStateOf(false)
-    }
-    val lifecycleOwner= LocalLifecycleOwner.current
-    Surface(
-        Modifier
-            .size(120.dp)
-            .padding(8.dp), shape = CircleShape, color = Color.LightGray, shadowElevation = 12.dp) {
-        if(showCustomDialog) DialogBoxForCameraAndGallery(profileViewModel , navController ){ showCustomDialog=!showCustomDialog }
-        DisposableEffect(lifecycleOwner) {
-            val observer = LifecycleEventObserver { _, event ->
-                if (event == Lifecycle.Event.ON_RESUME) {
-                    showCustomDialog=false
-                }
-            }
-            lifecycleOwner.lifecycle.addObserver(observer)
 
-            // When the effect leaves the Composition, remove the observer
-            onDispose {
-                lifecycleOwner.lifecycle.removeObserver(observer)
-            }
-        }
-        Row(
-            modifier = Modifier.fillMaxSize(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            if (profileImage.isNotEmpty())
-                GlideImage(
-                    model = "${Constants.BASE_URL}${profileImage}",
-                    contentDescription = "",
-                    transition = CrossFade,
-                    modifier = Modifier.clip(
-                        CircleShape
-                    ), contentScale = ContentScale.Crop
-                )
-            else {
-                Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-                    IconButton(onClick = { showCustomDialog=true }) {
-                        Image(
-                            painter = painterResource(id = R.drawable.camera),
-                            contentDescription = "",
-                            modifier = Modifier.size(40.dp)
-                        )
-                    }
-                    Text(text = "Upload photo", fontSize = 8.sp, fontWeight = FontWeight.SemiBold, color = Color.Black)
-                }
-            }
-
-        }
-    }
-}
 
 
 @OptIn(ExperimentalMaterial3Api::class)

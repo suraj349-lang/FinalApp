@@ -1,6 +1,5 @@
 package com.example.finalapp.network
 
-import com.example.finalapp.database.Profile
 import com.example.finalapp.model.ImageUploadResponse
 import com.example.finalapp.model.LoginAPIResponse
 import com.example.finalapp.model.LoginModel
@@ -8,18 +7,16 @@ import com.example.finalapp.model.OfferModel
 import com.example.finalapp.model.OfferResponseModel
 import com.example.finalapp.model.ProfileResponse
 import com.example.finalapp.model.RegisterUserModel
+import com.example.finalapp.model.Response
 import com.example.finalapp.model.SignupAPIResponse
 import com.example.finalapp.model.User
-import kotlinx.serialization.json.Json
 import okhttp3.MultipartBody
-import retrofit2.Response
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
+import retrofit2.http.Query
 
 interface ApiService {
 
@@ -35,7 +32,10 @@ interface ApiService {
     suspend fun getAllProfiles():ProfileResponse
 
     @GET("/api/v1/user")
-    suspend fun getUser():ProfileResponse
+    suspend fun getUserData():ProfileResponse
+
+    @GET("/api/v1/auth/updateUserImage")
+    suspend fun updateUserImage(@Query("number") number: String, @Query("imageUrl") imageUrl: String): Response
 
     @Multipart
     @POST("/api/v1/user/uploadImage")

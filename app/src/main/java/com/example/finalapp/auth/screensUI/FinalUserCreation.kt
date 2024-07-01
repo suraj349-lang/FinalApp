@@ -100,13 +100,14 @@ fun FinalUserCreation(authViewModel: AuthViewModel, navController: NavHostContro
             scope.launch(Dispatchers.IO) {
                 // TODO("the code to save data in SQLITE should be once the response have been returned from api")TODO("the code to save data in SQLITE should be once the response have been returned from api")
                 try {
-                    authViewModel.saveProfileData(Profile(name=name, username = username, number=number,token=token, address = address))
+                    authViewModel.RegisterUser(RegisterUserModel(name.trim(), number,username,password,token,address))
                 }catch (e:Exception){
                     Log.d("FinalUserCreation",e.message.toString())
                 }
             }
-            scope.launch(Dispatchers.IO) {
-                authViewModel.RegisterUser(RegisterUserModel(name.trim(), number,username,password,token,address))  }
+//            scope.launch(Dispatchers.IO) {
+//                authViewModel.saveProfileData(Profile(name=name, username = username, number=number,token=token, address = address))
+        //                }
             }
 
 
@@ -239,8 +240,7 @@ fun FinalUserCreationUI (
                     when (val result = authViewModel.mySignupResponse.value) {
                         is RequestState.Success -> {
                              authViewModel.keyForFinalUserCreation.value=RESPONSE.KEY_OFF;
-                            Toast.makeText(context, "Welcome to Active Dating", Toast.LENGTH_SHORT)
-                                .show()
+                            Toast.makeText(context, "Welcome to Active Dating", Toast.LENGTH_SHORT).show()
                             navController.navigate(SCREENS.HOME.route) {
                                 popUpTo(0);
                             }

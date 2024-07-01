@@ -22,9 +22,11 @@ data class User(
   val username: String,
   val token: String,
   val address: String,
-  val offers:List<String>,
+  val offers:List<String>?=null,
   val profileImage:String
-)
+){
+    constructor():this("","","","","","", emptyList(),"")
+}
 data class ChatUser(
   val name:String,
   val number:String
@@ -32,4 +34,9 @@ data class ChatUser(
 data class ProfileResponse(
   val success: Boolean,
   val data: List<User>
+)
+
+data class Response(
+    val success: Boolean,
+    val data: User
 )

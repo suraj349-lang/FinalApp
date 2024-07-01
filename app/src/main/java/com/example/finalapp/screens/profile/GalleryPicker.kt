@@ -19,18 +19,28 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import com.example.finalapp.auth.authViewModel.AuthViewModel
+import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.utils.Constants.Constants
 import com.example.finalapp.utils.RequestState
+import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.launch
 
 
 //https://www.youtube.com/watch?v=uHX5NB6wHao
@@ -39,6 +49,25 @@ fun GalleryPicker(navController: NavHostController,profileViewModel: ProfileView
 
     var selectedImageUris by remember {
         mutableStateOf<List<Uri>>(emptyList())
+    }
+    val lifecycleOwner= LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        // Create an observer that triggers our remembered callbacks
+        // for sending analytics events
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                navController.navigate(SCREENS.PROFILE.route)
+
+            }
+        }
+
+        // Add the observer to the lifecycle
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        // When the effect leaves the Composition, remove the observer
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
     }
 
     val context= LocalContext.current
@@ -68,31 +97,43 @@ fun GalleryPicker(navController: NavHostController,profileViewModel: ProfileView
             CircularProgressIndicator()
         }
         is RequestState.Success ->{
+
             Toast.makeText(context,result.data.toString(), Toast.LENGTH_SHORT).show()
+            navController.navigate(SCREENS.PROFILE.route)
 
         }
         is RequestState.Error ->{
             Toast.makeText(context,result.error.message.toString(), Toast.LENGTH_SHORT).show()
             Log.d(Constants.TAG, "ImageCaptureFromCamera: ${result.error.message}")
+            navController.navigate(SCREENS.PROFILE.route)
 
         }
 
         else -> {}
     }
+//    if (selectedImageUris.isNotEmpty()) {
+//        profileViewModel.uploadImage(selectedImageUris[0], context )
+//
+//        LazyRow(modifier = Modifier.fillMaxSize()) {
+//            items(selectedImageUris) { uri ->
+//                AsyncImage(
+//                    model = uri,
+//                    contentDescription = null,
+//                    modifier = Modifier
+//                        .fillMaxWidth(0.3f)
+//                        .fillMaxHeight(0.4f),
+//                    contentScale = ContentScale.Crop
+//                )
+//            }
+//        }
+//    }
     if (selectedImageUris.isNotEmpty()) {
-        profileViewModel.uploadImage(selectedImageUris[0], context )
-
-        LazyRow(modifier = Modifier.fillMaxSize()) {
-            items(selectedImageUris) { uri ->
-                AsyncImage(
-                    model = uri,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .fillMaxWidth(0.3f)
-                        .fillMaxHeight(0.4f),
-                    contentScale = ContentScale.Crop
-                )
+        val scope= rememberCoroutineScope()
+        LaunchedEffect(key1 = true) {
+            scope.launch {
+                profileViewModel.uploadImage(selectedImageUris[0], context)
             }
         }
+
     }
 }

@@ -3,7 +3,9 @@ package com.example.finalapp.auth.authViewModel
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.app.ActivityCompat
@@ -17,8 +19,11 @@ import com.example.finalapp.model.LoginAPIResponse
 import com.example.finalapp.model.LoginModel
 import com.example.finalapp.model.RegisterUserModel
 import com.example.finalapp.model.SignupAPIResponse
+import com.example.finalapp.model.User
 import com.example.finalapp.utils.RequestState
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -32,15 +37,14 @@ import javax.inject.Inject
 class AuthViewModel @Inject constructor(
     private val repository: AuthRepository,
     private val profileDatabaseRepository: ProfileDatabaseRepository,
-    @ApplicationContext private val context: Context): ViewModel() {
+    @ApplicationContext private val context: Context): ViewModel()
+   {
+
+
     var latitude= mutableStateOf(0.0)
     var longitude= mutableStateOf(0.0)
     var address= mutableStateOf("")
-    var permission= mutableStateOf(
-        ActivityCompat.checkSelfPermission(
-            context,
-            Manifest.permission.ACCESS_FINE_LOCATION
-        ) == PackageManager.PERMISSION_GRANTED)
+    var permission= mutableStateOf(ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
 
 
 
@@ -53,7 +57,7 @@ class AuthViewModel @Inject constructor(
 
 
     val myLoginResponse: MutableState<RequestState<LoginAPIResponse>> = mutableStateOf(RequestState.Idle)
-    val mySignupResponse: MutableState<RequestState<SignupAPIResponse>> = mutableStateOf(RequestState.Idle)
+
 
 
     fun loginUser(loginModel: LoginModel)=viewModelScope.launch(Dispatchers.IO) {
@@ -73,6 +77,7 @@ class AuthViewModel @Inject constructor(
 
             }
     }
+    val mySignupResponse: MutableState<RequestState<SignupAPIResponse>> = mutableStateOf(RequestState.Idle)
 
 
 
@@ -99,7 +104,7 @@ class AuthViewModel @Inject constructor(
     //-----------------------------------------------------------------------------------------------------------//
     fun saveProfileData(profile: Profile){
         viewModelScope.launch {
-            profileDatabaseRepository.saveProfileData(profile = profile)
+            profileDatabaseRepository.saveProfileDataInDb(profile = profile)
         }
 
     }
@@ -112,13 +117,13 @@ class AuthViewModel @Inject constructor(
         val hashedBytes = digest.digest(bytes)
         return hashedBytes.joinToString("") { "%02x".format(it) }
     }
-    var userFromDb:MutableState<Profile> = mutableStateOf(Profile(name="", username = "", number = "", token = "", address = ""))
+    var userFromDb:MutableState<Profile> = mutableStateOf(Profile())
 
     fun getProfileData(){
 
             try {
                 viewModelScope.launch {
-                    profileDatabaseRepository.getProfileData().collect{
+                    profileDatabaseRepository.getProfileDataFromDb().collect{
                         userFromDb.value=it
                     }
 
@@ -129,5 +134,6 @@ class AuthViewModel @Inject constructor(
        }
 
 
-}
+
+   }
 

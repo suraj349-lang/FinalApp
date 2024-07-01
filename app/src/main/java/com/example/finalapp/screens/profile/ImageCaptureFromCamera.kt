@@ -31,6 +31,7 @@ import androidx.core.content.FileProvider
 import coil.compose.rememberImagePainter
 import com.example.finalapp.utils.Constants.Constants.TAG
 import com.example.finalapp.utils.RequestState
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
@@ -51,6 +52,7 @@ fun ImageCaptureFromCamera(profileViewModel: ProfileViewModel) {
         file
     )
     var capturedImageUri by remember { mutableStateOf<Uri>(Uri.EMPTY) }
+    val firebaseStorage= FirebaseStorage.getInstance().getReference()
 
     val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
         if (success) {
