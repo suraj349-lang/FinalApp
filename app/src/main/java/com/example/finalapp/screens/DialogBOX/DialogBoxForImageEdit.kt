@@ -1,9 +1,11 @@
 package com.example.finalapp.screens.DialogBOX
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,10 +15,13 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.Divider
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,11 +31,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -100,19 +107,18 @@ fun BtnForDialogBoxForImageEdit(onDismiss: () -> Unit){
     }
 
 }
-
+//
 
 @Composable
-fun DialogBoxForCameraAndGallery( profileViewModel:ProfileViewModel,navController:NavHostController,onDismiss: () -> Unit) {
+fun DialogBoxForCameraAndGallery(profileViewModel:ProfileViewModel,navController:NavHostController,onDismiss: () -> Unit) {
     var key by remember { mutableStateOf(false) }
     if (key) {
         ImageCaptureFromCamera(profileViewModel)
     }
 
     Dialog(
-        onDismissRequest = { onDismiss() }, properties = DialogProperties(
-            dismissOnBackPress = true, dismissOnClickOutside = true
-        )
+        onDismissRequest = { onDismiss() },
+        properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true)
     ) {
         Card(
             shape = RoundedCornerShape(10.dp),
@@ -121,9 +127,20 @@ fun DialogBoxForCameraAndGallery( profileViewModel:ProfileViewModel,navControlle
                 .height(200.dp)
                 .padding(8.dp)
         ) {
-            Column() {
-                Row(modifier = Modifier.background(color = Color(0xFFFFFFFE)).padding(top=16.dp).fillMaxWidth().wrapContentHeight(), horizontalArrangement = Arrangement.Center) {
-                    Text(text = "Choose from Camera / Gallery.", fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = Color.Black)
+            Column(modifier = Modifier.fillMaxSize()) {
+                Row(
+                    modifier = Modifier
+                        .background(color = Color(0xFFFFFFFE))
+                        .padding(top = 16.dp)
+                        .fillMaxWidth()
+                        .wrapContentHeight(), horizontalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "Choose from Camera / Gallery.",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color.Black
+                    )
                 }
 
                 Row(
@@ -133,18 +150,40 @@ fun DialogBoxForCameraAndGallery( profileViewModel:ProfileViewModel,navControlle
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
                 ) {
+                    Box(modifier = Modifier.size(100.dp)) {
+                        Column(
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            Image(painterResource(id = R.drawable.camera),
+                                contentDescription = "",
+                                modifier = Modifier
+                                    .size(50.dp)
+                                    .clickable { key = !key }
+                            )
+                            Text(text = "Camera", modifier = Modifier)
 
-                    Image(painterResource(id = R.drawable.camera),
-                        contentDescription = "",
-                        modifier = Modifier
-                            .size(80.dp)
-                            .clickable { key = !key }
-                            .padding(end=25.dp))
-                    Image(painterResource(id = R.drawable.gallery),
-                        contentDescription = "",
-                        modifier = Modifier
-                            .size(50.dp)
-                            .clickable { navController.navigate(SCREENS.GALLERY.route) })
+                        }
+                    }
+                    Box(modifier = Modifier.size(100.dp)) {
+                        Column(
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            Image(painterResource(id = R.drawable.gallery),
+                                contentDescription = "",
+                                modifier = Modifier
+                                    .size(50.dp)
+                                    .clickable {
+                                        navController.navigate(SCREENS.GALLERY.route)
+                                    })
+                            Text(text = "Gallery", modifier = Modifier)
+
+                        }
+                    }
+
 
                 }
             }
