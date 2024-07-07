@@ -2,6 +2,9 @@ package com.example.finalapp.ui.theme
 
 import android.app.Activity
 import android.os.Build
+import android.view.WindowInsetsController
+import android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
@@ -10,10 +13,12 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsControllerCompat
 
 private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
@@ -37,6 +42,7 @@ private val LightColorScheme = lightColorScheme(
     */
 )
 
+@RequiresApi(Build.VERSION_CODES.R)
 @Composable
 fun FinalAppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -58,8 +64,14 @@ fun FinalAppTheme(
         SideEffect {
             val window = (view.context as Activity).window
            // window.statusBarColor = colorScheme.primary.toArgb()
-            window.statusBarColor = statusAndTopAppBarColor.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
+//            window.statusBarColor = statusAndTopAppBarColor.toArgb()
+            window.statusBarColor=Color.Transparent.toArgb()
+           // WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
+            WindowCompat.getInsetsController(window, view)?.run {
+                isAppearanceLightStatusBars = !darkTheme // Set based on your theme
+                systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            }
+
         }
     }
 

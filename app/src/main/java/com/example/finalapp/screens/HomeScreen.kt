@@ -10,6 +10,7 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -29,25 +30,33 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Card
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.ShapeDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -55,18 +64,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
@@ -83,36 +92,101 @@ import androidx.navigation.NavHostController
 import com.bumptech.glide.integration.compose.CrossFade
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
-import com.bumptech.glide.integration.compose.Transition
 import com.example.finalapp.R
+import com.example.finalapp.auth.authViewModel.AuthViewModel
 import com.example.finalapp.model.User
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.offer.OfferViewModel
-import com.example.finalapp.screens.DialogBOX.CustomAlertDialog
-import com.example.finalapp.screens.DialogBOX.ShowQRDialog
-import com.example.finalapp.screens.DialogBOX.showDialog
+import com.example.finalapp.screens.dialogBox.DropProfileDialog
+import com.example.finalapp.screens.dialogBox.ShowQRDialog
+import com.example.finalapp.screens.dialogBox.showDialog
 import com.example.finalapp.screens.profile.ProfileViewModel
 import com.example.finalapp.ui.theme.DarkBlue
-import com.example.finalapp.ui.theme.floatingActionBtnTextColor
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
-import com.example.finalapp.ui.theme.topAppBarTextColor
 import com.example.finalapp.utils.Constants.Constants
 import com.example.finalapp.utils.Constants.Constants.TAG
 import com.example.finalapp.utils.RequestState
 import kotlinx.coroutines.launch
+import kotlinx.serialization.descriptors.PrimitiveKind
 
 
+enum class SideIcon(
+     val icon:Int,
+     val title:String
+){
+    MOVIES(R.drawable.cinema,"Cinema"),
+    COFFEE(R.drawable.coffeecup,"Coffee"),
+    DINNER(R.drawable.dinner,"Dates"),
+    TRAVEL(R.drawable.airplane,"Travel"),
+    CLUB(R.drawable.nightclubnew,"Clubs"),
+    PERSONAL(R.drawable.personal,"Personal"),
+    SPORTS(R.drawable.sports,"Sports")
 
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "StateFlowValueCalledInComposition")
 @Composable
-fun HomeScreenUI(navController: NavHostController, profileViewModel: ProfileViewModel) {
+fun HomeScreenUI(navController: NavHostController, profileViewModel: ProfileViewModel,authViewModel: AuthViewModel) {
+    var selectedItemIndex by rememberSaveable { mutableStateOf(0) }
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val items = listOf(
+        NavigationItem(
+            title = "Home",
+            selectedIcon = R.drawable.home,
+            unselectedIcon = R.drawable.home,
+            route= SCREENS.SIGNUP.route
+        ),
+        NavigationItem(
+            title = "Cinema",
+            selectedIcon = R.drawable.cinema,
+            unselectedIcon = R.drawable.cinema,
+            route= SCREENS.SIGNUP.route
+        ),
+        NavigationItem(
+            title = "Coffee",
+            selectedIcon =R.drawable.coffeecup,
+            unselectedIcon = R.drawable.coffeecup,
+            badgeCount = 45,
+            route=SCREENS.LOGIN.route
+        ),
+        NavigationItem(
+            title = "Travel",
+            selectedIcon = R.drawable.airplane,
+            unselectedIcon = R.drawable.airplane,
+            route=SCREENS.SPLASH.route
+        ),
+        NavigationItem(
+            title = "Date",
+            selectedIcon = R.drawable.dinner,
+            unselectedIcon = R.drawable.dinner,
+            route=SCREENS.SPLASH.route
+        ),
+        NavigationItem(
+            title = "Sports",
+            selectedIcon = R.drawable.sports,
+            unselectedIcon = R.drawable.sports,
+            route=SCREENS.SPLASH.route
+        ),
+        NavigationItem(
+            title = "Clubs",
+            selectedIcon = R.drawable.nightclubnew,
+            unselectedIcon = R.drawable.nightclubnew,
+            route=SCREENS.SPLASH.route
+        ),
+        NavigationItem(
+            title = "Personal",
+            selectedIcon = R.drawable.personal,
+            unselectedIcon = R.drawable.personal,
+            route=SCREENS.SPLASH.route
+        ),
+    )
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val buttonsVisible = remember { mutableStateOf(true) }
     val offerViewModel= hiltViewModel<OfferViewModel>()
     val usersList=profileViewModel.usersList.value
     val scope= rememberCoroutineScope()
+    val heightInDp = LocalConfiguration.current.screenHeightDp.dp * 0.78f
     var showQR:showDialog by remember {
         mutableStateOf(showDialog.CLOSE)
     }
@@ -130,50 +204,123 @@ fun HomeScreenUI(navController: NavHostController, profileViewModel: ProfileView
                 modifier = Modifier.height(45.dp))
              },
              floatingActionButton = {
-                 HomeFloatingActionButton(offerViewModel , navController );
+                 HomeFloatingActionButton(authViewModel ,offerViewModel , navController );
              }
             ) { it->
-        val padding=it
-        Surface(modifier = Modifier
-            .fillMaxSize()) {
-            LaunchedEffect(key1 =true){
-                scope.launch {
-                    profileViewModel.getAllProfiles()
+
+        val padding = it
+        LaunchedEffect(key1 = true) {
+            scope.launch {
+                profileViewModel.getAllProfiles()
+            }
+        }
+        ModalNavigationDrawer(
+            // scrimColor = Color.Yellow,
+            drawerContent = {
+                ModalDrawerSheet(
+                    modifier = Modifier
+                        .padding(it)
+                        .fillMaxHeight()
+                        .fillMaxWidth(0.5f),
+                    drawerContainerColor = Color.Transparent,
+                    drawerContentColor = Color.Black) {
+                    items.forEachIndexed { index, item ->
+                        Spacer(modifier = Modifier.height(10.dp))
+                        NavigationDrawerItem(
+                            colors = NavigationDrawerItemDefaults
+                                .colors(
+                                    selectedContainerColor = Color(0xFF035697),
+                                    unselectedContainerColor = Color(0xFFFFFFFF).copy(alpha = 0.8f)
+                                ),
+                            label = {
+                                Text(text = item.title, modifier = Modifier
+                                )
+                            },
+                            selected = index == selectedItemIndex,
+                            onClick = {
+//                                            navController.navigate(item.route)
+                                selectedItemIndex = index
+                                scope.launch {
+                                    drawerState.close()
+                                }
+                            },
+                            icon = {
+                                Image(painterResource(id  = if(index==selectedItemIndex) item.selectedIcon else item.unselectedIcon), contentDescription = "", modifier = Modifier.size(40.dp))
+                            },
+//                            badge = {
+//                                item.badgeCount?.let {
+//                                    Text(text = item.badgeCount.toString())
+//                                }
+//                            },
+                            modifier = Modifier
+                                .padding(NavigationDrawerItemDefaults.ItemPadding)
+                                .wrapContentSize(),shape = RoundedCornerShape(6.dp),
+                        )
+
+                    }
                 }
-            }
-            if(showQR==showDialog.OPEN) {
-                ShowQRDialog(
-                    image = R.drawable.bigqr,
-                    navController = navController,
-                    onDismiss = {showQR=showDialog.CLOSE})
-            }
-            when (val result=profileViewModel.allProfiles.value){
-                is RequestState.Success->{
-                    profileViewModel.usersList.value= result.data
-                    LazyColumn(modifier = Modifier.padding(it)) {
-                        items(usersList) { user ->
-                            ImageScreen(user)
-                            Spacer(modifier = Modifier.height(20.dp))
+            },
+            drawerState = drawerState,
+            gesturesEnabled = true // todo remove it to allow right swipe to open the side navigation drawer
+        ) {
+            Surface(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+
+
+                if (showQR == showDialog.OPEN) {
+                    ShowQRDialog(
+                        image = R.drawable.bigqr,
+                        navController = navController,
+                        onDismiss = { showQR = showDialog.CLOSE })
+                }
+                when (val result = profileViewModel.allProfiles.value) {
+                    is RequestState.Success -> {
+                        profileViewModel.usersList.value = result.data
+                        LazyColumn(modifier = Modifier.padding(it)) {
+                            items(usersList) { user ->
+                                //ImageScreen(user)
+                                PostScreen(Post("", user))
+                            }
                         }
+
                     }
 
-                }
-                is RequestState.Error->{
-                    HomeError()
-                    Toast.makeText(LocalContext.current,"${result.error.message}",Toast.LENGTH_SHORT).show()
-                }
-                RequestState.Loading->{
-                    HomeLoading(padding)
-                }
-                RequestState.Idle->{
-                    HomeLoading(padding)
+                    is RequestState.Error -> {
+                        HomeError()
+                        Toast.makeText(
+                            LocalContext.current,
+                            "${result.error.message}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
+                    RequestState.Loading -> {
+                        HomeLoading(padding)
+                    }
+
+                    RequestState.Idle -> {
+                        HomeLoading(padding)
+                    }
+
+
                 }
 
             }
-
         }
     }
 }
+data class NavigationItem(
+    val title: String,
+    val selectedIcon: Int,
+    val unselectedIcon: Int,
+    val badgeCount: Int? = null,
+    val route:String
+)
+
+
+
 
 @Composable
 fun HomeError(){
@@ -261,7 +408,7 @@ fun ShimmerEffect(showShimmer: Boolean = true, targetValue: Float = 10000f): Bru
 
 
 @Composable
-fun HomeFloatingActionButton(offerViewModel: OfferViewModel,navController: NavHostController  ) {
+fun HomeFloatingActionButton(authViewModel:AuthViewModel,offerViewModel: OfferViewModel,navController: NavHostController  ) {
     var showCustomDialog by remember { mutableStateOf(false) }
 
     FloatingActionButton(
@@ -269,8 +416,8 @@ fun HomeFloatingActionButton(offerViewModel: OfferViewModel,navController: NavHo
         Modifier.size(75.dp),
         shape= CircleShape,
        // containerColor = Color(0xFFAFD7E9), // 0xFFE4E47F  0xFFFFEB3B
-        contentColor = Color(0xFF000000), //0xFFE4420E
-        containerColor = statusAndTopAppBarColor, //0xFFEBDB55
+        contentColor = Color.Black, //0xFFE4420E
+        containerColor = Color(0xFF9980C5)//statusAndTopAppBarColor, //0xFFEBDB55
 //        contentColor = floatingActionBtnTextColor,//0xFF090200
     ) {
         Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -281,7 +428,10 @@ fun HomeFloatingActionButton(offerViewModel: OfferViewModel,navController: NavHo
             Text(text = "Drop Profile", fontSize = 8.sp, modifier = Modifier.padding(top=0.dp))
         }
     }
-    if (showCustomDialog) { CustomAlertDialog(offerViewModel , navController ) { showCustomDialog = !showCustomDialog } }
+    if (showCustomDialog) {
+       // CustomAlertDialog(offerViewModel , navController ) { showCustomDialog = !showCustomDialog }
+        DropProfileDialog(authViewModel ,offerViewModel , navController ) { showCustomDialog = !showCustomDialog }
+    }
 }
 
 @Composable
@@ -370,6 +520,71 @@ fun HomeScreenOffer(){
 
 //0xFFEEF3B9 -> yellow   0xFFE8E9E2  -> grey  
 
+data class Post(
+    val postImage:String,
+    val user: User
+)
+@OptIn(ExperimentalGlideComposeApi::class)
+@Composable
+fun PostScreen(post:Post){
+    val configuration = LocalConfiguration.current
+    val widthInDp = configuration.screenWidthDp.dp
+    val heightInDp = configuration.screenHeightDp.dp * 0.78f
+    Box(modifier = Modifier
+        .padding(8.dp)
+        .fillMaxWidth()
+        .height(heightInDp - 160.dp)
+        , contentAlignment = Alignment.Center)
+
+    {
+        Column(verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
+            .fillMaxSize()
+//            .background(
+//                brush = Brush.linearGradient(
+//                    colors = listOf(
+//                        Color(0xFF424906),
+//                        Color(0xFFF2F3ED)
+//                    )
+//                )
+//            )
+            .border(
+                width = 0.5.dp, color = Color.DarkGray
+            )) {
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .height(45.dp), horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.CenterVertically) {
+                Card(modifier = Modifier.wrapContentSize(), shape = CircleShape) {
+
+                    Image(
+                        painter = painterResource(id = R.drawable.profile_image_1),
+                        contentDescription = "",
+                        modifier = Modifier
+                            .size(30.dp),
+                        contentScale = ContentScale.Crop
+                    )
+                }
+                Text(text = "Beauty/random", modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 10.dp), textAlign = TextAlign.Start, color = Color.Black, fontSize = 16.sp,style = MaterialTheme.typography.titleMedium)
+
+
+            }
+            GlideImage(
+                model = R.drawable.profile_image_1,
+                contentDescription = "",
+                transition=CrossFade,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(heightInDp - 80.dp)
+                // .clip(shape = RoundedCornerShape(12.dp))
+                , contentScale = ContentScale.Crop
+            )
+        }
+    }
+
+}
+
+
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun ImageScreen(user: User) {
@@ -379,7 +594,7 @@ fun ImageScreen(user: User) {
     val imageUrl=user.profileImage
     Log.d(TAG, "ImageScreen:${user.profileImage}")
    Box(modifier = Modifier
-       .padding(start = 2.dp, end = 2.dp,top=8.dp)
+       .padding(start = 2.dp, end = 2.dp, top = 8.dp)
        .fillMaxWidth()
        .height(heightInDp)
        , contentAlignment = Alignment.Center)
@@ -510,6 +725,59 @@ fun ImageScreen(user: User) {
    }
 }
 
+@OptIn(ExperimentalGlideComposeApi::class)
+@Composable
+@Preview(showBackground = true)
+fun PostSplitScreen(post:Post=Post("",User())){
+    val configuration = LocalConfiguration.current
+    val widthInDp = configuration.screenWidthDp.dp
+    val heightInDp = configuration.screenHeightDp.dp * 0.78f
+    Box(modifier = Modifier
+        .padding(top = 60.dp)
+        .fillMaxWidth()
+        .height(heightInDp)
+        , contentAlignment = Alignment.Center)
+
+    {
+        Column(verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
+            .fillMaxSize()
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        Color(
+                            0xFF5D096B
+                        ),
+                        Color(0xFF360986)
+                    )
+                )
+            )
+            .border(
+                width = 0.5.dp, color = Color.DarkGray, shape = RoundedCornerShape(10.dp)
+            )) {
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .height(45.dp), horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.CenterVertically) {
+                Text(text = "Beauty/random", modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 20.dp), textAlign = TextAlign.Start, color = Color.White, fontWeight = FontWeight.SemiBold)
+
+
+            }
+            GlideImage(
+                model = R.drawable.profile_image_1,
+                contentDescription = "",
+                transition=CrossFade,
+                modifier = Modifier
+                    .fillMaxWidth(.97f)
+                    .height(heightInDp - 80.dp)
+                // .clip(shape = RoundedCornerShape(12.dp))
+                , contentScale = ContentScale.Crop
+            )
+        }
+    }
+
+}
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -518,7 +786,8 @@ fun HomeTopBar(title:String,navController: NavHostController,navIcon:Boolean,act
 
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = statusAndTopAppBarColor
+           // containerColor = statusAndTopAppBarColor
+        containerColor = Color(0xFFE7EAEB)
         ),
         title = {
             Text(
@@ -553,7 +822,8 @@ fun HomeTopBar(title:String,navController: NavHostController,navIcon:Boolean,act
                 Image(
                     painter = painterResource(id = R.drawable.notification),
                     contentDescription = "",
-                    modifier = Modifier.clickable { navController.navigate(SCREENS.NOTIFICATIONS.route) }
+                    modifier = Modifier
+                        .clickable { navController.navigate(SCREENS.NOTIFICATIONS.route) }
                         .padding(end = 16.dp)
                         .size(32.dp)
                 )

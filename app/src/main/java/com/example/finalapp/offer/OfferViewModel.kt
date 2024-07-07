@@ -3,9 +3,12 @@ package com.example.finalapp.offer
 import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.finalapp.apiState.OfferApiState
+import com.example.finalapp.model.DropProfileModel
+import com.example.finalapp.model.DropProfileResponseModel
 import com.example.finalapp.model.OfferModel
 import com.example.finalapp.model.OfferResponseModel
 import com.example.finalapp.utils.RequestState
@@ -37,6 +40,27 @@ class OfferViewModel @Inject constructor(private val repository: OfferRepository
                     offerResponse.value = RequestState.Success(it);
                     Log.d("Data received",offerResponse.value.toString())
                 }
+    }
+
+
+    //-------------------------------------------DROP PROFILE--------------------------------------------------------------------------------------//
+
+    val dropProfileResponse:MutableState<RequestState<DropProfileResponseModel>> = mutableStateOf(RequestState.Idle)
+    fun dropProfile(data:DropProfileModel)=viewModelScope.launch(Dispatchers.IO) {
+        repository.sendDropProfileData(data)
+            .onStart {
+                dropProfileResponse.value=RequestState.Loading;
+                Log.d("Data received",offerResponse.value.toString())
+            }
+            .catch {
+                Log.d("Data received","error found")
+                dropProfileResponse.value=RequestState.Error(it)
+                Log.d("Data received",offerResponse.value.toString())
+            }
+            .collect {
+                dropProfileResponse.value = RequestState.Success(it);
+                Log.d("Data received",offerResponse.value.toString())
+            }
     }
 
 

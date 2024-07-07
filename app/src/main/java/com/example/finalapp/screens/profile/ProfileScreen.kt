@@ -4,13 +4,11 @@ import BottomBar
 import android.annotation.SuppressLint
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,7 +26,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.IconButton
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -51,7 +48,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
@@ -76,14 +72,10 @@ import com.example.finalapp.auth.authViewModel.AuthViewModel
 import com.example.finalapp.datastore.StoreUserData
 import com.example.finalapp.model.User
 import com.example.finalapp.navigation.SCREENS
-import com.example.finalapp.screens.DialogBOX.DialogBoxForCameraAndGallery
-import com.example.finalapp.screens.DialogBOX.DialogBoxForImageEdit
-import com.example.finalapp.screens.HomeError
-import com.example.finalapp.screens.HomeLoading
-import com.example.finalapp.screens.ImageScreen
+import com.example.finalapp.screens.dialogBox.DialogBoxForCameraAndGallery
+import com.example.finalapp.screens.dialogBox.DialogBoxForImageEdit
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.ui.theme.topAppBarTextColor
-import com.example.finalapp.utils.Constants.Constants
 import com.example.finalapp.utils.RequestState
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")

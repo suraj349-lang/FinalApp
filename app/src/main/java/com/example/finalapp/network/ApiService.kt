@@ -1,5 +1,7 @@
 package com.example.finalapp.network
 
+import com.example.finalapp.model.DropProfileModel
+import com.example.finalapp.model.DropProfileResponseModel
 import com.example.finalapp.model.ImageUploadResponse
 import com.example.finalapp.model.LoginAPIResponse
 import com.example.finalapp.model.LoginModel
@@ -27,6 +29,8 @@ interface ApiService {
 
     @POST("/api/v1/offer")
     suspend fun createOffer(@Body offerData:OfferModel):OfferResponseModel
+    @POST("/api/v1/dropProfile/postDropProfile")
+    suspend fun dropProfile(@Body data:DropProfileModel):DropProfileResponseModel
 
     @GET("/api/v1/user/all")
     suspend fun getAllProfiles():ProfileResponse

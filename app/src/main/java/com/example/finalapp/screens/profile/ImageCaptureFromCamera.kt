@@ -52,7 +52,6 @@ fun ImageCaptureFromCamera(profileViewModel: ProfileViewModel) {
         file
     )
     var capturedImageUri by remember { mutableStateOf<Uri>(Uri.EMPTY) }
-    val firebaseStorage= FirebaseStorage.getInstance().getReference()
 
     val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
         if (success) {

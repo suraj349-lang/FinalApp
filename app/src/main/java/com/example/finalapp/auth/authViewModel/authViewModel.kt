@@ -27,6 +27,7 @@ import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
@@ -43,7 +44,7 @@ class AuthViewModel @Inject constructor(
 
     var latitude= mutableStateOf(0.0)
     var longitude= mutableStateOf(0.0)
-    var address= mutableStateOf("")
+    var address= MutableStateFlow<String>("")
     var permission= mutableStateOf(ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
 
 

@@ -1,5 +1,7 @@
 package com.example.finalapp.offer
 
+import com.example.finalapp.model.DropProfileModel
+import com.example.finalapp.model.DropProfileResponseModel
 import com.example.finalapp.model.LoginAPIResponse
 import com.example.finalapp.model.LoginModel
 import com.example.finalapp.model.OfferModel
@@ -17,6 +19,10 @@ class OfferRepository @Inject constructor(private val api: ApiService) {
 
     fun sendCreateOfferData(offerData: OfferModel): Flow<OfferResponseModel> = flow  {
         emit(api.createOffer(offerData))
+    }.flowOn(Dispatchers.IO)
+
+    fun sendDropProfileData(data: DropProfileModel): Flow<DropProfileResponseModel> = flow  {
+        emit(api.dropProfile(data))
     }.flowOn(Dispatchers.IO)
 }
 

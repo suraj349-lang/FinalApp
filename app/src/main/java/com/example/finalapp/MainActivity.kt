@@ -72,6 +72,7 @@ import io.socket.client.Socket
 import kotlinx.coroutines.async
 import java.net.URISyntaxException
 import javax.inject.Inject
+import kotlin.math.log
 
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -270,6 +271,7 @@ private fun getLocation(context: Context, authViewModel:AuthViewModel){
             authViewModel.longitude.value=it.longitude
 //                Log.d("Coordinates", authViewModel.latitude.value.toString() + "    "+authViewModel.longitude.value.toString())
             authViewModel.address.value= getReadableLocation(authViewModel.latitude.value,authViewModel.longitude.value,context)
+            Log.d("Flash Location", "getLocation: ${authViewModel.address.value}")
 //                Log.d("Coordinates", authViewModel.address.value)
 //
 //

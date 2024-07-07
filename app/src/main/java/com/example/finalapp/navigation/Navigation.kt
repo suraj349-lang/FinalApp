@@ -81,7 +81,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
 
 
 
-    NavHost(navController = navController, startDestination =SCREENS.PROFILE.route){
+    NavHost(navController = navController, startDestination =SCREENS.HOME.route){
         composable(SCREENS.SPLASH.route){
             SplashScreenUI(navController,screen)
         }
@@ -98,7 +98,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
             FinalUserCreation(authViewModel,navController)
         }
         composable(SCREENS.HOME.route){
-            HomeScreenUI( navController,profileViewModel)
+            HomeScreenUI( navController,profileViewModel,authViewModel)
         }
 
         composable(SCREENS.PROFILE.route){
