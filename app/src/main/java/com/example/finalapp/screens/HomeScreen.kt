@@ -10,7 +10,6 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -36,15 +35,12 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
@@ -71,11 +67,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
@@ -94,6 +88,7 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
 import com.example.finalapp.auth.authViewModel.AuthViewModel
+import com.example.finalapp.model.ImageUploadResponse
 import com.example.finalapp.model.User
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.offer.OfferViewModel
@@ -102,12 +97,10 @@ import com.example.finalapp.screens.dialogBox.ShowQRDialog
 import com.example.finalapp.screens.dialogBox.showDialog
 import com.example.finalapp.screens.profile.ProfileViewModel
 import com.example.finalapp.ui.theme.DarkBlue
-import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.utils.Constants.Constants
 import com.example.finalapp.utils.Constants.Constants.TAG
 import com.example.finalapp.utils.RequestState
 import kotlinx.coroutines.launch
-import kotlinx.serialization.descriptors.PrimitiveKind
 
 
 enum class SideIcon(
@@ -184,7 +177,7 @@ fun HomeScreenUI(navController: NavHostController, profileViewModel: ProfileView
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val buttonsVisible = remember { mutableStateOf(true) }
     val offerViewModel= hiltViewModel<OfferViewModel>()
-    val usersList=profileViewModel.usersList.value
+    val offersList=profileViewModel.offersList.value
     val scope= rememberCoroutineScope()
     val heightInDp = LocalConfiguration.current.screenHeightDp.dp * 0.78f
     var showQR:showDialog by remember {
@@ -211,7 +204,7 @@ fun HomeScreenUI(navController: NavHostController, profileViewModel: ProfileView
         val padding = it
         LaunchedEffect(key1 = true) {
             scope.launch {
-                profileViewModel.getAllProfiles()
+                profileViewModel.getAllOffers()
             }
         }
         ModalNavigationDrawer(
@@ -275,13 +268,14 @@ fun HomeScreenUI(navController: NavHostController, profileViewModel: ProfileView
                         navController = navController,
                         onDismiss = { showQR = showDialog.CLOSE })
                 }
-                when (val result = profileViewModel.allProfiles.value) {
+                when (val result = profileViewModel.allOffers.value) {
                     is RequestState.Success -> {
-                        profileViewModel.usersList.value = result.data
+                        profileViewModel.offersList.value = result.data
                         LazyColumn(modifier = Modifier.padding(it)) {
-                            items(usersList) { user ->
+                            items(offersList) { offer ->
                                 //ImageScreen(user)
-                                PostScreen(Post("", user))
+                               // PostScreen(Post("", offer))
+                                OffersListScreen()
                             }
                         }
 
@@ -520,13 +514,14 @@ fun HomeScreenOffer(){
 
 //0xFFEEF3B9 -> yellow   0xFFE8E9E2  -> grey  
 
-data class Post(
-    val postImage:String,
+data class Offer(
+    val offerImage:String,
     val user: User
 )
+
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun PostScreen(post:Post){
+fun OffersListScreen(){
     val configuration = LocalConfiguration.current
     val widthInDp = configuration.screenWidthDp.dp
     val heightInDp = configuration.screenHeightDp.dp * 0.78f
@@ -570,7 +565,7 @@ fun PostScreen(post:Post){
 
             }
             GlideImage(
-                model = R.drawable.profile_image_1,
+                model = R.drawable.profile_image_2,
                 contentDescription = "",
                 transition=CrossFade,
                 modifier = Modifier
@@ -728,7 +723,7 @@ fun ImageScreen(user: User) {
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 @Preview(showBackground = true)
-fun PostSplitScreen(post:Post=Post("",User())){
+fun PostSplitScreen(post:Offer=Offer("",User())){
     val configuration = LocalConfiguration.current
     val widthInDp = configuration.screenWidthDp.dp
     val heightInDp = configuration.screenHeightDp.dp * 0.78f

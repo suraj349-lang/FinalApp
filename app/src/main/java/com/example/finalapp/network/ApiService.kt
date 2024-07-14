@@ -2,6 +2,7 @@ package com.example.finalapp.network
 
 import com.example.finalapp.model.DropProfileModel
 import com.example.finalapp.model.DropProfileResponseModel
+import com.example.finalapp.model.GetDropProfileResponseModel
 import com.example.finalapp.model.ImageUploadResponse
 import com.example.finalapp.model.LoginAPIResponse
 import com.example.finalapp.model.LoginModel
@@ -11,7 +12,7 @@ import com.example.finalapp.model.ProfileResponse
 import com.example.finalapp.model.RegisterUserModel
 import com.example.finalapp.model.Response
 import com.example.finalapp.model.SignupAPIResponse
-import com.example.finalapp.model.User
+import com.example.finalapp.model.SingleOfferModel
 import okhttp3.MultipartBody
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -28,15 +29,18 @@ interface ApiService {
     suspend fun postSignupData(@Body signupData:RegisterUserModel): SignupAPIResponse
 
     @POST("/api/v1/offer")
-    suspend fun createOffer(@Body offerData:OfferModel):OfferResponseModel
+    suspend fun createOffer(@Body offerData:OfferModel):SingleOfferModel
     @POST("/api/v1/dropProfile/postDropProfile")
     suspend fun dropProfile(@Body data:DropProfileModel):DropProfileResponseModel
 
-    @GET("/api/v1/user/all")
-    suspend fun getAllProfiles():ProfileResponse
+    @GET("/api/v1/dropProfile/getDropProfile")
+    suspend fun getDropProfile():GetDropProfileResponseModel
+
+    @GET("/api/v1/offer")
+    suspend fun getAllOffers():OfferResponseModel
 
     @GET("/api/v1/user")
-    suspend fun getUserData():ProfileResponse
+    suspend fun getUserData(@Query("number") number: String):ProfileResponse
 
     @GET("/api/v1/auth/updateUserImage")
     suspend fun updateUserImage(@Query("number") number: String, @Query("imageUrl") imageUrl: String): Response

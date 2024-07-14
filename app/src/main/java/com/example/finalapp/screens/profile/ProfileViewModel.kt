@@ -9,6 +9,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.finalapp.model.OfferModel
 import com.example.finalapp.model.User
 import com.example.finalapp.utils.RequestState
 import com.google.android.gms.tasks.Task
@@ -45,23 +46,23 @@ class ProfileViewModel @Inject constructor(private val repository: ProfileReposi
 
 
     //--------------------------------------------------------------------------------------------------------------------//
-    var usersList= mutableStateOf<List<User>>(emptyList())
+    var offersList= mutableStateOf<List<OfferModel>>(emptyList())
 
-    val allProfiles: MutableState<RequestState<List<User>>> = mutableStateOf(RequestState.Idle)
+    val allOffers: MutableState<RequestState<List<OfferModel>>> = mutableStateOf(RequestState.Idle)
 
-    fun getAllProfiles()=viewModelScope.launch(Dispatchers.IO) {
-        repository.getAllProfiles()
+    fun getAllOffers()=viewModelScope.launch(Dispatchers.IO) {
+        repository.getAllOffers()
             .onStart {
-                allProfiles.value = RequestState.Loading
-                Log.d("ZUNE", "all profiles start ${allProfiles.value}")
+                allOffers.value = RequestState.Loading
+                Log.d("ZUNE", "all profiles start ${allOffers.value}")
 
             }.catch {
-                allProfiles.value = RequestState.Error(it)
-                Log.d("ZUNE", "all profiles error ${allProfiles.value}")
+                allOffers.value = RequestState.Error(it)
+                Log.d("ZUNE", "all profiles error ${allOffers.value}")
 
             }.collect {
-                allProfiles.value = RequestState.Success(it.data)
-                Log.d("ZUNE", "all profiles data ${allProfiles.value}")
+                allOffers.value = RequestState.Success(it.data)
+                Log.d("ZUNE", "all profiles data ${allOffers.value}")
 
             }
     }

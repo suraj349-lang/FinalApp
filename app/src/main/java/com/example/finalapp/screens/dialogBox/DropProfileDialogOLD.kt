@@ -110,7 +110,7 @@ fun CustomAlertDialog(offerViewModel: OfferViewModel,navController: NavHostContr
                             offerViewModel.key.value = 1;
                             enabled=false;
                             scope.launch {
-                                offerViewModel.createOffer(OfferModel("SURAJ","65692fe3d203dbf0e3ddcb17"));
+                                offerViewModel.createOffer(OfferModel("SURAJ","65692fe3d203dbf0e3ddcb17","","",""));
 
                             }
 

@@ -6,6 +6,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.Address
 import android.location.Geocoder
 import android.net.Uri
 import android.os.Build
@@ -51,7 +52,9 @@ import kotlinx.serialization.Serializable
 import java.io.IOException
 import java.util.Locale
 import android.location.LocationManager
+import android.os.Looper
 import android.provider.ContactsContract.CommonDataKinds.StructuredName
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
@@ -66,6 +69,11 @@ import com.example.finalapp.datastore.StoreUserData
 import com.example.finalapp.screens.chat.ChatViewModel
 import com.example.finalapp.screens.onboarding.viewmodel.SplashViewModel
 import com.example.finalapp.utils.Constants.Constants
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.Priority
+import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.Gson
 import io.socket.client.IO
 import io.socket.client.Socket
@@ -92,9 +100,11 @@ class MainActivity : ComponentActivity() {
             !splashViewModel.isLoading.value
         }
 
+
         setContent {
             FinalAppTheme {
                 val authViewModel= hiltViewModel<AuthViewModel>()
+                getCity(this, authViewModel ,this)
                 val locationSettingsLauncher = rememberLauncherForActivityResult(
                     contract = ActivityResultContracts.StartActivityForResult()
                 ) { result ->
@@ -288,6 +298,65 @@ private fun getLocation(context: Context, authViewModel:AuthViewModel){
         }
     }
 }
+data class LatLng(
+    val latitude: Double?=null,
+    val longitude: Double?=null
+)
+private fun getCity(context: Context, authViewModel:AuthViewModel,activity: Activity){
+    //location
+     lateinit var locationCallback:LocationCallback
+
+
+    val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY,1000000000).build()
+    locationCallback = object : LocationCallback() {
+        override fun onLocationResult(locationResult: LocationResult) {
+            super.onLocationResult(locationResult)
+
+            val newPos = LatLng(locationResult.lastLocation?.latitude!!, locationResult.lastLocation?.longitude!!)
+            authViewModel.currentLocation.value= LatLng(locationResult.lastLocation?.latitude!!,locationResult.lastLocation?.longitude!!)
+            Log.d("Location compose", "onLocationResult:$newPos ")
+
+            val geocoder= Geocoder(context, Locale.getDefault())
+            val addressList: List<Address>?
+            try {
+                addressList=geocoder.getFromLocation(
+                    locationResult.lastLocation?.latitude!!,
+                    locationResult.lastLocation?.longitude!!,
+                    1
+                )
+                val cityName=addressList?.get(0)!!.locality
+                authViewModel.city.value=cityName
+                Log.d("Location compose",  authViewModel.city.value)
+
+
+            }catch (e: IOException){
+                Toast.makeText(context,e.message, Toast.LENGTH_SHORT).show()
+
+            }
+
+        }
+    }
+
+
+    var fusedLocationProviderClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
+    if (ActivityCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) != PackageManager.PERMISSION_GRANTED
+    ) {
+        ActivityCompat.requestPermissions(
+            activity,
+            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),100)
+        return
+    }
+    fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(activity)
+    fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
+
+}
+
 fun getReadableLocation(latitude: Double, longitude: Double, context: Context): String {
     var addressText = ""
     val geocoder = Geocoder(context, Locale.getDefault())

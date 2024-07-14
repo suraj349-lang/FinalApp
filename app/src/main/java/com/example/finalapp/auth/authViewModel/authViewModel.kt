@@ -11,6 +11,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.finalapp.LatLng
 import com.example.finalapp.auth.repository.AuthRepository
 import com.example.finalapp.auth.screensUI.RESPONSE
 import com.example.finalapp.database.Profile
@@ -45,6 +46,8 @@ class AuthViewModel @Inject constructor(
     var latitude= mutableStateOf(0.0)
     var longitude= mutableStateOf(0.0)
     var address= MutableStateFlow<String>("")
+    val currentLocation= MutableStateFlow(LatLng())
+       val city= MutableStateFlow("")
     var permission= mutableStateOf(ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
 
 

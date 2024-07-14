@@ -1,15 +1,7 @@
 package com.example.finalapp.navigation
 
-import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.platform.LocalContext
-import androidx.datastore.core.DataStore
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -27,28 +19,20 @@ import com.example.finalapp.auth.screensUI.SplashScreenUI
 import com.example.finalapp.auth.screensUI.otp.OtpBox
 import com.example.finalapp.screens.chat.ChatScreenUI
 import com.example.finalapp.auth.screensUI.FinalUserCreation
-import com.example.finalapp.database.Chat
-import com.example.finalapp.datastore.StoreUserData
+import com.example.finalapp.offer.OfferViewModel
 import com.example.finalapp.screens.chat.ChatListScreen
 import com.example.finalapp.screens.DirectChatScreenUI
 import com.example.finalapp.screens.profile.GalleryPicker
 import com.example.finalapp.screens.HomeScreenUI
 import com.example.finalapp.screens.NotificationsScreenUI
-import com.example.finalapp.screens.RaiseOfferScreenUI
+import com.example.finalapp.screens.offer.CreateOfferScreen
 import com.example.finalapp.screens.EventsAndPlacesScreen
 import com.example.finalapp.screens.profile.ProfileScreenUI
 import com.example.finalapp.screens.SettingsScreenUI
+import com.example.finalapp.screens.offer.PastRaisedOffer
 import com.example.finalapp.screens.onboarding.screen.WelcomeScreen
-import com.example.finalapp.screens.profile.AllProfiles
 import com.example.finalapp.screens.profile.ProfileViewModel
-import com.example.finalapp.utils.Constants.Constants
-import com.example.finalapp.utils.Constants.Constants.TAG
 import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.gson.Gson
-import io.socket.client.IO
-import io.socket.client.Socket
-import kotlinx.coroutines.launch
-import java.net.URISyntaxException
 
 const val NavArg="name"
 sealed class SCREENS(val route:String){
@@ -70,6 +54,7 @@ sealed class SCREENS(val route:String){
     object SEARCH:SCREENS("search")
     object DROP_PROFILE:SCREENS("drop_profile")
     object RAISE_OFFER:SCREENS("raise_offer")
+    object PAST_OFFERS:SCREENS("past_offers")
 
 }
 @OptIn(ExperimentalAnimationApi::class, ExperimentalPagerApi::class)
@@ -78,10 +63,11 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
     val navController:NavHostController= rememberNavController();
     val profileViewModel= hiltViewModel<ProfileViewModel>()
     val viewModel = hiltViewModel<ChatViewModel>()
+    val offerViewModel= hiltViewModel<OfferViewModel>()
 
 
 
-    NavHost(navController = navController, startDestination =SCREENS.HOME.route){
+    NavHost(navController = navController, startDestination =SCREENS.RAISE_OFFER.route){
         composable(SCREENS.SPLASH.route){
             SplashScreenUI(navController,screen)
         }
@@ -129,16 +115,19 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
             WelcomeScreen(navController)
         }
         composable(SCREENS.ALL_USERS.route){
-            AllProfiles(profileViewModel)
+            //AllProfiles(profileViewModel)
         }
         composable(SCREENS.SEARCH.route){
             EventsAndPlacesScreen(navController)
         }
         composable(SCREENS.DROP_PROFILE.route){
-            DirectChatScreenUI(navController )
+            DirectChatScreenUI(navController,offerViewModel )
         }
         composable(SCREENS.RAISE_OFFER.route){
-            RaiseOfferScreenUI(navController )
+            CreateOfferScreen(authViewModel, offerViewModel, navController )
+        }
+        composable(SCREENS.PAST_OFFERS.route){
+            PastRaisedOffer(authViewModel = authViewModel, offerViewModel =offerViewModel , navController = navController)
         }
     }
 

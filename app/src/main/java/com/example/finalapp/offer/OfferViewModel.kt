@@ -9,8 +9,10 @@ import androidx.lifecycle.viewModelScope
 import com.example.finalapp.apiState.OfferApiState
 import com.example.finalapp.model.DropProfileModel
 import com.example.finalapp.model.DropProfileResponseModel
+import com.example.finalapp.model.GetDropProfileResponseModel
 import com.example.finalapp.model.OfferModel
 import com.example.finalapp.model.OfferResponseModel
+import com.example.finalapp.model.SingleOfferModel
 import com.example.finalapp.utils.RequestState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -22,26 +24,7 @@ import javax.inject.Inject
 
 
 @HiltViewModel
-class OfferViewModel @Inject constructor(private val repository: OfferRepository): ViewModel() {
-    val offerResponse:MutableState<RequestState<OfferResponseModel>> = mutableStateOf(RequestState.Idle)
-    var key :MutableState<Int> = mutableStateOf(0);
-    fun createOffer(offerData:OfferModel)=viewModelScope.launch(Dispatchers.IO) {
-        repository.sendCreateOfferData(offerData)
-                .onStart {
-                    offerResponse.value=RequestState.Loading;
-                    Log.d("Data received",offerResponse.value.toString())
-                }
-                .catch {
-                    Log.d("Data received","error found")
-                    offerResponse.value=RequestState.Error(it)
-                    Log.d("Data received",offerResponse.value.toString())
-                 }
-                .collect {
-                    offerResponse.value = RequestState.Success(it);
-                    Log.d("Data received",offerResponse.value.toString())
-                }
-    }
-
+class OfferViewModel @Inject constructor(private val repository: OfferRepository): ViewModel(){
 
     //-------------------------------------------DROP PROFILE--------------------------------------------------------------------------------------//
 
@@ -62,6 +45,52 @@ class OfferViewModel @Inject constructor(private val repository: OfferRepository
                 Log.d("Data received",offerResponse.value.toString())
             }
     }
+
+    //--------------------------------------------------------------------------------------------------------------------------------------------//
+    val getDropProfileResponse:MutableState<RequestState<List<DropProfileModel>>> = mutableStateOf(RequestState.Idle)
+    var droppedProfilesList= mutableStateOf<List<DropProfileModel>>(emptyList())
+    fun getDropProfile()=viewModelScope.launch(Dispatchers.IO) {
+        repository.getDropProfileData()
+            .onStart {
+                getDropProfileResponse.value=RequestState.Loading;
+                Log.d("Data received",offerResponse.value.toString())
+            }
+            .catch {
+                Log.d("Data received","error found")
+                getDropProfileResponse.value=RequestState.Error(it)
+                Log.d("Data received",offerResponse.value.toString())
+            }
+            .collect {
+                getDropProfileResponse.value = RequestState.Success(it.data);
+                Log.d("Data received",offerResponse.value.toString())
+            }
+    }
+
+
+
+
+
+    val offerResponse:MutableState<RequestState<SingleOfferModel>> = mutableStateOf(RequestState.Idle)
+    var key :MutableState<Int> = mutableStateOf(0);
+    fun createOffer(offerData:OfferModel)=viewModelScope.launch(Dispatchers.IO) {
+        repository.sendCreateOfferData(offerData)
+                .onStart {
+                    offerResponse.value=RequestState.Loading;
+                    Log.d("Data received",offerResponse.value.toString())
+                }
+                .catch {
+                    Log.d("Data received","error found")
+                    offerResponse.value=RequestState.Error(it)
+                    Log.d("Data received",offerResponse.value.toString())
+                 }
+                .collect {
+                    offerResponse.value = RequestState.Success(it);
+                    Log.d("Data received",offerResponse.value.toString())
+                }
+    }
+
+
+
 
 
 }

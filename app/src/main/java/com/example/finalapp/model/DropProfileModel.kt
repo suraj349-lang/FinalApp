@@ -12,3 +12,8 @@ data class DropProfileResponseModel(
     val message:String,
     val data:DropProfileModel
 )
+
+data class GetDropProfileResponseModel(
+    val message:String,
+    val data:List<DropProfileModel>
+)

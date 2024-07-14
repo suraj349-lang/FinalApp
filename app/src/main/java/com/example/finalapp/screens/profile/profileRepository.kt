@@ -3,9 +3,9 @@ package com.example.finalapp.screens.profile
 import android.content.Context
 import android.net.Uri
 import com.example.finalapp.model.ImageUploadResponse
+import com.example.finalapp.model.OfferResponseModel
 import com.example.finalapp.model.ProfileResponse
 import com.example.finalapp.model.Response
-import com.example.finalapp.model.User
 import com.example.finalapp.network.ApiService
 import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.Dispatchers
@@ -20,8 +20,8 @@ import javax.inject.Inject
 @ViewModelScoped
 class ProfileRepository @Inject constructor(private val api: ApiService) {
 
-    fun getAllProfiles(): Flow<ProfileResponse> = flow {
-        emit(api.getAllProfiles())
+    fun getAllOffers(): Flow<OfferResponseModel> = flow {
+        emit(api.getAllOffers())
     }.flowOn(Dispatchers.IO)
     fun updateUserImage(number: String, imageUrl: String): Flow<Response> = flow {
         emit(api.updateUserImage(number,imageUrl))

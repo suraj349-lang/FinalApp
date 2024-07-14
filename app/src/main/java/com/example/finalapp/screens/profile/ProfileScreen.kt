@@ -232,17 +232,17 @@ fun ProfileIcon(profileImage:String,profileViewModel: ProfileViewModel,navContro
 
 
 
-@Composable
-fun AllProfiles(profileViewModel: ProfileViewModel) {
-    val profileViewModel= hiltViewModel<ProfileViewModel>()
-    val user by remember{ mutableStateOf(profileViewModel.usersList.value) }
-
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
-        items(user){ user->
-            UsersItem(user)
-        }
-    }
-}
+//@Composable
+//fun AllProfiles(profileViewModel: ProfileViewModel) {
+//    val profileViewModel= hiltViewModel<ProfileViewModel>()
+//    val user by remember{ mutableStateOf(profileViewModel.offersList.value) }
+//
+//    LazyColumn(modifier = Modifier.fillMaxSize()) {
+//        items(user){ user->
+//            UsersItem(user)
+//        }
+//    }
+//}
 
 @Composable
 fun UsersItem(user: User) {
