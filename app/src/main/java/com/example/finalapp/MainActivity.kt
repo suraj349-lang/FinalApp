@@ -104,7 +104,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             FinalAppTheme {
                 val authViewModel= hiltViewModel<AuthViewModel>()
-                getCity(this, authViewModel ,this)
+//                getCity(this, authViewModel ,this)
                 val locationSettingsLauncher = rememberLauncherForActivityResult(
                     contract = ActivityResultContracts.StartActivityForResult()
                 ) { result ->
@@ -302,6 +302,7 @@ data class LatLng(
     val latitude: Double?=null,
     val longitude: Double?=null
 )
+/*
 private fun getCity(context: Context, authViewModel:AuthViewModel,activity: Activity){
     //location
      lateinit var locationCallback:LocationCallback
@@ -356,7 +357,7 @@ private fun getCity(context: Context, authViewModel:AuthViewModel,activity: Acti
     fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
 
 }
-
+*/
 fun getReadableLocation(latitude: Double, longitude: Double, context: Context): String {
     var addressText = ""
     val geocoder = Geocoder(context, Locale.getDefault())

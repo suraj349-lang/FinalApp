@@ -1,4 +1,4 @@
-package com.example.finalapp.screens.profile
+package com.example.finalapp.screens.dialogBox
 
 import android.net.Uri
 import android.util.Log
@@ -7,15 +7,7 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
+
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,6 +29,7 @@ import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.finalapp.auth.authViewModel.AuthViewModel
 import com.example.finalapp.navigation.SCREENS
+import com.example.finalapp.screens.profile.ProfileViewModel
 import com.example.finalapp.utils.Constants.Constants
 import com.example.finalapp.utils.RequestState
 import com.google.firebase.storage.FirebaseStorage
@@ -45,7 +38,7 @@ import kotlinx.coroutines.launch
 
 //https://www.youtube.com/watch?v=uHX5NB6wHao
 @Composable
-fun GalleryPicker(navController: NavHostController,profileViewModel: ProfileViewModel) {
+fun GalleryPickerForDropProfile(navController: NavHostController,profileViewModel: ProfileViewModel,onImageSelected:(Uri)->Unit) {
 
     var selectedImageUris by remember {
         mutableStateOf<List<Uri>>(emptyList())
@@ -56,7 +49,7 @@ fun GalleryPicker(navController: NavHostController,profileViewModel: ProfileView
         // for sending analytics events
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
-                navController.navigate(SCREENS.PROFILE.route)
+               // navController.navigate(SCREENS.PROFILE.route)
 
             }
         }
@@ -77,6 +70,7 @@ fun GalleryPicker(navController: NavHostController,profileViewModel: ProfileView
         onResult = { uris ->
             if (uris.isNotEmpty()) {
                 selectedImageUris = uris
+                onImageSelected(selectedImageUris[0])
             } else {
                 // Navigate back if no image is selected
                 navController.navigateUp()
@@ -99,14 +93,15 @@ fun GalleryPicker(navController: NavHostController,profileViewModel: ProfileView
         is RequestState.Success ->{
 
             Toast.makeText(context,result.data.toString(), Toast.LENGTH_SHORT).show()
-            navController.navigate(SCREENS.PROFILE.route)
+//            navController.navigate(SCREENS.PROFILE.route)
+
 
 
         }
         is RequestState.Error ->{
             Toast.makeText(context,result.error.message.toString(), Toast.LENGTH_SHORT).show()
             Log.d(Constants.TAG, "ImageCaptureFromCamera: ${result.error.message}")
-            navController.navigate(SCREENS.PROFILE.route)
+//            navController.navigate(SCREENS.PROFILE.route)
 
         }
 

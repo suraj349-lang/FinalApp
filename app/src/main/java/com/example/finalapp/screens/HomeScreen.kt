@@ -197,7 +197,7 @@ fun HomeScreenUI(navController: NavHostController, profileViewModel: ProfileView
                 modifier = Modifier.height(45.dp))
              },
              floatingActionButton = {
-                 HomeFloatingActionButton(authViewModel ,offerViewModel , navController );
+                 HomeFloatingActionButton(authViewModel ,offerViewModel ,profileViewModel, navController );
              }
             ) { it->
 
@@ -402,7 +402,7 @@ fun ShimmerEffect(showShimmer: Boolean = true, targetValue: Float = 10000f): Bru
 
 
 @Composable
-fun HomeFloatingActionButton(authViewModel:AuthViewModel,offerViewModel: OfferViewModel,navController: NavHostController  ) {
+fun HomeFloatingActionButton(authViewModel:AuthViewModel,offerViewModel: OfferViewModel,profileViewModel: ProfileViewModel,navController: NavHostController  ) {
     var showCustomDialog by remember { mutableStateOf(false) }
 
     FloatingActionButton(
@@ -424,7 +424,7 @@ fun HomeFloatingActionButton(authViewModel:AuthViewModel,offerViewModel: OfferVi
     }
     if (showCustomDialog) {
        // CustomAlertDialog(offerViewModel , navController ) { showCustomDialog = !showCustomDialog }
-        DropProfileDialog(authViewModel ,offerViewModel , navController ) { showCustomDialog = !showCustomDialog }
+        DropProfileDialog(authViewModel ,offerViewModel ,profileViewModel, navController ) { showCustomDialog = !showCustomDialog }
     }
 }
 

@@ -69,6 +69,8 @@ import com.example.finalapp.model.OfferModel
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.offer.OfferViewModel
 import com.example.finalapp.screens.OfferResponseDataAndAction
+import com.example.finalapp.screens.profile.GalleryPicker
+import com.example.finalapp.screens.profile.ProfileViewModel
 import com.example.finalapp.screens.profile.createImageFile
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.ui.theme.topAppBarTextColor
@@ -78,7 +80,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun DropProfileDialog(authViewModel:AuthViewModel,offerViewModel: OfferViewModel,navController: NavHostController, onDismiss: () -> Unit) {
+fun DropProfileDialog(authViewModel:AuthViewModel,offerViewModel: OfferViewModel,profileViewModel: ProfileViewModel,navController: NavHostController, onDismiss: () -> Unit) {
     var offerTextField:String by remember{ mutableStateOf("") }
     val context= LocalContext.current
     var messageText:String by remember{ mutableStateOf("") }
@@ -92,6 +94,19 @@ fun DropProfileDialog(authViewModel:AuthViewModel,offerViewModel: OfferViewModel
     var key by remember { mutableStateOf(false) }
     if (key) {
         ImageCaptureFromCameraForDropProfile{uri=it}
+    }
+    var keyForGallery by remember {
+        mutableStateOf(0)
+    }
+    if(keyForGallery!=0) {
+        Log.d("DropProfileDialog", "DropProfileDialog:called")
+        GalleryPickerForDropProfile(
+            navController = navController,
+            profileViewModel = profileViewModel
+        ) {
+            Log.d("DropProfileDialog", "DropProfileDialog: $it")
+            uri = it
+        }
     }
 
 
@@ -182,7 +197,9 @@ fun DropProfileDialog(authViewModel:AuthViewModel,offerViewModel: OfferViewModel
                                                 modifier = Modifier
                                                     .size(50.dp)
                                                     .clickable {
-                                                        navController.navigate(SCREENS.GALLERY.route)
+                                                        keyForGallery = 1
+
+
                                                     })
                                             Text(text = "Gallery", modifier = Modifier)
 
