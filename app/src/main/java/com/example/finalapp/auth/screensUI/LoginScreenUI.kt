@@ -115,7 +115,7 @@ fun LoginScreenUI(navController: NavController= NavController(LocalContext.curre
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
-                painter = painterResource(id = R.drawable.flash),
+                painter = painterResource(id = R.drawable.app_icon),
                 contentDescription = "",
                 modifier = Modifier.size(100.dp)
 

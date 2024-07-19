@@ -29,6 +29,7 @@ import com.example.finalapp.screens.offer.CreateOfferScreen
 import com.example.finalapp.screens.EventsAndPlacesScreen
 import com.example.finalapp.screens.profile.ProfileScreenUI
 import com.example.finalapp.screens.SettingsScreenUI
+import com.example.finalapp.screens.TabView
 import com.example.finalapp.screens.offer.PastRaisedOffer
 import com.example.finalapp.screens.onboarding.screen.WelcomeScreen
 import com.example.finalapp.screens.profile.ProfileViewModel
@@ -53,8 +54,9 @@ sealed class SCREENS(val route:String){
     object ALL_USERS:SCREENS("all_users")
     object SEARCH:SCREENS("search")
     object DROP_PROFILE:SCREENS("drop_profile")
-    object RAISE_OFFER:SCREENS("raise_offer")
+    object CREATE_EVENT:SCREENS("raise_offer")
     object PAST_OFFERS:SCREENS("past_offers")
+    object TABVIEW:SCREENS("tab_view")
 
 }
 @OptIn(ExperimentalAnimationApi::class, ExperimentalPagerApi::class)
@@ -67,7 +69,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
 
 
 
-    NavHost(navController = navController, startDestination =SCREENS.RAISE_OFFER.route){
+    NavHost(navController = navController, startDestination =SCREENS.HOME.route){
         composable(SCREENS.SPLASH.route){
             SplashScreenUI(navController,screen)
         }
@@ -123,11 +125,14 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
         composable(SCREENS.DROP_PROFILE.route){
             DirectChatScreenUI(navController,offerViewModel )
         }
-        composable(SCREENS.RAISE_OFFER.route){
-            CreateOfferScreen(authViewModel, offerViewModel, navController )
+        composable(SCREENS.CREATE_EVENT.route){
+            CreateOfferScreen(authViewModel, offerViewModel, profileViewModel,navController )
         }
         composable(SCREENS.PAST_OFFERS.route){
             PastRaisedOffer(authViewModel = authViewModel, offerViewModel =offerViewModel , navController = navController)
+        }
+        composable(SCREENS.TABVIEW.route){
+            TabView()
         }
     }
 

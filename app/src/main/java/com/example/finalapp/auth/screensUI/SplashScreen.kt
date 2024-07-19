@@ -61,7 +61,7 @@ fun SplashScreenUI(navController: NavController, screen: String){
             verticalArrangement = Arrangement.Center
         ) {
             Image(
-                painterResource(id = R.drawable.flash ),
+                painterResource(id = R.drawable.app_icon ),
                 contentDescription ="App Icon" +
                         "",
                 contentScale= ContentScale.Fit,

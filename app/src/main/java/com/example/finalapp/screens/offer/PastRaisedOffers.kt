@@ -2,7 +2,6 @@ package com.example.finalapp.screens.offer
 
 import BottomBar
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -17,7 +16,6 @@ import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.Card
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -31,7 +29,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import com.example.finalapp.R
 import com.example.finalapp.auth.authViewModel.AuthViewModel
@@ -50,7 +47,7 @@ fun PastRaisedOffer(authViewModel: AuthViewModel,offerViewModel: OfferViewModel,
                 navController=navController,
                 navIcon = false,
                 actionIcon = false,
-                icon = R.drawable.raise_offer
+                icon = R.drawable.create_event
             )
         },
         bottomBar = {
@@ -61,7 +58,7 @@ fun PastRaisedOffer(authViewModel: AuthViewModel,offerViewModel: OfferViewModel,
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { navController.navigate(SCREENS.RAISE_OFFER.route) },Modifier.size(75.dp), backgroundColor = Color.White, contentColor = Color.Black) {
+            FloatingActionButton(onClick = { navController.navigate(SCREENS.CREATE_EVENT.route) },Modifier.size(75.dp), backgroundColor = Color.White, contentColor = Color.Black) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "", modifier = Modifier.size(40.dp))
 
 

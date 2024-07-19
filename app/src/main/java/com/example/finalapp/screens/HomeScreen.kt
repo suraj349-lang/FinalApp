@@ -72,6 +72,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.modifier.modifierLocalProvider
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -83,12 +84,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
 import com.bumptech.glide.integration.compose.CrossFade
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
 import com.example.finalapp.auth.authViewModel.AuthViewModel
 import com.example.finalapp.model.ImageUploadResponse
+import com.example.finalapp.model.OfferModel
 import com.example.finalapp.model.User
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.offer.OfferViewModel
@@ -275,7 +278,8 @@ fun HomeScreenUI(navController: NavHostController, profileViewModel: ProfileView
                             items(offersList) { offer ->
                                 //ImageScreen(user)
                                // PostScreen(Post("", offer))
-                                OffersListScreen()
+                                Log.d("offerData", "HomeScreenUI: $offer")
+                                OffersListScreen(offer)
                             }
                         }
 
@@ -521,59 +525,87 @@ data class Offer(
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun OffersListScreen(){
+fun OffersListScreen(offer:OfferModel){
     val configuration = LocalConfiguration.current
-    val widthInDp = configuration.screenWidthDp.dp
     val heightInDp = configuration.screenHeightDp.dp * 0.78f
     Box(modifier = Modifier
         .padding(8.dp)
         .fillMaxWidth()
-        .height(heightInDp - 160.dp)
+//        .height(heightInDp - 160.dp)
+        .wrapContentHeight()
         , contentAlignment = Alignment.Center)
 
     {
         Column(verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
             .fillMaxSize()
-//            .background(
-//                brush = Brush.linearGradient(
-//                    colors = listOf(
-//                        Color(0xFF424906),
-//                        Color(0xFFF2F3ED)
-//                    )
-//                )
-//            )
             .border(
                 width = 0.5.dp, color = Color.DarkGray
             )) {
             Row(modifier = Modifier
                 .fillMaxWidth()
                 .height(45.dp), horizontalArrangement = Arrangement.Start, verticalAlignment = Alignment.CenterVertically) {
-                Card(modifier = Modifier.wrapContentSize(), shape = CircleShape) {
+                Card(modifier = Modifier
+                    .wrapContentSize()
+                    .padding(start = 8.dp), shape = CircleShape) {
 
-                    Image(
-                        painter = painterResource(id = R.drawable.profile_image_1),
+                    GlideImage(
+                        model = if(offer.image !="") offer.image else R.drawable.baseline_person_24,
                         contentDescription = "",
                         modifier = Modifier
                             .size(30.dp),
                         contentScale = ContentScale.Crop
                     )
                 }
-                Text(text = "Beauty/random", modifier = Modifier
+                Text(text = if(offer.category !="") offer.category else "Miscellaneous ", modifier = Modifier
+                    .padding(start = 10.dp), color = Color.Black, fontSize = 20.sp,style = MaterialTheme.typography.titleMedium)
+
+                Text(text = if(offer.expirationTime !="") offer.expirationTime else "Forever ", modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 10.dp), textAlign = TextAlign.Start, color = Color.Black, fontSize = 16.sp,style = MaterialTheme.typography.titleMedium)
+                    .padding(end = 12.dp)
+                    , textAlign = TextAlign.End, color = Color.Red, fontSize = 18.sp,style = MaterialTheme.typography.titleMedium)
+
 
 
             }
-            GlideImage(
-                model = R.drawable.profile_image_2,
-                contentDescription = "",
-                transition=CrossFade,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(heightInDp - 80.dp)
-                // .clip(shape = RoundedCornerShape(12.dp))
-                , contentScale = ContentScale.Crop
-            )
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                .height(heightInDp - 80.dp) , contentAlignment = Alignment.BottomCenter) {
+
+
+                    GlideImage(
+                        model = if (offer.image != "") offer.image else R.drawable.baseline_person_24,//
+                        contentDescription = "",
+                        transition = CrossFade,
+                        modifier=Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+
+                    )
+                Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.Start) {
+                    Image(painter = painterResource(id = R.drawable.marker), contentDescription ="", modifier = Modifier.size(24.dp) )
+                    Text(text = "Delhi", modifier = Modifier.padding(start = 4.dp))
+
+                }
+                Column(modifier = Modifier
+                    .fillMaxSize()
+                    .padding(start = 12.dp), verticalArrangement = Arrangement.Bottom) {
+
+                    Text(
+                        text = if (offer.offer != "") offer.offer else "",
+                        color = Color.Black,
+                        fontSize = 18.sp,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    Text(
+                        text = if (offer.location != "") offer.location else "",
+                        overflow = TextOverflow.Ellipsis,
+                        color = Color.Black,
+                        fontSize = 18.sp,
+                        maxLines = 1,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
+
+            }
         }
     }
 
@@ -787,23 +819,34 @@ fun HomeTopBar(title:String,navController: NavHostController,navIcon:Boolean,act
         title = {
             Text(
                 title,
+                fontSize = 20.sp,
                 maxLines = 1,
+                fontWeight=FontWeight.SemiBold,
                 overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top=8.dp), color = Color( 0xFF000000), style = MaterialTheme.typography.titleMedium
             )
         },
         navigationIcon = {
-            if(navIcon) {
-                Image(
-                    painter = painterResource(
-                        id = R.drawable.boy
-                    ),
-                    contentDescription = "",
-                    modifier = Modifier
-                        .clickable { navController.navigate(SCREENS.PROFILE.route) }
-                        .padding(top = 6.dp)
-                        .size(40.dp)
-                )
-            }
+//            if(navIcon) {
+//                Image(
+//                    painter = painterResource(
+//                        id = R.drawable.boy
+//                    ),
+//                    contentDescription = "",
+//                    modifier = Modifier
+//                        .clickable { navController.navigate(SCREENS.PROFILE.route) }
+//                        .padding(top = 6.dp)
+//                        .size(40.dp)
+//                )
+//            }
+            Image(
+                painter = painterResource(
+                    id = R.drawable.app_icon
+                ),
+                contentDescription = "",
+                modifier = Modifier
+                    .padding(top = 6.dp)
+                    .size(28.dp)
+            )
         }, actions = {
             if(actionIcon) {
                 Image(painter = painterResource(id = R.drawable.qr),

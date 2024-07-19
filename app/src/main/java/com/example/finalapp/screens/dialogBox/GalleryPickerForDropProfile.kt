@@ -91,12 +91,8 @@ fun GalleryPickerForDropProfile(navController: NavHostController,profileViewMode
             CircularProgressIndicator()
         }
         is RequestState.Success ->{
-
             Toast.makeText(context,result.data.toString(), Toast.LENGTH_SHORT).show()
 //            navController.navigate(SCREENS.PROFILE.route)
-
-
-
         }
         is RequestState.Error ->{
             Toast.makeText(context,result.error.message.toString(), Toast.LENGTH_SHORT).show()
