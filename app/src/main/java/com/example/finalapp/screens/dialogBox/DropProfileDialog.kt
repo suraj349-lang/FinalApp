@@ -17,17 +17,25 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardColors
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -43,15 +51,15 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -65,11 +73,8 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
 import com.example.finalapp.auth.authViewModel.AuthViewModel
 import com.example.finalapp.model.DropProfileModel
-import com.example.finalapp.model.OfferModel
-import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.offer.OfferViewModel
 import com.example.finalapp.screens.OfferResponseDataAndAction
-import com.example.finalapp.screens.profile.GalleryPicker
 import com.example.finalapp.screens.profile.ProfileViewModel
 import com.example.finalapp.screens.profile.createImageFile
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
@@ -81,13 +86,12 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun DropProfileDialog(authViewModel:AuthViewModel,offerViewModel: OfferViewModel,profileViewModel: ProfileViewModel,navController: NavHostController, onDismiss: () -> Unit) {
-    var offerTextField:String by remember{ mutableStateOf("") }
     val context= LocalContext.current
-    var messageText:String by remember{ mutableStateOf("") }
-    var placesText:String by remember{ mutableStateOf("") }
+    var caption by remember{ mutableStateOf("") }
     val scope= rememberCoroutineScope()
     var enabled=true;
-    val address by authViewModel.address.collectAsState()
+    val location by authViewModel.currentLocation.collectAsState()
+
     var uri by remember {
         mutableStateOf(Uri.EMPTY)
     }
@@ -96,6 +100,9 @@ fun DropProfileDialog(authViewModel:AuthViewModel,offerViewModel: OfferViewModel
         ImageCaptureFromCameraForDropProfile{uri=it}
     }
     var keyForGallery by remember {
+        mutableStateOf(0)
+    }
+    var activeBtnKey by remember {
         mutableStateOf(0)
     }
     if(keyForGallery!=0) {
@@ -115,184 +122,207 @@ fun DropProfileDialog(authViewModel:AuthViewModel,offerViewModel: OfferViewModel
     )
     ) {
         Card(
-            shape = RoundedCornerShape(16.dp),
+            shape = RoundedCornerShape((6.dp)),
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.9f)
+                .fillMaxHeight(0.9f),
         ) {
             Column(
                 Modifier
                     .fillMaxSize()
+                    //.verticalScroll(enabled = true, state = rememberScrollState())
                     .background(Color.White),
                 verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                Card(modifier = Modifier
+                    .fillMaxWidth()
+                    .height(40.dp), colors = CardDefaults.cardColors(containerColor = statusAndTopAppBarColor), shape = RoundedCornerShape(bottomStart = 0.dp, bottomEnd = 0.dp, topStart = 0.dp, topEnd = 0.dp)
+                ) {
+                    Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
+                        Image(painter = painterResource(id = R.drawable.app_icon), contentDescription ="app icon", modifier = Modifier
+                            .size(40.dp)
+                            .padding(start = 8.dp, end = 8.dp) , colorFilter = ColorFilter.tint(
+                            topAppBarTextColor))
+                        Text(text = "Drop Profile", modifier = Modifier
+                            .fillMaxWidth()
+                            , color = topAppBarTextColor, fontWeight = FontWeight.Normal,textAlign = TextAlign.Start,style = MaterialTheme.typography.titleMedium)
+                    }
+
+
+                }
+
                 Card(
                     shape=RoundedCornerShape(8.dp),
                     modifier = Modifier
                         .fillMaxWidth()
-                        .fillMaxHeight(0.5f)
-                        .padding(8.dp)
+                        .fillMaxHeight(0.6f)
+                        .padding(8.dp),
                 ) {
                     if(uri !=Uri.EMPTY){
                         GlideImage(
                             model = uri,
                             contentDescription = "",
-                            transition = CrossFade
-                            , contentScale = ContentScale.Crop
+                            transition = CrossFade,
+                            contentScale = ContentScale.Crop
                         )
                     }else{
-                        Card(
-                            shape = RoundedCornerShape(10.dp),
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(8.dp)
-                        ) {
-                            Column(modifier = Modifier.fillMaxSize()) {
-                                Row(
-                                    modifier = Modifier
-                                        .background(color = Color(0xFFFFFFFE))
-                                        .padding(top = 16.dp)
-                                        .fillMaxWidth()
-                                        .wrapContentHeight(), horizontalArrangement = Arrangement.Center
+                        Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                            Card(
+                                shape = RoundedCornerShape(10.dp),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .fillMaxSize(0.5f)
+                                    .padding(8.dp)
+                            ) {
+                                Column(
+                                    modifier = Modifier.fillMaxSize(),
+                                    verticalArrangement = Arrangement.Center,
+                                    horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
-                                    Text(
-                                        text = "Choose from Camera / Gallery.",
-                                        fontSize = 16.sp,
-                                        fontWeight = FontWeight.SemiBold,
-                                        color = Color.Black
-                                    )
-                                }
-
-                                Row(
-                                    Modifier
-                                        .fillMaxSize()
-                                        .background(Color.White),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.Center
-                                ) {
-                                    Box(modifier = Modifier.size(100.dp)) {
-                                        Column(
-                                            verticalArrangement = Arrangement.Center,
-                                            horizontalAlignment = Alignment.CenterHorizontally,
-                                            modifier = Modifier.fillMaxSize()
-                                        ) {
-                                            Image(painterResource(id = R.drawable.camera),
-                                                contentDescription = "",
-                                                modifier = Modifier
-                                                    .size(50.dp)
-                                                    .clickable { key = !key }
-                                            )
-                                            Text(text = "Camera", modifier = Modifier)
-
-                                        }
-                                    }
-                                    Box(modifier = Modifier.size(100.dp)) {
-                                        Column(
-                                            verticalArrangement = Arrangement.Center,
-                                            horizontalAlignment = Alignment.CenterHorizontally,
-                                            modifier = Modifier.fillMaxSize()
-                                        ) {
-                                            Image(painterResource(id = R.drawable.gallery),
-                                                contentDescription = "",
-                                                modifier = Modifier
-                                                    .size(50.dp)
-                                                    .clickable {
-                                                        keyForGallery = 1
-
-
-                                                    })
-                                            Text(text = "Gallery", modifier = Modifier)
-
-                                        }
+                                    Row(
+                                        modifier = Modifier
+                                            .background(color = Color(0xFFFFFFFE))
+                                            .padding(top = 16.dp)
+                                            .fillMaxWidth()
+                                            .wrapContentHeight(),
+                                        horizontalArrangement = Arrangement.Center
+                                    ) {
+                                        Text(
+                                            text = "Choose from Camera / Gallery.",
+                                            fontSize = 16.sp,
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = Color.Black
+                                        )
                                     }
 
+                                    Row(
+                                        Modifier
+                                            .fillMaxSize()
+                                            .background(Color.White),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.Center
+                                    ) {
+                                        Box(modifier = Modifier.size(100.dp)) {
+                                            Column(
+                                                verticalArrangement = Arrangement.Center,
+                                                horizontalAlignment = Alignment.CenterHorizontally,
+                                                modifier = Modifier.fillMaxSize()
+                                            ) {
+                                                Image(painterResource(id = R.drawable.camera),
+                                                    contentDescription = "",
+                                                    modifier = Modifier
+                                                        .size(50.dp)
+                                                        .clickable { key = !key }
+                                                )
+                                                Text(text = "Camera", modifier = Modifier)
 
+                                            }
+                                        }
+                                        Box(modifier = Modifier.size(100.dp)) {
+                                            Column(
+                                                verticalArrangement = Arrangement.Center,
+                                                horizontalAlignment = Alignment.CenterHorizontally,
+                                                modifier = Modifier.fillMaxSize()
+                                            ) {
+                                                Image(painterResource(id = R.drawable.gallery),
+                                                    contentDescription = "",
+                                                    modifier = Modifier
+                                                        .size(50.dp)
+                                                        .clickable {
+                                                            keyForGallery = 1
+
+
+                                                        })
+                                                Text(text = "Gallery", modifier = Modifier)
+
+                                            }
+                                        }
+
+
+                                    }
                                 }
                             }
                         }
 
-
                }
                 }
                 Divider(modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 8.dp, end = 8.dp), thickness = 2.dp,color=Color(
-                    0xFF560464
+                    .fillMaxWidth(), thickness = 1.dp,color=Color(0xFFDCD6DD)
                 )
-                )
-                Text(text = "Location:", color = Color(0xFF661FE6), modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 16.dp), textAlign = TextAlign.Start)
-                //Location Text
-                Text(address, maxLines = 1, overflow = TextOverflow.Ellipsis, modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 16.dp), color = Color.Blue, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
-                //Google places to search to show nearby places
                 OutlinedTextField(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 15.dp, top = 8.dp, end = 15.dp)
-                        .background(Color.White, RoundedCornerShape(5.dp)),
-                    shape = RoundedCornerShape(5.dp),
-                    value = placesText,
-                    onValueChange = { placesText = it },
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                    placeholder={ Text(text = "Search a Landmark")},
-                    label = { Text(text = "Search a Landmark")}
-                )
-                //message
-                TextField(
-                    modifier = Modifier
-                        .fillMaxWidth()
+                        .heightIn(min=60.dp,max=100.dp)
                         .padding(start = 15.dp, top = 10.dp, end = 15.dp)
                         .background(Color.White, RoundedCornerShape(5.dp)),
                     shape = RoundedCornerShape(5.dp),
-                    value = messageText,
-                    onValueChange = { messageText = it },
+                    value = caption,
+                    onValueChange = { caption = it },
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                    maxLines = 1,
-                    placeholder={ Text(text = "Message")},
-                    label = { Text(text = "Message")},
-                    colors = TextFieldDefaults.colors(focusedContainerColor = Color(0xFFEBD515), unfocusedContainerColor = Color(0xFFEBD515))
+                    maxLines = 4,
+                    placeholder={ Text(text = "Enter caption")},
                 )
                 //Expiration time
-                Row(modifier = Modifier
+                Column(modifier = Modifier
                     .fillMaxWidth()
                     .wrapContentHeight()
                     .padding(start = 16.dp, end = 16.dp, top = 8.dp)
-                    .background(Color(0xFFEAE7F0)), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text(text = "Expiration Time", color = Color.DarkGray, modifier = Modifier.padding(8.dp))
-                    Text(text = "08:00 hrs", color = Color.Black, modifier = Modifier.padding(8.dp))
-                }
-
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)) {
-                    OutlinedButton(onClick = { onDismiss() },
-                        Modifier
-                            .fillMaxWidth(0.5f)
-                            .padding(8.dp)) {
-                        Text(text = "Cancel", color = Color.Red)
+                    , horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(text = "Availability Time :", color = Color.DarkGray, modifier = Modifier.fillMaxWidth() , fontSize = 12.sp, textAlign = TextAlign.Start)
+                    Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceEvenly) {
+                        Button(
+                            onClick = { activeBtnKey=0 },
+                            shape = RoundedCornerShape(6.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = if(activeBtnKey==0) statusAndTopAppBarColor else Color.LightGray ,
+                                contentColor =if(activeBtnKey==0) topAppBarTextColor else Color.DarkGray
+                        )
+                        ) {
+                            Text(text = "12 hrs")
+                        }
+                        Button(onClick = {activeBtnKey=1 },
+                            shape = RoundedCornerShape(6.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = if(activeBtnKey==1) statusAndTopAppBarColor else Color.LightGray ,
+                                contentColor =if(activeBtnKey==1) topAppBarTextColor else Color.DarkGray
+                            )
+                        ) {
+                            Text(text = "24 hrs")
+                        }
+                        Button(onClick = { activeBtnKey=2 },
+                            shape = RoundedCornerShape(6.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = if(activeBtnKey==2) statusAndTopAppBarColor else Color.LightGray ,
+                                contentColor =if(activeBtnKey==2) topAppBarTextColor else Color.DarkGray
+                            )
+                        ) {
+                            Text(text = "1 week")
+                        }
                     }
+                }
+                Divider(modifier = Modifier
+                    .fillMaxWidth(), thickness = 1.dp,color=Color(0xFFDCD6DD)
+                )
+
                     Button(onClick = {
                             offerViewModel.key.value = 1;
                             enabled=false;
                             scope.launch {
                                 offerViewModel.dropProfile(DropProfileModel(image = uri.toString(), location = authViewModel.address.value, landmark = "",message="", expirationTime = "")); }
                            },
-                        Modifier
+                        shape= RoundedCornerShape(6.dp),
+                        modifier= Modifier
                             .fillMaxWidth(1f)
-                            .padding(8.dp),
+                            .padding(15.dp),
                         enabled=enabled,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = statusAndTopAppBarColor,
                             contentColor = topAppBarTextColor,
-                            disabledContainerColor= statusAndTopAppBarColor,
-                            disabledContentColor= topAppBarTextColor
+                            disabledContainerColor= Color.LightGray,
+                            disabledContentColor= Color.DarkGray
                         )
                     ) {
-                        Text(text = "Upload")
+                        Text(text = "Drop Profile")
                     }
 
                     when (val result=offerViewModel.dropProfileResponse.value){
@@ -310,12 +340,11 @@ fun DropProfileDialog(authViewModel:AuthViewModel,offerViewModel: OfferViewModel
                             CircularProgressIndicator(color = Color(0xFF1289BE))
                         }
                         RequestState.Idle->{
-                            CircularProgressIndicator(color = Color(0xFF1289BE))
 
                         }
 
                     }
-                }
+
                 if(offerViewModel.key.value==1){
                     Log.d("Data received","runned this")
                     OfferResponseDataAndAction(offerViewModel,navController)

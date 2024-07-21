@@ -27,10 +27,13 @@ import com.example.finalapp.R
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.navigation.NavHostController
+import com.example.finalapp.auth.authViewModel.AuthViewModel
+import com.example.finalapp.screens.profile.ProfileViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun TabView(){
+fun TabView(navController:NavHostController,profileViewModel:ProfileViewModel,authViewModel:AuthViewModel){
     val tabItems= listOf(
         TabItem("Vectors"),
         TabItem("DirectChat"),
@@ -69,7 +72,7 @@ fun TabView(){
                     .fillMaxWidth()
                     .weight(1f)) {index->
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(text = tabItems[index].title)
+
 
                 }
                 

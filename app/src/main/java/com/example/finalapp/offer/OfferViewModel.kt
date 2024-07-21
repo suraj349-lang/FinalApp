@@ -1,9 +1,11 @@
 package com.example.finalapp.offer
 
+import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.finalapp.apiState.OfferApiState
@@ -14,8 +16,14 @@ import com.example.finalapp.model.OfferModel
 import com.example.finalapp.model.OfferResponseModel
 import com.example.finalapp.model.SingleOfferModel
 import com.example.finalapp.utils.RequestState
+import com.google.android.libraries.places.api.Places
+import com.google.android.libraries.places.api.model.AutocompletePrediction
+import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
@@ -24,7 +32,7 @@ import javax.inject.Inject
 
 
 @HiltViewModel
-class OfferViewModel @Inject constructor(private val repository: OfferRepository): ViewModel(){
+class OfferViewModel @Inject constructor(private val repository: OfferRepository,@ApplicationContext context: Context): ViewModel(){
 
     //-------------------------------------------DROP PROFILE--------------------------------------------------------------------------------------//
 
@@ -66,7 +74,7 @@ class OfferViewModel @Inject constructor(private val repository: OfferRepository
             }
     }
 
-
+//-----------------------------------------------------------------------------------------------------------------------------------------------//
 
 
 
@@ -88,7 +96,26 @@ class OfferViewModel @Inject constructor(private val repository: OfferRepository
                     Log.d("Data received",offerResponse.value.toString())
                 }
     }
+//-----------------------------------------------------------------------------------------------------------------------------------------------//
+     private val placesClient = Places.createClient( context)
 
+    fun getAutocompletePredictions(query: String): Flow<List<AutocompletePrediction>> {
+        val results = MutableStateFlow<List<AutocompletePrediction>>(emptyList())
+
+        val request = FindAutocompletePredictionsRequest.builder()
+            .setQuery(query)
+            .build()
+
+        placesClient.findAutocompletePredictions(request)
+            .addOnSuccessListener { response ->
+                results.value = response.autocompletePredictions
+            }
+            .addOnFailureListener { exception ->
+                Log.e("PlacesViewModel", "Autocomplete prediction request failed: ${exception.message}")
+            }
+
+        return results
+    }
 
 
 

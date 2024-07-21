@@ -10,6 +10,7 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -32,9 +33,14 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material.Divider
+import androidx.compose.material.Tab
+import androidx.compose.material.TabRow
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -52,6 +58,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.contentColorFor
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
@@ -70,6 +77,8 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.colorspace.Rgb
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.modifier.modifierLocalProvider
@@ -100,92 +109,28 @@ import com.example.finalapp.screens.dialogBox.ShowQRDialog
 import com.example.finalapp.screens.dialogBox.showDialog
 import com.example.finalapp.screens.profile.ProfileViewModel
 import com.example.finalapp.ui.theme.DarkBlue
+import com.example.finalapp.ui.theme.statusBarColor
 import com.example.finalapp.utils.Constants.Constants
 import com.example.finalapp.utils.Constants.Constants.TAG
 import com.example.finalapp.utils.RequestState
 import kotlinx.coroutines.launch
 
 
-enum class SideIcon(
-     val icon:Int,
-     val title:String
-){
-    MOVIES(R.drawable.cinema,"Cinema"),
-    COFFEE(R.drawable.coffeecup,"Coffee"),
-    DINNER(R.drawable.dinner,"Dates"),
-    TRAVEL(R.drawable.airplane,"Travel"),
-    CLUB(R.drawable.nightclubnew,"Clubs"),
-    PERSONAL(R.drawable.personal,"Personal"),
-    SPORTS(R.drawable.sports,"Sports")
 
-}
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "StateFlowValueCalledInComposition")
 @Composable
 fun HomeScreenUI(navController: NavHostController, profileViewModel: ProfileViewModel,authViewModel: AuthViewModel) {
     var selectedItemIndex by rememberSaveable { mutableStateOf(0) }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    val items = listOf(
-        NavigationItem(
-            title = "Home",
-            selectedIcon = R.drawable.home,
-            unselectedIcon = R.drawable.home,
-            route= SCREENS.SIGNUP.route
-        ),
-        NavigationItem(
-            title = "Cinema",
-            selectedIcon = R.drawable.cinema,
-            unselectedIcon = R.drawable.cinema,
-            route= SCREENS.SIGNUP.route
-        ),
-        NavigationItem(
-            title = "Coffee",
-            selectedIcon =R.drawable.coffeecup,
-            unselectedIcon = R.drawable.coffeecup,
-            badgeCount = 45,
-            route=SCREENS.LOGIN.route
-        ),
-        NavigationItem(
-            title = "Travel",
-            selectedIcon = R.drawable.airplane,
-            unselectedIcon = R.drawable.airplane,
-            route=SCREENS.SPLASH.route
-        ),
-        NavigationItem(
-            title = "Date",
-            selectedIcon = R.drawable.dinner,
-            unselectedIcon = R.drawable.dinner,
-            route=SCREENS.SPLASH.route
-        ),
-        NavigationItem(
-            title = "Sports",
-            selectedIcon = R.drawable.sports,
-            unselectedIcon = R.drawable.sports,
-            route=SCREENS.SPLASH.route
-        ),
-        NavigationItem(
-            title = "Clubs",
-            selectedIcon = R.drawable.nightclubnew,
-            unselectedIcon = R.drawable.nightclubnew,
-            route=SCREENS.SPLASH.route
-        ),
-        NavigationItem(
-            title = "Personal",
-            selectedIcon = R.drawable.personal,
-            unselectedIcon = R.drawable.personal,
-            route=SCREENS.SPLASH.route
-        ),
-    )
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val buttonsVisible = remember { mutableStateOf(true) }
     val offerViewModel= hiltViewModel<OfferViewModel>()
     val offersList=profileViewModel.offersList.value
     val scope= rememberCoroutineScope()
     val heightInDp = LocalConfiguration.current.screenHeightDp.dp * 0.78f
-    var showQR:showDialog by remember {
-        mutableStateOf(showDialog.CLOSE)
-    }
+    var showQR:showDialog by remember { mutableStateOf(showDialog.CLOSE) }
     Scaffold(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
              topBar = { HomeTopBar(
                  Constants.APP_NAME,
@@ -215,7 +160,6 @@ fun HomeScreenUI(navController: NavHostController, profileViewModel: ProfileView
             drawerContent = {
                 ModalDrawerSheet(
                     modifier = Modifier
-                        .padding(it)
                         .fillMaxHeight()
                         .fillMaxWidth(0.5f),
                     drawerContainerColor = Color.Transparent,
@@ -259,11 +203,7 @@ fun HomeScreenUI(navController: NavHostController, profileViewModel: ProfileView
             drawerState = drawerState,
             gesturesEnabled = true // todo remove it to allow right swipe to open the side navigation drawer
         ) {
-            Surface(
-                modifier = Modifier
-                    .fillMaxSize()
-            ) {
-
+            Surface(modifier = Modifier.fillMaxSize()) {
 
                 if (showQR == showDialog.OPEN) {
                     ShowQRDialog(
@@ -271,39 +211,116 @@ fun HomeScreenUI(navController: NavHostController, profileViewModel: ProfileView
                         navController = navController,
                         onDismiss = { showQR = showDialog.CLOSE })
                 }
-                when (val result = profileViewModel.allOffers.value) {
-                    is RequestState.Success -> {
-                        profileViewModel.offersList.value = result.data
-                        LazyColumn(modifier = Modifier.padding(it)) {
-                            items(offersList) { offer ->
-                                //ImageScreen(user)
-                               // PostScreen(Post("", offer))
-                                Log.d("offerData", "HomeScreenUI: $offer")
-                                OffersListScreen(offer)
+                val tabItems= listOf(
+                    TabItem("Vectors"),
+                    TabItem("DirectChat"),
+                    TabItem("Profiles")
+                )
+                var selectedTabIndex by remember {
+                    mutableStateOf(0)
+                }
+                val pagerState= rememberPagerState {
+                    tabItems.size
+
+                }
+                LaunchedEffect(selectedTabIndex){
+                    scope.launch { pagerState.animateScrollToPage(selectedTabIndex) }
+
+                }
+                LaunchedEffect(pagerState.currentPage,pagerState.isScrollInProgress){
+                    scope.launch {if(!pagerState.isScrollInProgress)  selectedTabIndex=pagerState.currentPage  }
+
+
+                }
+                Column(modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)) {
+                    Divider(
+                        modifier = Modifier
+                            .fillMaxWidth(), thickness = 1.dp, color = Color(0xFFDCD6DD)
+                    )
+                    TabRow(
+                        selectedTabIndex = selectedTabIndex,
+                        backgroundColor = Color(0xFFFFFFFE),
+                        contentColor = Color(0xFFEB1809),
+                        modifier = Modifier
+                            .padding(bottom = 0.dp)
+                            .fillMaxWidth()
+                            .height(20.dp)) {
+                        tabItems.forEachIndexed { index, item ->
+                            Tab(selected = index==selectedTabIndex,
+                                selectedContentColor = Color(0xFF9CC2E0),
+                                onClick = {
+                                    selectedTabIndex=index
+                                },
+                                text = {
+                                    if (selectedItemIndex!=index) Text(text = item.title, color = Color(0xFF636368), style = MaterialTheme.typography.titleMedium, fontSize = 16.sp, fontWeight = FontWeight.Normal)
+                                    else Text(text = item.title, color = Color(0xFF000000), style = MaterialTheme.typography.titleMedium, fontSize = 16.sp, fontWeight = FontWeight.Normal)
+                                
+                                
+                                }
+                            )
+                        }
+
+                    }
+                    HorizontalPager(
+                        state = pagerState,
+                        modifier = Modifier
+                            .padding(top = 0.dp)
+                            .fillMaxWidth()) {index->
+                        Box(modifier = Modifier
+                            .padding(top = 0.dp)
+                            .fillMaxSize()) {
+                            if(pagerState.currentPage==0){
+                                when (val result = profileViewModel.allOffers.value) {
+                                    is RequestState.Success -> {
+                                        profileViewModel.offersList.value = result.data
+                                        LazyColumn {
+                                            items(offersList) { offer ->
+                                                //ImageScreen(user)
+                                                // PostScreen(Post("", offer))
+                                                Log.d("offerData", "HomeScreenUI: $offer")
+                                                OffersListScreen(offer)
+                                            }
+                                        }
+
+                                    }
+
+                                    is RequestState.Error -> {
+                                        HomeError()
+                                        Toast.makeText(
+                                            LocalContext.current,
+                                            "${result.error.message}",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+
+                                    RequestState.Loading -> {
+                                        HomeLoading(padding)
+                                    }
+
+                                    RequestState.Idle -> {
+                                        HomeLoading(padding)
+                                    }
+
+
+                                }
+                            }else if(pagerState.currentPage==1){
+                                Text(text = "Direct Chat")
+                            }else{
+                                GetDroppedProfiles(navController = navController, offerViewModel =offerViewModel )
+                                
                             }
+
+
                         }
 
                     }
 
-                    is RequestState.Error -> {
-                        HomeError()
-                        Toast.makeText(
-                            LocalContext.current,
-                            "${result.error.message}",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-
-                    RequestState.Loading -> {
-                        HomeLoading(padding)
-                    }
-
-                    RequestState.Idle -> {
-                        HomeLoading(padding)
-                    }
-
-
                 }
+
+                
+               
 
             }
         }
@@ -529,8 +546,8 @@ fun OffersListScreen(offer:OfferModel){
     val configuration = LocalConfiguration.current
     val heightInDp = configuration.screenHeightDp.dp * 0.78f
     Box(modifier = Modifier
-        .padding(8.dp)
         .fillMaxWidth()
+        .padding(bottom = 8.dp)
 //        .height(heightInDp - 160.dp)
         .wrapContentHeight()
         , contentAlignment = Alignment.Center)
@@ -808,13 +825,13 @@ fun PostSplitScreen(post:Offer=Offer("",User())){
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeTopBar(title:String,navController: NavHostController,navIcon:Boolean,actionIcon:Boolean,icon:Int,onQRClicked:()->Unit={}){
+fun HomeTopBar(title:String,navController: NavHostController,navIcon:Boolean,actionIcon:Boolean,icon:Int?=null,onQRClicked:()->Unit={}){
 
 
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
            // containerColor = statusAndTopAppBarColor
-        containerColor = Color(0xFFE7EAEB)
+        containerColor = statusBarColor  //  0xF8E2A61A
         ),
         title = {
             Text(
@@ -822,7 +839,9 @@ fun HomeTopBar(title:String,navController: NavHostController,navIcon:Boolean,act
                 fontSize = 20.sp,
                 maxLines = 1,
                 fontWeight=FontWeight.SemiBold,
-                overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top=8.dp), color = Color( 0xFF000000), style = MaterialTheme.typography.titleMedium
+                overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top=8.dp), color = Color(
+                    0xFF000000
+                ), style = MaterialTheme.typography.titleMedium
             )
         },
         navigationIcon = {
@@ -842,6 +861,7 @@ fun HomeTopBar(title:String,navController: NavHostController,navIcon:Boolean,act
                 painter = painterResource(
                     id = R.drawable.app_icon
                 ),
+                colorFilter = ColorFilter.tint(color= Color(0xFF000000)),
                 contentDescription = "",
                 modifier = Modifier
                     .padding(top = 6.dp)
@@ -851,6 +871,7 @@ fun HomeTopBar(title:String,navController: NavHostController,navIcon:Boolean,act
             if(actionIcon) {
                 Image(painter = painterResource(id = R.drawable.qr),
                     contentDescription = "",
+                    colorFilter = ColorFilter.tint(color= Color(0xFF000000)),
                     modifier = Modifier
                         .padding(end = 16.dp)
                         .size(32.dp)
@@ -865,16 +886,18 @@ fun HomeTopBar(title:String,navController: NavHostController,navIcon:Boolean,act
                         .padding(end = 16.dp)
                         .size(32.dp)
                 )
-                Image(painter = painterResource(id = icon),
-                    contentDescription = "",
-                    modifier = Modifier
-                        .padding(end = 8.dp)
-                        .size(28.dp)
-                        .rotate(-40f)
-                        .shadow(elevation = 12.dp, shape = CircleShape, spotColor = Color.White)
-                        .clickable {
-                            navController.navigate(SCREENS.CHAT.route)
-                        })
+                icon?.let { painterResource(id = it) }?.let {
+                    Image(painter = it,
+                        contentDescription = "",
+                        modifier = Modifier
+                            .padding(end = 8.dp)
+                            .size(28.dp)
+                            .rotate(-40f)
+                            .shadow(elevation = 12.dp, shape = CircleShape, spotColor = Color.White)
+                            .clickable {
+                                navController.navigate(SCREENS.CHAT.route)
+                            })
+                }
             }
 
         }

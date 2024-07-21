@@ -23,7 +23,7 @@ fun SettingsScreenUI(navController: NavHostController){
     val buttonVisible= remember { mutableStateOf(false) };
 
     Scaffold(
-        topBar = { HomeTopBar(title = "Settings",navController, navIcon = false, actionIcon = true, R.drawable.settings)},
+        topBar = { HomeTopBar(title = "Settings",navController, navIcon = false, actionIcon = true)},
         bottomBar = { BottomBar(navController =navController , state = buttonVisible,modifier = Modifier.height(45.dp)) }
     ) {
         Surface(Modifier.fillMaxSize()) {

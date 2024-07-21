@@ -93,7 +93,7 @@ fun CreateOfferScreen(authViewModel: AuthViewModel, offerViewModel: OfferViewMod
     Scaffold(
         topBar = {
             HomeTopBar(
-                title = "Raise Offer",
+                title = "Event",
                 navController=navController,
                 navIcon = false,
                 actionIcon = false,
@@ -287,7 +287,7 @@ fun CreateOfferScreen(authViewModel: AuthViewModel, offerViewModel: OfferViewMod
                                     )
                                 )}
                             }) {
-                                Text("Create Offer", color = Color.White)
+                                Text("Create Event", color = Color.White)
 
                             }
                             when (val result = offerViewModel.offerResponse.value) {
@@ -298,12 +298,12 @@ fun CreateOfferScreen(authViewModel: AuthViewModel, offerViewModel: OfferViewMod
                                 is RequestState.Error -> {
                                     Toast.makeText(
                                         context,
-                                        "Error creating Offer",
+                                        "Error creating event",
                                         Toast.LENGTH_SHORT
                                     ).show()
                                     Log.d(
-                                        "OfferCreation",
-                                        "CreateOfferScreen:${result.error.message} "
+                                        "EventCreation",
+                                        "CreateEventScreen:${result.error.message} "
                                     )
 
                                 }
@@ -315,7 +315,7 @@ fun CreateOfferScreen(authViewModel: AuthViewModel, offerViewModel: OfferViewMod
                                 is RequestState.Success -> {
                                     Toast.makeText(
                                         context,
-                                        "Offer Raised successfully",
+                                        "Event Created successfully",
                                         Toast.LENGTH_SHORT
                                     ).show()
                                     offerViewModel.offerResponse.value=RequestState.Idle

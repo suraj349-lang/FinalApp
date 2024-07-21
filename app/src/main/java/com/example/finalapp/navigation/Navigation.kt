@@ -21,12 +21,12 @@ import com.example.finalapp.screens.chat.ChatScreenUI
 import com.example.finalapp.auth.screensUI.FinalUserCreation
 import com.example.finalapp.offer.OfferViewModel
 import com.example.finalapp.screens.chat.ChatListScreen
-import com.example.finalapp.screens.DirectChatScreenUI
 import com.example.finalapp.screens.profile.GalleryPicker
 import com.example.finalapp.screens.HomeScreenUI
 import com.example.finalapp.screens.NotificationsScreenUI
 import com.example.finalapp.screens.offer.CreateOfferScreen
-import com.example.finalapp.screens.EventsAndPlacesScreen
+import com.example.finalapp.screens.SearchScreen
+import com.example.finalapp.screens.GetDroppedProfiles
 import com.example.finalapp.screens.profile.ProfileScreenUI
 import com.example.finalapp.screens.SettingsScreenUI
 import com.example.finalapp.screens.TabView
@@ -57,6 +57,7 @@ sealed class SCREENS(val route:String){
     object CREATE_EVENT:SCREENS("raise_offer")
     object PAST_OFFERS:SCREENS("past_offers")
     object TABVIEW:SCREENS("tab_view")
+    object GET_DROPPED_PROFILES:SCREENS("get_dropped_profiles")
 
 }
 @OptIn(ExperimentalAnimationApi::class, ExperimentalPagerApi::class)
@@ -120,10 +121,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
             //AllProfiles(profileViewModel)
         }
         composable(SCREENS.SEARCH.route){
-            EventsAndPlacesScreen(navController)
-        }
-        composable(SCREENS.DROP_PROFILE.route){
-            DirectChatScreenUI(navController,offerViewModel )
+            SearchScreen(navController)
         }
         composable(SCREENS.CREATE_EVENT.route){
             CreateOfferScreen(authViewModel, offerViewModel, profileViewModel,navController )
@@ -132,7 +130,10 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
             PastRaisedOffer(authViewModel = authViewModel, offerViewModel =offerViewModel , navController = navController)
         }
         composable(SCREENS.TABVIEW.route){
-            TabView()
+            TabView(navController,profileViewModel,authViewModel)
+        }
+        composable(SCREENS.GET_DROPPED_PROFILES.route){
+            GetDroppedProfiles(navController,offerViewModel)
         }
     }
 

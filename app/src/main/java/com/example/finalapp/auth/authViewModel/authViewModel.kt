@@ -46,8 +46,8 @@ class AuthViewModel @Inject constructor(
     var latitude= mutableStateOf(0.0)
     var longitude= mutableStateOf(0.0)
     var address= MutableStateFlow<String>("")
-    val currentLocation= MutableStateFlow(LatLng())
-       val city= MutableStateFlow("")
+    val currentLocation= MutableStateFlow(LatLng(latitude.value,longitude.value))
+    val city= MutableStateFlow("")
     var permission= mutableStateOf(ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
 
 

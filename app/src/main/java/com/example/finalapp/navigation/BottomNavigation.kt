@@ -38,15 +38,21 @@ sealed class Destinations(
         icon = R.drawable.search,
         name = "Search"
     )
-    object ProfileScreen : Destinations(
-        route = SCREENS.PROFILE.route,
-        icon = R.drawable.baseline_person_24,
-        name = "Profile"
-    )
     object CreateEvent : Destinations(
         route = SCREENS.CREATE_EVENT.route,
         icon = R.drawable.create_event,
         name = "Create Event"
+    )
+    object ProfileScreen : Destinations(
+        route = SCREENS.PROFILE.route,
+        icon = R.drawable.boy,
+        name = "Profile"
+    )
+
+    object Settings : Destinations(
+        route = SCREENS.SETTINGS.route,
+        icon = R.drawable.settings,
+        name = "Settings"
     )
 
 
@@ -57,7 +63,7 @@ fun BottomBar(
     navController: NavHostController, state: MutableState<Boolean>, modifier: Modifier = Modifier
 ) {
     val screens = listOf(
-        Destinations.HomeScreen, Destinations.SearchProfileScreen,Destinations.CreateEvent,Destinations.ProfileScreen
+        Destinations.HomeScreen, Destinations.SearchProfileScreen,Destinations.CreateEvent,Destinations.ProfileScreen,Destinations.Settings
     )
 
     NavigationBar(

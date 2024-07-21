@@ -68,11 +68,13 @@ import com.example.finalapp.database.Chat
 import com.example.finalapp.datastore.StoreUserData
 import com.example.finalapp.screens.chat.ChatViewModel
 import com.example.finalapp.screens.onboarding.viewmodel.SplashViewModel
+import com.example.finalapp.ui.API_KEY
 import com.example.finalapp.utils.Constants.Constants
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.Priority
+import com.google.android.libraries.places.api.Places
 import com.google.firebase.auth.FirebaseAuth
 import com.google.gson.Gson
 import io.socket.client.IO
@@ -99,6 +101,7 @@ class MainActivity : ComponentActivity() {
         installSplashScreen().setKeepOnScreenCondition {
             !splashViewModel.isLoading.value
         }
+        Places.initialize(applicationContext, API_KEY)
 
 
         setContent {

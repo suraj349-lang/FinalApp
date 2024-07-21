@@ -65,10 +65,12 @@ fun FinalAppTheme(
             val window = (view.context as Activity).window
            // window.statusBarColor = colorScheme.primary.toArgb()
 //            window.statusBarColor = statusAndTopAppBarColor.toArgb()
-            window.statusBarColor=Color.Transparent.toArgb()
+            window.statusBarColor= statusBarColor
+                .toArgb()
+
            // WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
             WindowCompat.getInsetsController(window, view)?.run {
-                isAppearanceLightStatusBars = !darkTheme // Set based on your theme
+                isAppearanceLightStatusBars = darkTheme // Set based on your theme
                 systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
             }
 

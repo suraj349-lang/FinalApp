@@ -35,7 +35,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 
 @Composable
-fun EventsAndPlacesScreen(navController:NavHostController) {
+fun SearchScreen(navController:NavHostController) {
     val buttonsVisible = remember { mutableStateOf(true) }
     val scope = rememberCoroutineScope()
     val items:List<String> = listOf("Alpha-1","Beta-1","Gamma-1","Delta-1","Delta-2","Gamma-2","Beta-2","Alpha-2","Cp Mall")
