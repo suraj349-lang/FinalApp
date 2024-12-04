@@ -8,7 +8,6 @@ import com.example.finalapp.model.LoginAPIResponse
 import com.example.finalapp.model.LoginModel
 import com.example.finalapp.model.OfferModel
 import com.example.finalapp.model.OfferResponseModel
-import com.example.finalapp.model.ProfileResponse
 import com.example.finalapp.model.RegisterUserModel
 import com.example.finalapp.model.Response
 import com.example.finalapp.model.SignupAPIResponse
@@ -27,23 +26,25 @@ interface ApiService {
     suspend fun postLoginData(@Body loginData:LoginModel): LoginAPIResponse
     @POST("/api/v1/auth/register")
     suspend fun postSignupData(@Body signupData:RegisterUserModel): SignupAPIResponse
-
-    @POST("/api/v1/offer")
-    suspend fun createOffer(@Body offerData:OfferModel):SingleOfferModel
+    //---------------------------------------------------------------------//
+    @GET("/api/v1/dropProfile/getDropProfile")
+    suspend fun getDropProfile():GetDropProfileResponseModel
     @POST("/api/v1/dropProfile/postDropProfile")
     suspend fun dropProfile(@Body data:DropProfileModel):DropProfileResponseModel
 
-    @GET("/api/v1/dropProfile/getDropProfile")
-    suspend fun getDropProfile():GetDropProfileResponseModel
-
-    @GET("/api/v1/offer")
+    //---------------------------------------------------------------------//
+    @POST("/api/v1/event")
+    suspend fun createEvent(@Body offerData:OfferModel):SingleOfferModel
+    @GET("/api/v1/event")
     suspend fun getAllOffers():OfferResponseModel
 
-    @GET("/api/v1/user")
-    suspend fun getUserData(@Query("number") number: String):ProfileResponse
+    //---------------------------------------------------------------------//
+    @GET("/api/v1/user/getUser")
+    suspend fun getUserData(@Query("number") number: String):Response
 
+    //---------------------------------------------------------------------//
     @GET("/api/v1/auth/updateUserImage")
-    suspend fun updateUserImage(@Query("number") number: String, @Query("imageUrl") imageUrl: String): Response
+    suspend fun updateUserImage(@Query("email") email: String, @Query("imageUrl") imageUrl: String): Response
 
     @Multipart
     @POST("/api/v1/user/uploadImage")

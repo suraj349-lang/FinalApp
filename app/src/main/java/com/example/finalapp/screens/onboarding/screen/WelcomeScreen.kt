@@ -15,13 +15,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens.onboarding.util.OnBoardingPage
-import com.example.finalapp.screens.onboarding.viewmodel.WelcomeViewModel
+import com.example.finalapp.viewmodels.WelcomeViewModel
 import com.google.accompanist.pager.*
 
 @ExperimentalAnimationApi

@@ -40,17 +40,15 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import com.example.finalapp.R
-import com.example.finalapp.model.OfferModel
-import com.example.finalapp.offer.OfferViewModel
-import com.example.finalapp.screens.OfferResponseDataAndAction
+import com.example.finalapp.viewmodels.EventsViewModel
+import com.example.finalapp.screens._1home.OfferResponseDataAndAction
 import com.example.finalapp.ui.theme.DarkBlue
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.ui.theme.topAppBarTextColor
-import kotlinx.coroutines.launch
 
 
 @Composable
-fun CustomAlertDialog(offerViewModel: OfferViewModel,navController: NavHostController,onDismiss: () -> Unit) {
+fun CustomAlertDialog(eventsViewModel: EventsViewModel, navController: NavHostController, onDismiss: () -> Unit) {
     var offerTextField:String by remember{ mutableStateOf("") }
 
     val scope= rememberCoroutineScope()
@@ -107,12 +105,10 @@ fun CustomAlertDialog(offerViewModel: OfferViewModel,navController: NavHostContr
 
                     Button(
                         onClick = {
-                            offerViewModel.key.value = 1;
+                            eventsViewModel.key.value = 1;
                             enabled=false;
-                            scope.launch {
-                                offerViewModel.createOffer(OfferModel("SURAJ","65692fe3d203dbf0e3ddcb17","","",""));
+                            //TODO nothing on click right now
 
-                            }
 
                         },
                         Modifier
@@ -130,9 +126,9 @@ fun CustomAlertDialog(offerViewModel: OfferViewModel,navController: NavHostContr
                         Text(text = "Upload")
                     }
                 }
-                if(offerViewModel.key.value==1){
+                if(eventsViewModel.key.value==1){
                     Log.d("Data received","runned this")
-                    OfferResponseDataAndAction(offerViewModel,navController)
+                    OfferResponseDataAndAction(eventsViewModel,navController)
 
                 }
 

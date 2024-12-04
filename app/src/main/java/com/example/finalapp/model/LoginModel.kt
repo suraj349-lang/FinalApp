@@ -7,7 +7,7 @@ data class LoginModel(
 data class LoginAPIResponse(
   val success:Boolean,
   val code:Int,
-  val token:String
+  val data:User
 )
 
 data class ImageUploadResponse(

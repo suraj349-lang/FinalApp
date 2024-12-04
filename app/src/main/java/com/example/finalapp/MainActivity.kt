@@ -6,7 +6,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.location.Address
 import android.location.Geocoder
 import android.net.Uri
 import android.os.Build
@@ -34,7 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.core.app.ActivityCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.finalapp.auth.authViewModel.AuthViewModel
+import com.example.finalapp.viewmodels.AuthViewModel
 import com.example.finalapp.navigation.Navigation
 import com.example.finalapp.permissions.LocationPermissionTextProvider
 import com.example.finalapp.permissions.MainViewModel
@@ -42,7 +41,7 @@ import com.example.finalapp.permissions.NotificationPermissionTextProvider
 import com.example.finalapp.permissions.PermissionDialog
 import com.example.finalapp.permissions.PermissionsUI
 import com.example.finalapp.ui.theme.FinalAppTheme
-import com.example.finalapp.utils.Constants.Constants.TAG
+import com.example.finalapp.utils.constants.Constants.TAG
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import dagger.hilt.android.AndroidEntryPoint
@@ -52,37 +51,17 @@ import kotlinx.serialization.Serializable
 import java.io.IOException
 import java.util.Locale
 import android.location.LocationManager
-import android.os.Looper
-import android.provider.ContactsContract.CommonDataKinds.StructuredName
-import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.viewModelScope
-import com.example.finalapp.database.Chat
-import com.example.finalapp.datastore.StoreUserData
-import com.example.finalapp.screens.chat.ChatViewModel
-import com.example.finalapp.screens.onboarding.viewmodel.SplashViewModel
+import com.example.finalapp.viewmodels.SplashViewModel
 import com.example.finalapp.ui.API_KEY
-import com.example.finalapp.utils.Constants.Constants
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationResult
-import com.google.android.gms.location.Priority
 import com.google.android.libraries.places.api.Places
-import com.google.firebase.auth.FirebaseAuth
-import com.google.gson.Gson
-import io.socket.client.IO
-import io.socket.client.Socket
-import kotlinx.coroutines.async
-import java.net.URISyntaxException
 import javax.inject.Inject
-import kotlin.math.log
 
 
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -256,7 +235,7 @@ private fun enableLocationSettings(context: Context, launcher: ActivityResultLau
     }
 }
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-private fun getLocation(context: Context, authViewModel:AuthViewModel){
+private fun getLocation(context: Context, authViewModel: AuthViewModel){
     val fusedLocationProviderClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
     // check location permission
     if(ActivityCompat.checkSelfPermission(context,Manifest.permission.ACCESS_FINE_LOCATION)

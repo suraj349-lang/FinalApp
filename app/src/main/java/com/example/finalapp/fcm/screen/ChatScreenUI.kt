@@ -6,7 +6,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.example.finalapp.fcm.dialog.EnterTokenDialog
-import com.example.finalapp.fcm.viewmodel.FCMViewModel
+import com.example.finalapp.viewmodels.FCMViewModel
 
 @Composable
 fun ChatScreenUIFCM(){

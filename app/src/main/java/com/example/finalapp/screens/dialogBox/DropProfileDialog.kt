@@ -22,25 +22,17 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -56,7 +48,6 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
@@ -71,21 +62,20 @@ import com.bumptech.glide.integration.compose.CrossFade
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
-import com.example.finalapp.auth.authViewModel.AuthViewModel
+import com.example.finalapp.viewmodels.AuthViewModel
 import com.example.finalapp.model.DropProfileModel
-import com.example.finalapp.offer.OfferViewModel
-import com.example.finalapp.screens.OfferResponseDataAndAction
-import com.example.finalapp.screens.profile.ProfileViewModel
-import com.example.finalapp.screens.profile.createImageFile
+import com.example.finalapp.viewmodels.EventsViewModel
+import com.example.finalapp.screens._1home.OfferResponseDataAndAction
+import com.example.finalapp.viewmodels.ProfileViewModel
+import com.example.finalapp.screens._4profile.createImageFile
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.ui.theme.topAppBarTextColor
 import com.example.finalapp.utils.RequestState
-import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun DropProfileDialog(authViewModel:AuthViewModel,offerViewModel: OfferViewModel,profileViewModel: ProfileViewModel,navController: NavHostController, onDismiss: () -> Unit) {
+fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewModel, navController: NavHostController, onDismiss: () -> Unit) {
     val context= LocalContext.current
     var caption by remember{ mutableStateOf("") }
     val scope= rememberCoroutineScope()
@@ -106,10 +96,8 @@ fun DropProfileDialog(authViewModel:AuthViewModel,offerViewModel: OfferViewModel
         mutableStateOf(0)
     }
     if(keyForGallery!=0) {
-        Log.d("DropProfileDialog", "DropProfileDialog:called")
         GalleryPickerForDropProfile(
-            navController = navController,
-            profileViewModel = profileViewModel
+            navController = navController
         ) {
             Log.d("DropProfileDialog", "DropProfileDialog: $it")
             uri = it
@@ -252,7 +240,7 @@ fun DropProfileDialog(authViewModel:AuthViewModel,offerViewModel: OfferViewModel
                 OutlinedTextField(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .heightIn(min=60.dp,max=100.dp)
+                        .heightIn(min = 60.dp, max = 100.dp)
                         .padding(start = 15.dp, top = 10.dp, end = 15.dp)
                         .background(Color.White, RoundedCornerShape(5.dp)),
                     shape = RoundedCornerShape(5.dp),
@@ -304,12 +292,20 @@ fun DropProfileDialog(authViewModel:AuthViewModel,offerViewModel: OfferViewModel
                     .fillMaxWidth(), thickness = 1.dp,color=Color(0xFFDCD6DD)
                 )
 
-                    Button(onClick = {
-                            offerViewModel.key.value = 1;
-                            enabled=false;
-                            scope.launch {
-                                offerViewModel.dropProfile(DropProfileModel(image = uri.toString(), location = authViewModel.address.value, landmark = "",message="", expirationTime = "")); }
-                           },
+                    Button(
+                        onClick = {
+                            eventsViewModel.key.value = 1;
+                            enabled = false;
+                            eventsViewModel.dropProfile(
+                                DropProfileModel(
+                                    image = uri.toString(),
+                                    location = authViewModel.address.value,
+                                    landmark = "",
+                                    message = "",
+                                    expirationTime = ""
+                                )
+                            );
+                        },
                         shape= RoundedCornerShape(6.dp),
                         modifier= Modifier
                             .fillMaxWidth(1f)
@@ -325,7 +321,7 @@ fun DropProfileDialog(authViewModel:AuthViewModel,offerViewModel: OfferViewModel
                         Text(text = "Drop Profile")
                     }
 
-                    when (val result=offerViewModel.dropProfileResponse.value){
+                    when (val result=eventsViewModel.dropProfileResponse.value){
                         is RequestState.Success->{
 
                             Toast.makeText(context,"${result.data}", Toast.LENGTH_SHORT).show()
@@ -345,9 +341,9 @@ fun DropProfileDialog(authViewModel:AuthViewModel,offerViewModel: OfferViewModel
 
                     }
 
-                if(offerViewModel.key.value==1){
+                if(eventsViewModel.key.value==1){
                     Log.d("Data received","runned this")
-                    OfferResponseDataAndAction(offerViewModel,navController)
+                    OfferResponseDataAndAction(eventsViewModel,navController)
 
                 }
 

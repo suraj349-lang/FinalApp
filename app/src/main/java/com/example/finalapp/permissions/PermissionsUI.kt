@@ -31,9 +31,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.finalapp.Disposable
 import com.example.finalapp.R
-import com.example.finalapp.auth.authViewModel.AuthViewModel
+import com.example.finalapp.viewmodels.AuthViewModel
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
-import com.example.finalapp.utils.Constants.Constants
+import com.example.finalapp.utils.constants.Constants
 
 @Composable
 fun PermissionsUI(authViewModel: AuthViewModel, onGoToAppSettingsClick: () -> Unit){

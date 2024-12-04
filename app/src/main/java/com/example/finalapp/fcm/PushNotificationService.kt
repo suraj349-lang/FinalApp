@@ -1,13 +1,13 @@
 package com.example.finalapp.fcm
 
 import android.util.Log
-import com.example.finalapp.fcm.viewmodel.FCMViewModel
+import com.example.finalapp.viewmodels.FCMViewModel
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import java.lang.Exception
 
 class PushNotificationService: FirebaseMessagingService() {
-    private val viewModel=FCMViewModel()
+    private val viewModel= FCMViewModel()
 
     override fun onNewToken(token: String) {
         super.onNewToken(token)
