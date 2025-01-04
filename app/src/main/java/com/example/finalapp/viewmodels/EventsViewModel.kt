@@ -8,6 +8,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.finalapp.model.DropProfileModel
 import com.example.finalapp.model.DropProfileResponseModel
 import com.example.finalapp.model.OfferModel
@@ -20,19 +21,32 @@ import com.google.android.libraries.places.api.model.AutocompletePrediction
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
-import java.lang.Exception
-import javax.inject.Inject
 
+import javax.inject.Inject
+import kotlin.Exception
 
 
 @HiltViewModel
 class EventsViewModel @Inject constructor(private val eventsRepository: EventsRepository, @ApplicationContext context: Context): ViewModel(){
+    private val placesClient by lazy { Places.createClient(context) }
+    init {
+        viewModelScope.launch(Dispatchers.Main) {
+            val job = viewModelScope.launch {
+                getDropProfile()
+                getAllEvents()
+            }
+            job.join()
+        }
+    }
 
     //-------------------------------------------DROP PROFILE--------------------------------------------------------------------------------------//
 
@@ -57,7 +71,7 @@ class EventsViewModel @Inject constructor(private val eventsRepository: EventsRe
     //--------------------------------------------------------------------------------------------------------------------------------------------//
     val getDropProfileResponse:MutableState<RequestState<List<DropProfileModel>>> = mutableStateOf(RequestState.Idle)
     var droppedProfilesList= mutableStateOf<List<DropProfileModel>>(emptyList())
-    fun getDropProfile()=viewModelScope.launch(Dispatchers.IO) {
+    suspend fun getDropProfile() {
         eventsRepository.getDropProfileData()
             .onStart {
                 getDropProfileResponse.value=RequestState.Loading;
@@ -67,8 +81,7 @@ class EventsViewModel @Inject constructor(private val eventsRepository: EventsRe
                 Log.d("Data received","error found")
                 getDropProfileResponse.value=RequestState.Error(it)
                 Log.d("Data received",offerResponse.value.toString())
-            }
-            .collect {
+            }.collect {
                 getDropProfileResponse.value = RequestState.Success(it.data);
                 Log.d("Data received",offerResponse.value.toString())
             }
@@ -97,7 +110,7 @@ class EventsViewModel @Inject constructor(private val eventsRepository: EventsRe
                 }
     }
 //-----------------------------------------------------------------------------------------------------------------------------------------------//
-     private val placesClient = Places.createClient( context)
+
 
     fun getAutocompletePredictions(query: String): Flow<List<AutocompletePrediction>> {
         val results = MutableStateFlow<List<AutocompletePrediction>>(emptyList())

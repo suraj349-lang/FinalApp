@@ -70,7 +70,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
 
 
 
-    NavHost(navController = navController, startDestination =SCREENS.CREATE_EVENT.route){
+    NavHost(navController = navController, startDestination =SCREENS.HOME.route){
         composable(SCREENS.SPLASH.route){
             SplashScreenUI(navController,screen)
         }

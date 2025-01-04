@@ -477,11 +477,11 @@ fun CreateEvent(
                         onClick = {
                             eventsViewModel.createEvent(
                                 OfferModel(
-                                    uri?.path.toString(),
-                                    "Event",
-                                    eventLocation,
-                                    "date",
-                                    expirationTime
+                                    image= uri.toString(),
+                                    category = "Event",
+                                    location =  eventLocation,
+                                    offer = "date",
+                                    expirationTime=expirationTime
                                 )
                             )
                         },

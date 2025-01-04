@@ -344,10 +344,6 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
             HomeFloatingActionButton(authViewModel, eventsViewModel, navController)
         }
     ) { padding ->
-        LaunchedEffect(key1 = true) {
-            eventsViewModel.getAllEvents()
-        }
-
         ModalNavigationDrawer(
             drawerContent = {
                 ModalDrawerSheet(

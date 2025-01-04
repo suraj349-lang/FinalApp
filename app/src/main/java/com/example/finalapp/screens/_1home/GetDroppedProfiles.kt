@@ -64,10 +64,6 @@ fun GetDroppedProfiles(navController:NavHostController, eventsViewModel: EventsV
     val widthINDp = LocalConfiguration.current.screenWidthDp
     var query by remember { mutableStateOf("") }
     val predictions by eventsViewModel.getAutocompletePredictions(query).collectAsState(emptyList())
-    LaunchedEffect(key1 = true){
-        eventsViewModel.getDropProfile()
-
-    }
         Surface(modifier = Modifier
             .fillMaxSize()
             .padding()) {
