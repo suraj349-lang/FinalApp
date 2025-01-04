@@ -134,7 +134,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
         }
 
         composable(SCREENS.CREATE_EVENT.route) {
-            CreateEvent(eventsViewModel, profileViewModel, navController)
+            CreateEvent(eventsViewModel, navController)
         }
 
         composable(SCREENS.PREMIUM_CREATE_EVENT.route) {

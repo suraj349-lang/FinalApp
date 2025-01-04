@@ -72,7 +72,6 @@ import com.example.finalapp.model.OfferModel
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.viewmodels.EventsViewModel
 import com.example.finalapp.screens.dialogBox.GalleryPickerForDropProfile
-import com.example.finalapp.viewmodels.ProfileViewModel
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.ui.theme.statusBarColor
 import com.example.finalapp.ui.theme.topAppBarTextColor
@@ -369,7 +368,7 @@ fun PremiumCreateEvent(authViewModel: AuthViewModel, eventsViewModel: EventsView
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 } else {
-                                    eventsViewModel.createEvent(
+                                    eventsViewModel.premiumCreateEvent(
                                         OfferModel(
                                             image = uri.toString(),
                                             category = category,

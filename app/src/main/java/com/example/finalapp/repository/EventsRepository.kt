@@ -8,7 +8,6 @@ import com.example.finalapp.model.GetDropProfileResponseModel
 import com.example.finalapp.model.ImageUploadResponse
 import com.example.finalapp.model.OfferModel
 import com.example.finalapp.model.OfferResponseModel
-import com.example.finalapp.model.Response
 import com.example.finalapp.model.SingleOfferModel
 import com.example.finalapp.network.ApiService
 import com.example.finalapp.screens._4profile.uriToMultipart
@@ -21,10 +20,10 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @ViewModelScoped
-class OfferRepository @Inject constructor(private val api: ApiService) {
+class EventsRepository @Inject constructor(private val api: ApiService) {
 
     fun sendCreateEventData(offerData: OfferModel): Flow<SingleOfferModel> = flow  {
-        emit(api.createEvent(offerData))
+        emit(api.premiumCreateEvent(offerData))
     }.flowOn(Dispatchers.IO)
 
     fun sendDropProfileData(data: DropProfileModel): Flow<DropProfileResponseModel> = flow  {
@@ -34,8 +33,22 @@ class OfferRepository @Inject constructor(private val api: ApiService) {
     fun getDropProfileData(): Flow<GetDropProfileResponseModel> = flow  {
         emit(api.getDropProfile())
     }.flowOn(Dispatchers.IO)
-    fun getAllOffers(): Flow<OfferResponseModel> = flow {
-        emit(api.getAllOffers())
+   suspend fun createEvent(data:OfferModel):Resource<SingleOfferModel>{
+        return try {
+          Resource.Loading(data=true)
+           val createEventsResponse =api.createEvent(data)
+           if(createEventsResponse.success){
+               Resource.Loading(data=false)
+           }
+            Resource.Success(data=createEventsResponse)
+       }catch (e:Exception){
+           Resource.Error(e.message.toString())
+
+       }
+
+   }
+    fun getAllEvents(): Flow<OfferResponseModel> = flow {
+        emit(api.getAllEvents())
     }.flowOn(Dispatchers.IO)
 
 
@@ -46,3 +59,16 @@ class OfferRepository @Inject constructor(private val api: ApiService) {
     }.flowOn(Dispatchers.IO)
 }
 
+//data class DataOrException<T,Boolean,E:Exception>(
+//    var data:T?=null,
+//    var loading:Boolean?=null,
+//    var e:E?=null
+//)
+
+sealed class Resource<T>(val data:T?=null,val message:String?=null){
+    class Empty<T> : Resource<T>()
+    class Success<T>(data:T):Resource<T>(data)
+    class Error<T>(message:String?,data: T?=null):Resource<T>(data,message)
+    class Loading<T>(data:T):Resource<T>(data)
+
+}

@@ -34,9 +34,11 @@ interface ApiService {
 
     //---------------------------------------------------------------------//
     @POST("/api/v1/event")
+    suspend fun premiumCreateEvent(@Body offerData:OfferModel):SingleOfferModel
+    @POST("/api/v1/event")
     suspend fun createEvent(@Body offerData:OfferModel):SingleOfferModel
     @GET("/api/v1/event")
-    suspend fun getAllOffers():OfferResponseModel
+    suspend fun getAllEvents():OfferResponseModel
 
     //---------------------------------------------------------------------//
     @GET("/api/v1/user/getUser")

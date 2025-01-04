@@ -1,25 +1,23 @@
 package com.example.finalapp.viewmodels
 
 import android.content.Context
-import android.net.Uri
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.finalapp.model.DropProfileModel
 import com.example.finalapp.model.DropProfileResponseModel
 import com.example.finalapp.model.OfferModel
 import com.example.finalapp.model.SingleOfferModel
-import com.example.finalapp.model.User
-import com.example.finalapp.repository.OfferRepository
+import com.example.finalapp.repository.EventsRepository
+import com.example.finalapp.repository.Resource
 import com.example.finalapp.utils.RequestState
-import com.google.android.gms.tasks.Task
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.AutocompletePrediction
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
-import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -28,18 +26,19 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
+import java.lang.Exception
 import javax.inject.Inject
 
 
 
 @HiltViewModel
-class EventsViewModel @Inject constructor(private val offerRepository: OfferRepository, @ApplicationContext context: Context): ViewModel(){
+class EventsViewModel @Inject constructor(private val eventsRepository: EventsRepository, @ApplicationContext context: Context): ViewModel(){
 
     //-------------------------------------------DROP PROFILE--------------------------------------------------------------------------------------//
 
     val dropProfileResponse:MutableState<RequestState<DropProfileResponseModel>> = mutableStateOf(RequestState.Idle)
     fun dropProfile(data:DropProfileModel)=viewModelScope.launch(Dispatchers.IO) {
-        offerRepository.sendDropProfileData(data)
+        eventsRepository.sendDropProfileData(data)
             .onStart {
                 dropProfileResponse.value=RequestState.Loading;
                 Log.d("Data received",offerResponse.value.toString())
@@ -59,7 +58,7 @@ class EventsViewModel @Inject constructor(private val offerRepository: OfferRepo
     val getDropProfileResponse:MutableState<RequestState<List<DropProfileModel>>> = mutableStateOf(RequestState.Idle)
     var droppedProfilesList= mutableStateOf<List<DropProfileModel>>(emptyList())
     fun getDropProfile()=viewModelScope.launch(Dispatchers.IO) {
-        offerRepository.getDropProfileData()
+        eventsRepository.getDropProfileData()
             .onStart {
                 getDropProfileResponse.value=RequestState.Loading;
                 Log.d("Data received",offerResponse.value.toString())
@@ -81,8 +80,8 @@ class EventsViewModel @Inject constructor(private val offerRepository: OfferRepo
 
     val offerResponse:MutableState<RequestState<SingleOfferModel>> = mutableStateOf(RequestState.Idle)
     var key :MutableState<Int> = mutableStateOf(0);
-    fun createEvent(offerData:OfferModel)=viewModelScope.launch(Dispatchers.IO) {
-        offerRepository.sendCreateEventData(offerData)
+    fun premiumCreateEvent(offerData:OfferModel)=viewModelScope.launch(Dispatchers.IO) {
+        eventsRepository.sendCreateEventData(offerData)
                 .onStart {
                     offerResponse.value=RequestState.Loading;
                     Log.d("Data received",offerResponse.value.toString())
@@ -145,8 +144,8 @@ class EventsViewModel @Inject constructor(private val offerRepository: OfferRepo
 
     val allOffers: MutableState<RequestState<List<OfferModel>>> = mutableStateOf(RequestState.Idle)
 
-    fun getAllOffers()=viewModelScope.launch(Dispatchers.IO) {
-        offerRepository.getAllOffers()
+    fun getAllEvents()=viewModelScope.launch(Dispatchers.IO) {
+        eventsRepository.getAllEvents()
             .onStart {
                 allOffers.value = RequestState.Loading
                 Log.d("ZUNE", "all profiles start ${allOffers.value}")
@@ -160,6 +159,39 @@ class EventsViewModel @Inject constructor(private val offerRepository: OfferRepo
                 Log.d("ZUNE", "all profiles data ${allOffers.value}")
 
             }
+    }
+
+   var createEventResponse = MutableStateFlow(SingleOfferModel(false,100, OfferModel("","","","","")))
+    var isLoading = MutableStateFlow(false)
+    var isSuccess= MutableStateFlow(false)
+    fun createEvent(data:OfferModel){
+        isLoading.value=true
+        viewModelScope.launch(Dispatchers.IO) {
+//            if(data.location=="") return@launch
+            try {
+                when(val response=eventsRepository.createEvent(data)){
+                    is Resource.Success->{
+                        createEventResponse.value= response.data!!
+                        isSuccess.value=true;
+                      //  isLoading.value=false
+
+                    }
+                    is Resource.Error->{
+                        Log.d("TAG","create event ${response.message.toString()}")
+                     //   isLoading.value=false
+                    }
+                    else->{//isLoading.value=false
+                     }
+                }
+            }catch (e:Exception){
+                Log.d("TAG","create event ${e.message.toString()}")
+            }
+            finally {
+                isLoading.value=false
+            }
+
+        }
+
     }
 
 

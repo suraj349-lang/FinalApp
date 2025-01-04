@@ -31,6 +31,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -56,6 +57,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import com.bumptech.glide.integration.compose.CrossFade
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
@@ -63,10 +66,11 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
 import com.example.finalapp.model.OfferModel
 import com.example.finalapp.navigation.SCREENS
+import com.example.finalapp.repository.Resource
+import com.example.finalapp.screens.dialogBox.DialogLoading
 import com.example.finalapp.viewmodels.EventsViewModel
 import com.example.finalapp.screens.dialogBox.GalleryPickerForDropProfile
 import com.example.finalapp.screens.dialogBox.ImageCaptureFromCameraForDropProfile
-import com.example.finalapp.viewmodels.ProfileViewModel
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.ui.theme.topAppBarTextColor
 
@@ -75,7 +79,6 @@ import com.example.finalapp.ui.theme.topAppBarTextColor
 @Composable
 fun CreateEvent(
     eventsViewModel: EventsViewModel,
-    profileViewModel: ProfileViewModel,
     navController: NavHostController
 ) {
     var placeText by remember { mutableStateOf("") }
@@ -91,6 +94,18 @@ fun CreateEvent(
     var uri by remember {
         mutableStateOf(Uri.EMPTY)
     }
+    var activeBtnKey by remember {
+        mutableStateOf(0)
+    }
+    val expirationTime by remember {
+        mutableStateOf(
+            when(activeBtnKey){
+            0-> "12"
+            1-> "24"
+            2->"24*7"
+            else -> {"12"}
+        })
+    }
     var key by remember { mutableStateOf(false) }
     if (key) {
         ImageCaptureFromCameraForDropProfile { uri = it }
@@ -99,10 +114,15 @@ fun CreateEvent(
         mutableStateOf(0)
     }
     val buttonsVisible = remember { mutableStateOf(true) }
-
-    var activeBtnKey by remember {
-        mutableStateOf(0)
+    val isLoading=eventsViewModel.isLoading.collectAsState()
+    val isSuccess=eventsViewModel.isSuccess.collectAsState()
+    if(isSuccess.value) {
+        Toast.makeText(LocalContext.current,"Event Created",Toast.LENGTH_SHORT).show()
+        eventsViewModel.isSuccess.value=false
+        navController.navigate(SCREENS.HOME.route)
     }
+    if(isLoading.value) DialogLoading()
+
     if (keyForGallery != 0) {
         //todo change this , its not correct
         GalleryPickerForDropProfile(
@@ -112,6 +132,7 @@ fun CreateEvent(
             uri = it
         }
     }
+
     val predictions by eventsViewModel.getAutocompletePredictions(placeText)
         .collectAsState(emptyList())
     Scaffold(
@@ -208,7 +229,9 @@ fun CreateEvent(
                             Icon(
                                 imageVector = Icons.Default.Edit,
                                 contentDescription = "",
-                                modifier = Modifier.fillMaxWidth(1f).clickable {eventEntered=!eventEntered  }
+                                modifier = Modifier
+                                    .fillMaxWidth(1f)
+                                    .clickable { eventEntered = !eventEntered }
                             )
 
                         }
@@ -451,7 +474,17 @@ fun CreateEvent(
                             .fillMaxWidth(), thickness = 1.dp, color = Color(0xFFDCD6DD)
                     )
                     Button(
-                        onClick = {eventsViewModel.createEvent(OfferModel(uri?.path.toString(),"Event",eventLocation,"date","09"))},
+                        onClick = {
+                            eventsViewModel.createEvent(
+                                OfferModel(
+                                    uri?.path.toString(),
+                                    "Event",
+                                    eventLocation,
+                                    "date",
+                                    expirationTime
+                                )
+                            )
+                        },
                         shape = RoundedCornerShape(6.dp),
                         modifier = Modifier
                             .fillMaxWidth(1f)
@@ -474,3 +507,4 @@ fun CreateEvent(
         }
     }
 }
+

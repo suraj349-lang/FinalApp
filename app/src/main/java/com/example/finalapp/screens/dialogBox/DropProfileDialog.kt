@@ -106,7 +106,7 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
 
 
     Dialog(onDismissRequest = { onDismiss() }, properties = DialogProperties(
-        dismissOnBackPress = true,dismissOnClickOutside = true
+        dismissOnBackPress = true,dismissOnClickOutside = false
     )
     ) {
         Card(

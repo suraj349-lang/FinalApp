@@ -42,7 +42,8 @@ fun ImageCaptureFromCamera(profileViewModel: ProfileViewModel) {
     val file = context.createImageFile()
     val uri = FileProvider.getUriForFile(
         context,
-        "${context.packageName}.provider",
+       // "${context.packageName}.provider",// todo edited so as to change the image file name
+        "vectorapp.provider",
         file
     )
     var capturedImageUri by remember { mutableStateOf<Uri>(Uri.EMPTY) }
@@ -50,7 +51,7 @@ fun ImageCaptureFromCamera(profileViewModel: ProfileViewModel) {
     val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
         if (success) {
             capturedImageUri = uri
-            profileViewModel.uploadUserImage(uri,"besetsua", context )
+            profileViewModel.uploadUserImage(uri,"besetsuraj", context )
 
         } else {
             Toast.makeText(context, "Image capture failed", Toast.LENGTH_SHORT).show()

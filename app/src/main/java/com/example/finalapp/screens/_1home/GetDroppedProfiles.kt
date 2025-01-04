@@ -57,7 +57,6 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun GetDroppedProfiles(navController:NavHostController, eventsViewModel: EventsViewModel) {
-    val scope= rememberCoroutineScope()
     val context= LocalContext.current
     val droppedProfiles by remember {
         mutableStateOf(eventsViewModel.droppedProfilesList)
@@ -66,7 +65,7 @@ fun GetDroppedProfiles(navController:NavHostController, eventsViewModel: EventsV
     var query by remember { mutableStateOf("") }
     val predictions by eventsViewModel.getAutocompletePredictions(query).collectAsState(emptyList())
     LaunchedEffect(key1 = true){
-        scope.launch {eventsViewModel.getDropProfile()  }
+        eventsViewModel.getDropProfile()
 
     }
         Surface(modifier = Modifier

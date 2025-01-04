@@ -106,7 +106,6 @@ import com.example.finalapp.screens.dialogBox.DropProfileDialog
 import com.example.finalapp.screens.dialogBox.ShowQRDialog
 import com.example.finalapp.screens.dialogBox.showDialog
 import com.example.finalapp.testing.items
-import com.example.finalapp.viewmodels.ProfileViewModel
 import com.example.finalapp.ui.theme.DarkBlue
 import com.example.finalapp.ui.theme.statusBarColor
 import com.example.finalapp.utils.constants.Constants
@@ -346,7 +345,7 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
         }
     ) { padding ->
         LaunchedEffect(key1 = true) {
-            eventsViewModel.getAllOffers()
+            eventsViewModel.getAllEvents()
         }
 
         ModalNavigationDrawer(
