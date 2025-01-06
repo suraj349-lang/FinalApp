@@ -389,7 +389,9 @@ fun LogOut(navController:NavHostController,authViewModel: AuthViewModel) {
                 .padding(start = 16.dp)
                 .clickable {
                     authViewModel.LogoutUser();
-                    navController.navigate(SCREENS.LOGIN.route);
+                    navController.navigate(SCREENS.LOGIN.route){
+                        popUpTo(0) { inclusive = true } // Clear entire back stack
+                    };
                 })
     }
 }

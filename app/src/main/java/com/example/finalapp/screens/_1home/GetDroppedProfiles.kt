@@ -1,5 +1,6 @@
 package com.example.finalapp.screens._1home
 
+import android.annotation.SuppressLint
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.border
@@ -55,6 +56,7 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import kotlinx.coroutines.launch
 
+
 @Composable
 fun GetDroppedProfiles(navController:NavHostController, eventsViewModel: EventsViewModel) {
     val context= LocalContext.current
@@ -64,7 +66,7 @@ fun GetDroppedProfiles(navController:NavHostController, eventsViewModel: EventsV
     val widthINDp = LocalConfiguration.current.screenWidthDp
     var query by remember { mutableStateOf("") }
     val predictions by eventsViewModel.getAutocompletePredictions(query).collectAsState(emptyList())
-        Surface(modifier = Modifier
+    Surface(modifier = Modifier
             .fillMaxSize()
             .padding()) {
             Column(
@@ -222,7 +224,6 @@ fun DroppedProfile(profile: DropProfileModel) {
             )
 
 
-            profile.landmark?.let { Text(text = it) }
 
         }
     }

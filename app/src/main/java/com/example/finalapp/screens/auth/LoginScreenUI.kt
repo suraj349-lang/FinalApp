@@ -2,6 +2,7 @@ package com.example.finalapp.screens.auth
 
 import android.annotation.SuppressLint
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -90,6 +91,7 @@ fun LoginScreenUI(navController: NavController= NavController(LocalContext.curre
     else painterResource(id = R.drawable.round_visibility_off_24)
 
     val lifecycleOwner= LocalLifecycleOwner.current
+
     // If `lifecycleOwner` changes, dispose and reset the effect
     DisposableEffect(lifecycleOwner) {
         // Create an observer that triggers our remembered callbacks

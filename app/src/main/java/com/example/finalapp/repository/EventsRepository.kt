@@ -30,8 +30,8 @@ class EventsRepository @Inject constructor(private val api: ApiService) {
         emit(api.dropProfile(data))
     }.flowOn(Dispatchers.IO)
 
-    fun getDropProfileData(): Flow<GetDropProfileResponseModel> = flow  {
-        emit(api.getDropProfile())
+    fun getAllDropProfiles(): Flow<GetDropProfileResponseModel> = flow  {
+        emit(api.getAllDropProfiles())
     }.flowOn(Dispatchers.IO)
    suspend fun createEvent(data:OfferModel):Resource<SingleOfferModel>{
         return try {

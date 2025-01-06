@@ -27,8 +27,8 @@ interface ApiService {
     @POST("/api/v1/auth/register")
     suspend fun postSignupData(@Body signupData:RegisterUserModel): SignupAPIResponse
     //---------------------------------------------------------------------//
-    @GET("/api/v1/dropProfile/getDropProfile")
-    suspend fun getDropProfile():GetDropProfileResponseModel
+    @GET("/api/v1/dropProfile/getAllDropProfiles")
+    suspend fun getAllDropProfiles():GetDropProfileResponseModel
     @POST("/api/v1/dropProfile/postDropProfile")
     suspend fun dropProfile(@Body data:DropProfileModel):DropProfileResponseModel
 

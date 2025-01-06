@@ -95,6 +95,16 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
     var activeBtnKey by remember {
         mutableStateOf(0)
     }
+    var expirationTime by remember {
+        mutableStateOf(
+            when(activeBtnKey){
+                0-> "12"
+                1-> "24"
+                2-> "168"
+                else -> "infinite"
+            }
+        )
+    }
     if(keyForGallery!=0) {
         GalleryPickerForDropProfile(
             navController = navController
@@ -300,9 +310,9 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                                 DropProfileModel(
                                     image = uri.toString(),
                                     location = authViewModel.address.value,
-                                    landmark = "",
-                                    message = "",
-                                    expirationTime = ""
+                                    message = caption,
+                                    expirationTime = expirationTime,
+                                    createdBy="6680fef693d1e2645e19ee09"
                                 )
                             );
                         },

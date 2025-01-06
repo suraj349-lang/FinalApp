@@ -1,11 +1,17 @@
 package com.example.finalapp.model
 
+import java.util.Date
+
 data class DropProfileModel(
     val image:String,
+    val personalEvent:Boolean=true,
+    val tag:String="",
     val location:String,
-    val landmark:String,
-    val message:String?=null,
-    val expirationTime:String
+    val message:String,
+    val expirationTime:String,
+    val validTill:Date?=null,
+    val createdAt:Date?=null,
+    val createdBy:String,
 )
 
 data class DropProfileResponseModel(

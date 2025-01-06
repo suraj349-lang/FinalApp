@@ -63,7 +63,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -100,6 +99,7 @@ import com.example.finalapp.viewmodels.AuthViewModel
 import com.example.finalapp.model.OfferModel
 import com.example.finalapp.model.User
 import com.example.finalapp.navigation.SCREENS
+import com.example.finalapp.screens._1home._1_1Events.OfferCard
 import com.example.finalapp.viewmodels.EventsViewModel
 import com.example.finalapp.testing.TabItem
 import com.example.finalapp.screens.dialogBox.DropProfileDialog
@@ -429,7 +429,6 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
                     HorizontalPager(
                         state = pagerState,
                         modifier = Modifier
-                            .padding(top = 0.dp)
                             .fillMaxWidth()
                     ) { page ->
                         when (page) {
@@ -458,7 +457,9 @@ fun VectorsUI(
                     //ImageScreen(user)
                     // PostScreen(Post("", offer))
                     Log.d("offerData", "HomeScreenUI: $offer")
-                    VectorsListScreen(offer)
+                    //VectorsListScreen(offer)
+                   OfferCard(offer)
+
                 }
             }
 
