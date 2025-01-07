@@ -100,6 +100,7 @@ import com.example.finalapp.model.OfferModel
 import com.example.finalapp.model.User
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens._1home._1_1Events.OfferCard
+import com.example.finalapp.screens.dialogBox.DialogLoading
 import com.example.finalapp.viewmodels.EventsViewModel
 import com.example.finalapp.testing.TabItem
 import com.example.finalapp.screens.dialogBox.DropProfileDialog
@@ -433,7 +434,7 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
                     ) { page ->
                         when (page) {
                             0 -> VectorsUI( eventsViewModel, offersList, padding)
-                            1 -> DirectChat()
+                            1 -> DirectChat(eventsViewModel,navController)
                             2 -> GetDroppedProfiles(navController = navController, eventsViewModel = eventsViewModel)
                         }
                     }
@@ -471,11 +472,12 @@ fun VectorsUI(
         }
 
         RequestState.Loading -> {
-            HomeLoading(padding)
+           // HomeLoading(padding)
+            DialogLoading()
         }
 
         RequestState.Idle -> {
-            HomeLoading(padding)
+           // HomeLoading(padding)
         }
 
 
@@ -495,7 +497,7 @@ data class NavigationItem(
 
 @Composable
 fun HomeError(){
-    Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
         Image(painter = painterResource(id = R.drawable.oops), contentDescription = "oops")
         Text(text = "Error loading Profiles !", fontSize = 20.sp, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, color = Color(
             0xFFE91E63
