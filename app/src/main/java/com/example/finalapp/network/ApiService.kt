@@ -1,5 +1,6 @@
 package com.example.finalapp.network
 
+import com.example.finalapp.model.DirectChat
 import com.example.finalapp.model.DropProfileModel
 import com.example.finalapp.model.DropProfileResponseModel
 import com.example.finalapp.model.GetDropProfileResponseModel
@@ -12,6 +13,8 @@ import com.example.finalapp.model.RegisterUserModel
 import com.example.finalapp.model.Response
 import com.example.finalapp.model.SignupAPIResponse
 import com.example.finalapp.model.SingleOfferModel
+import com.example.finalapp.model.User
+import com.example.finalapp.utils.ApiResponse
 import okhttp3.MultipartBody
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -31,6 +34,12 @@ interface ApiService {
     suspend fun getAllDropProfiles():GetDropProfileResponseModel
     @POST("/api/v1/dropProfile/postDropProfile")
     suspend fun dropProfile(@Body data:DropProfileModel):DropProfileResponseModel
+
+    //------------------------- Direct chat --------------------------------------------//
+    @POST("/api/v1/direct-chat/")
+    suspend fun getDirectChatUsers(@Body data: DirectChat):ApiResponse<List<User>>
+    @POST("/api/v1/direct-chat/")
+    suspend fun setLocationForDirectChat(@Body data:DirectChat):ApiResponse<User>
 
     //---------------------------------------------------------------------//
     @POST("/api/v1/event")

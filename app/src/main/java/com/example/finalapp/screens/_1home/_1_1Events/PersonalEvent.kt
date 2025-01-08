@@ -36,6 +36,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -45,7 +46,9 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
 import com.example.finalapp.model.OfferModel
-
+import com.example.finalapp.utils.constants.Constants.FONT_EXTRA_LIGHT
+import com.example.finalapp.utils.constants.Constants.FONT_LIGHT
+import com.example.finalapp.utils.constants.Constants.FONT_MEDIUM
 
 
 @OptIn(ExperimentalGlideComposeApi::class)
@@ -82,7 +85,7 @@ fun OfferCard(offer: OfferModel) {
 
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.profile_image_2), // Replace with your profile image
+                        painter = painterResource(id = R.drawable.profile_image_1), // Replace with your profile image
                         contentDescription = "Profile Image",
                         modifier = Modifier
                             .size(50.dp),
@@ -118,11 +121,11 @@ fun OfferCard(offer: OfferModel) {
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Text(
-                                    text = "Marilyn munroe.",
+                                    text = "Suraj kumar",
                                     color = Color.Black,
                                     fontSize = 20.sp,
                                     modifier = Modifier,
-                                    fontFamily = FontFamily(Font(R.font.oreganoregular))
+                                    fontFamily = FONT_LIGHT
                                 )
 //                                Image(
 //                                    painter = painterResource(id = R.drawable.personal),
@@ -131,14 +134,15 @@ fun OfferCard(offer: OfferModel) {
 //                                )
                                 Card(
                                     modifier = Modifier.wrapContentHeight(),
-                                    colors = CardDefaults.cardColors(containerColor = Color.Black),
+                                    colors = CardDefaults.cardColors(containerColor = Color.LightGray),
                                     shape = RoundedCornerShape(6.dp)
                                 ) {
                                     Text(
-                                        text = "+Follow",
-                                        modifier = Modifier.padding(start = 2.dp, end = 2.dp),
+                                        text = "Follow",
+                                        modifier = Modifier.padding(start = 4.dp, end = 4.dp),
                                         fontSize = 12.sp,
-                                        color = Color.White
+                                        color = Color.Black,
+                                        fontFamily = FONT_LIGHT,fontWeight = FontWeight.Bold,
                                     )
                                 }
                             }
@@ -161,17 +165,16 @@ fun OfferCard(offer: OfferModel) {
                                 Card(
                                     modifier = Modifier.wrapContentSize(),
                                     colors = CardDefaults.cardColors(
-                                        containerColor = Color(
-                                            0xFFD81B60
-                                        ).copy(alpha = 0.7f)
+                                      //  containerColor = Color(0xFFD81B60).copy(alpha = 0.7f)
+                                    containerColor = Color.White
                                     ),
                                     shape = RoundedCornerShape(6.dp)
                                 ) {
                                     Text(
-                                        text =  "Miscellaneous ",
-                                        color = Color(0xFFFFFFFF),
-                                        fontFamily = FontFamily(Font(R.font.oreganoregular)),
-                                        fontSize = 18.sp, fontWeight = FontWeight.Bold,
+                                        text =  "Trekking ",
+                                        color = Color(0xFF4B045E),
+                                        fontFamily = FONT_EXTRA_LIGHT,
+                                        fontSize = 14.sp, fontWeight = FontWeight.Bold,
                                         modifier = Modifier.padding(start = 4.dp, end = 4.dp)
                                     )
                                 }
@@ -179,33 +182,33 @@ fun OfferCard(offer: OfferModel) {
                                 Card(
                                     modifier = Modifier.wrapContentSize(),
                                     colors = CardDefaults.cardColors(
-                                        containerColor = Color(
-                                            0xFF043C6D
-                                        ).copy(alpha = 0.8f)
+                                       // containerColor = Color(0xFF043C6D).copy(alpha = 0.8f)
+                                    containerColor = Color.LightGray
                                     ),
                                     shape = RoundedCornerShape(6.dp)
                                 ) {
                                     Text(
-                                        text =  "World",
+                                        text =  "Himachal Pradesh ,In",
                                         modifier = Modifier.padding(2.dp),
-                                        fontFamily = FontFamily(Font(R.font.oreganoregular)),
-                                        color = Color.White
+                                        fontFamily = FONT_EXTRA_LIGHT,fontWeight = FontWeight.Bold,
+                                        color = Color(0xFF00080F),
+                                        fontSize=14.sp
                                     )
                                 }
                                 Card(
                                     modifier = Modifier.wrapContentSize(),
                                     colors = CardDefaults.cardColors(
-                                        containerColor = Color(
-                                            0xFF3F7903
-                                        ).copy(alpha = 0.9f)
+                                      //  containerColor = Color(0xFF3F7903).copy(alpha = 0.9f)
+                                    containerColor = Color.LightGray
                                     ),
                                     shape = RoundedCornerShape(3.dp)
                                 ) {
                                     Text(
-                                        text = "Top 8 user",
-                                        fontFamily = FontFamily(Font(R.font.oreganoregular)),
+                                        text = "12 people max",
+                                        fontFamily = FONT_EXTRA_LIGHT,fontWeight = FontWeight.Bold,
                                         modifier = Modifier.padding(2.dp),
-                                        color = Color.White
+                                        color = Color(0xFF060C00),
+                                        fontSize = 12.sp
                                     )
                                 }
                             }
@@ -218,9 +221,10 @@ fun OfferCard(offer: OfferModel) {
                                 .background(color = Color.White.copy(alpha = 0.9f))
                         ) {
                             Text(
-                                text =  "Looking for someone to join me for a night out at the club. Good vibes, music, and fun!",
-                                fontFamily = FontFamily(Font(R.font.oreganoregular)),
-                                fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black,
+                                text =  "Looking for someone to join me for trekking at HP, India. Nature,Adventure,FUN ,memories.",
+                                fontFamily = FONT_EXTRA_LIGHT,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 14.sp, color = Color.Black,
                                 modifier = Modifier
                                     .padding(8.dp),
                                 textAlign = TextAlign.Center
@@ -244,24 +248,24 @@ fun OfferCard(offer: OfferModel) {
                                     verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement = Arrangement.Start
                                 ) {
-                                    Row(
+                                    Column(
                                         modifier = Modifier
                                             .fillMaxHeight()
                                             .fillMaxWidth(0.5f),
-                                        verticalAlignment = Alignment.CenterVertically,
-                                        horizontalArrangement = Arrangement.Start
+                                        verticalArrangement = Arrangement.Center,
+                                        horizontalAlignment = Alignment.Start
                                     ) {
                                         Text(
                                             text = "event active till :",
-                                            fontFamily = FontFamily(Font(R.font.oreganoregular)),
+                                            fontFamily = FONT_EXTRA_LIGHT,
                                             fontSize = 8.sp,
                                             fontWeight = FontWeight.SemiBold,
                                             color = Color.DarkGray,
 
                                             )
                                         Text(
-                                            text =  "Forever",
-                                            fontFamily = FontFamily(Font(R.font.oreganoregular)),
+                                            text =  "12 hrs.",
+                                            fontFamily = FONT_EXTRA_LIGHT,
                                             fontSize = 20.sp,
 //                                        fontWeight = FontWeight.SemiBold,
                                             color = Color.Black,
@@ -287,7 +291,7 @@ fun OfferCard(offer: OfferModel) {
                                             colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
                                             shape = RoundedCornerShape(6.dp)
                                         ) {
-                                            Text(text = "JOIN")
+                                            Text(text = "JOIN", fontFamily = FONT_LIGHT)
 
                                         }
 

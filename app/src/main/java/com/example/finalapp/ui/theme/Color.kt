@@ -14,9 +14,10 @@ val statusAndTopAppBarColor= Color(0xFF073144);  // original    0xFFE99923      
 
 
 //purple=0xFF5D0B6B
-val topAppBarTextColor= Color(0xFFEEE6A2); //
+val topAppBarTextColor= Color(0xFFEBDB55); //0xFFEEE6A2
 
 val DarkBlue=Color(0xFF08155E)
 val LightBlueBkg= Color(0xFF3C9BE7)
-val floatingActionBtnTextColor= Color(0xFFEBDB55);
-val statusBarColor= Color(0xFFBFFFBC)
+val floatingActionBtnTextColor= Color(0xFF9980C5);
+val statusBarColor= Color(0xFF4505C7) //0xFFBFFFBC  //
+val statusBarColorBlue=Color(0xFF000000) //0xFF601AF1

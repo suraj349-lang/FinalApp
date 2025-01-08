@@ -1,6 +1,5 @@
 package com.example.finalapp.screens._1home
 
-import android.annotation.SuppressLint
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.border
@@ -30,11 +29,9 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -51,14 +48,14 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import com.bumptech.glide.integration.compose.CrossFade
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
-import kotlinx.coroutines.launch
 
 
 @Composable
-fun GetDroppedProfiles(navController:NavHostController, eventsViewModel: EventsViewModel) {
+fun DroppedProfiles(navController:NavHostController, eventsViewModel: EventsViewModel) {
     val context= LocalContext.current
     val droppedProfiles by remember {
         mutableStateOf(eventsViewModel.droppedProfilesList)
@@ -97,7 +94,7 @@ fun GetDroppedProfiles(navController:NavHostController, eventsViewModel: EventsV
                                         .padding(16.dp)
                                 )
 
-                                LazyColumn {
+                                LazyColumn(modifier = Modifier.zIndex(1f)) {
                                     items(predictions) { prediction ->
                                         Text(
                                             text = prediction.getPrimaryText(null).toString(),
@@ -111,7 +108,42 @@ fun GetDroppedProfiles(navController:NavHostController, eventsViewModel: EventsV
                                     }
                                 }
                             }
-                            Card(modifier = Modifier
+
+                            LazyVerticalGrid(
+                                modifier=Modifier.zIndex(0f),
+                                columns = GridCells.Fixed(2),
+                                contentPadding = PaddingValues(2.dp),
+                                verticalArrangement = Arrangement.spacedBy(1.dp),
+                                horizontalArrangement = Arrangement.spacedBy(1.dp)
+                            ) {
+                                items(droppedProfiles.value) { profile ->
+                                    DroppedProfile(profile = profile)
+
+                                }
+                            }
+                        }
+                    }
+                    is RequestState.Error->{
+                        Log.d("Data received",result.error.message.toString())
+                        Toast.makeText(context,"$result", Toast.LENGTH_SHORT).show()
+                    }
+                    RequestState.Loading->{
+                        CircularProgressIndicator(color = Color(0xFF1289BE))
+                    }
+                    RequestState.Idle->{
+                        CircularProgressIndicator(color = Color(0xFF1289BE))
+
+                    }
+
+                }
+
+            }
+
+        }
+    }
+
+/*
+Card(modifier = Modifier
                                 .height(if (height) 30.dp else 100.dp)
                                 .fillMaxWidth(), backgroundColor = Color(0xFFC5BBBE)
                             )
@@ -152,39 +184,7 @@ fun GetDroppedProfiles(navController:NavHostController, eventsViewModel: EventsV
                                 }
 
                             }
-
-                            LazyVerticalGrid(
-                                columns = GridCells.Fixed(2),
-                                contentPadding = PaddingValues(2.dp),
-                                verticalArrangement = Arrangement.spacedBy(1.dp),
-                                horizontalArrangement = Arrangement.spacedBy(1.dp)
-                            ) {
-                                items(droppedProfiles.value) { profile ->
-                                    DroppedProfile(profile = profile)
-
-                                }
-                            }
-                        }
-                    }
-                    is RequestState.Error->{
-                        Log.d("Data received",result.error.message.toString())
-                        Toast.makeText(context,"$result", Toast.LENGTH_SHORT).show()
-                    }
-                    RequestState.Loading->{
-                        CircularProgressIndicator(color = Color(0xFF1289BE))
-                    }
-                    RequestState.Idle->{
-                        CircularProgressIndicator(color = Color(0xFF1289BE))
-
-                    }
-
-                }
-
-            }
-
-        }
-    }
-
+ */
 
 
 

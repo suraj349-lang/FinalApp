@@ -2,6 +2,7 @@ package com.example.finalapp.repository
 
 import android.content.Context
 import android.net.Uri
+import com.example.finalapp.model.DirectChat
 import com.example.finalapp.model.DropProfileModel
 import com.example.finalapp.model.DropProfileResponseModel
 import com.example.finalapp.model.GetDropProfileResponseModel
@@ -9,8 +10,10 @@ import com.example.finalapp.model.ImageUploadResponse
 import com.example.finalapp.model.OfferModel
 import com.example.finalapp.model.OfferResponseModel
 import com.example.finalapp.model.SingleOfferModel
+import com.example.finalapp.model.User
 import com.example.finalapp.network.ApiService
 import com.example.finalapp.screens._4profile.uriToMultipart
+import com.example.finalapp.utils.ApiResponse
 import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -21,6 +24,13 @@ import javax.inject.Inject
 
 @ViewModelScoped
 class EventsRepository @Inject constructor(private val api: ApiService) {
+
+    fun sendUserLocation(directChat: DirectChat):Flow<ApiResponse<User>> = flow {
+        emit(api.setLocationForDirectChat(directChat))
+    }.flowOn(Dispatchers.IO)
+    fun getDirectChatUsers(directChat: DirectChat):Flow<ApiResponse<List<User>>> = flow {
+        emit(api.getDirectChatUsers(directChat))
+    }.flowOn(Dispatchers.IO)
 
     fun sendCreateEventData(offerData: OfferModel): Flow<SingleOfferModel> = flow  {
         emit(api.premiumCreateEvent(offerData))

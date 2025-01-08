@@ -173,35 +173,33 @@ fun DirectChatItem(image: Int,onDirectChatItemClicked:()->Unit) {
 
 @Composable
 fun SwitchWithIcon(checked: Boolean,onClick:(value:Boolean)->Unit) {
-
-
-        Switch(
-            checked = checked,
-            onCheckedChange = {
-                onClick(it)
-            },
-            modifier = Modifier.padding(0.dp),
-            thumbContent = if (checked) {
-                {
-                    Icon(
-                        imageVector = Icons.Filled.Check,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(SwitchDefaults.IconSize)
-                            .padding(0.dp),
-                        tint = Color.White
-                    )
-                }
-            } else {
-                null
-            },
-            colors = SwitchDefaults.colors(
-                checkedThumbColor = Color(0xFF022E04),// MaterialTheme.colorScheme.primary,
-                checkedTrackColor = MaterialTheme.colorScheme.primaryContainer,
-                uncheckedThumbColor = MaterialTheme.colorScheme.secondary,
-                uncheckedTrackColor = MaterialTheme.colorScheme.secondaryContainer,
-            )
+    Switch(
+        checked = checked,
+        onCheckedChange = {
+            onClick(it)
+        },
+        modifier = Modifier.padding(0.dp),
+        thumbContent = if (checked) {
+            {
+                Icon(
+                    imageVector = Icons.Filled.Check,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .size(SwitchDefaults.IconSize)
+                        .padding(0.dp),
+                    tint = Color.White
+                )
+            }
+        } else {
+            null
+        },
+        colors = SwitchDefaults.colors(
+            checkedThumbColor = Color(0xFF022E04),// MaterialTheme.colorScheme.primary,
+            checkedTrackColor = MaterialTheme.colorScheme.primaryContainer,
+            uncheckedThumbColor = MaterialTheme.colorScheme.secondary,
+            uncheckedTrackColor = MaterialTheme.colorScheme.secondaryContainer,
         )
+    )
 
 
 }
