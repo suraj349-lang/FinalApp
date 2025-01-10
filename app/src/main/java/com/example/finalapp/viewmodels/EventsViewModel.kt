@@ -35,7 +35,6 @@ class EventsViewModel @Inject constructor(private val eventsRepository: EventsRe
     init {
         viewModelScope.launch(Dispatchers.Main) {
             val job = viewModelScope.launch {
-                getAllDropProfiles()
                 getAllEvents()
             }
             job.join()
@@ -65,7 +64,7 @@ class EventsViewModel @Inject constructor(private val eventsRepository: EventsRe
     //--------------------------------------------------------------------------------------------------------------------------------------------//
     val getDropProfileResponse:MutableState<RequestState<List<DropProfileModel>>> = mutableStateOf(RequestState.Idle)
     var droppedProfilesList= mutableStateOf<List<DropProfileModel>>(emptyList())
-     suspend fun getAllDropProfiles() {
+     suspend fun getAllDropProfiles(location:String="",date:String="") {
         eventsRepository.getAllDropProfiles()
             .onStart {
                 getDropProfileResponse.value=RequestState.Loading;

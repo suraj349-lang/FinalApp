@@ -33,21 +33,23 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
 import com.example.finalapp.model.OfferModel
-import com.example.finalapp.utils.constants.Constants.FONT_EXTRA_LIGHT
-import com.example.finalapp.utils.constants.Constants.FONT_LIGHT
+import com.example.finalapp.ui.theme.statusBarColor
+import com.example.finalapp.utils.constants.Constants
 
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun PersonalEvent(offer: OfferModel) {
+fun PersonalEventDesign2(offer: OfferModel) {
     Surface(modifier = Modifier.fillMaxSize()) {
         Box(
             modifier = Modifier
@@ -92,7 +94,7 @@ fun PersonalEvent(offer: OfferModel) {
                         .fillMaxWidth()
                         .height(200.dp),
                     colors = CardDefaults.cardColors(containerColor = Color.Transparent),
-                    border = BorderStroke(width = 1.dp, color = Color.LightGray),
+                   // border = BorderStroke(width = 1.dp, color = Color.LightGray),
                     shape = RoundedCornerShape(0.dp)
                 ) {
                     Column(
@@ -105,38 +107,35 @@ fun PersonalEvent(offer: OfferModel) {
                                 .height(40.dp),
                             shape = RoundedCornerShape(0f),
                             colors = CardDefaults.cardColors(
-//                                containerColor = Color(0xFF0F3A4E).copy(alpha = 0.8f)
-                                containerColor = Color.White.copy(alpha = 0.9f)
+                                containerColor = Color.Transparent
                             )
                         ) {
                             Row(
                                 modifier = Modifier.fillMaxSize().padding(start=8.dp,end=16.dp),
                                 verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceBetween
+                                horizontalArrangement = Arrangement.spacedBy(24.dp)
                             ) {
                                 Text(
-                                    text = "Suraj kumar",
-                                    color = Color.Black,
-                                    fontSize = 20.sp,
-                                    modifier = Modifier,
-                                    fontFamily = FONT_LIGHT
+                                    text = "suraj kumar",
+                                    color = Color.White,
+                                    fontSize = 16.sp,
+                                    fontWeight=FontWeight.Bold,
+                                    modifier = Modifier.background(color = Color.LightGray.copy(alpha = 0.2f)),
+                                    fontFamily = Constants.FONT_LIGHT
                                 )
-//                                Image(
-//                                    painter = painterResource(id = R.drawable.personal),
-//                                    contentDescription = "",
-//                                    modifier = Modifier.size(30.dp)
-//                                )
                                 Card(
                                     modifier = Modifier.wrapContentHeight(),
-                                    colors = CardDefaults.cardColors(containerColor = Color.LightGray),
-                                    shape = RoundedCornerShape(6.dp)
+                                    colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+                                    shape = RoundedCornerShape(6.dp),
+                                    border = BorderStroke(width = 1.dp, color = Color.LightGray)
                                 ) {
                                     Text(
                                         text = "Follow",
-                                        modifier = Modifier.padding(start = 4.dp, end = 4.dp),
+                                        modifier = Modifier.padding(start = 4.dp, end = 4.dp).background(color = Color.LightGray.copy(alpha = 0.2f)),
                                         fontSize = 12.sp,
-                                        color = Color.Black,
-                                        fontFamily = FONT_LIGHT,fontWeight = FontWeight.Bold,
+                                        color = Color.White,
+
+                                        fontFamily = Constants.FONT_LIGHT,fontWeight = FontWeight.Bold,
                                     )
                                 }
                             }
@@ -146,7 +145,8 @@ fun PersonalEvent(offer: OfferModel) {
                                 .fillMaxWidth()
                                 .height(40.dp),
                             shape= RoundedCornerShape(2.dp),
-                            colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.4f))
+                           // colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.4f))
+                            colors = CardDefaults.cardColors(containerColor = Color.Transparent)
                         ) {
                             Row(
                                 modifier = Modifier
@@ -159,15 +159,16 @@ fun PersonalEvent(offer: OfferModel) {
                                 Card(
                                     modifier = Modifier.wrapContentSize(),
                                     colors = CardDefaults.cardColors(
-                                      //  containerColor = Color(0xFFD81B60).copy(alpha = 0.7f)
-                                    containerColor = Color.White
+                                        //  containerColor = Color(0xFFD81B60).copy(alpha = 0.7f)
+                                        containerColor = Color.White
                                     ),
-                                    shape = RoundedCornerShape(6.dp)
+                                    shape = RoundedCornerShape(6.dp),
+                                    border = BorderStroke(width = 1.dp,color= statusBarColor)
                                 ) {
                                     Text(
                                         text =  "Trekking ",
                                         color = Color(0xFF4B045E),
-                                        fontFamily = FONT_EXTRA_LIGHT,
+                                        fontFamily = Constants.FONT_EXTRA_LIGHT,
                                         fontSize = 14.sp, fontWeight = FontWeight.Bold,
                                         modifier = Modifier.padding(start = 4.dp, end = 4.dp)
                                     )
@@ -176,15 +177,15 @@ fun PersonalEvent(offer: OfferModel) {
                                 Card(
                                     modifier = Modifier.wrapContentSize(),
                                     colors = CardDefaults.cardColors(
-                                       // containerColor = Color(0xFF043C6D).copy(alpha = 0.8f)
-                                    containerColor = Color.LightGray
+                                        // containerColor = Color(0xFF043C6D).copy(alpha = 0.8f)
+                                        containerColor = Color.LightGray
                                     ),
                                     shape = RoundedCornerShape(6.dp)
                                 ) {
                                     Text(
                                         text =  "Himachal Pradesh ,In",
                                         modifier = Modifier.padding(2.dp),
-                                        fontFamily = FONT_EXTRA_LIGHT,fontWeight = FontWeight.Bold,
+                                        fontFamily = Constants.FONT_EXTRA_LIGHT,fontWeight = FontWeight.Bold,
                                         color = Color(0xFF00080F),
                                         fontSize=14.sp
                                     )
@@ -192,14 +193,14 @@ fun PersonalEvent(offer: OfferModel) {
                                 Card(
                                     modifier = Modifier.wrapContentSize(),
                                     colors = CardDefaults.cardColors(
-                                      //  containerColor = Color(0xFF3F7903).copy(alpha = 0.9f)
-                                    containerColor = Color.LightGray
+                                        //  containerColor = Color(0xFF3F7903).copy(alpha = 0.9f)
+                                        containerColor = Color.LightGray
                                     ),
                                     shape = RoundedCornerShape(3.dp)
                                 ) {
                                     Text(
                                         text = "12 people max",
-                                        fontFamily = FONT_EXTRA_LIGHT,fontWeight = FontWeight.Bold,
+                                        fontFamily = Constants.FONT_EXTRA_LIGHT,fontWeight = FontWeight.Bold,
                                         modifier = Modifier.padding(2.dp),
                                         color = Color(0xFF060C00),
                                         fontSize = 12.sp
@@ -216,7 +217,7 @@ fun PersonalEvent(offer: OfferModel) {
                         ) {
                             Text(
                                 text =  "Looking for someone to join me for trekking at HP, India. Nature,Adventure,FUN ,memories.",
-                                fontFamily = FONT_EXTRA_LIGHT,
+                                fontFamily = Constants.FONT_EXTRA_LIGHT,
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 14.sp, color = Color.Black,
                                 modifier = Modifier
@@ -232,7 +233,8 @@ fun PersonalEvent(offer: OfferModel) {
                             Card(
                                 modifier = Modifier.wrapContentSize(),
                                 colors = CardDefaults.cardColors(
-                                    containerColor = Color(0xFFF4F8F4)
+                                   // containerColor = Color(0xFFF4F8F4)
+                                      containerColor = Color.Transparent
                                 ), shape = RoundedCornerShape(0.dp)
                             ) {
                                 Row(
@@ -251,18 +253,21 @@ fun PersonalEvent(offer: OfferModel) {
                                     ) {
                                         Text(
                                             text = "event active till :",
-                                            fontFamily = FONT_EXTRA_LIGHT,
+                                            fontFamily = Constants.FONT_EXTRA_LIGHT,
                                             fontSize = 8.sp,
-                                            fontWeight = FontWeight.SemiBold,
-                                            color = Color.DarkGray,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color.White,
 
                                             )
                                         Text(
                                             text =  "12 hrs.",
-                                            fontFamily = FONT_EXTRA_LIGHT,
+                                            fontFamily = Constants.FONT_EXTRA_LIGHT,
+                                            style = TextStyle(
+                                                textDecoration = TextDecoration.Underline
+                                            ),
                                             fontSize = 20.sp,
-//                                        fontWeight = FontWeight.SemiBold,
-                                            color = Color.Black,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color.White,
 
                                             )
                                     }
@@ -285,7 +290,7 @@ fun PersonalEvent(offer: OfferModel) {
                                             colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
                                             shape = RoundedCornerShape(6.dp)
                                         ) {
-                                            Text(text = "JOIN", fontFamily = FONT_LIGHT)
+                                            Text(text = "JOIN", fontFamily = Constants.FONT_LIGHT)
 
                                         }
 

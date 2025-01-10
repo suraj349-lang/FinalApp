@@ -32,7 +32,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
@@ -43,12 +45,15 @@ import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
 import androidx.compose.material.TabRowDefaults
 import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
@@ -63,7 +68,9 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -72,8 +79,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -99,7 +104,7 @@ import com.example.finalapp.viewmodels.AuthViewModel
 import com.example.finalapp.model.OfferModel
 import com.example.finalapp.model.User
 import com.example.finalapp.navigation.SCREENS
-import com.example.finalapp.screens._1home._1_1Events.OfferCard
+import com.example.finalapp.screens._1home._1_1Events.PersonalEventDesign2
 import com.example.finalapp.screens.dialogBox.DialogLoading
 import com.example.finalapp.viewmodels.EventsViewModel
 import com.example.finalapp.testing.TabItem
@@ -107,22 +112,24 @@ import com.example.finalapp.screens.dialogBox.DropProfileDialog
 import com.example.finalapp.screens.dialogBox.ShowQRDialog
 import com.example.finalapp.screens.dialogBox.showDialog
 import com.example.finalapp.testing.items
+import com.example.finalapp.ui.TAB_ITEMS
 import com.example.finalapp.ui.theme.DarkBlue
-import com.example.finalapp.ui.theme.floatingActionBtnTextColor
+import com.example.finalapp.ui.theme.homeTopBarIconsColor
 import com.example.finalapp.ui.theme.statusBarColor
 import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.utils.constants.Constants.TAG
 import com.example.finalapp.utils.RequestState
+import com.example.finalapp.utils.constants.Constants.FONT_MEDIUM
 import kotlinx.coroutines.launch
 
 
+
+
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter", "StateFlowValueCalledInComposition")
 @Composable
 fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewModel, authViewModel: AuthViewModel) {
     var selectedItemIndex by rememberSaveable { mutableStateOf(0) }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val buttonsVisible = remember { mutableStateOf(true) }
     val eventsViewModel = hiltViewModel<EventsViewModel>()
     val offersList = eventsViewModel.offersList.value
@@ -139,14 +146,9 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
     }
 
     val pagerState = rememberPagerState(0, pageCount = { 3 })
-    val tabItems = listOf(
-        TabItem("Posts"),
-        TabItem("Nearby-chat"),
-        TabItem("Drop-profile")
-    )
+
 
     Scaffold(
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             HomeTopBar(
                 Constants.APP_NAME,
@@ -227,13 +229,12 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
                             )
                         },
                         backgroundColor = Color(0xFFFFFFFE),
-                        contentColor = Color(0xFFEB1809),
                         modifier = Modifier
                             .padding(bottom = 0.dp)
                             .fillMaxWidth()
-                            .height(20.dp)
+                            .height(40.dp)
                     ) {
-                        tabItems.forEachIndexed { index, item ->
+                        TAB_ITEMS.forEachIndexed { index, item ->
                             Tab(
                                 selected = pagerState.currentPage == index,
                                 onClick = { scope.launch { pagerState.animateScrollToPage(index) } },
@@ -242,7 +243,7 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
                                         text = item.title,
                                         color = if (pagerState.currentPage == index) Color(0xFF000000) else Color(0xFF636368),
                                         style = MaterialTheme.typography.titleMedium,
-                                        fontSize = 16.sp,
+                                        fontSize = 18.sp,
                                         fontWeight = if (pagerState.currentPage == index) FontWeight.Bold else FontWeight.Normal
                                     )
                                 }
@@ -257,7 +258,8 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
                         when (page) {
                             0 -> VectorsUI( eventsViewModel, offersList, padding)
                             1 -> DirectChat(eventsViewModel,navController)
-                            2 -> DroppedProfiles(navController = navController, eventsViewModel = eventsViewModel)
+                            2 -> DroppedProfilesDesign2(navController ,eventsViewModel)
+                                //DroppedProfiles(navController = navController, eventsViewModel = eventsViewModel)
                         }
                     }
                 }
@@ -265,6 +267,8 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
         }
     }
 }
+
+
 
 @Composable
 fun VectorsUI(
@@ -275,13 +279,14 @@ fun VectorsUI(
     when (val result = eventsViewModel.allOffers.value) {
         is RequestState.Success -> {
             eventsViewModel.offersList.value = result.data
-            LazyColumn {
+            LazyColumn{
                 items(offersList) { offer ->
                     //ImageScreen(user)
                     // PostScreen(Post("", offer))
                     Log.d("offerData", "HomeScreenUI: $offer")
                     //VectorsListScreen(offer)
-                   OfferCard(offer)
+                  // PersonalEvent(offer)
+                    PersonalEventDesign2(offer)
 
                 }
             }
@@ -408,26 +413,28 @@ fun HomeFloatingActionButton(authViewModel: AuthViewModel, eventsViewModel: Even
 
     FloatingActionButton(
         onClick = { showCustomDialog = !showCustomDialog},
-        Modifier.size(75.dp),
-        shape= CircleShape,
-        contentColor = Color.Black,
-        containerColor = floatingActionBtnTextColor
+        shape= RoundedCornerShape(8.dp),
+        modifier = Modifier
+            .wrapContentSize()
+            .padding(2.dp),
+        contentColor = Color.White,
+        containerColor = statusBarColor// floatingActionBtnTextColor
     ) {
-        Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(modifier = Modifier.wrapContentSize(), horizontalAlignment = Alignment.CenterHorizontally) {
             Image(
                 painterResource(id = R.drawable.drop_profile_filled_rounded),
                 contentDescription = "Add",
-                colorFilter = ColorFilter.tint(color= Color.White),
+                colorFilter = ColorFilter.tint(color=  Color.White),
                 modifier= Modifier
                     .padding(top = 4.dp)
-                    .size(50.dp)
+                    .size(40.dp)
             )
-            Text(text = "Drop Profile", fontSize = 8.sp, color = Color.White,modifier = Modifier.padding(top=0.dp))
+            Text(text = "Drop Profile", fontSize = 8.sp,modifier = Modifier.padding(top=0.dp))
         }
     }
     if (showCustomDialog) {
-       // CustomAlertDialog(offerViewModel , navController ) { showCustomDialog = !showCustomDialog }
         DropProfileDialog(authViewModel ,eventsViewModel , navController ) { showCustomDialog = !showCustomDialog }
+        Log.d("Suraj", "HomeFloatingActionButton:entered to drop profile dialog ")
     }
 }
 
@@ -812,7 +819,7 @@ fun HomeTopBar(title:String,navController: NavHostController,navIcon:Boolean,act
     TopAppBar(
         colors = TopAppBarDefaults.topAppBarColors(
            // containerColor = statusAndTopAppBarColor
-        containerColor = statusBarColor  //  0xF8E2A61A
+        containerColor = statusBarColor //  0xF8E2A61A
         ),
         title = {
             Text(
@@ -820,25 +827,26 @@ fun HomeTopBar(title:String,navController: NavHostController,navIcon:Boolean,act
                 fontSize = 20.sp,
                 maxLines = 1,
                 fontWeight=FontWeight.SemiBold,
-                overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top=8.dp), color = Color.White, style = MaterialTheme.typography.titleMedium
+                modifier = Modifier.padding(top=8.dp), color = homeTopBarIconsColor, fontFamily = FONT_MEDIUM
             )
         },
-        navigationIcon = {
-            Image(
-                painter = painterResource(
-                    id = R.drawable.app_icon
-                ),
-                colorFilter = ColorFilter.tint(color= Color.White),
-                contentDescription = "",
-                modifier = Modifier
-                    .padding(top = 6.dp)
-                    .size(28.dp)
-            )
-        }, actions = {
+//        navigationIcon = {
+//            Image(
+//                painter = painterResource(
+//                    id = R.drawable.app_icon_new
+//                ),
+//                colorFilter = ColorFilter.tint(color= Color.White),
+//                contentDescription = "",
+//                modifier = Modifier
+//                    .padding(top = 6.dp)
+//                    .size(28.dp)
+//            )
+//        },
+         actions = {
             if(actionIcon) {
                 Image(painter = painterResource(id = R.drawable.new_qr),
                     contentDescription = "",
-                    colorFilter = ColorFilter.tint(color= Color.White),
+                    colorFilter = ColorFilter.tint(color=homeTopBarIconsColor),
                     modifier = Modifier
                         .padding(end = 16.dp)
                         .size(24.dp)
@@ -848,7 +856,7 @@ fun HomeTopBar(title:String,navController: NavHostController,navIcon:Boolean,act
                 Image(
                     painter = painterResource(id = R.drawable.notification_new),
                     contentDescription = "",
-                    colorFilter=ColorFilter.tint(color = Color.White),
+                    colorFilter=ColorFilter.tint(color = homeTopBarIconsColor),
                     modifier = Modifier
                         .clickable { navController.navigate(SCREENS.NOTIFICATIONS.route) }
                         .padding(end = 16.dp)
@@ -857,12 +865,12 @@ fun HomeTopBar(title:String,navController: NavHostController,navIcon:Boolean,act
                 icon?.let { painterResource(id = it) }?.let {
                     Image(painter = it,
                         contentDescription = "",
-                        colorFilter=ColorFilter.tint(color = Color.White),
+                        colorFilter=ColorFilter.tint(color = homeTopBarIconsColor),
                         modifier = Modifier
                             .padding(end = 8.dp)
                             .size(24.dp)
                             //.rotate(-40f)
-                           // .shadow(elevation = 12.dp, shape = CircleShape, spotColor = Color.White)
+                            // .shadow(elevation = 12.dp, shape = CircleShape, spotColor = Color.White)
                             .clickable {
                                 navController.navigate(SCREENS.CHAT.route)
                             })

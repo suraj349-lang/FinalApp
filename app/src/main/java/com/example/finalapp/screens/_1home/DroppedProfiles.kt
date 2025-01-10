@@ -26,6 +26,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.Composable
@@ -64,8 +65,8 @@ fun DroppedProfiles(navController:NavHostController, eventsViewModel: EventsView
     var query by remember { mutableStateOf("") }
     val predictions by eventsViewModel.getAutocompletePredictions(query).collectAsState(emptyList())
     Surface(modifier = Modifier
-            .fillMaxSize()
-            .padding()) {
+        .fillMaxSize()
+        .padding()) {
             Column(
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
@@ -102,7 +103,9 @@ fun DroppedProfiles(navController:NavHostController, eventsViewModel: EventsView
                                                 .padding(16.dp)
                                                 .clickable {
                                                     // Handle click on prediction
-                                                    query = prediction.getPrimaryText(null).toString()
+                                                    query = prediction
+                                                        .getPrimaryText(null)
+                                                        .toString()
                                                 }
                                         )
                                     }
@@ -195,10 +198,10 @@ fun DroppedProfile(profile: DropProfileModel) {
     val widthInDp = configuration.screenWidthDp.dp
     val heightInDp = configuration.screenHeightDp.dp * 0.5f
     Card(modifier = Modifier
-        .padding(8.dp)
+        .padding(2.dp)
         .fillMaxWidth()
         .wrapContentHeight(),
-        shape = RoundedCornerShape(8.dp)
+        shape = RoundedCornerShape(4.dp)
         )
 
     {
@@ -207,10 +210,6 @@ fun DroppedProfile(profile: DropProfileModel) {
             .border(
                 width = 0.1.dp, color = Color.LightGray
             )) {
-
-            profile.expirationTime?.let { Text(text = it) }
-            profile.message?.let { Text(text = it) }
-            profile.location?.let { Text(text = it, maxLines = 1) }
 
             GlideImage(
                 model =  if(profile.image!="") profile.image else R.drawable.femaleprofile,
@@ -222,6 +221,9 @@ fun DroppedProfile(profile: DropProfileModel) {
                 // .clip(shape = RoundedCornerShape(12.dp))
                 , contentScale = ContentScale.Crop
             )
+            profile.expirationTime?.let { Text(text = it) }
+            profile.message?.let { Text(text = it) }
+            profile.location?.let { Text(text = it, maxLines = 1) }
 
 
 

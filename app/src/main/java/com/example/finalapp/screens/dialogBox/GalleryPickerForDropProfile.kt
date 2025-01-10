@@ -25,6 +25,7 @@ import androidx.navigation.NavHostController
 import com.example.finalapp.viewmodels.ProfileViewModel
 import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.utils.RequestState
+import com.example.finalapp.utils.constants.Constants.TAG
 import kotlinx.coroutines.launch
 
 
@@ -61,8 +62,10 @@ fun GalleryPickerForDropProfile(navController: NavHostController, onImageSelecte
         contract = ActivityResultContracts.PickMultipleVisualMedia(),
         onResult = { uris ->
             if (uris.isNotEmpty()) {
+                Log.d("Suraj", "GalleryPickerForDropProfile: Image selected")
                 selectedImageUris = uris
                 onImageSelected(selectedImageUris[0])
+                Log.d("Suraj", "uri of image:${selectedImageUris[0]} ")
             } else {
                 // Navigate back if no image is selected
                 navController.navigateUp()

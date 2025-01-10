@@ -80,8 +80,8 @@ fun BottomBar(
                 selected = currentRoute == screen.route,
                 icon = {
                     Column( verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-                        Image(painter = painterResource(id = screen.icon), contentDescription ="",modifier=Modifier.size(24.dp), colorFilter = ColorFilter.tint(color = statusBarColor) )
-                        Text(text = screen.name, fontSize = 8.sp, style = MaterialTheme.typography.labelSmall, color = statusBarColor)
+                        Image(painter = painterResource(id = screen.icon), contentDescription ="",modifier=Modifier.size(24.dp), colorFilter = ColorFilter.tint( color = if(currentRoute == screen.route) statusBarColor else Color.Gray) )
+                        Text(text = screen.name, fontSize = 8.sp, style = MaterialTheme.typography.labelSmall, color = if(currentRoute == screen.route) statusBarColor  else Color.Gray)
                     }
 
                 },
@@ -98,7 +98,7 @@ fun BottomBar(
 //                    }
                 },
                 colors = NavigationBarItemDefaults.colors(
-                    indicatorColor = Color.LightGray
+                    indicatorColor = Color.Transparent
                 )
             )
         }

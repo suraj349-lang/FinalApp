@@ -71,6 +71,7 @@ import com.example.finalapp.screens._4profile.createImageFile
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.ui.theme.topAppBarTextColor
 import com.example.finalapp.utils.RequestState
+import com.example.finalapp.utils.constants.Constants.TAG
 
 
 @OptIn(ExperimentalGlideComposeApi::class)
@@ -106,10 +107,11 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
         )
     }
     if(keyForGallery!=0) {
+        Log.d("Suraj", "DropProfileDialog:entered in gallery ")
         GalleryPickerForDropProfile(
             navController = navController
         ) {
-            Log.d("DropProfileDialog", "DropProfileDialog: $it")
+            Log.d("suraj", "DropProfileDialog: received image uri $it")
             uri = it
         }
     }
@@ -306,6 +308,8 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                         onClick = {
                             eventsViewModel.key.value = 1;
                             enabled = false;
+
+                            Log.d("Suraj"," ${uri.toString()}")
                             eventsViewModel.dropProfile(
                                 DropProfileModel(
                                     image = uri.toString(),
