@@ -76,6 +76,7 @@ import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.ui.theme.statusBarColor
 import com.example.finalapp.ui.theme.topAppBarTextColor
 import com.example.finalapp.utils.RequestState
+import java.io.File
 
 
 @OptIn(ExperimentalGlideComposeApi::class)
@@ -93,7 +94,8 @@ fun PremiumCreateEvent(authViewModel: AuthViewModel, eventsViewModel: EventsView
     var activeBtnKey by remember {
         mutableStateOf(0)
     }
-    if(keyForGallery==1) GalleryPickerForDropProfile(navController  ,{uri=it})
+    var imageFile by mutableStateOf<File?>(null)
+    if(keyForGallery==1) GalleryPickerForDropProfile(navController  ,{imageFile=it}){uri=it}
 
     Scaffold(
         topBar = {

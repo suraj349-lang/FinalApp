@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -47,18 +46,28 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
+import com.example.finalapp.model.DirectChat
+import com.example.finalapp.model.User
+import com.example.finalapp.screens.dialogBox.DialogError
+import com.example.finalapp.screens.dialogBox.DialogLoading
 import com.example.finalapp.ui.theme.statusBarColor
+import com.example.finalapp.utils.RequestState
+import com.example.finalapp.viewmodels.AuthViewModel
 import com.example.finalapp.viewmodels.EventsViewModel
 
 @Composable
-fun DirectChat(
-    viewModel: EventsViewModel,
+fun DirectChatScreen(
+    authViewModel: AuthViewModel,
+    eventsViewModel: EventsViewModel,
     navController: NavHostController
 ) {
     var checked by remember {
         mutableStateOf(false)
     }
+
 
     Scaffold(
         content = { paddingValues ->
@@ -68,9 +77,10 @@ fun DirectChat(
                     .padding(paddingValues)
             ) {
                 // Main UI content
-                DirectChatUI(paddingValues,checked){
+                DirectChatUI(eventsViewModel,paddingValues,checked){
                     checked=!checked
-                    // TODO call the api to share the profile
+                    eventsViewModel.shareChatFunction(
+                        DirectChat("677b4df1842c1c465293fc2f",authViewModel.latitude.value,authViewModel.longitude.value))
                 }
 
                 // Floating Action Button at Top-End
@@ -98,14 +108,31 @@ fun DirectChat(
 }
 
 @Composable
-fun DirectChatUI(paddingValues: PaddingValues, checked: Boolean,onShareProfileClicked: () -> Unit) {
+fun DirectChatUI(eventsViewModel: EventsViewModel,paddingValues: PaddingValues, checked: Boolean,onShareProfileClicked: () -> Unit) {
+    val nearByUsersList by  remember {
+        mutableStateOf(eventsViewModel.nearByUsersList.value)
+    }
+    when(val result=eventsViewModel.nearByUserResponse.value){
+        is RequestState.Success ->{
+           eventsViewModel.nearByUsersList.value=result.data;
+        }
+        is RequestState.Loading->{
+            DialogLoading()
+        }
+        is RequestState.Error ->{
+            DialogError { eventsViewModel.nearByUserResponse.value= RequestState.Idle }
+        }
+        is RequestState.Idle->{
+
+        }
+    }
 
     Surface(modifier = Modifier
         .fillMaxSize()
         .padding(paddingValues)) {
         Column(modifier = Modifier
             .fillMaxSize(), verticalArrangement = Arrangement.spacedBy(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            if(!checked) {
+            if(!checked && nearByUsersList.isEmpty()) {
                 Text(
                     text = "Share your profile nearby",
                     fontSize = 20.sp,
@@ -115,7 +142,7 @@ fun DirectChatUI(paddingValues: PaddingValues, checked: Boolean,onShareProfileCl
                 //if user want to share the profile , it will automatically switch on the button for direct chat
                 ShareProfileForDirectChat(){onShareProfileClicked()}
             } else{
-                DirectChatProfiles()
+                DirectChatProfiles(nearByUsersList)
             }
 
             
@@ -126,8 +153,8 @@ fun DirectChatUI(paddingValues: PaddingValues, checked: Boolean,onShareProfileCl
 }
 
 @Composable
-fun DirectChatProfiles() {
-    val profileImage= listOf(R.drawable.profile_image_1,R.drawable.profile_image_2,R.drawable.profile_image_3)
+fun DirectChatProfiles(nearByUsersList: List<User>) {
+
     Surface(modifier = Modifier
         .fillMaxWidth()
         .fillMaxHeight()) {
@@ -136,7 +163,7 @@ fun DirectChatProfiles() {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally) {
             LazyColumn{
-                items(profileImage){
+                items(nearByUsersList){
                     DirectChatItem(it){}
 
                 }
@@ -145,8 +172,9 @@ fun DirectChatProfiles() {
     }
 }
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun DirectChatItem(image: Int,onDirectChatItemClicked:()->Unit) {
+fun DirectChatItem(user: User, onDirectChatItemClicked:()->Unit) {
         Surface(modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight(1f)) {
@@ -155,10 +183,10 @@ fun DirectChatItem(image: Int,onDirectChatItemClicked:()->Unit) {
                 Card(modifier = Modifier
                     .size(150.dp)
                     .padding(top = 4.dp),shape= CircleShape, border = BorderStroke(width = 1.dp, color = Color.LightGray)) {
-                    Image(painter = painterResource(id = image), contentDescription = "", contentScale = ContentScale.Crop)
+                    GlideImage(model =  user.profileImage, contentDescription = "", contentScale = ContentScale.Crop)
                 }
                 Row(modifier =Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically ) {
-                    Text(text = "Marilyn Munroe", fontSize = 25.sp, fontFamily = FontFamily(Font(R.font.oreganoregular)))
+                    Text(text = user.name, fontSize = 25.sp, fontFamily = FontFamily(Font(R.font.oreganoregular)))
                     Text(text = " ,100m.", fontSize = 12.sp, fontFamily = FontFamily(Font(R.font.oreganoregular)))
                 }
 

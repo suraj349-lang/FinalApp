@@ -5,9 +5,11 @@ import android.widget.Toast
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -47,12 +49,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.bumptech.glide.integration.compose.CrossFade
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.example.finalapp.ui.imagePrefix
 
 
 @Composable
@@ -61,7 +66,7 @@ fun DroppedProfiles(navController:NavHostController, eventsViewModel: EventsView
     val droppedProfiles by remember {
         mutableStateOf(eventsViewModel.droppedProfilesList)
     }
-    val widthINDp = LocalConfiguration.current.screenWidthDp
+    val widthInDp = LocalConfiguration.current.screenWidthDp
     var query by remember { mutableStateOf("") }
     val predictions by eventsViewModel.getAutocompletePredictions(query).collectAsState(emptyList())
     Surface(modifier = Modifier
@@ -205,29 +210,52 @@ fun DroppedProfile(profile: DropProfileModel) {
         )
 
     {
-        Column(verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier
-            .fillMaxSize()
-            .border(
-                width = 0.1.dp, color = Color.LightGray
-            )) {
-
+        Box(
+            modifier = Modifier.fillMaxSize() // Box to overlay content
+        ) {
+            // Image in the background
             GlideImage(
-                model =  if(profile.image!="") profile.image else R.drawable.femaleprofile,
-                contentDescription = "",
-                transition=CrossFade,
+                model = imagePrefix+profile.image, // Replace with your image resource
+                contentDescription = "Background Image",
+                contentScale = ContentScale.Crop, // Crop to fill the space
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(heightInDp - 120.dp)
-                // .clip(shape = RoundedCornerShape(12.dp))
-                , contentScale = ContentScale.Crop
+                    .height(heightInDp - 120.dp) // Fill the entire space
             )
-            profile.expirationTime?.let { Text(text = it) }
-            profile.message?.let { Text(text = it) }
-            profile.location?.let { Text(text = it, maxLines = 1) }
 
+            // Multiple texts
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomStart) // Center the entire column
+                    .padding(8.dp), // Add padding for spacing
+                horizontalAlignment = Alignment.Start,
+                verticalArrangement = Arrangement.Bottom// Center texts horizontally
+            ) {
+                Row(modifier = Modifier.fillMaxWidth().wrapContentHeight(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+                    Text(
+                        text = "Suraj singh",//profile.location,
+                        modifier=Modifier.fillMaxWidth(0.8f),
+                        maxLines=1,
+                        overflow=TextOverflow.Ellipsis,
+                        style = TextStyle(color = Color.White, fontSize = 18.sp)
+                    )
+                    Text(
+                        text = profile.expirationTime+" hrs.",
+                        modifier=Modifier.fillMaxWidth(1f),
+                        maxLines=1,
+                        overflow=TextOverflow.Ellipsis,
+                        style = TextStyle(color = Color.White, fontSize = 10.sp)
+                    )
 
+                }
 
+                Text(
+                    text =profile.message,
+                    style = TextStyle(color = Color.White, fontSize = 10.sp)
+                )
+            }
         }
+
     }
 
 }

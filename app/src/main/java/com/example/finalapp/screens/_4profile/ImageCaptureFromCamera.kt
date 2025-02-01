@@ -117,6 +117,12 @@ fun uriToMultipart(uri: Uri, context: Context): MultipartBody.Part {
     return MultipartBody.Part.createFormData("image", "filename.jpg", requestBody)
 }
 
+fun Context.createImageFile(): File {
+    val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+    val imageFileName = "JPEG_${timeStamp}_"
+    val storageDir = externalCacheDir // Get external cache directory
+    return File.createTempFile(imageFileName, ".jpg", storageDir)
+}
 
 
 //@Composable
@@ -216,10 +222,4 @@ fun uriToMultipart(uri: Uri, context: Context): MultipartBody.Part {
 //
 //}
 
-fun Context.createImageFile(): File {
-    val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-    val imageFileName = "JPEG_${timeStamp}_"
-    val storageDir = externalCacheDir // Get external cache directory
-    return File.createTempFile(imageFileName, ".jpg", storageDir)
-}
 

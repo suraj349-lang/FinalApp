@@ -8,13 +8,7 @@ data class RegisterUserModel(
     val token:String,
     val address:String
 )
-data class SignupAPIResponse(
-  val success:Boolean,
-  val code:Int,
-  val token:String,
-  val data:User,
-  val _id:String
-)
+
 data class User(
   val _id:String,
   val name:String,
@@ -36,7 +30,7 @@ data class ProfileResponse(
   val data: List<User>
 )
 
-data class Response(
+data class OkResponse(
     val success: Boolean,
     val data: User
 )

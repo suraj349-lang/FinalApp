@@ -32,9 +32,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
@@ -45,15 +43,12 @@ import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
 import androidx.compose.material.TabRowDefaults
 import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
@@ -66,11 +61,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
-import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -83,7 +75,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -107,7 +98,6 @@ import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens._1home._1_1Events.PersonalEventDesign2
 import com.example.finalapp.screens.dialogBox.DialogLoading
 import com.example.finalapp.viewmodels.EventsViewModel
-import com.example.finalapp.testing.TabItem
 import com.example.finalapp.screens.dialogBox.DropProfileDialog
 import com.example.finalapp.screens.dialogBox.ShowQRDialog
 import com.example.finalapp.screens.dialogBox.showDialog
@@ -120,6 +110,7 @@ import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.utils.constants.Constants.TAG
 import com.example.finalapp.utils.RequestState
 import com.example.finalapp.utils.constants.Constants.FONT_MEDIUM
+import com.example.finalapp.viewmodels.ProfileViewModel
 import kotlinx.coroutines.launch
 
 
@@ -127,7 +118,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewModel, authViewModel: AuthViewModel) {
+fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewModel,profileViewModel: ProfileViewModel, authViewModel: AuthViewModel) {
     var selectedItemIndex by rememberSaveable { mutableStateOf(0) }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val buttonsVisible = remember { mutableStateOf(true) }
@@ -166,7 +157,7 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
             )
         },
         floatingActionButton = {
-            HomeFloatingActionButton(authViewModel, eventsViewModel, navController)
+            HomeFloatingActionButton(authViewModel, eventsViewModel, profileViewModel , navController)
         }
     ) { padding ->
         ModalNavigationDrawer(
@@ -257,8 +248,8 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
                     ) { page ->
                         when (page) {
                             0 -> VectorsUI( eventsViewModel, offersList, padding)
-                            1 -> DirectChat(eventsViewModel,navController)
-                            2 -> DroppedProfilesDesign2(navController ,eventsViewModel)
+                            1 -> DirectChatScreen(authViewModel,eventsViewModel,navController)
+                            2 -> DroppedProfilesNew(navController ,eventsViewModel)
                                 //DroppedProfiles(navController = navController, eventsViewModel = eventsViewModel)
                         }
                     }
@@ -294,7 +285,7 @@ fun VectorsUI(
         }
 
         is RequestState.Error -> {
-            HomeError()
+            HomeError(eventsViewModel)
             Toast.makeText(LocalContext.current, "${result.error.message}", Toast.LENGTH_SHORT).show()
         }
 
@@ -323,15 +314,36 @@ data class NavigationItem(
 
 
 @Composable
-fun HomeError(){
+fun HomeError(eventsViewModel: EventsViewModel){
+    var retry by remember {
+        mutableStateOf(false)
+    }
+    if(retry) {
+        retry=false;
+        RetryCall(eventsViewModel = eventsViewModel)
+    }
+
     Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
         Image(painter = painterResource(id = R.drawable.oops), contentDescription = "oops")
         Text(text = "Error loading Profiles !", fontSize = 20.sp, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, color = Color(
             0xFFE91E63
         )
         )
+        Button(onClick = {retry=true}) {
+            Text(text = "Retry")
+
+        }
         
     }
+}
+
+@Composable
+fun RetryCall(eventsViewModel: EventsViewModel){
+    val scope= rememberCoroutineScope()
+    scope.launch {
+        eventsViewModel.getAllEvents()
+    }
+
 }
 
 @Composable
@@ -408,7 +420,7 @@ fun ShimmerEffect(showShimmer: Boolean = true, targetValue: Float = 10000f): Bru
 
 
 @Composable
-fun HomeFloatingActionButton(authViewModel: AuthViewModel, eventsViewModel: EventsViewModel, navController: NavHostController  ) {
+fun HomeFloatingActionButton(authViewModel: AuthViewModel, eventsViewModel: EventsViewModel,profileViewModel: ProfileViewModel, navController: NavHostController  ) {
     var showCustomDialog by remember { mutableStateOf(false) }
 
     FloatingActionButton(
@@ -433,7 +445,7 @@ fun HomeFloatingActionButton(authViewModel: AuthViewModel, eventsViewModel: Even
         }
     }
     if (showCustomDialog) {
-        DropProfileDialog(authViewModel ,eventsViewModel , navController ) { showCustomDialog = !showCustomDialog }
+        DropProfileDialog(authViewModel ,eventsViewModel , profileViewModel ,navController ) { showCustomDialog = !showCustomDialog }
         Log.d("Suraj", "HomeFloatingActionButton:entered to drop profile dialog ")
     }
 }

@@ -3,7 +3,6 @@ package com.example.finalapp.screens._1home
 
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -50,9 +49,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -66,7 +63,7 @@ import kotlinx.coroutines.launch
 
 
 @Composable
-fun DroppedProfilesDesign2(
+fun DroppedProfilesNew(
     navController: NavHostController,
     eventsViewModel: EventsViewModel,
 ) {
@@ -83,6 +80,10 @@ fun DroppedProfilesDesign2(
         mutableStateOf(false)
     }
     val scope= rememberCoroutineScope()
+    var labelText by remember {
+        mutableStateOf("Enter location")
+    }
+
     val predictions by eventsViewModel.getAutocompletePredictions(query).collectAsState(emptyList())
     Surface(modifier = Modifier
         .fillMaxSize()
@@ -92,62 +93,23 @@ fun DroppedProfilesDesign2(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            if(!showSearchUI && query.isEmpty()) {
-                OutlinedTextField(
-                    value = "",
-                    onValueChange = {
+            OutlinedTextField(
+                value = query,
+                onValueChange = {
+                    query = it
+                    showPredictionBoxForSearch = it.isNotEmpty()
+                },
+                label = { Text(text="Search Profiles") },
+                placeholder={ Text(text = labelText)},
+                modifier = Modifier
+                    .clickable {
+                        labelText = "Search location"
+                    }
+                    .fillMaxWidth()
+                    .padding(4.dp),
+                maxLines = 1,
 
-                    },
-                    enabled = false,
-                    label = { Text("Search profiles") },
-                    modifier = Modifier.clickable { showSearchUI = !showSearchUI }
-                        .fillMaxWidth().padding(4.dp),
                 )
-            }
-            else {
-                OutlinedTextField(
-                    value = query,
-                    onValueChange = {
-                        query = it
-                        showPredictionBoxForSearch = it.isNotEmpty()
-                    },
-                    label = { Text("Enter location") },
-                    modifier = Modifier
-                        .fillMaxWidth().padding(4.dp),
-                    maxLines = 1,
-
-                    )
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth().padding(4.dp)
-                        .wrapContentSize(),
-                    verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Button(
-                        onClick = { },
-                        shape= RoundedCornerShape(12.dp),
-                        modifier = Modifier
-                            .fillMaxWidth(0.7f).padding(end=16.dp),
-
-                        ) {
-                        Text(text = "Date range picker")
-
-                    }
-                    Button(
-                        onClick = { scope.launch {
-                            eventsViewModel.getAllDropProfiles()
-                        }  },
-                        shape= RoundedCornerShape(12.dp),
-                        modifier = Modifier
-                            .fillMaxWidth(1f),
-
-                        ) {
-                        Text(text = "Search")
-
-                    }
-                }
-            }
-
             if (showPredictionBoxForSearch) {
                 Box(
                     modifier = Modifier
@@ -156,6 +118,7 @@ fun DroppedProfilesDesign2(
                         .height(200.dp)
                         .padding(start = 20.dp, end = 20.dp)
                         .border(1.dp, color = Color.LightGray)
+
                 ) {
                     LazyColumn(modifier = Modifier.zIndex(1f)) {
                         items(predictions) { prediction ->
@@ -175,6 +138,41 @@ fun DroppedProfilesDesign2(
                     }
                 }
             }
+
+                Row(
+                    modifier = Modifier.zIndex(0f)
+                        .fillMaxWidth()
+                        .padding(4.dp)
+                        .wrapContentSize(),
+                    verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Button(
+                        onClick = { },
+                        shape= RoundedCornerShape(12.dp),
+                        modifier = Modifier
+                            .fillMaxWidth(0.7f)
+                            .padding(end = 16.dp),
+
+                        ) {
+                        Text(text = "Date range picker")
+
+                    }
+                    Button(
+                        onClick = { scope.launch {
+                            eventsViewModel.getAllDropProfiles()
+                        }  },
+                        shape= RoundedCornerShape(12.dp),
+                        modifier = Modifier
+                            .fillMaxWidth(1f),
+
+                        ) {
+                        Text(text = "Search")
+
+                    }
+                }
+
+
+
             when (val result=eventsViewModel.getDropProfileResponse.value){
                 is RequestState.Success->{
                     eventsViewModel.droppedProfilesList.value=result.data

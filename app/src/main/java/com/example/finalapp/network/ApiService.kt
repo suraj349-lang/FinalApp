@@ -1,5 +1,7 @@
 package com.example.finalapp.network
 
+import com.example.finalapp.model.DTO.Response.PreSignedUrlResponse
+import com.example.finalapp.model.DTO.Response.SignupAPIResponse
 import com.example.finalapp.model.DirectChat
 import com.example.finalapp.model.DropProfileModel
 import com.example.finalapp.model.DropProfileResponseModel
@@ -10,18 +12,21 @@ import com.example.finalapp.model.LoginModel
 import com.example.finalapp.model.OfferModel
 import com.example.finalapp.model.OfferResponseModel
 import com.example.finalapp.model.RegisterUserModel
-import com.example.finalapp.model.Response
-import com.example.finalapp.model.SignupAPIResponse
+import com.example.finalapp.model.OkResponse
 import com.example.finalapp.model.SingleOfferModel
 import com.example.finalapp.model.User
 import com.example.finalapp.utils.ApiResponse
 import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.Query
+import retrofit2.http.Url
 
 interface ApiService {
 
@@ -36,10 +41,10 @@ interface ApiService {
     suspend fun dropProfile(@Body data:DropProfileModel):DropProfileResponseModel
 
     //------------------------- Direct chat --------------------------------------------//
-    @POST("/api/v1/direct-chat/")
-    suspend fun getDirectChatUsers(@Body data: DirectChat):ApiResponse<List<User>>
-    @POST("/api/v1/direct-chat/")
-    suspend fun setLocationForDirectChat(@Body data:DirectChat):ApiResponse<User>
+    @GET("/api/v1/directChat/")
+    suspend fun getDirectChatUsers(@Query("lat") lat:Double,@Query("long") long:Double):ApiResponse<List<User>>
+    @POST("/api/v1/directChat/")
+    suspend fun setLocationForDirectChat(@Body data:DirectChat):ApiResponse<DirectChat>
 
     //---------------------------------------------------------------------//
     @POST("/api/v1/event")
@@ -48,14 +53,19 @@ interface ApiService {
     suspend fun createEvent(@Body offerData:OfferModel):SingleOfferModel
     @GET("/api/v1/event")
     suspend fun getAllEvents():OfferResponseModel
+    //---------------------------------------------------------------------//
+    @GET("api/getPreSignedUrl")
+    suspend fun getPreSignedUrl(@Query("id") id:String):PreSignedUrlResponse
+    @PUT
+    suspend fun uploadImageToS3(@Url url:String,@Body image:RequestBody): Response<Unit>
 
     //---------------------------------------------------------------------//
     @GET("/api/v1/user/getUser")
-    suspend fun getUserData(@Query("number") number: String):Response
+    suspend fun getUserData(@Query("number") number: String):OkResponse
 
     //---------------------------------------------------------------------//
     @GET("/api/v1/auth/updateUserImage")
-    suspend fun updateUserImage(@Query("email") email: String, @Query("imageUrl") imageUrl: String): Response
+    suspend fun updateUserImage(@Query("email") email: String, @Query("imageUrl") imageUrl: String): OkResponse
 
     @Multipart
     @POST("/api/v1/user/uploadImage")

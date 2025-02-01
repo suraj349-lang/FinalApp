@@ -6,10 +6,12 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.finalapp.model.DirectChat
 import com.example.finalapp.model.DropProfileModel
 import com.example.finalapp.model.DropProfileResponseModel
 import com.example.finalapp.model.OfferModel
 import com.example.finalapp.model.SingleOfferModel
+import com.example.finalapp.model.User
 import com.example.finalapp.repository.EventsRepository
 import com.example.finalapp.repository.Resource
 import com.example.finalapp.utils.RequestState
@@ -141,7 +143,52 @@ class EventsViewModel @Inject constructor(private val eventsRepository: EventsRe
 //                }
 //        }
 //    }
+    //-------------------------------------------DIRECT CHAT--------------------------------------------------------------------------------------//
 
+    fun shareChatFunction(data: DirectChat){
+        viewModelScope.launch {
+            sendDirectChatData(data)
+            getNearByUsers(data.lat,data.long)
+        }
+
+    }
+    val directChatResponse:MutableState<RequestState<DirectChat>> = mutableStateOf(RequestState.Idle)
+    fun sendDirectChatData(data: DirectChat)=viewModelScope.launch(Dispatchers.IO) {
+        eventsRepository.setLocationForDirectChat(data)
+            .onStart {
+                directChatResponse.value=RequestState.Loading;
+                Log.d("Data received",offerResponse.value.toString())
+            }
+            .catch {
+                Log.d("Data received","error found")
+                directChatResponse.value=RequestState.Error(it)
+                Log.d("Data received",offerResponse.value.toString())
+            }
+            .collect {
+                directChatResponse.value = RequestState.Success(it.data);
+                Log.d("Data received",offerResponse.value.toString())
+            }
+    }
+
+//--------------------------------------------------------------------------------------------------------------------//
+    val nearByUserResponse:MutableState<RequestState<List<User>>> = mutableStateOf(RequestState.Idle)
+    var nearByUsersList= mutableStateOf<List<User>>(emptyList())
+    fun getNearByUsers(lat:Double, long: Double)=viewModelScope.launch(Dispatchers.IO) {
+        eventsRepository.getDirectChatUsers(lat,long)
+            .onStart {
+                nearByUserResponse.value=RequestState.Loading;
+                Log.d("Data received",offerResponse.value.toString())
+            }
+            .catch {
+                Log.d("Data received","error found")
+                nearByUserResponse.value=RequestState.Error(it)
+                Log.d("Data received",offerResponse.value.toString())
+            }
+            .collect {
+                nearByUserResponse.value = RequestState.Success(it.data);
+                Log.d("Data received",offerResponse.value.toString())
+            }
+    }
 
 
 

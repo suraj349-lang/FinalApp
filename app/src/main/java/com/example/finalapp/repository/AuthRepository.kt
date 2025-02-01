@@ -1,11 +1,9 @@
 package com.example.finalapp.repository
 
+import com.example.finalapp.model.DTO.Response.SignupAPIResponse
 import com.example.finalapp.model.LoginAPIResponse
 import com.example.finalapp.model.LoginModel
-import com.example.finalapp.model.OfferModel
-import com.example.finalapp.model.OfferResponseModel
 import com.example.finalapp.model.RegisterUserModel
-import com.example.finalapp.model.SignupAPIResponse
 import com.example.finalapp.network.ApiService
 import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.Dispatchers
@@ -20,12 +18,8 @@ class AuthRepository @Inject constructor(private val api:ApiService){
         emit(api.postLoginData(loginData))
     }.flowOn(Dispatchers.IO)
 
-    fun sendSignupData(signupData: RegisterUserModel): Flow<SignupAPIResponse> = flow  {
+    fun sendSignupData(signupData: RegisterUserModel): Flow<SignupAPIResponse> = flow {
         emit(api.postSignupData(signupData))
     }.flowOn(Dispatchers.IO)
-
-
-
-
 }
 

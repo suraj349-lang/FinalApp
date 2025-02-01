@@ -1,6 +1,7 @@
 package com.example.finalapp.screens.dialogBox
 
 import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.util.Log
@@ -62,24 +63,26 @@ import com.bumptech.glide.integration.compose.CrossFade
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
-import com.example.finalapp.viewmodels.AuthViewModel
 import com.example.finalapp.model.DropProfileModel
-import com.example.finalapp.viewmodels.EventsViewModel
 import com.example.finalapp.screens._1home.OfferResponseDataAndAction
-import com.example.finalapp.viewmodels.ProfileViewModel
 import com.example.finalapp.screens._4profile.createImageFile
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.ui.theme.topAppBarTextColor
 import com.example.finalapp.utils.RequestState
-import com.example.finalapp.utils.constants.Constants.TAG
+import com.example.finalapp.viewmodels.AuthViewModel
+import com.example.finalapp.viewmodels.EventsViewModel
+import com.example.finalapp.viewmodels.ProfileViewModel
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody
+import java.io.File
 
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewModel, navController: NavHostController, onDismiss: () -> Unit) {
-    val context= LocalContext.current
-    var caption by remember{ mutableStateOf("") }
+fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewModel,profileViewModel: ProfileViewModel, navController: NavHostController, onDismiss: () -> Unit) {
+    var caption by remember{ mutableStateOf("testing") }
     val scope= rememberCoroutineScope()
+    val context= LocalContext.current
     var enabled=true;
     val location by authViewModel.currentLocation.collectAsState()
 
@@ -106,10 +109,35 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
             }
         )
     }
+
+    var uploadImageKey by remember {
+        mutableStateOf(false)
+    }
+    val successImageUpload = profileViewModel.successImageUploadKey.collectAsState()
+
+    LaunchedEffect(successImageUpload.value) {
+        if (successImageUpload.value.isNotEmpty()) {
+            Log.d("S3 Upload", "DropProfileDialog:${successImageUpload.value} ")
+
+            val dropProfileModel = DropProfileModel(
+                image = successImageUpload.value,
+                location = authViewModel.address.value,
+                message = caption,
+                expirationTime = expirationTime,
+                createdBy = "6680fef693d1e2645e19ee09"
+            )
+
+            Log.d("S3 Upload", "key: ${successImageUpload.value} ")
+            eventsViewModel.dropProfile(dropProfileModel) // 🔥 CALLING DROP PROFILE FUNCTION
+            profileViewModel.successImageUploadKey.value=""
+         }
+    }
+
+    var imageFile by mutableStateOf<File?>(null)
     if(keyForGallery!=0) {
         Log.d("Suraj", "DropProfileDialog:entered in gallery ")
         GalleryPickerForDropProfile(
-            navController = navController
+            navController = navController,{imageFile=it}
         ) {
             Log.d("suraj", "DropProfileDialog: received image uri $it")
             uri = it
@@ -306,19 +334,13 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
 
                     Button(
                         onClick = {
-                            eventsViewModel.key.value = 1;
-                            enabled = false;
-
-                            Log.d("Suraj"," ${uri.toString()}")
-                            eventsViewModel.dropProfile(
-                                DropProfileModel(
-                                    image = uri.toString(),
-                                    location = authViewModel.address.value,
-                                    message = caption,
-                                    expirationTime = expirationTime,
-                                    createdBy="6680fef693d1e2645e19ee09"
-                                )
-                            );
+                            eventsViewModel.key.value = 1
+                            uploadImageKey=true
+                            //todo later on turn enalbed to true
+                          //  enabled = false;
+                            imageFile?.let {
+                                    profileViewModel.s3ImageUploadFunction("suraj3494", it)
+                                }
                         },
                         shape= RoundedCornerShape(6.dp),
                         modifier= Modifier
@@ -338,8 +360,10 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                     when (val result=eventsViewModel.dropProfileResponse.value){
                         is RequestState.Success->{
 
-                            Toast.makeText(context,"${result.data}", Toast.LENGTH_SHORT).show()
-                           onDismiss()
+                            Toast.makeText(context,"Profile drop : SUCCESS", Toast.LENGTH_SHORT).show()
+                            eventsViewModel.dropProfileResponse.value=RequestState.Idle
+                            onDismiss()
+
 
                         }
                         is RequestState.Error->{
@@ -354,6 +378,24 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                         }
 
                     }
+                val presignedUrlData = profileViewModel.preSignedUrlData.collectAsState()
+                when (val result=profileViewModel.preSignedUrlDataState.value){
+                    is RequestState.Success->{
+                        profileViewModel.preSignedUrlData.value= result.data
+                        Log.d("PresignedURL", "DropProfileDialog:${result.data} ")
+                    }
+                    is RequestState.Error->{
+                        Log.d("PresignedURL",result.error.message.toString())
+                        Toast.makeText(context,"$result", Toast.LENGTH_SHORT).show()
+                    }
+                    RequestState.Loading->{
+
+                    }
+                    RequestState.Idle->{
+
+                    }
+
+                }
 
                 if(eventsViewModel.key.value==1){
                     Log.d("Data received","runned this")
@@ -364,6 +406,21 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
             }
         }
     }
+}
+
+fun getImageRequestBody(context: Context, imageUri: Uri?): RequestBody? {
+    imageUri ?: return null
+
+    val filePath = getPathFromUri(context, imageUri) ?: return null
+    val file = File(filePath)
+
+    return RequestBody.create("image/jpeg".toMediaTypeOrNull(), file)
+}
+
+// Function to get file path from Uri (implementation depends on your app needs)
+fun getPathFromUri(context: Context, uri: Uri): String? {
+    // Implement logic to get file path from Uri (use ContentResolver, MediaStore, etc.)
+    return uri.path // Replace with actual path retrieval logic
 }
 
 @Composable

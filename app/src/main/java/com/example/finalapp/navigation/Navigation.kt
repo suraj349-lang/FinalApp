@@ -87,7 +87,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
             FinalUserCreation(authViewModel,navController)
         }
         composable(SCREENS.HOME.route){
-            HomeScreenUI( navController,eventsViewModel,authViewModel)
+            HomeScreenUI( navController,eventsViewModel,profileViewModel,authViewModel)
         }
 
         composable(SCREENS.PROFILE.route){

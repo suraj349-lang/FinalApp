@@ -126,7 +126,7 @@ fun CreateEvent(
     if (keyForGallery != 0) {
         //todo change this , its not correct
         GalleryPickerForDropProfile(
-            navController = navController
+            navController = navController,{}
         ) {
             Log.d("DropProfileDialog", "DropProfileDialog: $it")
             uri = it

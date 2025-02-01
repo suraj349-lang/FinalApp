@@ -25,11 +25,11 @@ import javax.inject.Inject
 @ViewModelScoped
 class EventsRepository @Inject constructor(private val api: ApiService) {
 
-    fun sendUserLocation(directChat: DirectChat):Flow<ApiResponse<User>> = flow {
+    fun setLocationForDirectChat(directChat: DirectChat):Flow<ApiResponse<DirectChat>> = flow {
         emit(api.setLocationForDirectChat(directChat))
     }.flowOn(Dispatchers.IO)
-    fun getDirectChatUsers(directChat: DirectChat):Flow<ApiResponse<List<User>>> = flow {
-        emit(api.getDirectChatUsers(directChat))
+    fun getDirectChatUsers(lat:Double,long:Double):Flow<ApiResponse<List<User>>> = flow {
+        emit(api.getDirectChatUsers(lat,long))
     }.flowOn(Dispatchers.IO)
 
     fun sendCreateEventData(offerData: OfferModel): Flow<SingleOfferModel> = flow  {

@@ -42,6 +42,7 @@ import androidx.navigation.NavHostController
 import com.example.finalapp.R
 import com.example.finalapp.viewmodels.EventsViewModel
 import com.example.finalapp.screens._1home.OfferResponseDataAndAction
+import com.example.finalapp.screens.qrcode.QRCode
 import com.example.finalapp.ui.theme.DarkBlue
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.ui.theme.topAppBarTextColor
@@ -203,40 +204,3 @@ fun SuggestionsUI() {
 
 
 
-
-@Composable
-fun ShowQRDialog(image:Int,navController: NavHostController,onDismiss: () -> Unit) {
-
-
-    val scope= rememberCoroutineScope()
-    var enabled=true;
-
-
-    Dialog(onDismissRequest = { onDismiss() }, properties = DialogProperties(
-        dismissOnBackPress = true,dismissOnClickOutside = true
-    )
-    ) {
-        Card(
-            shape = RoundedCornerShape(10.dp),
-            modifier = Modifier
-                .fillMaxWidth().height(400.dp)
-                .padding(8.dp)
-        ) {
-           Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxSize()) {
-               Image(painter = painterResource(id = image), contentDescription ="" )
-               Column(modifier =Modifier.fillMaxSize(), verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally) {
-                   Image(painter = painterResource(id = R.drawable.camera), contentDescription ="", modifier = Modifier.size(40.dp) )
-                   Text("Scan QR")
-               }
-               
-           }
-        }
-    }
-}
-
-
-
-enum class showDialog{
-    OPEN,
-    CLOSE
-}

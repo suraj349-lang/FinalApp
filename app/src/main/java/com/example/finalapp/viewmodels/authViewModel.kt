@@ -13,10 +13,10 @@ import com.example.finalapp.LatLng
 import com.example.finalapp.repository.AuthRepository
 import com.example.finalapp.screens.auth.RESPONSE
 import com.example.finalapp.database.Profile
+import com.example.finalapp.model.DTO.Response.SignupAPIResponse
 import com.example.finalapp.repository.ProfileDatabaseRepository
 import com.example.finalapp.model.LoginModel
 import com.example.finalapp.model.RegisterUserModel
-import com.example.finalapp.model.SignupAPIResponse
 import com.example.finalapp.model.User
 import com.example.finalapp.utils.RequestState
 import com.google.firebase.auth.FirebaseAuth
