@@ -11,15 +11,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.finalapp.model.DTO.Response.PreSignedUrlResponse
 import com.example.finalapp.model.DropProfileModel
+import com.example.finalapp.model.DropProfileResponseModel
 import com.example.finalapp.model.User
-import com.example.finalapp.repository.EventsRepository
 import com.example.finalapp.repository.ProfileRepository
 import com.example.finalapp.utils.RequestState
 import com.google.android.gms.tasks.Task
 import com.google.firebase.storage.FirebaseStorage
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onStart
@@ -30,6 +29,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ProfileViewModel @Inject constructor(private val repository: ProfileRepository ):ViewModel(){
      var successImageUploadKey = MutableStateFlow("");
+     val dropProfileModel:MutableState<DropProfileModel?> = mutableStateOf(null)
      fun s3ImageUploadFunction(userId: String, file: File) {
          viewModelScope.launch {
              getSignedUrl(userId,file)
@@ -70,9 +70,10 @@ class ProfileViewModel @Inject constructor(private val repository: ProfileReposi
             val success = repository.uploadImageToS3(url, file) // Direct call to suspend function
 
             if (success) {
-                successImageUploadKey.emit(key)
                 s3DataState.value = RequestState.Success(Unit) // No data, just success
                 s3Response.value = true // Upload successful
+                dropProfileModel.value?.image=preSignedUrlData.value.key
+                dropProfileModel.value?.let { dropProfile(it) }
                 Log.d("S3 Upload", "s3upload success")
             } else {
                 s3DataState.value = RequestState.Error(Exception("Upload failed"))
@@ -123,6 +124,23 @@ class ProfileViewModel @Inject constructor(private val repository: ProfileReposi
 
             }
 
+    }
+    //-------------------------------------------DROP PROFILE--------------------------------------------------------------------------------------//
+
+    val dropProfileResponse:MutableState<RequestState<DropProfileResponseModel>> = mutableStateOf(RequestState.Idle)
+    fun dropProfile(data:DropProfileModel)=viewModelScope.launch(Dispatchers.IO) {
+        dropProfileResponse.value=RequestState.Loading
+        repository.sendDropProfileData(data)
+            .onStart {
+                dropProfileResponse.value=RequestState.Loading;
+            }
+            .catch {
+                Log.d("Data received","error found")
+                dropProfileResponse.value=RequestState.Error(it)
+            }
+            .collect {
+                dropProfileResponse.value = RequestState.Success(it)
+            }
     }
 
     //----------------------------------Get user data ---------------------------------------------------------------------------------------//

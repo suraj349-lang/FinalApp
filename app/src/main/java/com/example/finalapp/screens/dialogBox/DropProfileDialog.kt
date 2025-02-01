@@ -86,6 +86,7 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
     var enabled=true;
     val location by authViewModel.currentLocation.collectAsState()
 
+
     var uri by remember {
         mutableStateOf(Uri.EMPTY)
     }
@@ -109,29 +110,13 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
             }
         )
     }
-
-    var uploadImageKey by remember {
-        mutableStateOf(false)
-    }
-    val successImageUpload = profileViewModel.successImageUploadKey.collectAsState()
-
-    LaunchedEffect(successImageUpload.value) {
-        if (successImageUpload.value.isNotEmpty()) {
-            Log.d("S3 Upload", "DropProfileDialog:${successImageUpload.value} ")
-
-            val dropProfileModel = DropProfileModel(
-                image = successImageUpload.value,
-                location = authViewModel.address.value,
-                message = caption,
-                expirationTime = expirationTime,
-                createdBy = "6680fef693d1e2645e19ee09"
-            )
-
-            Log.d("S3 Upload", "key: ${successImageUpload.value} ")
-            eventsViewModel.dropProfile(dropProfileModel) // 🔥 CALLING DROP PROFILE FUNCTION
-            profileViewModel.successImageUploadKey.value=""
-         }
-    }
+    val dropProfileModel = DropProfileModel(
+        image = "",
+        location = authViewModel.address.value,
+        message = caption,
+        expirationTime = expirationTime,
+        createdBy = "6680fef693d1e2645e19ee09"
+    )
 
     var imageFile by mutableStateOf<File?>(null)
     if(keyForGallery!=0) {
@@ -335,11 +320,11 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                     Button(
                         onClick = {
                             eventsViewModel.key.value = 1
-                            uploadImageKey=true
                             //todo later on turn enalbed to true
                           //  enabled = false;
                             imageFile?.let {
-                                    profileViewModel.s3ImageUploadFunction("suraj3494", it)
+                                profileViewModel.dropProfileModel.value=dropProfileModel
+                                    profileViewModel.s3ImageUploadFunction("suraj3494",it)
                                 }
                         },
                         shape= RoundedCornerShape(6.dp),
@@ -357,11 +342,11 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                         Text(text = "Drop Profile")
                     }
 
-                    when (val result=eventsViewModel.dropProfileResponse.value){
+                    when (val result=profileViewModel.dropProfileResponse.value){
                         is RequestState.Success->{
 
                             Toast.makeText(context,"Profile drop : SUCCESS", Toast.LENGTH_SHORT).show()
-                            eventsViewModel.dropProfileResponse.value=RequestState.Idle
+                            profileViewModel.dropProfileResponse.value=RequestState.Idle
                             onDismiss()
 
 

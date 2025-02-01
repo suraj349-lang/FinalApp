@@ -9,7 +9,7 @@ object SecureStorage {
     private const val PREFS_NAME = "secure_prefs"
     private const val TOKEN_KEY = "auth_token"
 
-    fun getEncryptedSharedPreferences(context: Context): SharedPreferences {
+    private fun getEncryptedSharedPreferences(context: Context): SharedPreferences {
         return EncryptedSharedPreferences.create(
             PREFS_NAME,
             MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC),

@@ -2,6 +2,8 @@ package com.example.finalapp.repository
 
 import android.util.Log
 import com.example.finalapp.model.DTO.Response.PreSignedUrlResponse
+import com.example.finalapp.model.DropProfileModel
+import com.example.finalapp.model.DropProfileResponseModel
 import com.example.finalapp.model.OkResponse
 import com.example.finalapp.network.ApiService
 import dagger.hilt.android.scopes.ViewModelScoped
@@ -52,6 +54,10 @@ class ProfileRepository @Inject constructor(private val api: ApiService) {
     //--------------------------------------Get user data ---------------------------------//
     fun getUserData(number: String): Flow<OkResponse> = flow {
         emit(api.getUserData(number))
+    }.flowOn(Dispatchers.IO)
+
+    fun sendDropProfileData(data: DropProfileModel): Flow<DropProfileResponseModel> = flow  {
+        emit(api.dropProfile(data))
     }.flowOn(Dispatchers.IO)
 
 }

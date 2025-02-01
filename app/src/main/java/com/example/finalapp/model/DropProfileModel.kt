@@ -3,7 +3,7 @@ package com.example.finalapp.model
 import java.util.Date
 
 data class DropProfileModel(
-    val image:String,
+    var image:String,
     val personalEvent:Boolean=true,
     val tag:String="",
     val location:String,

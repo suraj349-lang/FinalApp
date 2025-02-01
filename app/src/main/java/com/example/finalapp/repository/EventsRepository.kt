@@ -36,10 +36,6 @@ class EventsRepository @Inject constructor(private val api: ApiService) {
         emit(api.premiumCreateEvent(offerData))
     }.flowOn(Dispatchers.IO)
 
-    fun sendDropProfileData(data: DropProfileModel): Flow<DropProfileResponseModel> = flow  {
-        emit(api.dropProfile(data))
-    }.flowOn(Dispatchers.IO)
-
     fun getAllDropProfiles(): Flow<GetDropProfileResponseModel> = flow  {
         emit(api.getAllDropProfiles())
     }.flowOn(Dispatchers.IO)

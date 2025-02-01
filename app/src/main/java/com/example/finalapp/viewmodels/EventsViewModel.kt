@@ -43,25 +43,7 @@ class EventsViewModel @Inject constructor(private val eventsRepository: EventsRe
         }
     }
 
-    //-------------------------------------------DROP PROFILE--------------------------------------------------------------------------------------//
 
-    val dropProfileResponse:MutableState<RequestState<DropProfileResponseModel>> = mutableStateOf(RequestState.Idle)
-    fun dropProfile(data:DropProfileModel)=viewModelScope.launch(Dispatchers.IO) {
-        eventsRepository.sendDropProfileData(data)
-            .onStart {
-                dropProfileResponse.value=RequestState.Loading;
-                Log.d("Data received",offerResponse.value.toString())
-            }
-            .catch {
-                Log.d("Data received","error found")
-                dropProfileResponse.value=RequestState.Error(it)
-                Log.d("Data received",offerResponse.value.toString())
-            }
-            .collect {
-                dropProfileResponse.value = RequestState.Success(it);
-                Log.d("Data received",offerResponse.value.toString())
-            }
-    }
 
     //--------------------------------------------------------------------------------------------------------------------------------------------//
     val getDropProfileResponse:MutableState<RequestState<List<DropProfileModel>>> = mutableStateOf(RequestState.Idle)
