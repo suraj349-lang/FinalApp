@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
@@ -31,6 +32,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,6 +41,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
@@ -58,8 +61,10 @@ import com.example.finalapp.utils.RequestState
 import com.example.finalapp.viewmodels.AuthViewModel
 import com.example.finalapp.viewmodels.EventsViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DirectChatScreen(
+    scrollBehavior: TopAppBarScrollBehavior,
     authViewModel: AuthViewModel,
     eventsViewModel: EventsViewModel,
     navController: NavHostController
@@ -77,7 +82,7 @@ fun DirectChatScreen(
                     .padding(paddingValues)
             ) {
                 // Main UI content
-                DirectChatUI(eventsViewModel,paddingValues,checked){
+                DirectChatUI(scrollBehavior,eventsViewModel,paddingValues,checked){
                     checked=!checked
                     eventsViewModel.shareChatFunction(
                         DirectChat("677b4df1842c1c465293fc2f",authViewModel.latitude.value,authViewModel.longitude.value))
@@ -107,8 +112,15 @@ fun DirectChatScreen(
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DirectChatUI(eventsViewModel: EventsViewModel,paddingValues: PaddingValues, checked: Boolean,onShareProfileClicked: () -> Unit) {
+fun DirectChatUI(
+    scrollBehavior: TopAppBarScrollBehavior,
+    eventsViewModel: EventsViewModel,
+    paddingValues: PaddingValues,
+    checked: Boolean,
+    onShareProfileClicked: () -> Unit
+) {
     val nearByUsersList by  remember {
         mutableStateOf(eventsViewModel.nearByUsersList.value)
     }
@@ -142,7 +154,7 @@ fun DirectChatUI(eventsViewModel: EventsViewModel,paddingValues: PaddingValues, 
                 //if user want to share the profile , it will automatically switch on the button for direct chat
                 ShareProfileForDirectChat(){onShareProfileClicked()}
             } else{
-                DirectChatProfiles(nearByUsersList)
+                DirectChatProfiles(scrollBehavior,nearByUsersList)
             }
 
             
@@ -152,8 +164,9 @@ fun DirectChatUI(eventsViewModel: EventsViewModel,paddingValues: PaddingValues, 
     
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DirectChatProfiles(nearByUsersList: List<User>) {
+fun DirectChatProfiles(scrollBehavior: TopAppBarScrollBehavior, nearByUsersList: List<User>) {
 
     Surface(modifier = Modifier
         .fillMaxWidth()
@@ -162,7 +175,7 @@ fun DirectChatProfiles(nearByUsersList: List<User>) {
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally) {
-            LazyColumn{
+            LazyColumn(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)){
                 items(nearByUsersList){
                     DirectChatItem(it){}
 

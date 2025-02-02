@@ -27,7 +27,7 @@ import androidx.core.content.FileProvider
 import coil.compose.rememberImagePainter
 import com.example.finalapp.utils.constants.Constants.TAG
 import com.example.finalapp.utils.RequestState
-import com.example.finalapp.viewmodels.ProfileViewModel
+import com.example.finalapp.viewmodels.ImageUploadViewModel
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -37,7 +37,7 @@ import java.util.Date
 import java.util.Locale
 
 @Composable
-fun ImageCaptureFromCamera(profileViewModel: ProfileViewModel) {
+fun ImageCaptureFromCamera(imageUploadViewModel: ImageUploadViewModel) {
     val context = LocalContext.current
     val file = context.createImageFile()
     val uri = FileProvider.getUriForFile(
@@ -51,7 +51,7 @@ fun ImageCaptureFromCamera(profileViewModel: ProfileViewModel) {
     val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
         if (success) {
             capturedImageUri = uri
-            profileViewModel.uploadUserImage(uri,"besetsuraj", context )
+            imageUploadViewModel.uploadUserImage(uri,"besetsuraj", context )
 
         } else {
             Toast.makeText(context, "Image capture failed", Toast.LENGTH_SHORT).show()
@@ -83,7 +83,7 @@ fun ImageCaptureFromCamera(profileViewModel: ProfileViewModel) {
                 .fillMaxWidth()
                 .padding(16.dp)
         )
-        when (val result=profileViewModel.imageUploadResponse.value){
+        when (val result=imageUploadViewModel.imageUploadResponse.value){
             is RequestState.Idle->{
                 CircularProgressIndicator()
             }

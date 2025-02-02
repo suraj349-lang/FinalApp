@@ -23,6 +23,7 @@ data class User(
 }
 data class ChatUser(
   val name:String,
+  val image:Int,
   val number:String
 )
 data class ProfileResponse(

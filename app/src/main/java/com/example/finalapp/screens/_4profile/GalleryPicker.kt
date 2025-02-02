@@ -24,13 +24,13 @@ import androidx.navigation.NavHostController
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.utils.RequestState
-import com.example.finalapp.viewmodels.ProfileViewModel
+import com.example.finalapp.viewmodels.ImageUploadViewModel
 import kotlinx.coroutines.launch
 
 
 //https://www.youtube.com/watch?v=uHX5NB6wHao
 @Composable
-fun GalleryPicker(navController: NavHostController,profileViewModel: ProfileViewModel) {
+fun GalleryPicker(navController: NavHostController, imageUploadViewModel: ImageUploadViewModel) {
 
     var selectedImageUris by remember {
         mutableStateOf<List<Uri>>(emptyList())
@@ -74,7 +74,7 @@ fun GalleryPicker(navController: NavHostController,profileViewModel: ProfileView
     BackHandler(true) {
         navController.navigateUp()
     }
-    when (val result=profileViewModel.imageUploadResponse.value){
+    when (val result=imageUploadViewModel.imageUploadResponse.value){
         is RequestState.Idle->{
             CircularProgressIndicator()
         }
@@ -117,7 +117,7 @@ fun GalleryPicker(navController: NavHostController,profileViewModel: ProfileView
         val scope= rememberCoroutineScope()
         LaunchedEffect(key1 = true) {
             scope.launch {
-                profileViewModel.uploadUserImage(selectedImageUris[0],"bestsuraj", context)
+                imageUploadViewModel.uploadUserImage(selectedImageUris[0],"bestsuraj", context)
             }
         }
 

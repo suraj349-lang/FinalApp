@@ -71,7 +71,7 @@ import com.example.finalapp.ui.theme.topAppBarTextColor
 import com.example.finalapp.utils.RequestState
 import com.example.finalapp.viewmodels.AuthViewModel
 import com.example.finalapp.viewmodels.EventsViewModel
-import com.example.finalapp.viewmodels.ProfileViewModel
+import com.example.finalapp.viewmodels.ImageUploadViewModel
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody
 import java.io.File
@@ -79,7 +79,7 @@ import java.io.File
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewModel,profileViewModel: ProfileViewModel, navController: NavHostController, onDismiss: () -> Unit) {
+fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewModel, imageUploadViewModel: ImageUploadViewModel, navController: NavHostController, onDismiss: () -> Unit) {
     var caption by remember{ mutableStateOf("testing") }
     val scope= rememberCoroutineScope()
     val context= LocalContext.current
@@ -323,8 +323,8 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                             //todo later on turn enalbed to true
                           //  enabled = false;
                             imageFile?.let {
-                                profileViewModel.dropProfileModel.value=dropProfileModel
-                                    profileViewModel.s3ImageUploadFunction("suraj3494",it)
+                                imageUploadViewModel.dropProfileModel.value=dropProfileModel
+                                    imageUploadViewModel.s3ImageUploadFunction("suraj3494",it)
                                 }
                         },
                         shape= RoundedCornerShape(6.dp),
@@ -342,11 +342,11 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                         Text(text = "Drop Profile")
                     }
 
-                    when (val result=profileViewModel.dropProfileResponse.value){
+                    when (val result=imageUploadViewModel.dropProfileResponse.value){
                         is RequestState.Success->{
 
                             Toast.makeText(context,"Profile drop : SUCCESS", Toast.LENGTH_SHORT).show()
-                            profileViewModel.dropProfileResponse.value=RequestState.Idle
+                            imageUploadViewModel.dropProfileResponse.value=RequestState.Idle
                             onDismiss()
 
 
@@ -363,10 +363,10 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                         }
 
                     }
-                val presignedUrlData = profileViewModel.preSignedUrlData.collectAsState()
-                when (val result=profileViewModel.preSignedUrlDataState.value){
+                val presignedUrlData = imageUploadViewModel.preSignedUrlData.collectAsState()
+                when (val result=imageUploadViewModel.preSignedUrlDataState.value){
                     is RequestState.Success->{
-                        profileViewModel.preSignedUrlData.value= result.data
+                        imageUploadViewModel.preSignedUrlData.value= result.data
                         Log.d("PresignedURL", "DropProfileDialog:${result.data} ")
                     }
                     is RequestState.Error->{

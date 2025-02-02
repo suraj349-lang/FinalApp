@@ -39,7 +39,7 @@ import androidx.navigation.NavHostController
 import com.example.finalapp.R
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens._4profile.ImageCaptureFromCamera
-import com.example.finalapp.viewmodels.ProfileViewModel
+import com.example.finalapp.viewmodels.ImageUploadViewModel
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.ui.theme.topAppBarTextColor
 
@@ -103,10 +103,10 @@ fun BtnForDialogBoxForImageEdit(onDismiss: () -> Unit){
 //
 
 @Composable
-fun DialogBoxForCameraAndGallery(profileViewModel: ProfileViewModel, navController:NavHostController, onDismiss: () -> Unit) {
+fun DialogBoxForCameraAndGallery(imageUploadViewModel: ImageUploadViewModel, navController:NavHostController, onDismiss: () -> Unit) {
     var key by remember { mutableStateOf(false) }
     if (key) {
-        ImageCaptureFromCamera(profileViewModel)
+        ImageCaptureFromCamera(imageUploadViewModel)
     }
 
     Dialog(

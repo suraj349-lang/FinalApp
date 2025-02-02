@@ -75,14 +75,14 @@ import com.example.finalapp.screens.dialogBox.DialogBoxForImageEdit
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.ui.theme.topAppBarTextColor
 import com.example.finalapp.utils.RequestState
-import com.example.finalapp.viewmodels.ProfileViewModel
+import com.example.finalapp.viewmodels.ImageUploadViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreenUI(
     navController: NavHostController = NavHostController(LocalContext.current),
-    profileViewModel: ProfileViewModel,
+    imageUploadViewModel: ImageUploadViewModel,
     authViewModel: AuthViewModel
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
@@ -93,16 +93,16 @@ fun ProfileScreenUI(
     var name by remember {
         mutableStateOf("")
     }
-    val userInfo by profileViewModel.firstUserData.collectAsState()
+    val userInfo by imageUploadViewModel.firstUserData.collectAsState()
     LaunchedEffect(key1 = true){
         name= dataStore.getUserNumber.toString()
     }
     LaunchedEffect(key1 = true ){
-         profileViewModel.getUserData("917250260100")
+         imageUploadViewModel.getUserData("917250260100")
     }
-    when (val result=profileViewModel.getUserData.value){
+    when (val result=imageUploadViewModel.getUserData.value){
         is RequestState.Success->{
-            profileViewModel.firstUserData.value= result.data
+            imageUploadViewModel.firstUserData.value= result.data
 
         }
         is RequestState.Error->{
@@ -120,8 +120,8 @@ fun ProfileScreenUI(
     Scaffold(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             ProfileTopBar(
-                navIcon = R.drawable.arrow_back,
-                actIcon = R.drawable.arrow_back,
+                navIcon = R.drawable.back,
+                actIcon = R.drawable.back,
                 showActIcon = false,
                 onNavIconClick = { navController.popBackStack() },
                 onActIconClick = { navController.popBackStack() },
@@ -144,7 +144,7 @@ fun ProfileScreenUI(
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                PersonalInfo(userInfo.profileImage,userInfo.name,profileViewModel,navController)
+                PersonalInfo(userInfo.profileImage,userInfo.name,imageUploadViewModel,navController)
                 FlashInfo()
                 //EditProfile(navController, profileViewModel)
                 //ProfileImages()
@@ -157,7 +157,7 @@ fun ProfileScreenUI(
     }
 }
 @Composable
-fun PersonalInfo(profileImage: String, name:String, profileViewModel: ProfileViewModel, navController: NavHostController) {
+fun PersonalInfo(profileImage: String, name:String, imageUploadViewModel: ImageUploadViewModel, navController: NavHostController) {
     Card(
         modifier = Modifier
             .padding(16.dp)
@@ -170,7 +170,7 @@ fun PersonalInfo(profileImage: String, name:String, profileViewModel: ProfileVie
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            ProfileIcon(profileImage = profileImage, profileViewModel , navController )
+            ProfileIcon(profileImage = profileImage, imageUploadViewModel , navController )
             ProfileName(name = name)
         }
     }
@@ -178,17 +178,17 @@ fun PersonalInfo(profileImage: String, name:String, profileViewModel: ProfileVie
 @SuppressLint("StateFlowValueCalledInComposition")
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun ProfileIcon(profileImage:String, profileViewModel: ProfileViewModel, navController: NavHostController) {
+fun ProfileIcon(profileImage:String, imageUploadViewModel: ImageUploadViewModel, navController: NavHostController) {
     var showCustomDialog by remember {
         mutableStateOf(false)
     }
-    val userData by  profileViewModel.userData.collectAsState()
+    val userData by  imageUploadViewModel.userData.collectAsState()
     val lifecycleOwner= LocalLifecycleOwner.current
     Surface(
         Modifier
             .size(120.dp)
             .padding(8.dp), shape = CircleShape, color = Color.LightGray, shadowElevation = 12.dp) {
-        if(showCustomDialog) DialogBoxForCameraAndGallery(profileViewModel , navController ){ showCustomDialog=!showCustomDialog }
+        if(showCustomDialog) DialogBoxForCameraAndGallery(imageUploadViewModel , navController ){ showCustomDialog=!showCustomDialog }
         DisposableEffect(lifecycleOwner) {
             val observer = LifecycleEventObserver { _, event ->
                 if (event == Lifecycle.Event.ON_RESUME) {
@@ -202,10 +202,10 @@ fun ProfileIcon(profileImage:String, profileViewModel: ProfileViewModel, navCont
                 lifecycleOwner.lifecycle.removeObserver(observer)
             }
         }
-        when (val result=profileViewModel.user.value){
+        when (val result=imageUploadViewModel.user.value){
             is RequestState.Success->{
-                profileViewModel.userData.value= result.data
-                Log.d("ZUNE", "ProfileIcon: ${profileViewModel.userData.value} ")
+                imageUploadViewModel.userData.value= result.data
+                Log.d("ZUNE", "ProfileIcon: ${imageUploadViewModel.userData.value} ")
 
             }
             is RequestState.Error->{
@@ -274,12 +274,12 @@ fun UsersItem(user: User) {
 
 
 @Composable
-fun EditProfile(navController: NavHostController, profileViewModel: ProfileViewModel) {
+fun EditProfile(navController: NavHostController, imageUploadViewModel: ImageUploadViewModel) {
     var key by remember {
         mutableStateOf(false)
     }
     if(key){
-        ImageCaptureFromCamera(profileViewModel)
+        ImageCaptureFromCamera(imageUploadViewModel)
 
     }
     Column(verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.Start, modifier = Modifier

@@ -5,11 +5,14 @@ import BottomBar
 import android.annotation.SuppressLint
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -60,6 +63,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -75,6 +79,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -110,7 +115,7 @@ import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.utils.constants.Constants.TAG
 import com.example.finalapp.utils.RequestState
 import com.example.finalapp.utils.constants.Constants.FONT_MEDIUM
-import com.example.finalapp.viewmodels.ProfileViewModel
+import com.example.finalapp.viewmodels.ImageUploadViewModel
 import kotlinx.coroutines.launch
 
 
@@ -118,7 +123,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
-fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewModel,profileViewModel: ProfileViewModel, authViewModel: AuthViewModel) {
+fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewModel, imageUploadViewModel: ImageUploadViewModel, authViewModel: AuthViewModel) {
     var selectedItemIndex by rememberSaveable { mutableStateOf(0) }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val buttonsVisible = remember { mutableStateOf(true) }
@@ -127,6 +132,8 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
     val scope = rememberCoroutineScope()
     val heightInDp = LocalConfiguration.current.screenHeightDp.dp * 0.78f
     var showQR: showDialog by remember { mutableStateOf(showDialog.CLOSE) }
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+
 
     if (showQR == showDialog.OPEN) {
         ShowQRDialog(
@@ -142,6 +149,7 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
     Scaffold(
         topBar = {
             HomeTopBar(
+                scrollBehavior,
                 Constants.APP_NAME,
                 navController,
                 true,
@@ -150,14 +158,20 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
             ) { showQR = showDialog.OPEN }
         },
         bottomBar = {
-            BottomBar(
-                navController = navController,
-                state = buttonsVisible,
-                modifier = Modifier.height(30.dp)
-            )
+            AnimatedVisibility(
+                visible = scrollBehavior.state.overlappedFraction == 0f, // Hide on scroll
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
+                BottomBar(
+                    navController = navController,
+                    state = buttonsVisible,
+                    modifier = Modifier.height(30.dp)
+                )
+            }
         },
         floatingActionButton = {
-            HomeFloatingActionButton(authViewModel, eventsViewModel, profileViewModel , navController)
+            HomeFloatingActionButton(authViewModel, eventsViewModel, imageUploadViewModel , navController)
         }
     ) { padding ->
         ModalNavigationDrawer(
@@ -247,9 +261,9 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
                             .fillMaxWidth()
                     ) { page ->
                         when (page) {
-                            0 -> VectorsUI( eventsViewModel, offersList, padding)
-                            1 -> DirectChatScreen(authViewModel,eventsViewModel,navController)
-                            2 -> DroppedProfilesNew(navController ,eventsViewModel)
+                            0 -> VectorsUI( scrollBehavior,eventsViewModel, offersList, padding)
+                            1 -> DirectChatScreen(scrollBehavior,authViewModel,eventsViewModel,navController)
+                            2 -> DroppedProfilesNew(scrollBehavior,navController ,eventsViewModel)
                                 //DroppedProfiles(navController = navController, eventsViewModel = eventsViewModel)
                         }
                     }
@@ -261,8 +275,10 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
 
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VectorsUI(
+    scrollBehavior: TopAppBarScrollBehavior,
     eventsViewModel: EventsViewModel,
     offersList: List<OfferModel>,
     padding: PaddingValues
@@ -270,7 +286,7 @@ fun VectorsUI(
     when (val result = eventsViewModel.allOffers.value) {
         is RequestState.Success -> {
             eventsViewModel.offersList.value = result.data
-            LazyColumn{
+            LazyColumn(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)){
                 items(offersList) { offer ->
                     //ImageScreen(user)
                     // PostScreen(Post("", offer))
@@ -420,7 +436,7 @@ fun ShimmerEffect(showShimmer: Boolean = true, targetValue: Float = 10000f): Bru
 
 
 @Composable
-fun HomeFloatingActionButton(authViewModel: AuthViewModel, eventsViewModel: EventsViewModel,profileViewModel: ProfileViewModel, navController: NavHostController  ) {
+fun HomeFloatingActionButton(authViewModel: AuthViewModel, eventsViewModel: EventsViewModel, imageUploadViewModel: ImageUploadViewModel, navController: NavHostController  ) {
     var showCustomDialog by remember { mutableStateOf(false) }
 
     FloatingActionButton(
@@ -445,7 +461,7 @@ fun HomeFloatingActionButton(authViewModel: AuthViewModel, eventsViewModel: Even
         }
     }
     if (showCustomDialog) {
-        DropProfileDialog(authViewModel ,eventsViewModel , profileViewModel ,navController ) { showCustomDialog = !showCustomDialog }
+        DropProfileDialog(authViewModel ,eventsViewModel , imageUploadViewModel ,navController ) { showCustomDialog = !showCustomDialog }
         Log.d("Suraj", "HomeFloatingActionButton:entered to drop profile dialog ")
     }
 }
@@ -825,7 +841,15 @@ fun PostSplitScreen(post: Offer = Offer("",User())){
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeTopBar(title:String,navController: NavHostController,navIcon:Boolean,actionIcon:Boolean,icon:Int?=null,onQRClicked:()->Unit={}){
+fun HomeTopBar(
+    scrollBehavior: TopAppBarScrollBehavior,
+    title: String,
+    navController: NavHostController,
+    navIcon: Boolean,
+    actionIcon: Boolean,
+    icon: Int? = null,
+    onQRClicked: () -> Unit = {}
+){
 
 
     TopAppBar(
@@ -833,6 +857,7 @@ fun HomeTopBar(title:String,navController: NavHostController,navIcon:Boolean,act
            // containerColor = statusAndTopAppBarColor
         containerColor = statusBarColor //  0xF8E2A61A
         ),
+        scrollBehavior = scrollBehavior,
         title = {
             Text(
                 title,

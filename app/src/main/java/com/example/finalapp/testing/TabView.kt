@@ -21,11 +21,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.navigation.NavHostController
 import com.example.finalapp.viewmodels.AuthViewModel
-import com.example.finalapp.viewmodels.ProfileViewModel
+import com.example.finalapp.viewmodels.ImageUploadViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun TabView(navController:NavHostController, profileViewModel: ProfileViewModel, authViewModel: AuthViewModel){
+fun TabView(navController:NavHostController, imageUploadViewModel: ImageUploadViewModel, authViewModel: AuthViewModel){
     val tabItems= listOf(
         TabItem("Vectors"),
         TabItem("DirectChat"),

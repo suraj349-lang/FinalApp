@@ -31,8 +31,9 @@ import com.example.finalapp.screens._5settings.SettingsScreenUI
 import com.example.finalapp.testing.TabView
 import com.example.finalapp.screens._3createEvent.PastRaisedOffer
 import com.example.finalapp.screens._3createEvent.PremiumCreateEvent
+import com.example.finalapp.screens._4profile.ProfileScreenNew
 import com.example.finalapp.screens.onboarding.screen.WelcomeScreen
-import com.example.finalapp.viewmodels.ProfileViewModel
+import com.example.finalapp.viewmodels.ImageUploadViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 
 const val NavArg="name"
@@ -64,13 +65,13 @@ sealed class SCREENS(val route:String){
 @Composable
 fun Navigation(authViewModel: AuthViewModel, screen: String) {
     val navController:NavHostController= rememberNavController();
-    val profileViewModel= hiltViewModel<ProfileViewModel>()
+    val imageUploadViewModel= hiltViewModel<ImageUploadViewModel>()
     val viewModel = hiltViewModel<ChatViewModel>()
     val eventsViewModel= hiltViewModel<EventsViewModel>()
 
 
 
-    NavHost(navController = navController, startDestination =SCREENS.HOME.route){
+    NavHost(navController = navController, startDestination =SCREENS.CHAT.route){
         composable(SCREENS.SPLASH.route){
             SplashScreenUI(navController,screen)
         }
@@ -87,11 +88,12 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
             FinalUserCreation(authViewModel,navController)
         }
         composable(SCREENS.HOME.route){
-            HomeScreenUI( navController,eventsViewModel,profileViewModel,authViewModel)
+            HomeScreenUI( navController,eventsViewModel,imageUploadViewModel,authViewModel)
         }
 
         composable(SCREENS.PROFILE.route){
-            ProfileScreenUI(navController,profileViewModel,authViewModel)
+           // ProfileScreenUI(navController,imageUploadViewModel,authViewModel)
+            ProfileScreenNew(navController)
         }
         composable(SCREENS.SETTINGS.route){
             SettingsScreenUI(navController)
@@ -105,14 +107,14 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
         composable(SCREENS.SINGLE_CHAT.route, arguments = listOf(navArgument("userNumber"){type= NavType.StringType}))
           {navBackStackEntry->
             val userNumber=navBackStackEntry.arguments?.getString("userNumber")
-            ChatScreenUI(userNumber, navController, viewModel )
+            ChatScreenUI(userNumber, navController )
 
         }
         composable(SCREENS.OTP2.route){
             OtpBox()
         }
         composable(SCREENS.GALLERY.route){
-            GalleryPicker(navController, profileViewModel )
+            GalleryPicker(navController, imageUploadViewModel )
         }
         composable(SCREENS.WELCOME.route){
             WelcomeScreen(navController)
@@ -130,7 +132,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
         }
         composable(SCREENS.TABVIEW.route){
             //todo for testing purpose
-            TabView(navController,profileViewModel,authViewModel)
+            TabView(navController,imageUploadViewModel,authViewModel)
         }
 
         composable(SCREENS.CREATE_EVENT.route) {

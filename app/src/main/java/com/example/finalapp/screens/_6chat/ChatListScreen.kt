@@ -2,23 +2,29 @@ package com.example.finalapp.screens._6chat
 
 
 
+import BottomBar
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.border
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Divider
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -35,44 +41,91 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.finalapp.R
 import com.example.finalapp.model.ChatUser
 import com.example.finalapp.navigation.SCREENS
-import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 
 
 val users:List<ChatUser> = listOf (
-    ChatUser("Suraj2","+917250260100"),
-    ChatUser("Suraj","+916376099670"),
-    ChatUser("sudha","+917367984901")
+    ChatUser("Tedha",R.drawable.girl,"+917250260100"),
+    ChatUser("Bahubali",R.drawable.profile_image_2,"+917250260100"),
+    ChatUser("Sakshi",R.drawable.profile_image_1,"+917250260100"),
+    ChatUser("Supriya",R.drawable.profile_image_3,"+917250260100"),
+    ChatUser("Sakshi Vashishth",R.drawable.girl,"+917250260100"),
+    ChatUser("Manthan",R.drawable.girl,"+917250260100"),
+    ChatUser("Tedha",R.drawable.girl,"+917250260100"),
+    ChatUser("Bahubali",R.drawable.profile_image_2,"+917250260100"),
+    ChatUser("Sakshi",R.drawable.profile_image_1,"+917250260100"),
+    ChatUser("Supriya",R.drawable.profile_image_3,"+917250260100"),
+    ChatUser("Sakshi Vashishth",R.drawable.girl,"+917250260100"),
+    ChatUser("Manthan",R.drawable.girl,"+917250260100"),
 
 )
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@Preview(showBackground = true)
 @Composable
-fun ChatListScreen(navController: NavHostController) {
+fun ChatListScreen(navController: NavHostController= NavHostController(LocalContext.current)) {
     val listOfUsers: List<ChatUser> by remember {
         mutableStateOf(users)
     }
+    val chatRowListItems=listOf("All","Unread","Unreplied")
+    val buttonsVisible = remember { mutableStateOf(true) }
     Scaffold(topBar = {
         ChatTopBar(
-            title = "Chats",
+            title = "Chat",
             navController = navController
         )
-    }) {
-
-
-        LazyColumn(modifier = Modifier.padding(it)){
-            itemsIndexed(listOfUsers){ i,users->
-                UserItem(navController , name=users.name,userNumber = users.number, lastMessage = "hello")
-
+    }, bottomBar = {BottomBar(navController = navController, state =buttonsVisible )}
+    ) {
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .padding(it)) {
+            LazyRow(modifier = Modifier
+                .background(color = Color.White)
+                .fillMaxWidth()
+                .height(40.dp)) {
+                items(chatRowListItems){item->
+                    ChatRowItem(item)
+                }
             }
+            LazyColumn(modifier = Modifier) {
+                itemsIndexed(listOfUsers) { i, user ->
+                    UserItem(navController, user)
+                    Divider(modifier = Modifier.fillMaxWidth(), color = Color(0xFFF1EAEA))
+
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ChatRowItem(item: String) {
+    Card(modifier = Modifier
+        .wrapContentSize()
+        .padding(8.dp), shape = RoundedCornerShape(12.dp), colors = CardDefaults.cardColors(containerColor = Color.LightGray)) {
+        Column(
+            Modifier.wrapContentSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text =item,
+                color = Color.DarkGray,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 12.sp,
+                modifier = Modifier.padding(4.dp)
+            )
         }
     }
 }
@@ -82,39 +135,78 @@ fun ChatListScreen(navController: NavHostController) {
 fun ChatTopBar(title: String, navController: NavHostController) {
         TopAppBar(
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = statusAndTopAppBarColor
+                containerColor = Color.White
             ),
             title = {
                 Text(
-                    title,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis, modifier = Modifier.padding(top=8.dp), color = Color( 0xFF000000), style = MaterialTheme.typography.titleMedium
+                    title,textAlign= TextAlign.Center, modifier = Modifier.fillMaxWidth(0.6f), color = Color( 0xFF000000), fontSize = 20.sp
                 )
             },
             navigationIcon = {
+                Row(modifier = Modifier.fillMaxWidth(0.2f)) {
+                    Card(
+                        modifier = Modifier.size(30.dp),
+                        shape = CircleShape,
+                        colors = CardDefaults.cardColors(containerColor = Color.LightGray)
+                    ) {
+                        Image(
+                            painterResource(id = R.drawable.person_new_filled),
+                            colorFilter = ColorFilter.tint(Color.DarkGray),
+                            contentDescription = "",
+                            modifier = Modifier
+                                .clickable { navController.navigate(SCREENS.PROFILE.route) }
+                                .padding(4.dp)
 
-                    Image(
-                        imageVector = Icons.Default.ArrowBack,
-                        contentDescription = "",
-                        modifier = Modifier
-                            .clickable { navController.navigate(SCREENS.HOME.route) }
-                            .padding(top = 6.dp)
-                            .size(40.dp)
-                    )
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Card(
+                        modifier = Modifier.size(30.dp),
+                        shape = CircleShape,
+                        colors = CardDefaults.cardColors(containerColor = Color.LightGray)
+                    ) {
+                        Image(
+                            painterResource(id = R.drawable.search_new_filled),
+                            contentDescription = "",
+                            colorFilter = ColorFilter.tint(Color.DarkGray),
+                            modifier = Modifier
+                                .clickable { navController.navigate(SCREENS.PROFILE.route) }
+                                .padding(8.dp)
+
+                        )
+                    }
+                }
             }, actions = {
+                Card(
+                    modifier = Modifier.size(30.dp),
+                    shape = CircleShape,
+                    colors = CardDefaults.cardColors(containerColor = Color.LightGray)
+                ) {
+                    Image(
+                        painterResource(id = R.drawable.menu),
+                        contentDescription = "",
+                        colorFilter = ColorFilter.tint(Color.DarkGray),
+                        modifier = Modifier
+                            .clickable { navController.navigate(SCREENS.PROFILE.route) }
+                            .padding(8.dp)
+
+                    )
+                }
 
             }
         )
     }
 
 @Composable
-fun UserItem(navController: NavHostController,name: String,userNumber:String,lastMessage:String){
+fun UserItem(navController: NavHostController, user: ChatUser){
 
     Card(modifier = Modifier
-        .padding(start = 8.dp, end = 8.dp, top = 10.dp)
+        .padding(start = 8.dp, end = 8.dp)
         .fillMaxWidth()
-        .wrapContentHeight()
-        .clickable { navController.navigate("singleChat/$userNumber") },
+        .height(60.dp)
+        .clickable {
+            navController.navigate("singleChat/${user.number}")
+        },
         colors = CardDefaults.cardColors(containerColor = Color(0xFFFFFFFE))
     ) {
         Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
@@ -129,20 +221,23 @@ fun UserItem(navController: NavHostController,name: String,userNumber:String,las
 //                    .clip(CircleShape)
 //                    .border(1.dp, Color.DarkGray, CircleShape)
 //            )
-            Image(painter = painterResource(id = R.drawable.profile_image_1), contentDescription = "",modifier = Modifier
-                .padding(2.dp)
-                .size(70.dp)
-                .clip(CircleShape)
-                .border(1.dp, Color.DarkGray, CircleShape),
-                contentScale = ContentScale.Crop
-            )
-            Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.Start) {
+            Card(modifier = Modifier.size(50.dp), shape = CircleShape, colors = CardDefaults.cardColors(containerColor = Color.Transparent)) {
+                Image(painter = painterResource(id = user.image), contentDescription = "",modifier = Modifier
+                    .padding(2.dp)
+                    .size(40.dp)
+                    .clip(CircleShape),
+                    contentScale = ContentScale.Crop
+                )
+            }
+            Column(modifier = Modifier
+                .fillMaxSize()
+                .padding(start = 8.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.Start) {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text(text = userNumber, fontWeight = FontWeight.SemiBold, style = MaterialTheme.typography.titleMedium, fontSize = 20.sp)
-                    Text(text = "08:38",style = MaterialTheme.typography.labelSmall, fontSize = 12.sp)
+                    Text(text = user.name, fontSize = 16.sp, color = Color.Black)
+                    Text(text = "08:38", fontSize = 12.sp, color = Color.LightGray)
                 }
-                Row() {
-                    Text(text = if(lastMessage.isNotEmpty()) lastMessage else "hello",style = MaterialTheme.typography.titleMedium, fontSize = 12.sp)
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
+                    Text(text =  "hello",style = MaterialTheme.typography.titleMedium, fontSize = 8.sp,color= Color.DarkGray)
                 }
 
 

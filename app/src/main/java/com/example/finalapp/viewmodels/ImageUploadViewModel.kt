@@ -27,8 +27,7 @@ import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
-class ProfileViewModel @Inject constructor(private val repository: ProfileRepository ):ViewModel(){
-     var successImageUploadKey = MutableStateFlow("");
+class ImageUploadViewModel @Inject constructor(private val repository: ProfileRepository ):ViewModel(){
      val dropProfileModel:MutableState<DropProfileModel?> = mutableStateOf(null)
      fun s3ImageUploadFunction(userId: String, file: File) {
          viewModelScope.launch {

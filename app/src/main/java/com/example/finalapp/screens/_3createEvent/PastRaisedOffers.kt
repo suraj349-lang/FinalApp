@@ -16,10 +16,12 @@ import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,6 +38,7 @@ import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.viewmodels.EventsViewModel
 import com.example.finalapp.screens._1home.HomeTopBar
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PastRaisedOffer(authViewModel: AuthViewModel, eventsViewModel: EventsViewModel, navController: NavHostController){
     val items:List<String> = listOf("Alpha-1","Beta-1","Gamma-1")
@@ -43,6 +46,7 @@ fun PastRaisedOffer(authViewModel: AuthViewModel, eventsViewModel: EventsViewMod
     Scaffold(
         topBar = {
             HomeTopBar(
+                scrollBehavior =TopAppBarDefaults.enterAlwaysScrollBehavior(),
                 title = "Raised Offers",
                 navController=navController,
                 navIcon = false,
