@@ -1,8 +1,8 @@
 package com.example.finalapp.testing
 
 import com.example.finalapp.R
+import com.example.finalapp.model.NavigationItem
 import com.example.finalapp.navigation.SCREENS
-import com.example.finalapp.screens._1home.NavigationItem
 
 val items = listOf(
     NavigationItem(

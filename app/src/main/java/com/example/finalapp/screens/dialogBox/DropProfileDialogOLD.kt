@@ -40,9 +40,8 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import com.example.finalapp.R
+import com.example.finalapp.screens._1home.utils.OfferResponseDataAndAction
 import com.example.finalapp.viewmodels.EventsViewModel
-import com.example.finalapp.screens._1home.OfferResponseDataAndAction
-import com.example.finalapp.screens.qrcode.QRCode
 import com.example.finalapp.ui.theme.DarkBlue
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.ui.theme.topAppBarTextColor

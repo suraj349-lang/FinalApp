@@ -14,7 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.example.finalapp.screens._1home.HomeTopBar
+import com.example.finalapp.screens._1home.utils.HomeTopBar
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")

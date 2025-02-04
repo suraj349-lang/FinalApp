@@ -9,10 +9,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -49,9 +51,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.modifier.modifierLocalProvider
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -103,7 +107,7 @@ fun ChatScreenUI(sentTo: String?="",navController: NavHostController= NavHostCon
             Row(modifier = Modifier
                 .padding(start = 16.dp, end = 16.dp)
                 .fillMaxWidth()
-                .height(40.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+                .heightIn(min = 56.dp, max = 150.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
                 Card(modifier = Modifier.size(40.dp), shape = CircleShape, colors = CardDefaults.cardColors(containerColor = Color.LightGray)) {
                     Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
                         Image(
@@ -122,34 +126,53 @@ fun ChatScreenUI(sentTo: String?="",navController: NavHostController= NavHostCon
                 OutlinedTextField(
                     value = inputText,
                     onValueChange = { inputText = it },
-                    modifier=Modifier.fillMaxWidth(0.7f),
-                    placeholder={ Text(text = "...")},
-                    shape = RoundedCornerShape(16.dp),
-                    colors = OutlinedTextFieldDefaults.colors()
-                )
-                Button(
-                    onClick = {
-                        val chat = Chat(
-                            sentTo = sentTo.toString(),
-                            sentFrom = loggedInNumber.toString(),
-                            message = inputText,
-                            received = false,
-                            sent = 0,
-                            seen = false
+                    modifier = Modifier
+                        .fillMaxWidth(0.7f)
+                        .defaultMinSize(minHeight = 48.dp)
+                        .heightIn(min = 48.dp, max = 150.dp),
+                    placeholder = {
+                        Text(
+                            text = "Send Chat",
+                            fontSize = 14.sp,
+                            modifier = Modifier.align(Alignment.Top)
                         )
-                        scope.launch {
-                            saveToDb = chatViewModel.saveChatToDB(chat)
-                            Log.d(TAG, "1: ChatScreenUI:$saveToDb $chat ")
-                            if (saveToDb) {
-                                chatViewModel.sendMessage(chat)
-                                inputText = ""
-                            }
-                        }
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray)
+                    textStyle = TextStyle(fontSize = 14.sp),
+                    shape = RoundedCornerShape(30.dp),
+                    maxLines=10,
+                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color.DarkGray, unfocusedBorderColor = Color.DarkGray, cursorColor = Color.Red)
+                )
 
-                ) {
-                    Image(painter = painterResource(id = R.drawable.chat_new), contentDescription ="", colorFilter = ColorFilter.tint(color = Color.DarkGray) )
+                Card(modifier = Modifier.size(48.dp).clickable {
+                    val chat = Chat(
+                        sentTo = sentTo.toString(),
+                        sentFrom = loggedInNumber.toString(),
+                        message = inputText,
+                        received = false,
+                        sent = 0,
+                        seen = false
+                    )
+                    scope.launch {
+                        saveToDb = chatViewModel.saveChatToDB(chat)
+                        Log.d(TAG, "1: ChatScreenUI:$saveToDb $chat ")
+                        if (saveToDb) {
+                            chatViewModel.sendMessage(chat)
+                            inputText = ""
+                        }
+                    }
+                }, shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = Color.LightGray)) {
+                    Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                        Image(
+                            painter = painterResource(id = R.drawable.chat_new),
+                            contentDescription = "",
+                            colorFilter = ColorFilter.tint(color = Color.DarkGray),
+                            alignment = Alignment.Center,
+                            modifier = Modifier
+                                .size(35.dp)
+                                .padding(2.dp)
+                        )
+                    }
+
                 }
             }
         }

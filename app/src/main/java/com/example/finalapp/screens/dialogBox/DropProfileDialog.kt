@@ -64,7 +64,7 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
 import com.example.finalapp.model.DropProfileModel
-import com.example.finalapp.screens._1home.OfferResponseDataAndAction
+import com.example.finalapp.screens._1home.utils.OfferResponseDataAndAction
 import com.example.finalapp.screens._4profile.createImageFile
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.ui.theme.topAppBarTextColor

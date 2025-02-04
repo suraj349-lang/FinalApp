@@ -35,8 +35,8 @@ import androidx.navigation.NavHostController
 import com.example.finalapp.R
 import com.example.finalapp.viewmodels.AuthViewModel
 import com.example.finalapp.navigation.SCREENS
+import com.example.finalapp.screens._1home.utils.HomeTopBar
 import com.example.finalapp.viewmodels.EventsViewModel
-import com.example.finalapp.screens._1home.HomeTopBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
