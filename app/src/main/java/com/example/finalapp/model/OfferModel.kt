@@ -12,13 +12,4 @@ data class OfferModel(
   val expirationTime:String
 )
 
-data class OfferResponseModel(
-  val success:Boolean,
-  val code:Int,
-  val data:List<OfferModel>
-)
-data class SingleOfferModel(
-  val success:Boolean,
-  val code:Int,
-  val data:OfferModel
-)
+

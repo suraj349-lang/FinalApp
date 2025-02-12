@@ -1,26 +1,27 @@
 package com.example.finalapp.network
 
-import com.example.finalapp.model.DTO.Response.PreSignedUrlResponse
-import com.example.finalapp.model.DTO.Response.SignupAPIResponse
+import com.example.finalapp.model.PreSignedUrlResponse
+import com.example.finalapp.model.SignupAPIResponse
 import com.example.finalapp.model.DirectChat
 import com.example.finalapp.model.DropProfileModel
 import com.example.finalapp.model.DropProfileResponseModel
 import com.example.finalapp.model.GetDropProfileResponseModel
-import com.example.finalapp.model.ImageUploadResponse
-import com.example.finalapp.model.LoginAPIResponse
 import com.example.finalapp.model.LoginModel
 import com.example.finalapp.model.OfferModel
-import com.example.finalapp.model.OfferResponseModel
 import com.example.finalapp.model.RegisterUserModel
 import com.example.finalapp.model.OkResponse
-import com.example.finalapp.model.SingleOfferModel
 import com.example.finalapp.model.User
+import com.example.finalapp.model.SingleOfferModel
+import com.example.finalapp.model.ImageUploadResponse
+import com.example.finalapp.model.LoginAPIResponse
+import com.example.finalapp.model.OfferResponseModel
 import com.example.finalapp.utils.ApiResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.PUT
@@ -48,14 +49,14 @@ interface ApiService {
 
     //---------------------------------------------------------------------//
     @POST("/api/v1/event")
-    suspend fun premiumCreateEvent(@Body offerData:OfferModel):SingleOfferModel
+    suspend fun premiumCreateEvent(@Body offerData:OfferModel): SingleOfferModel
     @POST("/api/v1/event")
-    suspend fun createEvent(@Body offerData:OfferModel):SingleOfferModel
+    suspend fun createEvent(@Body offerData:OfferModel): SingleOfferModel
     @GET("/api/v1/event")
-    suspend fun getAllEvents():OfferResponseModel
+    suspend fun getAllEvents(): OfferResponseModel
     //---------------------------------------------------------------------//
     @GET("api/getPreSignedUrl")
-    suspend fun getPreSignedUrl(@Query("id") id:String):PreSignedUrlResponse
+    suspend fun getPreSignedUrl(@Query("id") id:String): PreSignedUrlResponse
     @PUT
     suspend fun uploadImageToS3(@Url url:String,@Body image:RequestBody): Response<Unit>
 

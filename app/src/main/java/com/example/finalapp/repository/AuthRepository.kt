@@ -1,9 +1,9 @@
 package com.example.finalapp.repository
 
-import com.example.finalapp.model.DTO.Response.SignupAPIResponse
-import com.example.finalapp.model.LoginAPIResponse
+import com.example.finalapp.model.SignupAPIResponse
 import com.example.finalapp.model.LoginModel
 import com.example.finalapp.model.RegisterUserModel
+import com.example.finalapp.model.LoginAPIResponse
 import com.example.finalapp.network.ApiService
 import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.Dispatchers

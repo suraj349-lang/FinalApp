@@ -60,7 +60,11 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import com.example.finalapp.viewmodels.SplashViewModel
 import com.example.finalapp.ui.API_KEY
+import com.example.finalapp.utils.constants.Constants
 import com.google.android.libraries.places.api.Places
+import io.socket.client.IO
+import io.socket.client.Socket
+import java.net.URI
 import javax.inject.Inject
 
 
@@ -71,6 +75,7 @@ class MainActivity : ComponentActivity() {
         Manifest.permission.ACCESS_FINE_LOCATION,
         Manifest.permission.POST_NOTIFICATIONS
     )
+    private var mSocket:Socket? =null
 
     @Inject
     lateinit var splashViewModel: SplashViewModel
@@ -81,6 +86,20 @@ class MainActivity : ComponentActivity() {
             !splashViewModel.isLoading.value
         }
         Places.initialize(applicationContext, API_KEY)
+//        try {
+//            mSocket = IO.socket(Constants.TEMP_SOCKET_URL)
+//            mSocket?.connect()
+//            mSocket?.on(Socket.EVENT_CONNECT) {
+//                Log.d("SocketIO", "Connected to server")
+//                mSocket?.emit("user", Constants.APP_NAME)
+//                mSocket?.emit("message", "hello from ${Constants.APP_NAME}")
+//            }
+//            mSocket?.on(Socket.EVENT_CONNECT_ERROR) { args ->
+//                Log.d("SocketIO", "Connection error: ${args[0]}")
+//            }
+//        } catch (e: Exception) {
+//            Log.d("Error in socket", e.message.toString())
+//        }
 
 
         setContent {
@@ -237,7 +256,7 @@ private fun enableLocationSettings(context: Context, launcher: ActivityResultLau
 @RequiresApi(Build.VERSION_CODES.TIRAMISU)
 private fun getLocation(context: Context, authViewModel: AuthViewModel){
     val fusedLocationProviderClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
-    // check location permission
+
     if(ActivityCompat.checkSelfPermission(context,Manifest.permission.ACCESS_FINE_LOCATION)
         != PackageManager.PERMISSION_GRANTED
         &&
@@ -250,31 +269,13 @@ private fun getLocation(context: Context, authViewModel: AuthViewModel){
         return
     }
 
-    //get latitude and longitude
     val location=fusedLocationProviderClient.getCurrentLocation(100,null)
     location.addOnSuccessListener {
         if(it!=null){
-
-//                mSocket.emit("location",Constants.APP_NAME + "  "+it.latitude.toString() + " " + it.longitude.toString())
-//                mSocket.on("location"){data->
-//                    Log.d("Coordinates received from node", data[0].toString())
-//                }
             authViewModel.latitude.value=it.latitude
             authViewModel.longitude.value=it.longitude
-//                Log.d("Coordinates", authViewModel.latitude.value.toString() + "    "+authViewModel.longitude.value.toString())
             authViewModel.address.value= getReadableLocation(authViewModel.latitude.value,authViewModel.longitude.value,context)
             Log.d("Flash Location", "getLocation: ${authViewModel.address.value}")
-//                Log.d("Coordinates", authViewModel.address.value)
-//
-//
-//                val userTokenAndAddress=User(token = localToken.value, address = authViewModel.address.value)
-//                mSocket.emit("address",Json.encodeToString(userTokenAndAddress))
-//
-//
-//                mSocket.on("address"){data->
-//                  Log.d("Coordinates changed to address", data[0].toString())
-            // Log.d("Coordinates changed to address","no address")
-            //  }
         }else{
             Log.d(TAG,"error fetching location")
         }
@@ -374,17 +375,9 @@ fun getReadableLocation(latitude: Double, longitude: Double, context: Context): 
 
 @Serializable
 data class User(val token: String, val address: String)
-/*
-//
-//            try {
-//                mSocket= IO.socket(Constants.BASE_URL)
-//            }catch (e:Exception){
-//                Log.d("Error in socket",e.message.toString())
-//            }
-//
-//            mSocket.connect()
-//            mSocket.emit("user",Constants.APP_NAME)
-//            mSocket.emit("message","hello from ${Constants.APP_NAME}")
- */
+
+
+
+
 
 

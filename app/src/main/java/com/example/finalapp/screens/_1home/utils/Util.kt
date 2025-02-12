@@ -14,8 +14,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -48,7 +51,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -56,6 +62,7 @@ import androidx.navigation.NavHostController
 import com.example.finalapp.R
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens.dialogBox.DropProfileDialog
+import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.ui.theme.homeTopBarIconsColor
 import com.example.finalapp.ui.theme.statusBarColor
 import com.example.finalapp.utils.RequestState
@@ -104,64 +111,57 @@ fun HomeTopBar(
 
 
     TopAppBar(
+        modifier= Modifier
+            .fillMaxWidth()
+            .height(40.dp),
         colors = TopAppBarDefaults.topAppBarColors(
-            // containerColor = statusAndTopAppBarColor
-            containerColor = statusBarColor //  0xF8E2A61A
+            containerColor = statusBarColor
         ),
         scrollBehavior = scrollBehavior,
         title = {
+            Row(modifier = Modifier.fillMaxHeight(), verticalAlignment = Alignment.CenterVertically) {
             Text(
                 title,
                 fontSize = 20.sp,
-                maxLines = 1,
                 fontWeight=FontWeight.SemiBold,
-                modifier = Modifier.padding(top=8.dp), color = homeTopBarIconsColor, fontFamily = Constants.FONT_MEDIUM
+                modifier = Modifier, color = homeTopBarIconsColor, fontFamily = Constants.FONT_MEDIUM
             )
+            }
         },
-//        navigationIcon = {
-//            Image(
-//                painter = painterResource(
-//                    id = R.drawable.app_icon_new
-//                ),
-//                colorFilter = ColorFilter.tint(color= Color.White),
-//                contentDescription = "",
-//                modifier = Modifier
-//                    .padding(top = 6.dp)
-//                    .size(28.dp)
-//            )
-//        },
         actions = {
             if(actionIcon) {
-                Image(painter = painterResource(id = R.drawable.new_qr),
-                    contentDescription = "",
-                    colorFilter = ColorFilter.tint(color= homeTopBarIconsColor),
-                    modifier = Modifier
-                        .padding(end = 16.dp)
-                        .size(24.dp)
-                        .clickable {
-                            onQRClicked()
-                        })
-                Image(
-                    painter = painterResource(id = R.drawable.notification_new),
-                    contentDescription = "",
-                    colorFilter=ColorFilter.tint(color = homeTopBarIconsColor),
-                    modifier = Modifier
-                        .clickable { navController.navigate(SCREENS.NOTIFICATIONS.route) }
-                        .padding(end = 16.dp)
-                        .size(24.dp)
-                )
-                icon?.let { painterResource(id = it) }?.let {
-                    Image(painter = it,
+                Row(modifier = Modifier.fillMaxHeight(), verticalAlignment = Alignment.CenterVertically) {
+                    Image(painter = painterResource(id = R.drawable.new_qr),
                         contentDescription = "",
-                        colorFilter=ColorFilter.tint(color = homeTopBarIconsColor),
+                        colorFilter = ColorFilter.tint(color = homeTopBarIconsColor),
                         modifier = Modifier
-                            .padding(end = 8.dp)
+                            .padding(end = 16.dp)
                             .size(24.dp)
-                            //.rotate(-40f)
-                            // .shadow(elevation = 12.dp, shape = CircleShape, spotColor = Color.White)
                             .clickable {
-                                navController.navigate(SCREENS.CHAT.route)
+                                onQRClicked()
                             })
+                    Image(
+                        painter = painterResource(id = R.drawable.notification_new),
+                        contentDescription = "",
+                        colorFilter = ColorFilter.tint(color = homeTopBarIconsColor),
+                        modifier = Modifier
+                            .clickable { navController.navigate(SCREENS.NOTIFICATIONS.route) }
+                            .padding(end = 16.dp)
+                            .size(24.dp)
+                    )
+                    icon?.let { painterResource(id = it) }?.let {
+                        Image(painter = it,
+                            contentDescription = "",
+                            colorFilter = ColorFilter.tint(color = homeTopBarIconsColor),
+                            modifier = Modifier
+                                .padding(end = 8.dp)
+                                .size(24.dp)
+                                //.rotate(-40f)
+                                // .shadow(elevation = 12.dp, shape = CircleShape, spotColor = Color.White)
+                                .clickable {
+                                    navController.navigate(SCREENS.CHAT.route)
+                                })
+                    }
                 }
             }
 
@@ -264,7 +264,7 @@ fun HomeFloatingActionButton(authViewModel: AuthViewModel, eventsViewModel: Even
             .wrapContentSize()
             .padding(2.dp),
         contentColor = Color.White,
-        containerColor = statusBarColor// floatingActionBtnTextColor
+        containerColor = floatingActionBtnColor
     ) {
         Column(modifier = Modifier.wrapContentSize(), horizontalAlignment = Alignment.CenterHorizontally) {
             Image(
@@ -275,7 +275,7 @@ fun HomeFloatingActionButton(authViewModel: AuthViewModel, eventsViewModel: Even
                     .padding(top = 4.dp)
                     .size(40.dp)
             )
-            Text(text = "Drop Profile", fontSize = 8.sp,modifier = Modifier.padding(top=0.dp))
+            Text(text = "Drop Profile", fontSize = 8.sp,modifier = Modifier.padding(top=0.dp), fontFamily = FontFamily(Font(R.font.dongle_bold)), color = Color.White)
         }
     }
     if (showCustomDialog) {

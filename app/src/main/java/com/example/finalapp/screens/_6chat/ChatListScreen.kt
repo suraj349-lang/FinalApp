@@ -34,6 +34,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,42 +45,63 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavHostController
 import com.example.finalapp.R
 import com.example.finalapp.model.ChatUser
 import com.example.finalapp.navigation.SCREENS
+import com.example.finalapp.viewmodels.ChatViewModel
 
 
 val users:List<ChatUser> = listOf (
-    ChatUser("Tedha",R.drawable.girl,"+917250260100"),
-    ChatUser("Bahubali",R.drawable.profile_image_2,"+917250260100"),
-    ChatUser("Sakshi",R.drawable.profile_image_1,"+917250260100"),
-    ChatUser("Supriya",R.drawable.profile_image_3,"+917250260100"),
-    ChatUser("Sakshi Vashishth",R.drawable.girl,"+917250260100"),
-    ChatUser("Manthan",R.drawable.girl,"+917250260100"),
-    ChatUser("Tedha",R.drawable.girl,"+917250260100"),
-    ChatUser("Bahubali",R.drawable.profile_image_2,"+917250260100"),
-    ChatUser("Sakshi",R.drawable.profile_image_1,"+917250260100"),
-    ChatUser("Supriya",R.drawable.profile_image_3,"+917250260100"),
-    ChatUser("Sakshi Vashishth",R.drawable.girl,"+917250260100"),
-    ChatUser("Manthan",R.drawable.girl,"+917250260100"),
+    ChatUser("Female",R.drawable.girl,"6376099670"),
+//    ChatUser("Bahubali",R.drawable.profile_image_2,"+917250260100"),
+//    ChatUser("Sakshi",R.drawable.profile_image_1,"+917250260100"),
+//    ChatUser("Supriya",R.drawable.profile_image_3,"+917250260100"),
+//    ChatUser("Sakshi Vashishth",R.drawable.girl,"+917250260100"),
+//    ChatUser("Manthan",R.drawable.girl,"+917250260100"),
+//    ChatUser("Tedha",R.drawable.girl,"+917250260100"),
+//    ChatUser("Bahubali",R.drawable.profile_image_2,"+917250260100"),
+//    ChatUser("Sakshi",R.drawable.profile_image_1,"+917250260100"),
+//    ChatUser("Supriya",R.drawable.profile_image_3,"+917250260100"),
+//    ChatUser("Sakshi Vashishth",R.drawable.girl,"+917250260100"),
+//    ChatUser("Manthan",R.drawable.girl,"+917250260100"),
 
 )
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@Preview(showBackground = true)
 @Composable
-fun ChatListScreen(navController: NavHostController= NavHostController(LocalContext.current)) {
+fun ChatListScreen(navController: NavHostController,chatViewModel: ChatViewModel) {
+    val userNumber="6376099670"
     val listOfUsers: List<ChatUser> by remember {
         mutableStateOf(users)
     }
     val chatRowListItems=listOf("All","Unread","Unreplied")
     val buttonsVisible = remember { mutableStateOf(true) }
+    val lifecycleOwner= LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_START -> chatViewModel.connectSocket(userNumber )
+                Lifecycle.Event.ON_DESTROY -> chatViewModel.disconnectSocket()
+                else -> {}
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
     Scaffold(topBar = {
         ChatTopBar(
             title = "Chat",
@@ -122,7 +144,7 @@ fun ChatRowItem(item: String) {
             Text(
                 text =item,
                 color = Color.DarkGray,
-                fontWeight = FontWeight.SemiBold,
+                fontFamily = FontFamily(Font(R.font.dongle_bold)),
                 fontSize = 12.sp,
                 modifier = Modifier.padding(4.dp)
             )

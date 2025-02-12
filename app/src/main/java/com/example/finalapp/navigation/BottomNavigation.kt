@@ -25,6 +25,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.finalapp.R
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.ui.theme.DarkBlue
+import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.ui.theme.statusBarColor
 import com.example.finalapp.ui.theme.statusBarColorBlue
 import com.example.finalapp.ui.theme.topAppBarTextColor
@@ -80,8 +81,8 @@ fun BottomBar(
                 selected = currentRoute == screen.route,
                 icon = {
                     Column( verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-                        Image(painter = painterResource(id = screen.icon), contentDescription ="",modifier=Modifier.size(24.dp), colorFilter = ColorFilter.tint( color = if(currentRoute == screen.route) statusBarColor else Color.Gray) )
-                        Text(text = screen.name, fontSize = 8.sp, style = MaterialTheme.typography.labelSmall, color = if(currentRoute == screen.route) statusBarColor  else Color.Gray)
+                        Image(painter = painterResource(id = screen.icon), contentDescription ="",modifier=Modifier.size(24.dp), colorFilter = ColorFilter.tint( color = if(currentRoute == screen.route) Color.Black  else Color.Gray) )
+                        Text(text = screen.name, fontSize = 8.sp, style = MaterialTheme.typography.labelSmall, color = if(currentRoute == screen.route) Color.Black  else Color.Gray)
                     }
 
                 },

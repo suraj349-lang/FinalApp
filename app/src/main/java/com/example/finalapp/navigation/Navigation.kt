@@ -33,6 +33,7 @@ import com.example.finalapp.screens._3createEvent.PastRaisedOffer
 import com.example.finalapp.screens._3createEvent.PremiumCreateEvent
 import com.example.finalapp.screens._4profile.ProfileScreenNew
 import com.example.finalapp.screens.onboarding.screen.WelcomeScreen
+import com.example.finalapp.testingp.Tiktok
 import com.example.finalapp.viewmodels.ImageUploadViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 
@@ -58,6 +59,7 @@ sealed class SCREENS(val route:String){
     object CREATE_EVENT:SCREENS("create_event")
     object PAST_OFFERS:SCREENS("past_offers")
     object TABVIEW:SCREENS("tab_view")
+    object TIKTOK:SCREENS("tiktok")
     object PREMIUM_CREATE_EVENT:SCREENS("premium")
 
 }
@@ -68,10 +70,9 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
     val imageUploadViewModel= hiltViewModel<ImageUploadViewModel>()
     val viewModel = hiltViewModel<ChatViewModel>()
     val eventsViewModel= hiltViewModel<EventsViewModel>()
+    val chatViewModel= hiltViewModel<ChatViewModel>()
 
-
-
-    NavHost(navController = navController, startDestination =SCREENS.CHAT.route){
+    NavHost(navController = navController, startDestination =SCREENS.LOGIN.route){
         composable(SCREENS.SPLASH.route){
             SplashScreenUI(navController,screen)
         }
@@ -93,7 +94,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
 
         composable(SCREENS.PROFILE.route){
            // ProfileScreenUI(navController,imageUploadViewModel,authViewModel)
-            ProfileScreenNew(navController)
+            ProfileScreenNew(navController,authViewModel, eventsViewModel, imageUploadViewModel)
         }
         composable(SCREENS.SETTINGS.route){
             SettingsScreenUI(navController)
@@ -102,12 +103,12 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
             NotificationsScreenUI(navController)
         }
         composable(SCREENS.CHAT.route){
-            ChatListScreen(navController)
+            ChatListScreen(navController, chatViewModel)
         }
         composable(SCREENS.SINGLE_CHAT.route, arguments = listOf(navArgument("userNumber"){type= NavType.StringType}))
           {navBackStackEntry->
             val userNumber=navBackStackEntry.arguments?.getString("userNumber")
-            ChatScreenUI(userNumber, navController )
+            ChatScreenUI(userNumber, navController ,chatViewModel)
 
         }
         composable(SCREENS.OTP2.route){
@@ -126,7 +127,6 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
             SearchScreen(navController)
         }
 
-
         composable(SCREENS.PAST_OFFERS.route){
             PastRaisedOffer(authViewModel = authViewModel, eventsViewModel =eventsViewModel , navController = navController)
         }
@@ -141,6 +141,10 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
 
         composable(SCREENS.PREMIUM_CREATE_EVENT.route) {
             PremiumCreateEvent(authViewModel, eventsViewModel, navController)
+        }
+        composable(SCREENS.TIKTOK.route){
+            val list= listOf<String>("1","2","3","4","5","6")
+            Tiktok(videos = list)
         }
 
     }

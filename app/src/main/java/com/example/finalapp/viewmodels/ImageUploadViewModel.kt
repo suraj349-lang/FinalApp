@@ -9,7 +9,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.finalapp.model.DTO.Response.PreSignedUrlResponse
+import com.example.finalapp.model.PreSignedUrlResponse
 import com.example.finalapp.model.DropProfileModel
 import com.example.finalapp.model.DropProfileResponseModel
 import com.example.finalapp.model.User
@@ -127,6 +127,7 @@ class ImageUploadViewModel @Inject constructor(private val repository: ProfileRe
     //-------------------------------------------DROP PROFILE--------------------------------------------------------------------------------------//
 
     val dropProfileResponse:MutableState<RequestState<DropProfileResponseModel>> = mutableStateOf(RequestState.Idle)
+    val dropProfileState = MutableStateFlow<RequestState<DropProfileResponseModel>>(RequestState.Idle)
     fun dropProfile(data:DropProfileModel)=viewModelScope.launch(Dispatchers.IO) {
         dropProfileResponse.value=RequestState.Loading
         repository.sendDropProfileData(data)

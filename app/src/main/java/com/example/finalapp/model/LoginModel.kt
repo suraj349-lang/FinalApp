@@ -1,15 +1,8 @@
 package com.example.finalapp.model
 
 data class LoginModel(
-    val number:String,
+    val credentials:String,
     var password:String
 )
-data class LoginAPIResponse(
-  val success:Boolean,
-  val code:Int,
-  val data:User
-)
 
-data class ImageUploadResponse(
-  val message:String
-)
+

@@ -4,6 +4,13 @@ package com.example.finalapp.screens._1home
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,6 +22,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
@@ -24,11 +32,14 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Icon
 import androidx.compose.material.Surface
 import androidx.compose.ui.Alignment
 import androidx.compose.material.Text
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -52,16 +63,22 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.example.finalapp.R
 import com.example.finalapp.model.DropProfileModel
+import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.utils.testdata.Item
 import kotlinx.coroutines.launch
 
@@ -91,6 +108,7 @@ fun DroppedProfilesNew(
     }
 
     val predictions by eventsViewModel.getAutocompletePredictions(query).collectAsState(emptyList())
+
     Surface(modifier = Modifier
         .fillMaxSize()
         .padding()) {
@@ -100,23 +118,29 @@ fun DroppedProfilesNew(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             AnimatedVisibility(visible = scrollBehavior.state.overlappedFraction == 0f) {
-                OutlinedTextField(
-                    value = query,
-                    onValueChange = {
-                        query = it
-                        showPredictionBoxForSearch = it.isNotEmpty()
-                    },
-                    label = { Text(text = "Search Profiles") },
-                    placeholder = { Text(text = labelText) },
-                    modifier = Modifier
-                        .clickable {
-                            labelText = "Search location"
-                        }
-                        .fillMaxWidth()
-                        .padding(4.dp),
-                    maxLines = 1,
-
+                Row(modifier = Modifier.fillMaxWidth().height(60.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+                    OutlinedTextField(
+                        value = query,
+                        onValueChange = {
+                            query = it
+                            showPredictionBoxForSearch = it.isNotEmpty()
+                        },
+                        label = {
+                            Text(
+                                text = "Search Profiles",
+                                fontFamily = FontFamily(Font(R.font.dongle_bold))
+                            )
+                        },
+                        placeholder = { Text(text = labelText) },
+                        modifier = Modifier
+                            .clickable {
+                                labelText = "Search location"
+                            }
+                            .fillMaxWidth()
+                            .padding(4.dp),
+                        shape = RoundedCornerShape(20.dp)
                     )
+                }
                 if (showPredictionBoxForSearch) {
                     Box(
                         modifier = Modifier
@@ -148,38 +172,28 @@ fun DroppedProfilesNew(
             }
             AnimatedVisibility(visible = scrollBehavior.state.overlappedFraction == 0f) {
                     Row(
-                        modifier = Modifier.zIndex(0f)
+                        modifier = Modifier
+                            .zIndex(0f)
                             .fillMaxWidth()
-                            .padding(4.dp)
-                            .wrapContentSize(),
+                            .height(40.dp),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
-                        Button(
-                            onClick = { },
-                            shape = RoundedCornerShape(12.dp),
-                            modifier = Modifier
-                                .fillMaxWidth(0.7f)
-                                .padding(end = 16.dp),
-
-                            ) {
-                            Text(text = "Date range picker")
-
-                        }
-                        Button(
-                            onClick = {
+                        Text(text = "Last 1 Week ")
+                        Image(painter = painterResource(id = R.drawable.edit_new), contentDescription ="",modifier=Modifier.size(30.dp), colorFilter = ColorFilter.tint(
+                            Color.Black) )
+                        Card(modifier = Modifier
+                            .clickable {
                                 scope.launch {
                                     eventsViewModel.getAllDropProfiles()
                                 }
                             },
-                            shape = RoundedCornerShape(12.dp),
-                            modifier = Modifier
-                                .fillMaxWidth(1f),
-
-                            ) {
-                            Text(text = "Search")
+                            shape = CircleShape
+                        ) {
+                            Text(text = "Search",color= Color.White , fontSize = 20.sp,fontFamily = FontFamily(Font(R.font.dongle_bold)), modifier = Modifier.padding(4.dp))
 
                         }
+                       // DateRangePicker(newDate = "", onDateChange ={} )
                     }
                 }
             when (val result=eventsViewModel.getDropProfileResponse.value){
@@ -271,7 +285,9 @@ fun DropProfileSearchedList(
         .zIndex(0f)
         .fillMaxSize()) {
             LazyVerticalGrid(
-                modifier=Modifier.zIndex(0f).nestedScroll(scrollBehavior.nestedScrollConnection),
+                modifier= Modifier
+                    .zIndex(0f)
+                    .nestedScroll(scrollBehavior.nestedScrollConnection),
                 columns = GridCells.Fixed(2),
                 contentPadding = PaddingValues(2.dp),
 
@@ -282,3 +298,20 @@ fun DropProfileSearchedList(
             }
     }
 }
+
+@Composable
+fun DateRangePicker(newDate:String,onDateChange:(String)->Unit) {
+    OutlinedTextField(
+        value = newDate, 
+        onValueChange ={onDateChange(it)}, 
+        modifier= Modifier
+            .fillMaxWidth(0.7f)
+            .padding(end = 16.dp),
+        shape = RoundedCornerShape(20.dp),
+        trailingIcon = { Image(painter = painterResource(id = R.drawable.calendar), contentDescription ="" )},
+        
+        
+    )
+    
+}
+

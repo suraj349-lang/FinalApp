@@ -1,5 +1,6 @@
 package com.example.finalapp.screens._4profile
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -29,6 +30,11 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,11 +52,23 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.example.finalapp.R
+import com.example.finalapp.navigation.SCREENS
+import com.example.finalapp.screens.dialogBox.DropProfileDialog
+import com.example.finalapp.ui.theme.floatingActionBtnColor
+import com.example.finalapp.viewmodels.AuthViewModel
+import com.example.finalapp.viewmodels.EventsViewModel
+import com.example.finalapp.viewmodels.ImageUploadViewModel
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-@Preview(showBackground = true)
-fun ProfileScreenNew(navController: NavHostController = NavHostController(LocalContext.current)) {
+fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewModel,eventsViewModel:EventsViewModel,imageUploadViewModel:ImageUploadViewModel) {
+    var showCustomDialog by remember {
+        mutableStateOf(false)
+    }
+    if (showCustomDialog) {
+        DropProfileDialog(authViewModel ,eventsViewModel , imageUploadViewModel ,navController ) { showCustomDialog = !showCustomDialog }
+        Log.d("Suraj", "Profile Screen : Drop Profile ")
+    }
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier
             .fillMaxSize()
@@ -59,7 +77,7 @@ fun ProfileScreenNew(navController: NavHostController = NavHostController(LocalC
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)
-                    .background(color = Color(0xFFE4EE05))
+                    .background(color = floatingActionBtnColor) //Color(0xFFE4EE05)
             ) {
                 Box(modifier = Modifier
                     .fillMaxSize()
@@ -80,7 +98,7 @@ fun ProfileScreenNew(navController: NavHostController = NavHostController(LocalC
                         Image(
                             painterResource(id = R.drawable.back),
                             contentDescription = "",
-                            contentScale = ContentScale.Crop
+                            contentScale = ContentScale.Crop, colorFilter = ColorFilter.tint(Color.White)
                         )
 
                     }
@@ -168,8 +186,12 @@ fun ProfileScreenNew(navController: NavHostController = NavHostController(LocalC
             }
             }
             Column(modifier = Modifier.padding(start = 16.dp,end=16.dp,top=10.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                MyLiveEvents()
-                RecentDrops()
+                MyLiveEvents(){
+                    navController.navigate(SCREENS.CREATE_EVENT.route)
+                }
+                RecentDrops(){
+                    showCustomDialog=!showCustomDialog
+                }
                 UserStats()
             }
 
@@ -183,7 +205,7 @@ fun ProfileScreenNew(navController: NavHostController = NavHostController(LocalC
 
 
 @Composable
-fun MyLiveEvents() {
+fun MyLiveEvents(onAddEventClicked:()->Unit) {
     Column() {
             Row(
                 modifier = Modifier
@@ -201,6 +223,7 @@ fun MyLiveEvents() {
             }
         }
         Card(modifier = Modifier
+            .clickable { onAddEventClicked() }
             .padding(top = 8.dp)
             .fillMaxWidth()
             .height(40.dp), border = BorderStroke(width = 1.dp, brush = Brush.linearGradient(colors = listOf(
@@ -264,7 +287,7 @@ val items= listOf(
     LiveEventItem(R.drawable.femaleprofile,"News",12)
 )
 @Composable
-fun RecentDrops() {
+fun RecentDrops(onDropProfileClicked:()->Unit) {
     Column() {
             Row(
                 modifier = Modifier
@@ -292,6 +315,7 @@ fun RecentDrops() {
             }
         }
         Card(modifier = Modifier
+            .clickable { onDropProfileClicked() }
             .padding(top = 8.dp)
             .fillMaxWidth()
             .height(40.dp), border = BorderStroke(width = 1.dp, brush = Brush.linearGradient(colors = listOf(

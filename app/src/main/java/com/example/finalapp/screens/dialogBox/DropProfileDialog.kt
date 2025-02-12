@@ -1,6 +1,7 @@
 package com.example.finalapp.screens.dialogBox
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -77,6 +78,7 @@ import okhttp3.RequestBody
 import java.io.File
 
 
+@SuppressLint("SuspiciousIndentation")
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewModel, imageUploadViewModel: ImageUploadViewModel, navController: NavHostController, onDismiss: () -> Unit) {
@@ -128,6 +130,7 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
             uri = it
         }
     }
+    val dropProfileState by imageUploadViewModel.dropProfileState.collectAsState()
 
 
     Dialog(onDismissRequest = { onDismiss() }, properties = DialogProperties(
@@ -324,7 +327,7 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                           //  enabled = false;
                             imageFile?.let {
                                 imageUploadViewModel.dropProfileModel.value=dropProfileModel
-                                    imageUploadViewModel.s3ImageUploadFunction("suraj3494",it)
+                                imageUploadViewModel.s3ImageUploadFunction("suraj3494",it)
                                 }
                         },
                         shape= RoundedCornerShape(6.dp),
@@ -344,24 +347,15 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
 
                     when (val result=imageUploadViewModel.dropProfileResponse.value){
                         is RequestState.Success->{
-
                             Toast.makeText(context,"Profile drop : SUCCESS", Toast.LENGTH_SHORT).show()
                             imageUploadViewModel.dropProfileResponse.value=RequestState.Idle
                             onDismiss()
-
-
                         }
                         is RequestState.Error->{
                             Log.d("Data received",result.error.message.toString())
                             Toast.makeText(context,"$result", Toast.LENGTH_SHORT).show()
                         }
-                        RequestState.Loading->{
-                            CircularProgressIndicator(color = Color(0xFF1289BE))
-                        }
-                        RequestState.Idle->{
-
-                        }
-
+                        else->{}
                     }
                 val presignedUrlData = imageUploadViewModel.preSignedUrlData.collectAsState()
                 when (val result=imageUploadViewModel.preSignedUrlDataState.value){
@@ -373,13 +367,7 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                         Log.d("PresignedURL",result.error.message.toString())
                         Toast.makeText(context,"$result", Toast.LENGTH_SHORT).show()
                     }
-                    RequestState.Loading->{
-
-                    }
-                    RequestState.Idle->{
-
-                    }
-
+                    else->{}
                 }
 
                 if(eventsViewModel.key.value==1){

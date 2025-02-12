@@ -65,8 +65,7 @@ fun FinalAppTheme(
             val window = (view.context as Activity).window
            // window.statusBarColor = colorScheme.primary.toArgb()
 //            window.statusBarColor = statusAndTopAppBarColor.toArgb()
-            window.statusBarColor= statusBarColor
-                .toArgb()
+            window.statusBarColor= floatingActionBtnColor.toArgb()
 
            // WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
             WindowCompat.getInsetsController(window, view)?.run {

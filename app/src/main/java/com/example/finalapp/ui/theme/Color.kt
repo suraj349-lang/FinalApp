@@ -19,11 +19,14 @@ val topAppBarTextColor= Color(0xFFEBDB55); //0xFFEEE6A2
 val DarkBlue=Color(0xFF08155E)
 val LightBlueBkg= Color(0xFF3C9BE7)
 
-val statusBarColor= Color(0xFF1D1D1B) //0xFFBFFFBC  //
-val floatingActionBtnTextColor= statusBarColor//Color(0xFF9980C5);
+val statusBarColor= Color(0xFFFFFFFF) //0xFFBFFFBC  //
+val homeTopBarIconsColor= Color(0xFF480963);
+val floatingActionBtnColor= homeTopBarIconsColor//Color(0xFF9980C5);
 val statusBarColorSlack= Color(0xFF5A0470);
 val statusBarColorBlue=Color(0xFF4505C7) //0xFF601AF1
 
-val homeTopBarIconsColor= Color(0xFFFFFFFF);
+
 
 val droppedProfileExpirationTime= Color(0xFFA80641)
+
+val vectorScreenIcons=Color.Black.copy(alpha = 0.7f)

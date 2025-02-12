@@ -40,6 +40,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -54,6 +55,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.modifier.modifierLocalProvider
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
@@ -61,22 +63,23 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavHostController
 import com.example.finalapp.R
 import com.example.finalapp.database.Chat
 import com.example.finalapp.datastore.StoreUserData
 import com.example.finalapp.navigation.SCREENS
+import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
 import com.example.finalapp.utils.constants.Constants.TAG
 import com.example.finalapp.viewmodels.ChatViewModel
 import kotlinx.coroutines.launch
-
+import javax.inject.Inject
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-@Preview(showBackground = true)
-fun ChatScreenUI(sentTo: String?="",navController: NavHostController= NavHostController(LocalContext.current)) {
-    val chatViewModel= hiltViewModel<ChatViewModel>();
+fun ChatScreenUI(sentTo: String?="",navController: NavHostController,chatViewModel: ChatViewModel) {
     val context= LocalContext.current
     val messages by chatViewModel.messagesFromDB.collectAsState()
     val listState = rememberLazyListState()
@@ -86,22 +89,23 @@ fun ChatScreenUI(sentTo: String?="",navController: NavHostController= NavHostCon
     val datastore=StoreUserData(context)
     val loggedInNumber by datastore.getUserNumber.collectAsState(initial = "")
     chatViewModel.loggedInNumber.value=loggedInNumber.toString()
+    val sentTo="7250260100"
+    val userNumber="6376099670"
 
 
     LaunchedEffect(messages){
         listState.animateScrollToItem(messages.size)
-        chatViewModel.getChat(sentTo.toString())
-    }
-    LaunchedEffect(key1 = true){
-        chatViewModel.connectToSocket()
+        if (sentTo != null) {
+            chatViewModel.getChat(sentTo)
+        }
     }
     Scaffold(
-        topBar = { SingleChatTopBar(title = "Sakshi", navController =navController ) }) {
+        topBar = { SingleChatTopBar(title = sentTo!!, navController =navController ) }) {
 
         Column(modifier = Modifier.padding(it)) {
             LazyColumn(state = listState, modifier = Modifier.weight(1f)) {
-                items(messages) { message ->
-                    MessageItem( message.message, message.sentFrom==loggedInNumber.toString())
+                items(items=messages) { message ->
+                    MessageItem( message.message, message.sentFrom==userNumber)
                 }
             }
             Row(modifier = Modifier
@@ -143,24 +147,28 @@ fun ChatScreenUI(sentTo: String?="",navController: NavHostController= NavHostCon
                     colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color.DarkGray, unfocusedBorderColor = Color.DarkGray, cursorColor = Color.Red)
                 )
 
-                Card(modifier = Modifier.size(48.dp).clickable {
-                    val chat = Chat(
-                        sentTo = sentTo.toString(),
-                        sentFrom = loggedInNumber.toString(),
-                        message = inputText,
-                        received = false,
-                        sent = 0,
-                        seen = false
-                    )
-                    scope.launch {
-                        saveToDb = chatViewModel.saveChatToDB(chat)
-                        Log.d(TAG, "1: ChatScreenUI:$saveToDb $chat ")
-                        if (saveToDb) {
-                            chatViewModel.sendMessage(chat)
-                            inputText = ""
+                Card(modifier = Modifier
+                    .size(48.dp)
+                    .clickable {
+                        val chat = Chat(
+                            sentTo = sentTo, //sentTo
+                            sentFrom = userNumber,//loggedInNumber.toString(),
+                            message = inputText,
+                            received = false,
+                            sent = 0,
+                            seen = false
+                        )
+                        scope.launch {
+                            saveToDb = chatViewModel.saveChatToDB(chat)
+
+                            Log.d("socketManager", "1: ChatScreenUI:$saveToDb ------->  $chat ")
+
+                            if (saveToDb) {
+                                chatViewModel.sendMessage(userNumber,sentTo,if(inputText.isNullOrEmpty()) { "testing"}else inputText)
+                                inputText = ""
+                            }
                         }
-                    }
-                }, shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = Color.LightGray)) {
+                    }, shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = Color.LightGray)) {
                     Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
                         Image(
                             painter = painterResource(id = R.drawable.chat_new),
@@ -191,14 +199,14 @@ fun MessageItem(msg: String,isSentByLoggedInUser:Boolean) {
     ) {
         Surface(
             shape = RoundedCornerShape(16.dp),
-            color = if (isSentByLoggedInUser) Color(0xFFF5F3F3) else Color.DarkGray
+            color = if (isSentByLoggedInUser) Color(0xFFF5F3F3) else Color.DarkGray.copy(alpha = 0.5f)
         ) {
             Column(
                 modifier = Modifier
                     .padding(2.dp)
                     .widthIn(max = 240.dp)
             ) {
-                Text(text = if (isSentByLoggedInUser) "ME" else "Sakshi")
+                Text(text = if (isSentByLoggedInUser) "Me" else "Female", fontFamily = DONGLE_BOLD)
                 Text(
                     text = msg,
                    // style = MaterialTheme.typography.titleMedium,
@@ -286,3 +294,4 @@ fun SingleChatTopBar(title: String, navController: NavHostController) {
         }
     )
 }
+

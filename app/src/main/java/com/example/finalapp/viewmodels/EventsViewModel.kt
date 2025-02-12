@@ -8,12 +8,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.finalapp.model.DirectChat
 import com.example.finalapp.model.DropProfileModel
-import com.example.finalapp.model.DropProfileResponseModel
 import com.example.finalapp.model.OfferModel
-import com.example.finalapp.model.SingleOfferModel
 import com.example.finalapp.model.User
+import com.example.finalapp.model.SingleOfferModel
 import com.example.finalapp.repository.EventsRepository
 import com.example.finalapp.repository.Resource
+import com.example.finalapp.testingp.imageUrls
 import com.example.finalapp.utils.RequestState
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.AutocompletePrediction
@@ -33,6 +33,7 @@ import kotlin.Exception
 
 @HiltViewModel
 class EventsViewModel @Inject constructor(private val eventsRepository: EventsRepository, @ApplicationContext context: Context): ViewModel(){
+    val publicImage= MutableStateFlow(imageUrls.get(9))
     private val placesClient by lazy { Places.createClient(context) }
     init {
         viewModelScope.launch(Dispatchers.Main) {

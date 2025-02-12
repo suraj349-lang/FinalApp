@@ -144,6 +144,8 @@ dependencies {
     // qr scanning (static)
    // implementation 'com.google.mlkit:barcode-scanning:17.2.0'
 
+    implementation "com.google.accompanist:accompanist-pager:0.29.1-alpha"
+
 
 
 

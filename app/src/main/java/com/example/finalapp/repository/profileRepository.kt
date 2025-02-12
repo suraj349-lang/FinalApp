@@ -1,7 +1,7 @@
 package com.example.finalapp.repository
 
 import android.util.Log
-import com.example.finalapp.model.DTO.Response.PreSignedUrlResponse
+import com.example.finalapp.model.PreSignedUrlResponse
 import com.example.finalapp.model.DropProfileModel
 import com.example.finalapp.model.DropProfileResponseModel
 import com.example.finalapp.model.OkResponse
@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import java.io.File
 

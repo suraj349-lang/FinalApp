@@ -1,4 +1,4 @@
-package com.example.finalapp.model.DTO.Response
+package com.example.finalapp.model
 
 data class PreSignedUrlResponse(
     val key:String,
