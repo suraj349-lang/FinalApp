@@ -7,6 +7,7 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.staggeredgrid.LazyHorizontalStaggeredGrid
@@ -39,6 +40,7 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
 import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.ui.theme.vectorScreenIcons
+import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
 import com.example.finalapp.viewmodels.EventsViewModel
 
 
@@ -89,7 +91,10 @@ fun PublicActiveEvent(index:Int,height:Boolean,imageUrls: List<String>) {
         mutableStateOf(index)
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier
+        .fillMaxSize()
+        .padding(4.dp)
+        .border(width = 1.dp, color = Color.LightGray)) {
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Top,
@@ -232,13 +237,37 @@ fun PublicActiveEvent(index:Int,height:Boolean,imageUrls: List<String>) {
                         )
                     }}
             }
-
-            Box(
+            Box(modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(0.23f)
+                    .background(brush = Brush.linearGradient(colors = listOf(Color(0xFFE7A603),Color(0xFFF5EDF0)))))
+            {
+                Row(
+                    modifier = Modifier.fillMaxSize().padding(start = 16.dp, end = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Card(modifier = Modifier.size(40.dp), shape = CircleShape) {
+                            Image(
+                                painter = painterResource(id = R.drawable.add),
+                                contentDescription = " ", modifier = Modifier.padding(1.dp)
+                            )
+                        }
+                        Text(text = "Add Event", fontFamily = DONGLE_BOLD)
+                    }
+                }
+            }
+           Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .fillMaxHeight(1f)
+                    .fillMaxHeight(0.52f)
             ) {
-                UserReactions(imageUrls){image=it}
+                UserReactions(imageUrls) { image = it }
             }
 
         }
@@ -248,8 +277,8 @@ fun PublicActiveEvent(index:Int,height:Boolean,imageUrls: List<String>) {
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun UserReactions(imageUrls:List<String>,onImageClicked:(String)->Unit) {
-    LazyVerticalGrid(
-        columns = GridCells.Adaptive(minSize = 60.dp),
+    LazyHorizontalGrid(
+        rows = GridCells.Adaptive(minSize = 60.dp),
         contentPadding = PaddingValues(4.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp)

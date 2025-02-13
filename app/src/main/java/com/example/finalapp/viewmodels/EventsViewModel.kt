@@ -127,11 +127,11 @@ class EventsViewModel @Inject constructor(private val eventsRepository: EventsRe
 //        }
 //    }
     //-------------------------------------------DIRECT CHAT--------------------------------------------------------------------------------------//
-
+    val directChatRequestState = MutableStateFlow<RequestState<String>>(RequestState.Idle)
     fun shareChatFunction(data: DirectChat){
+        directChatRequestState.value=RequestState.Loading
         viewModelScope.launch {
             sendDirectChatData(data)
-            getNearByUsers(data.lat,data.long)
         }
 
     }
@@ -140,16 +140,14 @@ class EventsViewModel @Inject constructor(private val eventsRepository: EventsRe
         eventsRepository.setLocationForDirectChat(data)
             .onStart {
                 directChatResponse.value=RequestState.Loading;
-                Log.d("Data received",offerResponse.value.toString())
             }
             .catch {
                 Log.d("Data received","error found")
                 directChatResponse.value=RequestState.Error(it)
-                Log.d("Data received",offerResponse.value.toString())
             }
             .collect {
                 directChatResponse.value = RequestState.Success(it.data);
-                Log.d("Data received",offerResponse.value.toString())
+                getNearByUsers(data.lat,data.long)
             }
     }
 
@@ -160,17 +158,22 @@ class EventsViewModel @Inject constructor(private val eventsRepository: EventsRe
         eventsRepository.getDirectChatUsers(lat,long)
             .onStart {
                 nearByUserResponse.value=RequestState.Loading;
-                Log.d("Data received",offerResponse.value.toString())
             }
             .catch {
                 Log.d("Data received","error found")
                 nearByUserResponse.value=RequestState.Error(it)
-                Log.d("Data received",offerResponse.value.toString())
             }
             .collect {
                 nearByUserResponse.value = RequestState.Success(it.data);
-                Log.d("Data received",offerResponse.value.toString())
+                nearByUsersList.value=it.data
+                directChatRequestState.value=RequestState.Success("Successfully fetched direct chat users")
             }
+    }
+    fun setDirectChatRequestStateToIdle(){
+        directChatRequestState.value=RequestState.Idle
+    }
+    fun setDirectChatRequestStateToSuccess(){
+        directChatRequestState.value=RequestState.Success("")
     }
 
 

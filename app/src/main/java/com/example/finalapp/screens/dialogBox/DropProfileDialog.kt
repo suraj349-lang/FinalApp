@@ -74,6 +74,7 @@ import com.example.finalapp.viewmodels.AuthViewModel
 import com.example.finalapp.viewmodels.EventsViewModel
 import com.example.finalapp.viewmodels.ImageUploadViewModel
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.Request
 import okhttp3.RequestBody
 import java.io.File
 
@@ -345,30 +346,20 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                         Text(text = "Drop Profile")
                     }
 
-                    when (val result=imageUploadViewModel.dropProfileResponse.value){
+                    when (dropProfileState){
+                        is RequestState.Loading ->{
+                            DialogLoading()
+                        }
                         is RequestState.Success->{
                             Toast.makeText(context,"Profile drop : SUCCESS", Toast.LENGTH_SHORT).show()
-                            imageUploadViewModel.dropProfileResponse.value=RequestState.Idle
+                            imageUploadViewModel.updateDropProfileStateToIdle()
                             onDismiss()
                         }
                         is RequestState.Error->{
-                            Log.d("Data received",result.error.message.toString())
-                            Toast.makeText(context,"$result", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context,"Error dropping profile",Toast.LENGTH_SHORT).show()
                         }
                         else->{}
                     }
-                val presignedUrlData = imageUploadViewModel.preSignedUrlData.collectAsState()
-                when (val result=imageUploadViewModel.preSignedUrlDataState.value){
-                    is RequestState.Success->{
-                        imageUploadViewModel.preSignedUrlData.value= result.data
-                        Log.d("PresignedURL", "DropProfileDialog:${result.data} ")
-                    }
-                    is RequestState.Error->{
-                        Log.d("PresignedURL",result.error.message.toString())
-                        Toast.makeText(context,"$result", Toast.LENGTH_SHORT).show()
-                    }
-                    else->{}
-                }
 
                 if(eventsViewModel.key.value==1){
                     Log.d("Data received","runned this")

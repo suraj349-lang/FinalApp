@@ -34,6 +34,7 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -81,24 +82,14 @@ fun DirectChatScreen(
                     .fillMaxSize()
                     .padding(paddingValues)
             ) {
-                // Main UI content
-                DirectChatUI(scrollBehavior,eventsViewModel,paddingValues,checked){
-                    checked=!checked
-                    eventsViewModel.shareChatFunction(
-                        DirectChat("677b4df1842c1c465293fc2f",authViewModel.latitude.value,authViewModel.longitude.value))
-                }
-
-                // Floating Action Button at Top-End
                 FloatingActionButton(
                     onClick = { /* TODO */ },
                     modifier = Modifier
                         .align(Alignment.TopEnd)
                         .size(80.dp)
-                        .padding(4.dp) // Add padding from edges,
-                ,
+                        .padding(4.dp),
                     containerColor = Color.Transparent, // Set transparent background
                     elevation = FloatingActionButtonDefaults.elevation(0.dp)
-
                 ) {
                     Column(modifier = Modifier
                         .padding(4.dp)
@@ -106,6 +97,12 @@ fun DirectChatScreen(
                         SwitchWithIcon(checked) { checked = it }
                         Text(text = "Direct chat", fontSize = 8.sp, fontFamily = FontFamily(Font(R.font.oreganoregular)))
                     }
+                }
+                // Main UI content
+                DirectChatUI(eventsViewModel ,scrollBehavior,eventsViewModel,paddingValues,checked){
+                    checked=!checked
+                    eventsViewModel.shareChatFunction(
+                        DirectChat("677b4df1842c1c465293fc2f",authViewModel.latitude.value,authViewModel.longitude.value))
                 }
             }
         }
@@ -115,18 +112,20 @@ fun DirectChatScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DirectChatUI(
+    eventsViewModel1: EventsViewModel,
     scrollBehavior: TopAppBarScrollBehavior,
     eventsViewModel: EventsViewModel,
     paddingValues: PaddingValues,
     checked: Boolean,
     onShareProfileClicked: () -> Unit
 ) {
-    val nearByUsersList by  remember {
-        mutableStateOf(eventsViewModel.nearByUsersList.value)
-    }
-    when(val result=eventsViewModel.nearByUserResponse.value){
+    val directChatRequestState by eventsViewModel.directChatRequestState.collectAsState()
+    val nearByUsersList= mutableStateOf(eventsViewModel.nearByUsersList.value)
+
+
+    when(directChatRequestState){
         is RequestState.Success ->{
-           eventsViewModel.nearByUsersList.value=result.data;
+            eventsViewModel.setDirectChatRequestStateToIdle()
         }
         is RequestState.Loading->{
             DialogLoading()
@@ -144,7 +143,7 @@ fun DirectChatUI(
         .padding(paddingValues)) {
         Column(modifier = Modifier
             .fillMaxSize(), verticalArrangement = Arrangement.spacedBy(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            if(!checked && nearByUsersList.isEmpty()) {
+            if(!checked && nearByUsersList.value.isEmpty()) {
                 Text(
                     text = "Share your profile nearby",
                     fontSize = 20.sp,
@@ -154,7 +153,7 @@ fun DirectChatUI(
                 //if user want to share the profile , it will automatically switch on the button for direct chat
                 ShareProfileForDirectChat(){onShareProfileClicked()}
             } else{
-                DirectChatProfiles(scrollBehavior,nearByUsersList)
+                DirectChatProfiles(scrollBehavior,nearByUsersList.value)
             }
 
             

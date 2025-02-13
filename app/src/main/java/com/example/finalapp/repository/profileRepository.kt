@@ -6,6 +6,7 @@ import com.example.finalapp.model.DropProfileModel
 import com.example.finalapp.model.DropProfileResponseModel
 import com.example.finalapp.model.OkResponse
 import com.example.finalapp.network.ApiService
+import com.example.finalapp.network.NonAuthApiService
 import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -19,7 +20,7 @@ import javax.inject.Inject
 
 
 @ViewModelScoped
-class ProfileRepository @Inject constructor(private val api: ApiService) {
+class ProfileRepository @Inject constructor(private val api: ApiService,private val nonAuthApiService: NonAuthApiService) {
     fun getPreSignedUrl(userId:String):Flow<PreSignedUrlResponse> = flow{
         emit(api.getPreSignedUrl(userId))
     }.flowOn(Dispatchers.IO)
@@ -29,7 +30,7 @@ class ProfileRepository @Inject constructor(private val api: ApiService) {
         val requestBody = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
 
         val response = try {
-            api.uploadImageToS3(presignedUrl, requestBody)
+            nonAuthApiService.uploadImageToS3(presignedUrl, requestBody)
         } catch (e: Exception) {
             Log.e("S3 Upload", "Upload failed: ${e.localizedMessage}")
             return false

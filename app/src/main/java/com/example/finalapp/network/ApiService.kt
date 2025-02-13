@@ -31,11 +31,6 @@ import retrofit2.http.Url
 
 interface ApiService {
 
-    @POST("/api/v1/auth/login")
-    suspend fun postLoginData(@Body loginData:LoginModel): LoginAPIResponse
-    @POST("/api/v1/auth/register")
-    suspend fun postSignupData(@Body signupData:RegisterUserModel): SignupAPIResponse
-    //---------------------------------------------------------------------//
     @GET("/api/v1/dropProfile/getAllDropProfiles")
     suspend fun getAllDropProfiles():GetDropProfileResponseModel
     @POST("/api/v1/dropProfile/postDropProfile")
@@ -57,8 +52,8 @@ interface ApiService {
     //---------------------------------------------------------------------//
     @GET("api/getPreSignedUrl")
     suspend fun getPreSignedUrl(@Query("id") id:String): PreSignedUrlResponse
-    @PUT
-    suspend fun uploadImageToS3(@Url url:String,@Body image:RequestBody): Response<Unit>
+//    @PUT
+//    suspend fun uploadImageToS3(@Url url:String,@Body image:RequestBody): Response<Unit>
 
     //---------------------------------------------------------------------//
     @GET("/api/v1/user/getUser")
@@ -73,4 +68,14 @@ interface ApiService {
     suspend fun uploadImage(@Part image: MultipartBody.Part): ImageUploadResponse
 
 
+}
+
+interface NonAuthApiService{
+    @POST("/api/v1/auth/login")
+    suspend fun postLoginData(@Body loginData:LoginModel): LoginAPIResponse
+    @POST("/api/v1/auth/register")
+    suspend fun postSignupData(@Body signupData:RegisterUserModel): SignupAPIResponse
+    //---------------------------------------------------------------------//
+    @PUT
+    suspend fun uploadImageToS3(@Url url:String,@Body image:RequestBody): Response<Unit>
 }

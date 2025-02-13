@@ -29,7 +29,9 @@ import javax.inject.Inject
 @HiltViewModel
 class ImageUploadViewModel @Inject constructor(private val repository: ProfileRepository ):ViewModel(){
      val dropProfileModel:MutableState<DropProfileModel?> = mutableStateOf(null)
+    val dropProfileState = MutableStateFlow<RequestState<String>>(RequestState.Idle)
      fun s3ImageUploadFunction(userId: String, file: File) {
+         dropProfileState.value=RequestState.Loading
          viewModelScope.launch {
              getSignedUrl(userId,file)
          }
@@ -51,6 +53,7 @@ class ImageUploadViewModel @Inject constructor(private val repository: ProfileRe
 
                 }.collect {
                     preSignedUrlDataState.value = RequestState.Success(it)//RequestState.Success(it.data)
+                    preSignedUrlData.value=PreSignedUrlResponse(it.key,it.url)
                     uploadImageToS3(it.url, preSignedUrlData.value.key,file)
                     Log.d(TAG, "preSignedUrl data ${preSignedUrlDataState.value}")
 
@@ -127,7 +130,6 @@ class ImageUploadViewModel @Inject constructor(private val repository: ProfileRe
     //-------------------------------------------DROP PROFILE--------------------------------------------------------------------------------------//
 
     val dropProfileResponse:MutableState<RequestState<DropProfileResponseModel>> = mutableStateOf(RequestState.Idle)
-    val dropProfileState = MutableStateFlow<RequestState<DropProfileResponseModel>>(RequestState.Idle)
     fun dropProfile(data:DropProfileModel)=viewModelScope.launch(Dispatchers.IO) {
         dropProfileResponse.value=RequestState.Loading
         repository.sendDropProfileData(data)
@@ -139,8 +141,15 @@ class ImageUploadViewModel @Inject constructor(private val repository: ProfileRe
                 dropProfileResponse.value=RequestState.Error(it)
             }
             .collect {
-                dropProfileResponse.value = RequestState.Success(it)
+              //  dropProfileResponse.value = RequestState.Success(it)
+                updateDropProfileStateToSuccess()
             }
+    }
+    fun updateDropProfileStateToSuccess(){
+        dropProfileState.value=RequestState.Success("Success in drop profile")
+    }
+    fun updateDropProfileStateToIdle(){
+        dropProfileState.value=RequestState.Idle
     }
 
     //----------------------------------Get user data ---------------------------------------------------------------------------------------//

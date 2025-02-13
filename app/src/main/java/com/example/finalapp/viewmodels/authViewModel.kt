@@ -68,35 +68,39 @@ class AuthViewModel @Inject constructor(
     fun loginUser(loginMethod: LoginMethod, credentials:String,password: String)=viewModelScope.launch(Dispatchers.IO) {
         _loginState.value=LoginState.Loading
         val hashedPassword=hashPassword(password)
-//        val loginModel=when(loginMethod) {
-//            is  EmailLogin -> LoginModel(credentials,hashedPassword)
-//            is PhoneLogin ->  LoginModel(credentials,hashedPassword)
-//            else ->{throw  IllegalArgumentException("Unsupported Login Method")}
-//        }
         val loginModel=LoginModel(credentials,hashedPassword);
         repository.sendLoginData(loginModel)
             .onStart {
                 _loginState.value= LoginState.Loading
             }.catch {
                 _loginState.value= LoginState.Error(it.message.toString())
-            }.collect{response->
-                Log.d("Login", "loginUser: ${response.success}")
+            }.collect { response ->
+                Log.d("Login", "Full API response: ${response.toString()}") // Log the full response
+
                 if (response.success) {
-                    response.data.let { user ->
-                        Log.d("Login", "success entered here: ${response.success}")
-                        try {
-                            sharedPreferences.edit().putString("token", response.data.token)
-                                .apply();
-                        } catch (e: Exception) {
-                            _loginState.value =
-                                LoginState.Error("issue in shared preference ${e.message}");
+                    try {
+                        // Check if response.data is null
+                        if (response.data == null) {
+                            Log.d("Login", "response.data is null")
+                            _loginState.value = LoginState.Error("Data is null in the response")
+                            return@collect
                         }
 
-                        //Toast.makeText(context, "Login successful", Toast.LENGTH_SHORT).show()
-                        _loginState.value = LoginState.Success(user)
+                        // Log the token
+                        Log.d("Login", "token: ${response.data.token}")
+
+                        // Save the token in SharedPreferences
+                        sharedPreferences.edit().putString("token", response.data.token).apply()
+                        Log.d("Login", "Token saved in SharedPreferences: ${response.data.token}")
+
+                        // Update login state
+                        _loginState.value = LoginState.Success(response.data)
+                    } catch (e: Exception) {
+                        Log.d("Login", "exception: ${e.message}")
+                        _loginState.value = LoginState.Error("Issue in shared preference: ${e.message}")
                     }
                 } else {
-                    _loginState.value=LoginState.Error(response.success.toString())
+                    _loginState.value = LoginState.Error(response.success.toString())
                 }
             }
     }

@@ -304,7 +304,7 @@ fun OfferResponseDataAndAction(eventsViewModel: EventsViewModel, navController: 
             Toast.makeText(context,"$result", Toast.LENGTH_SHORT).show()
         }
         RequestState.Loading->{
-            CircularProgressIndicator(color = Color(0xFF1289BE))
+         //   CircularProgressIndicator(color = Color(0xFF1289BE))
         }
         RequestState.Idle->{
 
