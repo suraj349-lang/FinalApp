@@ -17,6 +17,13 @@ class ProfileDatabaseRepository @Inject constructor(private val profileDao: Prof
         profileDao.saveProfileData(profile =profile)
     }
 
+    fun deleteProfileData(){
+
+    }
+    fun updateUserData(){
+
+    }
+
 }
 
 @ViewModelScoped

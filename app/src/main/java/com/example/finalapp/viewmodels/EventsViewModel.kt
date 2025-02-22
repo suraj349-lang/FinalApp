@@ -35,6 +35,8 @@ import kotlin.Exception
 class EventsViewModel @Inject constructor(private val eventsRepository: EventsRepository, @ApplicationContext context: Context): ViewModel(){
     val publicImage= MutableStateFlow(imageUrls.get(9))
     private val placesClient by lazy { Places.createClient(context) }
+    var checked= mutableStateOf(false)
+    var shareProfileClicked= mutableStateOf(false)
     init {
         viewModelScope.launch(Dispatchers.Main) {
             val job = viewModelScope.launch {
@@ -144,6 +146,7 @@ class EventsViewModel @Inject constructor(private val eventsRepository: EventsRe
             .catch {
                 Log.d("Data received","error found")
                 directChatResponse.value=RequestState.Error(it)
+                directChatRequestState.emit(RequestState.Error(it))
             }
             .collect {
                 directChatResponse.value = RequestState.Success(it.data);
@@ -159,14 +162,22 @@ class EventsViewModel @Inject constructor(private val eventsRepository: EventsRe
             .onStart {
                 nearByUserResponse.value=RequestState.Loading;
             }
-            .catch {
+            .catch {error->
                 Log.d("Data received","error found")
-                nearByUserResponse.value=RequestState.Error(it)
+                nearByUserResponse.value=RequestState.Error(error)
+                directChatRequestState.emit(RequestState.Error(error))
             }
             .collect {
-                nearByUserResponse.value = RequestState.Success(it.data);
-                nearByUsersList.value=it.data
-                directChatRequestState.value=RequestState.Success("Successfully fetched direct chat users")
+                if(it.data.isNotEmpty()) {
+                    nearByUserResponse.value = RequestState.Success(it.data);
+                    nearByUsersList.value = it.data
+                    directChatRequestState.value =
+                        RequestState.Success("Successfully fetched direct chat users")
+                }else{
+                    val error=Throwable("No data found")
+                    directChatRequestState.value = RequestState.Error(error)
+                }
+
             }
     }
     fun setDirectChatRequestStateToIdle(){

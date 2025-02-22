@@ -194,13 +194,14 @@ fun FinalApp(
     getLocation: () -> Unit
 ) {
     val scope= rememberCoroutineScope()
-    val value by remember{ mutableStateOf(false) }
-    LaunchedEffect(value ){
+//    val value by remember{ mutableStateOf(false) }
+    LaunchedEffect(Unit){
         scope.launch(Dispatchers.IO) {
              getLocation()
-             authViewModel.getProfileData()
         }
-
+//        scope.launch {
+//            authViewModel.getProfileData()
+//        }
     }
 
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {

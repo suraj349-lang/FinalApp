@@ -24,9 +24,8 @@ import com.example.finalapp.screens._6chat.ChatListScreen
 import com.example.finalapp.screens._4profile.GalleryPicker
 import com.example.finalapp.screens._1home.HomeScreenUI
 import com.example.finalapp.screens._8notification.NotificationsScreenUI
-import com.example.finalapp.screens._2search.SearchScreen
+import com.example.finalapp.screens._2search.TrendingScreen
 import com.example.finalapp.screens._3createEvent.CreateEvent
-import com.example.finalapp.screens._4profile.ProfileScreenUI
 import com.example.finalapp.screens._5settings.SettingsScreenUI
 import com.example.finalapp.testing.TabView
 import com.example.finalapp.screens._3createEvent.PastRaisedOffer
@@ -72,7 +71,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
     val eventsViewModel= hiltViewModel<EventsViewModel>()
     val chatViewModel= hiltViewModel<ChatViewModel>()
 
-    NavHost(navController = navController, startDestination =SCREENS.HOME.route){
+    NavHost(navController = navController, startDestination =SCREENS.LOGIN.route){
         composable(SCREENS.SPLASH.route){
             SplashScreenUI(navController,screen)
         }
@@ -124,7 +123,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
             //AllProfiles(profileViewModel)
         }
         composable(SCREENS.SEARCH.route){
-            SearchScreen(navController)
+            TrendingScreen(navController)
         }
 
         composable(SCREENS.PAST_OFFERS.route){

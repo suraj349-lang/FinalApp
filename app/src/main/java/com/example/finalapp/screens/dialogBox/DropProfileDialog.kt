@@ -34,7 +34,9 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -45,9 +47,11 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -70,6 +74,7 @@ import com.example.finalapp.screens._4profile.createImageFile
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.ui.theme.topAppBarTextColor
 import com.example.finalapp.utils.RequestState
+import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
 import com.example.finalapp.viewmodels.AuthViewModel
 import com.example.finalapp.viewmodels.EventsViewModel
 import com.example.finalapp.viewmodels.ImageUploadViewModel
@@ -93,12 +98,22 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
     var uri by remember {
         mutableStateOf(Uri.EMPTY)
     }
+    var imageFile by mutableStateOf<File?>(null)
     var key by remember { mutableStateOf(false) }
-    if (key) {
-        ImageCaptureFromCameraForDropProfile{uri=it}
-    }
     var keyForGallery by remember {
         mutableStateOf(0)
+    }
+    if (key) {
+        ImageCaptureFromCameraForDropProfile({imageFile=it}){uri=it}
+    }
+    if(keyForGallery!=0) {
+        Log.d("Suraj", "DropProfileDialog:entered in gallery ")
+        GalleryPickerForDropProfile(
+            navController = navController,{imageFile=it}
+        ) {
+            Log.d("suraj", "DropProfileDialog: received image uri $it")
+            uri = it
+        }
     }
     var activeBtnKey by remember {
         mutableStateOf(0)
@@ -121,16 +136,8 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
         createdBy = "6680fef693d1e2645e19ee09"
     )
 
-    var imageFile by mutableStateOf<File?>(null)
-    if(keyForGallery!=0) {
-        Log.d("Suraj", "DropProfileDialog:entered in gallery ")
-        GalleryPickerForDropProfile(
-            navController = navController,{imageFile=it}
-        ) {
-            Log.d("suraj", "DropProfileDialog: received image uri $it")
-            uri = it
-        }
-    }
+
+
     val dropProfileState by imageUploadViewModel.dropProfileState.collectAsState()
 
 
@@ -151,18 +158,21 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                     .background(Color.White),
                 verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Card(modifier = Modifier
+                Box(modifier = Modifier
                     .fillMaxWidth()
-                    .height(40.dp), colors = CardDefaults.cardColors(containerColor = statusAndTopAppBarColor), shape = RoundedCornerShape(bottomStart = 0.dp, bottomEnd = 0.dp, topStart = 0.dp, topEnd = 0.dp)
-                ) {
+                    .height(50.dp)
+                    .background(
+                        brush = Brush.linearGradient(
+                            colors = listOf(Color(0xFF620F85), Color(0xFF560679))
+                        )
+                    ))
+                {
                     Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
                         Image(painter = painterResource(id = R.drawable.app_icon), contentDescription ="app icon", modifier = Modifier
                             .size(40.dp)
-                            .padding(start = 8.dp, end = 8.dp) , colorFilter = ColorFilter.tint(
-                            topAppBarTextColor))
-                        Text(text = "Drop Profile", modifier = Modifier
-                            .fillMaxWidth()
-                            , color = topAppBarTextColor, fontWeight = FontWeight.Normal,textAlign = TextAlign.Start,style = MaterialTheme.typography.titleMedium)
+                            .padding(start = 8.dp, end = 8.dp) , colorFilter = ColorFilter.tint(//topAppBarTextColor
+                            Color.White))
+                        Text(text = "Drop Profile", modifier = Modifier.fillMaxWidth(), color = Color.White, fontSize = 24.sp,textAlign = TextAlign.Start, fontFamily = DONGLE_BOLD)
                     }
 
 
@@ -206,9 +216,10 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                                     ) {
                                         Text(
                                             text = "Choose from Camera / Gallery.",
-                                            fontSize = 16.sp,
+                                            fontSize = 24.sp,
                                             fontWeight = FontWeight.SemiBold,
-                                            color = Color.Black
+                                            color = Color.Black,
+                                            fontFamily = DONGLE_BOLD
                                         )
                                     }
 
@@ -225,13 +236,13 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                                                 horizontalAlignment = Alignment.CenterHorizontally,
                                                 modifier = Modifier.fillMaxSize()
                                             ) {
-                                                Image(painterResource(id = R.drawable.camera),
+                                                Image(painterResource(id = R.drawable.cameranew),
                                                     contentDescription = "",
                                                     modifier = Modifier
                                                         .size(50.dp)
                                                         .clickable { key = !key }
                                                 )
-                                                Text(text = "Camera", modifier = Modifier)
+                                                Text(text = "Camera", modifier = Modifier,fontFamily = DONGLE_BOLD)
 
                                             }
                                         }
@@ -241,7 +252,7 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                                                 horizontalAlignment = Alignment.CenterHorizontally,
                                                 modifier = Modifier.fillMaxSize()
                                             ) {
-                                                Image(painterResource(id = R.drawable.gallery),
+                                                Image(painterResource(id = R.drawable.gallery_new),
                                                     contentDescription = "",
                                                     modifier = Modifier
                                                         .size(50.dp)
@@ -250,7 +261,7 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
 
 
                                                         })
-                                                Text(text = "Gallery", modifier = Modifier)
+                                                Text(text = "Gallery", modifier = Modifier,fontFamily = DONGLE_BOLD)
 
                                             }
                                         }
@@ -266,18 +277,22 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                 Divider(modifier = Modifier
                     .fillMaxWidth(), thickness = 1.dp,color=Color(0xFFDCD6DD)
                 )
+                Text("Caption",fontFamily = DONGLE_BOLD,modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 15.dp), fontSize = 20.sp, color = Color.DarkGray, textAlign = TextAlign.Start)
                 OutlinedTextField(
                     modifier = Modifier
                         .fillMaxWidth()
                         .heightIn(min = 60.dp, max = 100.dp)
-                        .padding(start = 15.dp, top = 10.dp, end = 15.dp)
+                        .padding(start = 15.dp, end = 15.dp)
                         .background(Color.White, RoundedCornerShape(5.dp)),
                     shape = RoundedCornerShape(5.dp),
                     value = caption,
                     onValueChange = { caption = it },
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     maxLines = 4,
-                    placeholder={ Text(text = "Enter caption")},
+                    placeholder={ Text(text = "Type something ...", fontFamily = DONGLE_BOLD)},
+                    colors = OutlinedTextFieldDefaults.colors(cursorColor = Color.Red, unfocusedBorderColor = Color.LightGray, focusedBorderColor = Color.LightGray)
                 )
                 //Expiration time
                 Column(modifier = Modifier
@@ -285,35 +300,41 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                     .wrapContentHeight()
                     .padding(start = 16.dp, end = 16.dp, top = 8.dp)
                     , horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(text = "Availability Time :", color = Color.DarkGray, modifier = Modifier.fillMaxWidth() , fontSize = 12.sp, textAlign = TextAlign.Start)
+                    Text(text = "Availability Time :", color = Color.DarkGray, modifier = Modifier.fillMaxWidth(), fontFamily = DONGLE_BOLD , fontSize = 20.sp, textAlign = TextAlign.Start)
                     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceEvenly) {
                         Button(
                             onClick = { activeBtnKey=0 },
                             shape = RoundedCornerShape(6.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = if(activeBtnKey==0) statusAndTopAppBarColor else Color.LightGray ,
-                                contentColor =if(activeBtnKey==0) topAppBarTextColor else Color.DarkGray
+                                containerColor = if(activeBtnKey==0) Color.DarkGray//statusAndTopAppBarColor
+                                else Color.LightGray ,
+                                contentColor =if(activeBtnKey==0) Color.White//topAppBarTextColor
+                                else Color.DarkGray
                         )
                         ) {
-                            Text(text = "12 hrs")
+                            Text(text = "12 hrs", fontFamily = DONGLE_BOLD, fontSize = 18.sp)
                         }
                         Button(onClick = {activeBtnKey=1 },
                             shape = RoundedCornerShape(6.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = if(activeBtnKey==1) statusAndTopAppBarColor else Color.LightGray ,
-                                contentColor =if(activeBtnKey==1) topAppBarTextColor else Color.DarkGray
+                                containerColor = if(activeBtnKey==1) Color.DarkGray//statusAndTopAppBarColor
+                                else Color.LightGray ,
+                                contentColor =if(activeBtnKey==1) Color.White//topAppBarTextColor
+                                else Color.DarkGray
                             )
                         ) {
-                            Text(text = "24 hrs")
+                            Text(text = "1 Day", fontFamily = DONGLE_BOLD, fontSize = 18.sp)
                         }
                         Button(onClick = { activeBtnKey=2 },
                             shape = RoundedCornerShape(6.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = if(activeBtnKey==2) statusAndTopAppBarColor else Color.LightGray ,
-                                contentColor =if(activeBtnKey==2) topAppBarTextColor else Color.DarkGray
+                                containerColor = if(activeBtnKey==2) Color.DarkGray//statusAndTopAppBarColor
+                                else Color.LightGray ,
+                                contentColor =if(activeBtnKey==2) Color.White//topAppBarTextColor
+                                else Color.DarkGray
                             )
                         ) {
-                            Text(text = "1 week")
+                            Text(text = "1 week", fontFamily = DONGLE_BOLD, fontSize = 18.sp)
                         }
                     }
                 }
@@ -337,13 +358,13 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                             .padding(15.dp),
                         enabled=enabled,
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = statusAndTopAppBarColor,
-                            contentColor = topAppBarTextColor,
+                            containerColor =Color.DarkGray, //statusAndTopAppBarColor,
+                            contentColor = Color.White,//topAppBarTextColor,
                             disabledContainerColor= Color.LightGray,
                             disabledContentColor= Color.DarkGray
                         )
                     ) {
-                        Text(text = "Drop Profile")
+                        Text(text = "Drop Profile", fontFamily = DONGLE_BOLD, fontSize = 22.sp)
                     }
 
                     when (dropProfileState){
@@ -388,7 +409,7 @@ fun getPathFromUri(context: Context, uri: Uri): String? {
 }
 
 @Composable
-fun ImageCaptureFromCameraForDropProfile(onUriChange:(Uri)->Unit) {
+fun ImageCaptureFromCameraForDropProfile(onFileCreated:(File)->Unit,onUriChange:(Uri)->Unit) {
 
         val context = LocalContext.current
         val file = context.createImageFile()
@@ -402,6 +423,8 @@ fun ImageCaptureFromCameraForDropProfile(onUriChange:(Uri)->Unit) {
         val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
             if (success) {
                 capturedImageUri = uri
+                val imageFile = uriToFile(uri, context )
+                onFileCreated(imageFile)
                 onUriChange(uri)
 
             } else {

@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.app.ActivityCompat
@@ -42,6 +41,35 @@ class AuthViewModel @Inject constructor(
     private val sharedPreferences: SharedPreferences,
     @ApplicationContext private val context: Context): ViewModel()
    {
+       private var _userFromDb:MutableStateFlow<RequestState<Profile>> = MutableStateFlow(RequestState.Idle)
+       val userFromDb:StateFlow<RequestState<Profile>> =_userFromDb
+
+       fun getProfileData() = viewModelScope.launch {
+           _userFromDb.value = RequestState.Loading
+           profileDatabaseRepository.getProfileDataFromDb()
+               .onStart {
+                   _userFromDb.value = RequestState.Loading
+               }.catch {
+                   _userFromDb.value = RequestState.Error(it)
+               }.collect {
+                   if (it.name.isNotEmpty()) {
+                       _userFromDb.value = RequestState.Success(it)
+                   } else {
+                       _userFromDb.value = RequestState.Error(Throwable("No user found"))
+                   }
+
+               }
+
+       }
+
+        fun updateUserFromDbToIdle(){
+           _userFromDb.value=RequestState.Idle
+       }
+       fun updateUserFromDbToError(){
+           _userFromDb.value=RequestState.Error(Throwable("Error"))
+
+       }
+
 
 
     var latitude= mutableStateOf(0.0)
@@ -78,25 +106,11 @@ class AuthViewModel @Inject constructor(
                 Log.d("Login", "Full API response: ${response.toString()}") // Log the full response
 
                 if (response.success) {
+                        saveProfileData(response.data);
                     try {
-                        // Check if response.data is null
-                        if (response.data == null) {
-                            Log.d("Login", "response.data is null")
-                            _loginState.value = LoginState.Error("Data is null in the response")
-                            return@collect
-                        }
-
-                        // Log the token
-                        Log.d("Login", "token: ${response.data.token}")
-
-                        // Save the token in SharedPreferences
                         sharedPreferences.edit().putString("token", response.data.token).apply()
-                        Log.d("Login", "Token saved in SharedPreferences: ${response.data.token}")
-
-                        // Update login state
                         _loginState.value = LoginState.Success(response.data)
                     } catch (e: Exception) {
-                        Log.d("Login", "exception: ${e.message}")
                         _loginState.value = LoginState.Error("Issue in shared preference: ${e.message}")
                     }
                 } else {
@@ -132,7 +146,8 @@ class AuthViewModel @Inject constructor(
     }
 
     //-----------------------------------------------------------------------------------------------------------//
-    fun saveProfileData(profile: Profile){
+    fun saveProfileData(user: User){
+        val profile=Profile(0,user._id,user.name,user.username,user.number,user.address,user.profileImage)
         viewModelScope.launch {
             profileDatabaseRepository.saveProfileDataInDb(profile = profile)
         }
@@ -146,23 +161,6 @@ class AuthViewModel @Inject constructor(
         val hashedBytes = digest.digest(bytes)
         return hashedBytes.joinToString("") { "%02x".format(it) }
     }
-    var userFromDb:MutableState<Profile> = mutableStateOf(Profile())
 
-    fun getProfileData(){
-
-            try {
-                viewModelScope.launch {
-                    profileDatabaseRepository.getProfileDataFromDb().collect{
-                        userFromDb.value=it
-                    }
-
-                }
-            }catch (e:Exception){
-                Log.d("Coordinate", e.message.toString())
-            }
-       }
-
-
-
-   }
+    }
 

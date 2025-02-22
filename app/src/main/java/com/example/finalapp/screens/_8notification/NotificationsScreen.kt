@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.finalapp.R
+import com.example.finalapp.fcm.screen.ChatScreenUIFCM
 import com.example.finalapp.screens._1home.utils.HomeTopBar
 
 
@@ -36,6 +37,7 @@ fun NotificationsScreenUI(navController:NavHostController){
         bottomBar = { BottomBar(navController =navController , state = buttonVisible,modifier = Modifier.height(45.dp)) }
     ) {
         Surface(Modifier.fillMaxSize()) {
+            ChatScreenUIFCM()
 
         }
 

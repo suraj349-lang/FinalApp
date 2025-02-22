@@ -1,7 +1,9 @@
 package com.example.finalapp.screens._1home
 
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,8 +12,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -23,6 +28,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FabPosition
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
@@ -34,6 +40,8 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -44,7 +52,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
@@ -53,14 +63,19 @@ import androidx.navigation.NavHostController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
+import com.example.finalapp.database.Profile
 import com.example.finalapp.model.DirectChat
 import com.example.finalapp.model.User
 import com.example.finalapp.screens.dialogBox.DialogError
 import com.example.finalapp.screens.dialogBox.DialogLoading
+import com.example.finalapp.ui.theme.Dongle
+import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.ui.theme.statusBarColor
 import com.example.finalapp.utils.RequestState
+import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
 import com.example.finalapp.viewmodels.AuthViewModel
 import com.example.finalapp.viewmodels.EventsViewModel
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -70,11 +85,43 @@ fun DirectChatScreen(
     eventsViewModel: EventsViewModel,
     navController: NavHostController
 ) {
-    var checked by remember {
-        mutableStateOf(false)
+//    var checked by remember {
+//        mutableStateOf(false)
+//    }
+    val checked by eventsViewModel.checked
+
+    //var shareProfileClicked by remember { mutableStateOf(false) }
+    val shareProfileClicked by eventsViewModel.shareProfileClicked
+    val context= LocalContext.current
+    val directChatRequestState by eventsViewModel.directChatRequestState.collectAsState()
+    val nearByUsersList= mutableStateOf(eventsViewModel.nearByUsersList.value)
+    LaunchedEffect(key1 =shareProfileClicked){
+        if(shareProfileClicked ){
+            eventsViewModel.checked.value=!checked
+            eventsViewModel.shareChatFunction(DirectChat("677b4df1842c1c465293fc2f",authViewModel.latitude.value,authViewModel.longitude.value))
+        }
+        eventsViewModel.shareProfileClicked.value=false
     }
+    val userFromDb by authViewModel.userFromDb.collectAsState()
+    var userData:Profile by remember {
+        mutableStateOf(Profile())
+    }
+    when(userFromDb){
+        is RequestState.Idle ->{}
+        is RequestState.Error->{
+            Toast.makeText(context,"",Toast.LENGTH_SHORT).show()
+        }
+        is RequestState.Success->{
+          userData= (userFromDb as RequestState.Success<Profile>).data
 
-
+        }
+        is RequestState.Loading->{
+            DialogLoading()
+        }
+    }
+    LaunchedEffect(Unit){
+        authViewModel.getProfileData()
+    }
     Scaffold(
         content = { paddingValues ->
             Box(
@@ -82,29 +129,60 @@ fun DirectChatScreen(
                     .fillMaxSize()
                     .padding(paddingValues)
             ) {
-                FloatingActionButton(
-                    onClick = { /* TODO */ },
-                    modifier = Modifier
-                        .align(Alignment.TopEnd)
-                        .size(80.dp)
-                        .padding(4.dp),
-                    containerColor = Color.Transparent, // Set transparent background
-                    elevation = FloatingActionButtonDefaults.elevation(0.dp)
-                ) {
-                    Column(modifier = Modifier
-                        .padding(4.dp)
-                        .fillMaxSize(), verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally) {
-                        SwitchWithIcon(checked) { checked = it }
-                        Text(text = "Direct chat", fontSize = 8.sp, fontFamily = FontFamily(Font(R.font.oreganoregular)))
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.TopEnd) 
+                            .padding(end = 16.dp, top = 8.dp)
+                    ) {
+                        SwitchWithIcon(checked) {
+                            eventsViewModel.shareProfileClicked.value = true
+                        }
                     }
+                Column(modifier = Modifier.fillMaxSize()) {
+                    Row(
+                        modifier = Modifier
+                            .padding(start = 16.dp)
+                            .fillMaxWidth()
+                            .height(60.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Start
+                    ) {
+                        Text(
+                            text = if(checked)"Users near you" else "Share profile nearby" ,
+                            fontFamily = DONGLE_BOLD,
+                            fontSize = 24.sp
+                        )
+                    }
+                    DirectChatUI(
+                        userData,
+                        scrollBehavior,
+                        nearByUsersList,
+                        checked
+                    ) { eventsViewModel.shareProfileClicked.value = true }
                 }
-                // Main UI content
-                DirectChatUI(eventsViewModel ,scrollBehavior,eventsViewModel,paddingValues,checked){
-                    checked=!checked
-                    eventsViewModel.shareChatFunction(
-                        DirectChat("677b4df1842c1c465293fc2f",authViewModel.latitude.value,authViewModel.longitude.value))
+
+
+                    when (directChatRequestState) {
+                        is RequestState.Success -> {
+                            eventsViewModel.setDirectChatRequestStateToIdle()
+                        }
+
+                        is RequestState.Loading -> {
+                            DialogLoading()
+                        }
+
+                        is RequestState.Error -> {
+                            DialogError {
+                                eventsViewModel.nearByUserResponse.value = RequestState.Idle
+                            }
+                        }
+
+                        is RequestState.Idle -> {
+
+                        }
+                    }
+
                 }
-            }
         }
     )
 }
@@ -112,105 +190,89 @@ fun DirectChatScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DirectChatUI(
-    eventsViewModel1: EventsViewModel,
+    userData: Profile,
     scrollBehavior: TopAppBarScrollBehavior,
-    eventsViewModel: EventsViewModel,
-    paddingValues: PaddingValues,
+    nearByUsersList: MutableState<List<User>>,
     checked: Boolean,
     onShareProfileClicked: () -> Unit
 ) {
-    val directChatRequestState by eventsViewModel.directChatRequestState.collectAsState()
-    val nearByUsersList= mutableStateOf(eventsViewModel.nearByUsersList.value)
-
-
-    when(directChatRequestState){
-        is RequestState.Success ->{
-            eventsViewModel.setDirectChatRequestStateToIdle()
-        }
-        is RequestState.Loading->{
-            DialogLoading()
-        }
-        is RequestState.Error ->{
-            DialogError { eventsViewModel.nearByUserResponse.value= RequestState.Idle }
-        }
-        is RequestState.Idle->{
-
-        }
+    if (!checked ) {
+        ShareProfileForDirectChat(userData) { onShareProfileClicked() }
+    } else {
+        DirectChatProfiles(scrollBehavior, nearByUsersList.value)
     }
 
-    Surface(modifier = Modifier
-        .fillMaxSize()
-        .padding(paddingValues)) {
-        Column(modifier = Modifier
-            .fillMaxSize(), verticalArrangement = Arrangement.spacedBy(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-            if(!checked && nearByUsersList.value.isEmpty()) {
-                Text(
-                    text = "Share your profile nearby",
-                    fontSize = 20.sp,
-                    fontFamily = FontFamily(Font(R.font.oreganoregular)),
-                    color = Color.DarkGray
-                )
-                //if user want to share the profile , it will automatically switch on the button for direct chat
-                ShareProfileForDirectChat(){onShareProfileClicked()}
-            } else{
-                DirectChatProfiles(scrollBehavior,nearByUsersList.value)
-            }
 
-            
-        }
-        
-    }
-    
 }
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DirectChatProfiles(scrollBehavior: TopAppBarScrollBehavior, nearByUsersList: List<User>) {
-
-    Surface(modifier = Modifier
-        .fillMaxWidth()
-        .fillMaxHeight()) {
-        Column(
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally) {
-            LazyColumn(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)){
-                items(nearByUsersList){
-                    DirectChatItem(it){}
-
-                }
+    val context = LocalContext.current
+    LazyColumn(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)) {
+        items(nearByUsersList,key={it._id}) {user->
+            DirectChatItem(user) {
+                Toast.makeText(context, "clicked to chat to this person", Toast.LENGTH_SHORT).show()
             }
+
         }
     }
 }
 
+
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun DirectChatItem(user: User, onDirectChatItemClicked:()->Unit) {
-        Surface(modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(1f)) {
-            Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-                Divider(color = Color.LightGray, thickness = 0.5.dp)
-                Card(modifier = Modifier
-                    .size(150.dp)
-                    .padding(top = 4.dp),shape= CircleShape, border = BorderStroke(width = 1.dp, color = Color.LightGray)) {
-                    GlideImage(model =  user.profileImage, contentDescription = "", contentScale = ContentScale.Crop)
-                }
-                Row(modifier =Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically ) {
-                    Text(text = user.name, fontSize = 25.sp, fontFamily = FontFamily(Font(R.font.oreganoregular)))
-                    Text(text = " ,100m.", fontSize = 12.sp, fontFamily = FontFamily(Font(R.font.oreganoregular)))
-                }
+fun DirectChatItem(user: User, onDirectChatItemClicked: () -> Unit) {
+    Column(
+        modifier = Modifier.wrapContentSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
 
-                Button(onClick = { onDirectChatItemClicked()}, shape = RoundedCornerShape(6.dp),modifier = Modifier
-                    .fillMaxWidth(0.5f) //.wrapContentHeight().fillMaxWidth(0.8f)
-                    .align(Alignment.CenterHorizontally),colors = ButtonDefaults.buttonColors(containerColor = Color.LightGray, contentColor = Color.White)) {
-                    Text(text = "Send Message", color = Color.Black)
-                }
-
-            }
+        Card(
+            modifier = Modifier
+                .size(150.dp)
+                .padding(top = 4.dp),
+            shape = RoundedCornerShape(20.dp),
+            border = BorderStroke(width = 1.dp, color = Color.LightGray)
+        ) {
+            GlideImage(
+                model = if(user.profileImage.isNotEmpty()) user.profileImage else R.drawable.profile_image_2,
+                contentDescription = "",
+                contentScale = ContentScale.Crop
+            )
         }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = if(user.name.isNotEmpty()) user.name.capitalize() else "...",
+                fontSize = 25.sp,
+                fontFamily = DONGLE_BOLD
+            )
+            // Text(text = " ,100m.", fontSize = 12.sp, fontFamily = FontFamily(Font(R.font.oreganoregular)))
+        }
+
+        Button(
+            onClick = { onDirectChatItemClicked() },
+            shape = RoundedCornerShape(6.dp),
+            modifier = Modifier
+                .fillMaxWidth(0.5f) //.wrapContentHeight().fillMaxWidth(0.8f)
+                .align(Alignment.CenterHorizontally),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.LightGray,
+                contentColor = Color.White
+            )
+        ) {
+            Text(text = "Send Message", color = Color.Black,fontFamily = DONGLE_BOLD)
+        }
+        Divider(color = Color.LightGray, thickness = 0.5.dp)
+
+    }
 }
+
 
 
 
@@ -221,42 +283,45 @@ fun SwitchWithIcon(checked: Boolean,onClick:(value:Boolean)->Unit) {
         onCheckedChange = {
             onClick(it)
         },
-        modifier = Modifier.padding(0.dp),
-        thumbContent = if (checked) {
-            {
-                Icon(
-                    imageVector = Icons.Filled.Check,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .size(SwitchDefaults.IconSize)
-                        .padding(0.dp),
-                    tint = Color.White
-                )
-            }
-        } else {
-            null
-        },
+//        thumbContent = if (checked) {
+//            {
+//                Icon(
+//                    imageVector = Icons.Filled.Check,
+//                    contentDescription = null,
+//                    modifier = Modifier
+//                        .size(SwitchDefaults.IconSize)
+//                        .padding(0.dp),
+//                    tint = Color.Black
+//                )
+//            }
+//        } else {
+//            null
+//        },
         colors = SwitchDefaults.colors(
-            checkedThumbColor = statusBarColor,// MaterialTheme.colorScheme.primary,
-            checkedTrackColor = MaterialTheme.colorScheme.primaryContainer,
-            uncheckedThumbColor = MaterialTheme.colorScheme.secondary,
-            uncheckedTrackColor = MaterialTheme.colorScheme.secondaryContainer,
-        )
+            checkedThumbColor = Color.White,// MaterialTheme.colorScheme.primary,
+            checkedTrackColor = Color(0xFF053E77),
+            uncheckedThumbColor = Color.DarkGray,
+            uncheckedTrackColor = Color.LightGray,
+        ), modifier = Modifier.padding(0.dp)
     )
 
 
 }
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun ShareProfileForDirectChat(onShareProfileClicked:()->Unit) {
+fun ShareProfileForDirectChat(userData:Profile,onShareProfileClicked:()->Unit) {
     Surface(modifier = Modifier
         .fillMaxWidth()
         .fillMaxHeight(1f)) {
         Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
             Card(modifier = Modifier.size(150.dp), shape = CircleShape, border = BorderStroke(width = 1.dp, color = Color.LightGray)) {
-                Image(painter = painterResource(id = R.drawable.profile_image_3), contentDescription = "", contentScale = ContentScale.Crop)
+                GlideImage(
+                    model =if(userData.profileImage.isNotEmpty()) userData.profileImage else R.drawable.profile_image_3,
+                    contentDescription = "",
+                    contentScale = ContentScale.Crop)
             }
-            Text(text = "Marilyn Munroe", fontSize = 30.sp, fontFamily = FontFamily(Font(R.font.oreganoregular)))
+            Text(text = if(userData.name.isNotEmpty()) userData.name.capitalize() else "...", fontSize = 30.sp, fontFamily = DONGLE_BOLD)
             Text(text = "Your profile will be active on this location for 30 minutes", fontSize = 8.sp,  color = Color.Gray,fontFamily = FontFamily(Font(R.font.oreganoregular)))
             
             Button(onClick = { onShareProfileClicked()}, shape = RoundedCornerShape(6.dp),modifier = Modifier

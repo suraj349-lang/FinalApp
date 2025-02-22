@@ -73,6 +73,7 @@ import com.example.finalapp.screens.dialogBox.GalleryPickerForDropProfile
 import com.example.finalapp.screens.dialogBox.ImageCaptureFromCameraForDropProfile
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.ui.theme.topAppBarTextColor
+import java.io.File
 
 
 @OptIn(ExperimentalGlideComposeApi::class)
@@ -106,9 +107,10 @@ fun CreateEvent(
             else -> {"12"}
         })
     }
+    var imageFile by mutableStateOf<File?>(null)
     var key by remember { mutableStateOf(false) }
     if (key) {
-        ImageCaptureFromCameraForDropProfile { uri = it }
+        ImageCaptureFromCameraForDropProfile({imageFile=it}) { uri = it }
     }
     var keyForGallery by remember {
         mutableStateOf(0)

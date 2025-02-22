@@ -116,7 +116,7 @@ fun DroppedProfiles(navController:NavHostController, eventsViewModel: EventsView
                                     }
                                 }
                             }
-
+                            val items=remember{droppedProfiles.value}
                             LazyVerticalGrid(
                                 modifier=Modifier.zIndex(0f),
                                 columns = GridCells.Fixed(2),
@@ -124,7 +124,8 @@ fun DroppedProfiles(navController:NavHostController, eventsViewModel: EventsView
                                 verticalArrangement = Arrangement.spacedBy(1.dp),
                                 horizontalArrangement = Arrangement.spacedBy(1.dp)
                             ) {
-                                items(droppedProfiles.value) { profile ->
+
+                                items(items,key={item->item.id.toString()}) { profile ->
                                     DroppedProfile(profile = profile)
 
                                 }
