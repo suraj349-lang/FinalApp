@@ -14,4 +14,6 @@ object Constants {
     val FONT_LIGHT= FontFamily(Font(R.font.k2d_light));
     val FONT_MEDIUM= FontFamily(Font(R.font.k2d_medium));
     val DONGLE_BOLD=FontFamily(Font(R.font.dongle_bold));
+    val DONGLE_NORMAL=FontFamily(Font(R.font.dongle_regular));
+    val DONGLE_LIGHT=FontFamily(Font(R.font.dongle_light));
 }

@@ -2,14 +2,7 @@ package com.example.finalapp.screens._1home
 
 
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -28,27 +21,21 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
 import androidx.compose.material.Surface
 import androidx.compose.ui.Alignment
 import androidx.compose.material.Text
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -58,7 +45,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.finalapp.viewmodels.EventsViewModel
-import com.example.finalapp.utils.RequestState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -68,16 +54,25 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
 import com.example.finalapp.model.DropProfileModel
+import com.example.finalapp.model.DropProfileResponse
+import com.example.finalapp.navigation.SCREENS
+import com.example.finalapp.screens.dialogBox.DialogLoading
+import com.example.finalapp.ui.imagePrefix
 import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.utils.testdata.Item
 import kotlinx.coroutines.launch
@@ -91,9 +86,8 @@ fun DroppedProfilesNew(
     eventsViewModel: EventsViewModel,
 ) {
     val context= LocalContext.current
-    val droppedProfiles by remember {
-        mutableStateOf(eventsViewModel.droppedProfilesList)
-    }
+    val triggerFetch by eventsViewModel.triggerFetch.collectAsState()
+    val droppedProfiles by eventsViewModel.droppedProfiles.collectAsState()
     val screenWidth = LocalConfiguration.current.screenWidthDp
     var query by remember { mutableStateOf("") }
     var showPredictionBoxForSearch by remember {
@@ -118,7 +112,9 @@ fun DroppedProfilesNew(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             AnimatedVisibility(visible = scrollBehavior.state.overlappedFraction == 0f) {
-                Row(modifier = Modifier.fillMaxWidth().height(60.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+                Row(modifier = Modifier
+                    .fillMaxWidth()
+                    .height(60.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
                     OutlinedTextField(
                         value = query,
                         onValueChange = {
@@ -185,38 +181,20 @@ fun DroppedProfilesNew(
                         Card(modifier = Modifier
                             .clickable {
                                 scope.launch {
-                                    eventsViewModel.getAllDropProfiles()
+                                   eventsViewModel.loadDroppedProfiles()
                                 }
-                            },
-                            shape = CircleShape
+                            }.width(80.dp),
+                            shape = RoundedCornerShape(8.dp),
+                            colors = CardDefaults.cardColors(containerColor = floatingActionBtnColor)
                         ) {
-                            Text(text = "Search",color= Color.White , fontSize = 20.sp,fontFamily = FontFamily(Font(R.font.dongle_bold)), modifier = Modifier.padding(4.dp))
+                            Text(text = "Search",color= Color.White , fontSize = 20.sp,fontFamily = FontFamily(Font(R.font.dongle_bold)), modifier = Modifier.fillMaxSize(), textAlign = TextAlign.Center)
 
                         }
                        // DateRangePicker(newDate = "", onDateChange ={} )
                     }
                 }
-            when (val result=eventsViewModel.getDropProfileResponse.value){
-                is RequestState.Success->{
-                    eventsViewModel.droppedProfilesList.value=result.data
-                    Log.d("Suraj", "image uri in main screen ${droppedProfiles.value} ")
 
-                    DropProfileSearchedList(scrollBehavior,droppedProfiles)
-
-                }
-                is RequestState.Error->{
-                    Log.d("Data received",result.error.message.toString())
-                    Toast.makeText(context,"$result", Toast.LENGTH_SHORT).show()
-                }
-                RequestState.Loading->{
-                    CircularProgressIndicator(color = Color(0xFF1289BE))
-                }
-                RequestState.Idle->{
-
-                }
-
-            }
-            if(droppedProfiles.value.isEmpty()){
+            if(droppedProfiles==null && !triggerFetch){
                 Card(modifier = Modifier
                     .padding(start = 4.dp)
                     .fillMaxWidth()
@@ -236,6 +214,64 @@ fun DroppedProfilesNew(
                     items(com.example.finalapp.utils.testdata.items){item->
                         LazyRowItem(item)
 
+                    }
+                }
+            }else{
+                val droppedProfiles = droppedProfiles!!.collectAsLazyPagingItems()
+                Column(
+                    modifier = Modifier
+                        .zIndex(0f)
+                        .fillMaxSize()
+                ) {
+                    LazyVerticalStaggeredGrid(
+                        modifier = Modifier
+                            .zIndex(0f)
+                            .nestedScroll(scrollBehavior.nestedScrollConnection),
+                        columns = StaggeredGridCells.Fixed(2),
+                        contentPadding = PaddingValues(2.dp),
+                    ) {
+                        items(droppedProfiles.itemCount) { index ->
+                            val item = droppedProfiles[index]
+                            if (item != null) {
+                                DroppedProfile(item){
+                                    Log.d("DropProfileTesting", "DroppedProfilesNew:callback called ")
+                                    Log.d("DropProfileTesting", "DroppedProfilesNew:${item} ")
+                                    try {
+                                        val route= item.let {
+                                            SCREENS.DROP_PROFILE_USER_PROFILE.passProfile(it)
+                                        }
+                                        Log.d("DropProfileTesting", "DroppedProfilesNew:$route ")
+                                        navController.navigate(route)
+                                    }catch (e:Exception){
+                                        Log.d("DropProfileTesting", "DroppedProfilesNew:${e.message} ")
+                                    }
+
+
+                                }
+                            }
+                        }
+                        droppedProfiles.apply {
+                            when {
+                                loadState.refresh is LoadState.Loading -> {
+                                    item {
+                                        DialogLoading()
+                                    }
+                                }
+
+                                loadState.append is LoadState.Loading -> {
+                                    item {
+                                        DialogLoading()
+                                    }
+                                }
+
+                                loadState.refresh is LoadState.Error -> {
+                                    val error = (loadState.refresh as LoadState.Error).error
+                                    item {
+                                        Text(text = "Error: ${error.message}", color = Color.Red)
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -279,26 +315,33 @@ fun LazyRowItem(item: Item) {
 @Composable
 fun DropProfileSearchedList(
     scrollBehavior: TopAppBarScrollBehavior,
-    droppedProfiles: MutableState<List<DropProfileModel>>,
+    droppedProfiles: LazyPagingItems<DropProfileResponse>,
 ) {
-    Column(modifier = Modifier
-        .zIndex(0f)
-        .fillMaxSize()) {
-            LazyVerticalGrid(
-                modifier= Modifier
-                    .zIndex(0f)
-                    .nestedScroll(scrollBehavior.nestedScrollConnection),
-                columns = GridCells.Fixed(2),
-                contentPadding = PaddingValues(2.dp),
+    val droppedProfilesList = remember { droppedProfiles }
+    Column(
+        modifier = Modifier
+            .zIndex(0f)
+            .fillMaxSize()
+    ) {
+        LazyVerticalStaggeredGrid(
+            modifier = Modifier
+                .zIndex(0f)
+                .nestedScroll(scrollBehavior.nestedScrollConnection),
+            columns = StaggeredGridCells.Fixed(2), // Ensure column count is defined
+            contentPadding = PaddingValues(2.dp),
+        ) {
+            items(droppedProfilesList.itemCount) { index ->
+                val item = droppedProfiles[index] // Access item safely
+                if (item != null) {
+                    DroppedProfile(item){
 
-            ) {
-                items(droppedProfiles.value) { profile ->
-                    DroppedProfile(profile = profile)
+                    }
                 }
             }
+        }
+
     }
 }
-
 @Composable
 fun DateRangePicker(newDate:String,onDateChange:(String)->Unit) {
     OutlinedTextField(
@@ -315,3 +358,80 @@ fun DateRangePicker(newDate:String,onDateChange:(String)->Unit) {
     
 }
 
+
+@OptIn(ExperimentalGlideComposeApi::class)
+@Composable
+fun DroppedProfile(profile: DropProfileResponse, onProfileClicked:()->Unit) {
+    val configuration = LocalConfiguration.current
+    val widthInDp = configuration.screenWidthDp.dp
+    val heightInDp = configuration.screenHeightDp.dp * 0.5f
+    Card(modifier = Modifier
+        .clickable {
+            onProfileClicked()
+        }
+        .padding(2.dp)
+        .fillMaxWidth()
+        .wrapContentHeight(),
+        shape = RoundedCornerShape(4.dp)
+    )
+
+    {
+        Box(
+            modifier = Modifier.fillMaxSize() // Box to overlay content
+        ) {
+            // Image in the background
+            GlideImage(
+                model = imagePrefix+ profile.image, // Replace with your image resource
+                contentDescription = "Background Image",
+                contentScale = ContentScale.Crop, // Crop to fill the space
+                modifier = Modifier
+                    .clickable {
+                        Log.d("DropProfileTesting", "DroppedProfile: onProfileClicked() called")
+                        onProfileClicked()
+                    }
+                    .fillMaxWidth()
+                    .height(heightInDp - 120.dp) // Fill the entire space
+            )
+
+            // Multiple texts
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomStart) // Center the entire column
+                    .padding(8.dp), // Add padding for spacing
+                horizontalAlignment = Alignment.Start,
+                verticalArrangement = Arrangement.Bottom// Center texts horizontally
+            ) {
+                Row(modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+                    profile.createdBy?.let {
+                        Text(
+                            text = it.name,//profile.location,
+                            modifier=Modifier.fillMaxWidth(0.8f),
+                            maxLines=1,
+                            overflow= TextOverflow.Ellipsis,
+                            style = TextStyle(color = Color.White, fontSize = 18.sp)
+                        )
+                    }
+                    Text(
+                        text = profile.expirationTime +" hrs.",
+                        modifier=Modifier.fillMaxWidth(1f),
+                        maxLines=1,
+                        overflow=TextOverflow.Ellipsis,
+                        style = TextStyle(color = Color.White, fontSize = 10.sp)
+                    )
+
+                }
+
+                profile.message?.let {
+                    Text(
+                        text = it,
+                        style = TextStyle(color = Color.White, fontSize = 10.sp)
+                    )
+                }
+            }
+        }
+
+    }
+
+}

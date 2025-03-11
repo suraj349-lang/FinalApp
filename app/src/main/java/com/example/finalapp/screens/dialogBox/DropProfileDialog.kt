@@ -73,6 +73,7 @@ import com.example.finalapp.screens._1home.utils.OfferResponseDataAndAction
 import com.example.finalapp.screens._4profile.createImageFile
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.ui.theme.topAppBarTextColor
+import com.example.finalapp.utils.ProfileObject
 import com.example.finalapp.utils.RequestState
 import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
 import com.example.finalapp.viewmodels.AuthViewModel
@@ -89,29 +90,16 @@ import java.io.File
 @Composable
 fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewModel, imageUploadViewModel: ImageUploadViewModel, navController: NavHostController, onDismiss: () -> Unit) {
     var caption by remember{ mutableStateOf("testing") }
-    val scope= rememberCoroutineScope()
     val context= LocalContext.current
     var enabled=true;
     val location by authViewModel.currentLocation.collectAsState()
-
-
-    var uri by remember {
-        mutableStateOf(Uri.EMPTY)
-    }
+    var uri by remember { mutableStateOf(Uri.EMPTY) }
     var imageFile by mutableStateOf<File?>(null)
     var key by remember { mutableStateOf(false) }
-    var keyForGallery by remember {
-        mutableStateOf(0)
-    }
-    if (key) {
-        ImageCaptureFromCameraForDropProfile({imageFile=it}){uri=it}
-    }
+    var keyForGallery by remember { mutableStateOf(0) }
+    if (key) { ImageCaptureFromCameraForDropProfile({imageFile=it}){uri=it} }
     if(keyForGallery!=0) {
-        Log.d("Suraj", "DropProfileDialog:entered in gallery ")
-        GalleryPickerForDropProfile(
-            navController = navController,{imageFile=it}
-        ) {
-            Log.d("suraj", "DropProfileDialog: received image uri $it")
+        GalleryPickerForDropProfile(navController = navController,{imageFile=it}) {
             uri = it
         }
     }
@@ -128,23 +116,12 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
             }
         )
     }
-    val dropProfileModel = DropProfileModel(
-        image = "",
-        location = authViewModel.address.value,
-        message = caption,
-        expirationTime = expirationTime,
-        createdBy = "6680fef693d1e2645e19ee09"
-    )
-
-
-
     val dropProfileState by imageUploadViewModel.dropProfileState.collectAsState()
 
 
-    Dialog(onDismissRequest = { onDismiss() }, properties = DialogProperties(
-        dismissOnBackPress = true,dismissOnClickOutside = false
-    )
-    ) {
+    Dialog(
+        onDismissRequest = { onDismiss() },
+        properties = DialogProperties(dismissOnBackPress = true,dismissOnClickOutside = false)) {
         Card(
             shape = RoundedCornerShape((6.dp)),
             modifier = Modifier
@@ -348,7 +325,16 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                             //todo later on turn enalbed to true
                           //  enabled = false;
                             imageFile?.let {
-                                imageUploadViewModel.dropProfileModel.value=dropProfileModel
+                                imageUploadViewModel.dropProfileModel.value=
+                                    ProfileObject.profile?.let { profile ->
+                                        DropProfileModel(
+                                            image = "",
+                                            location = authViewModel.address.value,
+                                            message = caption,
+                                            expirationTime = expirationTime,
+                                            createdBy = profile.userId
+                                        )
+                                    }
                                 imageUploadViewModel.s3ImageUploadFunction("suraj3494",it)
                                 }
                         },

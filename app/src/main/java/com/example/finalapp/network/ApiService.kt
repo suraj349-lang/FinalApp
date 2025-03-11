@@ -3,6 +3,8 @@ package com.example.finalapp.network
 import com.example.finalapp.model.PreSignedUrlResponse
 import com.example.finalapp.model.SignupAPIResponse
 import com.example.finalapp.model.DirectChat
+import com.example.finalapp.model.DirectChatApiResponse
+import com.example.finalapp.model.DirectChatRequest
 import com.example.finalapp.model.DropProfileModel
 import com.example.finalapp.model.DropProfileResponseModel
 import com.example.finalapp.model.GetDropProfileResponseModel
@@ -32,15 +34,15 @@ import retrofit2.http.Url
 interface ApiService {
 
     @GET("/api/v1/dropProfile/getAllDropProfiles")
-    suspend fun getAllDropProfiles():GetDropProfileResponseModel
+    suspend fun getAllDropProfiles(@Query("page") page:Int):Response<GetDropProfileResponseModel>
     @POST("/api/v1/dropProfile/postDropProfile")
     suspend fun dropProfile(@Body data:DropProfileModel):DropProfileResponseModel
 
     //------------------------- Direct chat --------------------------------------------//
     @GET("/api/v1/directChat/")
-    suspend fun getDirectChatUsers(@Query("lat") lat:Double,@Query("long") long:Double):ApiResponse<List<User>>
+    suspend fun getDirectChatUsers(@Query("lat") lat:Double,@Query("long") long:Double,@Query("page") page:Int): Response<DirectChatApiResponse>
     @POST("/api/v1/directChat/")
-    suspend fun setLocationForDirectChat(@Body data:DirectChat):ApiResponse<DirectChat>
+    suspend fun setLocationForDirectChat(@Body data:DirectChatRequest):ApiResponse<DirectChat>
 
     //---------------------------------------------------------------------//
     @POST("/api/v1/event")
@@ -60,6 +62,10 @@ interface ApiService {
     suspend fun getUserData(@Query("number") number: String):OkResponse
 
     //---------------------------------------------------------------------//
+    @PUT("/api/v1/user/update")
+    suspend fun updateUserData(@Body updateUser: User ):OkResponse
+
+    //---------------------------------------------------------------------//
     @GET("/api/v1/auth/updateUserImage")
     suspend fun updateUserImage(@Query("email") email: String, @Query("imageUrl") imageUrl: String): OkResponse
 
@@ -73,9 +79,10 @@ interface ApiService {
 interface NonAuthApiService{
     @POST("/api/v1/auth/login")
     suspend fun postLoginData(@Body loginData:LoginModel): LoginAPIResponse
+    //-----------------------------------------------------------------------------------//
     @POST("/api/v1/auth/register")
     suspend fun postSignupData(@Body signupData:RegisterUserModel): SignupAPIResponse
-    //---------------------------------------------------------------------//
+    //-----------------------------------------------------------------------------------//
     @PUT
     suspend fun uploadImageToS3(@Url url:String,@Body image:RequestBody): Response<Unit>
 }

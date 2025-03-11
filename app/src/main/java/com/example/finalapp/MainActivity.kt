@@ -52,8 +52,20 @@ import java.io.IOException
 import java.util.Locale
 import android.location.LocationManager
 import androidx.activity.result.ActivityResultLauncher
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -177,7 +189,6 @@ class MainActivity : ComponentActivity() {
 
 
 }
-
 fun Activity.openAppSettings() {
     Intent(
         Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
@@ -199,9 +210,9 @@ fun FinalApp(
         scope.launch(Dispatchers.IO) {
              getLocation()
         }
-//        scope.launch {
-//            authViewModel.getProfileData()
-//        }
+        scope.launch {
+            authViewModel.getProfileData()
+        }
     }
 
     Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {

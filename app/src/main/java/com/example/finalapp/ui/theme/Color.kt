@@ -30,3 +30,5 @@ val statusBarColorBlue=Color(0xFF4505C7) //0xFF601AF1
 val droppedProfileExpirationTime= Color(0xFFA80641)
 
 val vectorScreenIcons=Color.Black.copy(alpha = 0.7f)
+ val LIGHT_GREY_BG_COLOR = Color(0xFFF3F0F0)
+val LIGHT_GREEN= Color(0xFF5BBB07)

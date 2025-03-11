@@ -21,6 +21,7 @@ import com.example.finalapp.model.RegisterUserModel
 import com.example.finalapp.model.SignupAPIResponse
 import com.example.finalapp.model.User
 import com.example.finalapp.utils.LoginState
+import com.example.finalapp.utils.ProfileObject
 import com.example.finalapp.utils.RequestState
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -54,6 +55,7 @@ class AuthViewModel @Inject constructor(
                }.collect {
                    if (it.name.isNotEmpty()) {
                        _userFromDb.value = RequestState.Success(it)
+                       ProfileObject.profile=it
                    } else {
                        _userFromDb.value = RequestState.Error(Throwable("No user found"))
                    }

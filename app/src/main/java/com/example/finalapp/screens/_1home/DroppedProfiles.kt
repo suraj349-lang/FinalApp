@@ -59,12 +59,12 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.ui.imagePrefix
 
-
+/*
 @Composable
 fun DroppedProfiles(navController:NavHostController, eventsViewModel: EventsViewModel) {
     val context= LocalContext.current
     val droppedProfiles by remember {
-        mutableStateOf(eventsViewModel.droppedProfilesList)
+        mutableStateOf("")//eventsViewModel.droppedProfilesList)
     }
     val widthInDp = LocalConfiguration.current.screenWidthDp
     var query by remember { mutableStateOf("") }
@@ -151,7 +151,7 @@ fun DroppedProfiles(navController:NavHostController, eventsViewModel: EventsView
         }
     }
 
-/*
+
 Card(modifier = Modifier
                                 .height(if (height) 30.dp else 100.dp)
                                 .fillMaxWidth(), backgroundColor = Color(0xFFC5BBBE)
@@ -193,7 +193,7 @@ Card(modifier = Modifier
                                 }
 
                             }
- */
+
 
 
 
@@ -234,7 +234,7 @@ fun DroppedProfile(profile: DropProfileModel) {
             ) {
                 Row(modifier = Modifier.fillMaxWidth().wrapContentHeight(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
                     Text(
-                        text = "Suraj singh",//profile.location,
+                        text ="Suraj singh",//profile.location,
                         modifier=Modifier.fillMaxWidth(0.8f),
                         maxLines=1,
                         overflow=TextOverflow.Ellipsis,
@@ -260,3 +260,4 @@ fun DroppedProfile(profile: DropProfileModel) {
     }
 
 }
+*/

@@ -3,9 +3,10 @@ package com.example.finalapp.repository
 import android.content.Context
 import android.net.Uri
 import com.example.finalapp.model.DirectChat
+import com.example.finalapp.model.DirectChatApiResponse
+import com.example.finalapp.model.DirectChatRequest
 import com.example.finalapp.model.GetDropProfileResponseModel
 import com.example.finalapp.model.OfferModel
-import com.example.finalapp.model.User
 import com.example.finalapp.model.SingleOfferModel
 import com.example.finalapp.model.ImageUploadResponse
 import com.example.finalapp.model.OfferResponseModel
@@ -18,25 +19,27 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
+import retrofit2.Response
 import javax.inject.Inject
 
 @ViewModelScoped
 class EventsRepository @Inject constructor(private val api: ApiService) {
 
-    fun setLocationForDirectChat(directChat: DirectChat):Flow<ApiResponse<DirectChat>> = flow {
+    fun setLocationForDirectChat(directChat: DirectChatRequest):Flow<ApiResponse<DirectChat>> = flow {
         emit(api.setLocationForDirectChat(directChat))
     }.flowOn(Dispatchers.IO)
-    fun getDirectChatUsers(lat:Double,long:Double):Flow<ApiResponse<List<User>>> = flow {
-        emit(api.getDirectChatUsers(lat,long))
-    }.flowOn(Dispatchers.IO)
+    suspend fun getAllDirectChatUsers(lat:Double, long:Double, page:Int): Response<DirectChatApiResponse> {
+        return api.getDirectChatUsers(lat,long,page)
+    }
 
     fun sendCreateEventData(offerData: OfferModel): Flow<SingleOfferModel> = flow  {
         emit(api.premiumCreateEvent(offerData))
     }.flowOn(Dispatchers.IO)
 
-    fun getAllDropProfiles(): Flow<GetDropProfileResponseModel> = flow  {
-        emit(api.getAllDropProfiles())
-    }.flowOn(Dispatchers.IO)
+    suspend fun getAllDropProfiles(page:Int): Response<GetDropProfileResponseModel> {
+        return api.getAllDropProfiles(page)
+    }
+
    suspend fun createEvent(data:OfferModel):Resource<SingleOfferModel>{
         return try {
           Resource.Loading(data=true)

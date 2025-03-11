@@ -1,13 +1,13 @@
 package com.example.finalapp.screens._1home
 
+import android.text.Layout
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,24 +15,17 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CardElevation
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FabPosition
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.FloatingActionButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
@@ -41,7 +34,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -49,32 +41,35 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.paging.PagingData
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
 import com.example.finalapp.database.Profile
 import com.example.finalapp.model.DirectChat
-import com.example.finalapp.model.User
-import com.example.finalapp.screens.dialogBox.DialogError
+import com.example.finalapp.model.DirectChatRequest
 import com.example.finalapp.screens.dialogBox.DialogLoading
-import com.example.finalapp.ui.theme.Dongle
 import com.example.finalapp.ui.theme.floatingActionBtnColor
-import com.example.finalapp.ui.theme.statusBarColor
 import com.example.finalapp.utils.RequestState
 import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
 import com.example.finalapp.viewmodels.AuthViewModel
 import com.example.finalapp.viewmodels.EventsViewModel
+import kotlinx.coroutines.flow.Flow
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -85,20 +80,19 @@ fun DirectChatScreen(
     eventsViewModel: EventsViewModel,
     navController: NavHostController
 ) {
-//    var checked by remember {
-//        mutableStateOf(false)
-//    }
+
     val checked by eventsViewModel.checked
 
     //var shareProfileClicked by remember { mutableStateOf(false) }
     val shareProfileClicked by eventsViewModel.shareProfileClicked
     val context= LocalContext.current
     val directChatRequestState by eventsViewModel.directChatRequestState.collectAsState()
-    val nearByUsersList= mutableStateOf(eventsViewModel.nearByUsersList.value)
+   // val nearByUsersList= mutableStateOf(eventsViewModel.nearByUsersList.value)
+    val nearByUsersList  by eventsViewModel.nearByUsersList.collectAsState()
     LaunchedEffect(key1 =shareProfileClicked){
         if(shareProfileClicked ){
             eventsViewModel.checked.value=!checked
-            eventsViewModel.shareChatFunction(DirectChat("677b4df1842c1c465293fc2f",authViewModel.latitude.value,authViewModel.longitude.value))
+            eventsViewModel.shareChatFunction(DirectChatRequest( "677b4df1842c1c465293fc2f",authViewModel.latitude.value,authViewModel.longitude.value))
         }
         eventsViewModel.shareProfileClicked.value=false
     }
@@ -119,7 +113,8 @@ fun DirectChatScreen(
             DialogLoading()
         }
     }
-    LaunchedEffect(Unit){
+    LaunchedEffect(userData){
+        println("launched effect called")
         authViewModel.getProfileData()
     }
     Scaffold(
@@ -131,7 +126,7 @@ fun DirectChatScreen(
             ) {
                     Box(
                         modifier = Modifier
-                            .align(Alignment.TopEnd) 
+                            .align(Alignment.TopEnd)
                             .padding(end = 16.dp, top = 8.dp)
                     ) {
                         SwitchWithIcon(checked) {
@@ -162,26 +157,6 @@ fun DirectChatScreen(
                 }
 
 
-                    when (directChatRequestState) {
-                        is RequestState.Success -> {
-                            eventsViewModel.setDirectChatRequestStateToIdle()
-                        }
-
-                        is RequestState.Loading -> {
-                            DialogLoading()
-                        }
-
-                        is RequestState.Error -> {
-                            DialogError {
-                                eventsViewModel.nearByUserResponse.value = RequestState.Idle
-                            }
-                        }
-
-                        is RequestState.Idle -> {
-
-                        }
-                    }
-
                 }
         }
     )
@@ -192,14 +167,14 @@ fun DirectChatScreen(
 fun DirectChatUI(
     userData: Profile,
     scrollBehavior: TopAppBarScrollBehavior,
-    nearByUsersList: MutableState<List<User>>,
+    nearByUsersList: Flow<PagingData<DirectChat>>?,
     checked: Boolean,
     onShareProfileClicked: () -> Unit
 ) {
     if (!checked ) {
         ShareProfileForDirectChat(userData) { onShareProfileClicked() }
     } else {
-        DirectChatProfiles(scrollBehavior, nearByUsersList.value)
+        DirectChatProfiles(scrollBehavior, nearByUsersList)
     }
 
 
@@ -208,22 +183,36 @@ fun DirectChatUI(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DirectChatProfiles(scrollBehavior: TopAppBarScrollBehavior, nearByUsersList: List<User>) {
+fun DirectChatProfiles(scrollBehavior: TopAppBarScrollBehavior, nearByUsersList: Flow<PagingData<DirectChat>>?) {
     val context = LocalContext.current
+    val nearbyUsers= nearByUsersList?.collectAsLazyPagingItems()
     LazyColumn(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)) {
-        items(nearByUsersList,key={it._id}) {user->
-            DirectChatItem(user) {
-                Toast.makeText(context, "clicked to chat to this person", Toast.LENGTH_SHORT).show()
-            }
+        if (nearbyUsers != null) {
+            items(nearbyUsers.itemCount) {index->
+                val item= nearbyUsers?.get(index)
+                if(item!=null) {
+                    DirectChatItem(item) {
+                        Toast.makeText(context, "clicked to chat to this person", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                }
 
+            }
         }
     }
 }
-
+/*
+ items(droppedProfiles.itemCount) { index ->
+                            val item = droppedProfiles[index]
+                            if (item != null) {
+                                DroppedProfile(item)
+                            }
+                        }
+ */
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun DirectChatItem(user: User, onDirectChatItemClicked: () -> Unit) {
+fun DirectChatItem(user: DirectChat?, onDirectChatItemClicked: () -> Unit) {
     Column(
         modifier = Modifier.wrapContentSize(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -237,7 +226,7 @@ fun DirectChatItem(user: User, onDirectChatItemClicked: () -> Unit) {
             border = BorderStroke(width = 1.dp, color = Color.LightGray)
         ) {
             GlideImage(
-                model = if(user.profileImage.isNotEmpty()) user.profileImage else R.drawable.profile_image_2,
+                model = if(user?.userId?.profileImage?.isNotEmpty() == true) user.userId.profileImage else R.drawable.profile_image_2,
                 contentDescription = "",
                 contentScale = ContentScale.Crop
             )
@@ -248,7 +237,7 @@ fun DirectChatItem(user: User, onDirectChatItemClicked: () -> Unit) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = if(user.name.isNotEmpty()) user.name.capitalize() else "...",
+                text = if(user?.userId?.name?.isNotEmpty() == true) user!!.userId.name.capitalize() else "...",
                 fontSize = 25.sp,
                 fontFamily = DONGLE_BOLD
             )
@@ -311,30 +300,75 @@ fun SwitchWithIcon(checked: Boolean,onClick:(value:Boolean)->Unit) {
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun ShareProfileForDirectChat(userData:Profile,onShareProfileClicked:()->Unit) {
-    Surface(modifier = Modifier
+    Box(modifier = Modifier
         .fillMaxWidth()
         .fillMaxHeight(1f)) {
+        Image(painter = painterResource(id = R.drawable.whatsapp), contentDescription ="", contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize() )
         Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-            Card(modifier = Modifier.size(150.dp), shape = CircleShape, border = BorderStroke(width = 1.dp, color = Color.LightGray)) {
-                GlideImage(
-                    model =if(userData.profileImage.isNotEmpty()) userData.profileImage else R.drawable.profile_image_3,
-                    contentDescription = "",
-                    contentScale = ContentScale.Crop)
-            }
-            Text(text = if(userData.name.isNotEmpty()) userData.name.capitalize() else "...", fontSize = 30.sp, fontFamily = DONGLE_BOLD)
-            Text(text = "Your profile will be active on this location for 30 minutes", fontSize = 8.sp,  color = Color.Gray,fontFamily = FontFamily(Font(R.font.oreganoregular)))
-            
-            Button(onClick = { onShareProfileClicked()}, shape = RoundedCornerShape(6.dp),modifier = Modifier
-                .fillMaxWidth(0.8f) //.wrapContentHeight().fillMaxWidth(0.8f)
-                .align(Alignment.CenterHorizontally),colors = ButtonDefaults.buttonColors(containerColor = Color.Black, contentColor = Color.White)) {
-                Image(painter = painterResource(id = R.drawable.up_arrow), contentDescription = "", modifier = Modifier.size(40.dp))
-                Text(text = "Share Profile")
-                Image(painter = painterResource(id = R.drawable.up_arrow), contentDescription = "", modifier = Modifier.size(40.dp))
-                
-            }
-            Text(text = "Sharing your profile will switch on direct chat", fontSize = 8.sp, color = Color.Gray,fontFamily = FontFamily(Font(R.font.oreganoregular)))
+            Card(
+                modifier = Modifier
+                    .wrapContentSize(),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color(
+                        0xFFF1E7E7//0xFFFCFAFA
+                    )
+                ), elevation = CardDefaults.cardElevation(100.dp)
+            ) {
+                Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = if (userData.name.isNotEmpty()) userData.name.capitalize() else "...",
+                        fontSize = 30.sp,
+                        fontFamily = DONGLE_BOLD,
+                        modifier = Modifier
+                            .fillMaxWidth(0.7f)
+                            .align(Alignment.Start)
+                    )
+                Card(
+                    modifier = Modifier.size(150.dp),
+                    shape = RoundedCornerShape(20.dp),
+                    border = BorderStroke(width = 1.dp, color = Color.LightGray)
+                ) {
+                    GlideImage(
+                        model =R.drawable.profile_image_3,// userData.profileImage.ifEmpty { R.drawable.profile_image_3 },
+                        contentDescription = "",
+                        contentScale = ContentScale.Crop
+                    )
+                }
 
-            
+                Text(text = userData.username.ifEmpty { "suraj_singh94" }, fontFamily = DONGLE_BOLD)
+
+
+                Button(
+                    onClick = { onShareProfileClicked() },
+                    shape = RoundedCornerShape(6.dp),
+                    modifier = Modifier
+                        .fillMaxWidth(0.7f),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(
+                            0xFF737704
+                        ), contentColor = Color.White
+                    )
+                ) {
+//                    Image(
+//                        painter = painterResource(id = R.drawable.up_arrow),
+//                        contentDescription = "",
+//                        modifier = Modifier.size(40.dp),
+//                        colorFilter = ColorFilter.tint(Color(0xFFFFFFFF))
+//                    )
+                    Text(text = "Share Profile", fontFamily = DONGLE_BOLD)
+                }
+                Text(
+                    text = "Sharing your profile will switch on direct chat and will be active on this location for 30 minutes",
+                    fontSize = 8.sp,
+                    textAlign=TextAlign.Center,
+                    color = Color.Gray,
+                    maxLines=2,
+                    fontFamily = FontFamily(Font(R.font.oreganoregular))
+                )
+
+            }
+        }
         }
 
     }

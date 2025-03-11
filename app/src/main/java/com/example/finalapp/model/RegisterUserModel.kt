@@ -1,5 +1,7 @@
 package com.example.finalapp.model
 
+import kotlinx.serialization.Serializable
+
 data class RegisterUserModel(
     val name:String,
     val number:String,
@@ -9,6 +11,7 @@ data class RegisterUserModel(
     val address:String
 )
 
+@Serializable
 data class User(
   val _id:String,
   val name:String,

@@ -146,6 +146,12 @@ dependencies {
 
     implementation "com.google.accompanist:accompanist-pager:0.29.1-alpha"
 
+    //Paging 3.0
+    implementation 'androidx.paging:paging-compose:1.0.0-alpha17'
+
+    // Swipe refresh
+    implementation 'com.google.accompanist:accompanist-swiperefresh:0.24.13-rc'
+
 
 
 

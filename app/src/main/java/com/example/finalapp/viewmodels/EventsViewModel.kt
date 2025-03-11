@@ -6,11 +6,19 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.example.finalapp.model.DirectChat
+import com.example.finalapp.model.DirectChatRequest
 import com.example.finalapp.model.DropProfileModel
+import com.example.finalapp.model.DropProfileResponse
 import com.example.finalapp.model.OfferModel
 import com.example.finalapp.model.User
 import com.example.finalapp.model.SingleOfferModel
+import com.example.finalapp.paging.DirectChatUsersPagingSource
+import com.example.finalapp.paging.DropProfilePagingSource
 import com.example.finalapp.repository.EventsRepository
 import com.example.finalapp.repository.Resource
 import com.example.finalapp.testingp.imageUrls
@@ -23,6 +31,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
@@ -49,27 +59,69 @@ class EventsViewModel @Inject constructor(private val eventsRepository: EventsRe
 
 
     //--------------------------------------------------------------------------------------------------------------------------------------------//
-    val getDropProfileResponse:MutableState<RequestState<List<DropProfileModel>>> = mutableStateOf(RequestState.Idle)
-    var droppedProfilesList= mutableStateOf<List<DropProfileModel>>(emptyList())
-     suspend fun getAllDropProfiles(location:String="",date:String="") {
-        eventsRepository.getAllDropProfiles()
-            .onStart {
-                getDropProfileResponse.value=RequestState.Loading;
-                Log.d("Data received",offerResponse.value.toString())
-            }
-            .catch {
-                Log.d("Data received","error found")
-                getDropProfileResponse.value=RequestState.Error(it)
-                Log.d("Data received",offerResponse.value.toString())
-            }.collect {
-                getDropProfileResponse.value = RequestState.Success(it.data);
-                Log.d("Data received",offerResponse.value.toString())
-            }
+    private val _triggerFetch = MutableStateFlow(false)
+    val triggerFetch: StateFlow<Boolean> = _triggerFetch.asStateFlow()
+
+    // Create Pager but don't collect initially
+    private val _droppedProfilesFlow = MutableStateFlow<Flow<PagingData<DropProfileResponse>>?>(null)
+    val droppedProfiles: StateFlow<Flow<PagingData<DropProfileResponse>>?> = _droppedProfilesFlow.asStateFlow()
+
+    fun loadDroppedProfiles() {
+        _droppedProfilesFlow.value = Pager(
+            config = PagingConfig(pageSize = 10, prefetchDistance = 5),
+            pagingSourceFactory = { DropProfilePagingSource(eventsRepository) }
+        ).flow.cachedIn(viewModelScope)
+
+        _triggerFetch.value = true
     }
 
-//-----------------------------------------------------------------------------------------------------------------------------------------------//
 
+    //-----------------------------------------------------------------------------------------------------------------------------------------------//
 
+    //--------------------------------------------------------------------------------------------------------------------//
+//    private val nearByUserResponse:MutableState<RequestState<List<User>>> = mutableStateOf(RequestState.Idle)
+//    var nearByUsersList= mutableStateOf<List<User>>(emptyList())
+    private val nearByUserResponse = MutableStateFlow<Flow<PagingData<DirectChat>>?>(null)
+    val nearByUsersList: StateFlow<Flow<PagingData<DirectChat>>?> = nearByUserResponse.asStateFlow()
+
+    fun loadDirectChatUsers(lat:Double,long:Double) {
+        nearByUserResponse.value = Pager(
+            config = PagingConfig(pageSize = 10, prefetchDistance = 5),
+            pagingSourceFactory = { DirectChatUsersPagingSource(eventsRepository,lat, long) }
+        ).flow.cachedIn(viewModelScope)
+
+    }
+//    fun getNearByUsers(lat:Double, long: Double)=viewModelScope.launch(Dispatchers.IO) {
+//        eventsRepository.getAllDirectChatUsers(lat,long)
+//            .onStart {
+//                nearByUserResponse.value=RequestState.Loading;
+//            }
+//            .catch {error->
+//                Log.d("Data received","error found")
+//                nearByUserResponse.value=RequestState.Error(error)
+//                directChatRequestState.emit(RequestState.Error(error))
+//            }
+//            .collect {
+//                if(it.data.isNotEmpty()) {
+//                    nearByUserResponse.value = RequestState.Success(it.data);
+//                    nearByUsersList.value = it.data
+//                    directChatRequestState.value =
+//                        RequestState.Success("Successfully fetched direct chat users")
+//                }else{
+//                    val error=Throwable("No data found")
+//                    directChatRequestState.value = RequestState.Error(error)
+//                }
+//
+//            }
+//    }
+    fun setDirectChatRequestStateToIdle(){
+        directChatRequestState.value=RequestState.Idle
+    }
+    fun setDirectChatRequestStateToSuccess(){
+        directChatRequestState.value=RequestState.Success("")
+    }
+
+//----------------------------------------------------------------------------------------------------------------------------------//
 
     val offerResponse:MutableState<RequestState<SingleOfferModel>> = mutableStateOf(RequestState.Idle)
     var key :MutableState<Int> = mutableStateOf(0);
@@ -130,7 +182,7 @@ class EventsViewModel @Inject constructor(private val eventsRepository: EventsRe
 //    }
     //-------------------------------------------DIRECT CHAT--------------------------------------------------------------------------------------//
     val directChatRequestState = MutableStateFlow<RequestState<String>>(RequestState.Idle)
-    fun shareChatFunction(data: DirectChat){
+    fun shareChatFunction(data: DirectChatRequest){
         directChatRequestState.value=RequestState.Loading
         viewModelScope.launch {
             sendDirectChatData(data)
@@ -138,7 +190,7 @@ class EventsViewModel @Inject constructor(private val eventsRepository: EventsRe
 
     }
     val directChatResponse:MutableState<RequestState<DirectChat>> = mutableStateOf(RequestState.Idle)
-    fun sendDirectChatData(data: DirectChat)=viewModelScope.launch(Dispatchers.IO) {
+    fun sendDirectChatData(data: DirectChatRequest)=viewModelScope.launch(Dispatchers.IO) {
         eventsRepository.setLocationForDirectChat(data)
             .onStart {
                 directChatResponse.value=RequestState.Loading;
@@ -150,41 +202,9 @@ class EventsViewModel @Inject constructor(private val eventsRepository: EventsRe
             }
             .collect {
                 directChatResponse.value = RequestState.Success(it.data);
-                getNearByUsers(data.lat,data.long)
+               // getNearByUsers(data.lat,data.long)
+                loadDirectChatUsers(data.lat,data.long)
             }
-    }
-
-//--------------------------------------------------------------------------------------------------------------------//
-    val nearByUserResponse:MutableState<RequestState<List<User>>> = mutableStateOf(RequestState.Idle)
-    var nearByUsersList= mutableStateOf<List<User>>(emptyList())
-    fun getNearByUsers(lat:Double, long: Double)=viewModelScope.launch(Dispatchers.IO) {
-        eventsRepository.getDirectChatUsers(lat,long)
-            .onStart {
-                nearByUserResponse.value=RequestState.Loading;
-            }
-            .catch {error->
-                Log.d("Data received","error found")
-                nearByUserResponse.value=RequestState.Error(error)
-                directChatRequestState.emit(RequestState.Error(error))
-            }
-            .collect {
-                if(it.data.isNotEmpty()) {
-                    nearByUserResponse.value = RequestState.Success(it.data);
-                    nearByUsersList.value = it.data
-                    directChatRequestState.value =
-                        RequestState.Success("Successfully fetched direct chat users")
-                }else{
-                    val error=Throwable("No data found")
-                    directChatRequestState.value = RequestState.Error(error)
-                }
-
-            }
-    }
-    fun setDirectChatRequestStateToIdle(){
-        directChatRequestState.value=RequestState.Idle
-    }
-    fun setDirectChatRequestStateToSuccess(){
-        directChatRequestState.value=RequestState.Success("")
     }
 
 
