@@ -60,6 +60,7 @@ import com.example.finalapp.screens.dialogBox.DialogError
 import com.example.finalapp.screens.dialogBox.DialogLoading
 import com.example.finalapp.screens.dialogBox.DropProfileDialog
 import com.example.finalapp.ui.theme.floatingActionBtnColor
+import com.example.finalapp.utils.ProfileObject
 import com.example.finalapp.utils.RequestState
 import com.example.finalapp.viewmodels.AuthViewModel
 import com.example.finalapp.viewmodels.EventsViewModel
@@ -74,28 +75,6 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
     if (showCustomDialog) {
         DropProfileDialog(authViewModel ,eventsViewModel , imageUploadViewModel ,navController ) { showCustomDialog = !showCustomDialog }
         Log.d("Suraj", "Profile Screen : Drop Profile ")
-    }
-    val userDataState by authViewModel.userFromDb.collectAsState()
-    var userData: Profile by remember {
-        mutableStateOf(Profile())
-    }
-    LaunchedEffect(key1 = Unit){
-        authViewModel.getProfileData()
-    }
-    when(userDataState){
-        is  RequestState.Loading -> {
-            DialogLoading()
-        }
-        is RequestState.Error -> {
-            DialogError {
-                authViewModel.updateUserFromDbToIdle()
-            }
-        }
-        is RequestState.Success ->{
-            userData= (userDataState as RequestState.Success<Profile>).data
-        }
-        is RequestState.Idle ->{}
-
     }
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier
@@ -155,7 +134,7 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                                     elevation = 20.dp
                                 ) {
                                     GlideImage(
-                                        model=if(userData.profileImage.isNotEmpty()) userData.profileImage else "",
+                                        model= ProfileObject.profile?.profileImage,
                                         contentDescription = "",
                                         contentScale = ContentScale.Crop
                                     )
@@ -166,18 +145,22 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                                     verticalArrangement = Arrangement.spacedBy(8.dp),
                                     modifier = Modifier.padding(start = 8.dp)
                                 ) {
-                                    Text(
-                                        text = if(userData.name.isNotEmpty()) userData.name else "....",
-                                        fontWeight = FontWeight.Bold,
-                                        color = Color.White,
-                                        fontSize = 18.sp
-                                    )
-                                    Text(
-                                        text =if(userData.username.isNotEmpty()) userData.username else "....",
-                                        fontWeight = FontWeight.SemiBold,
-                                        color = Color.White,
-                                        fontSize = 10.sp
-                                    )
+                                    ProfileObject.profile?.let {
+                                        Text(
+                                            text = it.name,
+                                            fontWeight = FontWeight.Bold,
+                                            color = Color.White,
+                                            fontSize = 18.sp
+                                        )
+                                    }
+                                    ProfileObject.profile?.let {
+                                        Text(
+                                            text = it.username,
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = Color.White,
+                                            fontSize = 10.sp
+                                        )
+                                    }
 
                                 }
 
@@ -385,9 +368,8 @@ fun RecentProfileDropItem(item: RecentProfileDrop) {
                     0xFFF1EDE3
                 )
                 ) {
-                    Text(text = item.location, fontWeight = FontWeight.SemiBold,color = Color(
-                        0xFF072747
-                    ), modifier = Modifier.padding(start=4.dp,top=2.dp), fontSize = 8.sp)
+                    Text(text = item.location, fontWeight = FontWeight.SemiBold,color = Color(0xFF072747),
+                        modifier = Modifier.padding(start=4.dp,top=2.dp), fontSize = 8.sp)
                 }
                 Image(
                     painterResource(id = item.image),

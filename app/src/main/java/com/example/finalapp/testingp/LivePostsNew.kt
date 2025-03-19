@@ -15,12 +15,17 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -46,25 +51,29 @@ fun ActiveEvents(
             easing = LinearEasing, durationMillis = 300
         )
     )
-    var index by remember {
+    val index by remember {
         mutableStateOf(0)
     }
-    var height by remember {
+    val height by remember {
         mutableStateOf(false)
     }
-    VerticalPager(
-        pageSize = PageSize.Fill,
-        state = pagerState,
-        flingBehavior = fling,
-        beyondBoundsPageCount = 1,//todo set to 1 to save memory
-        modifier = modifier
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
     ) {
-//        val randomNumber = (0..10).random()
-//        if(randomNumber%2==0) {
-//            PrivateLiveEvent()
-//        }else {
+        VerticalPager(
+            pageSize = PageSize.Fill,
+            state = pagerState,
+            flingBehavior = fling,
+            beyondBoundsPageCount = 1,//todo set to 1 to save memory
+            modifier = modifier.weight(1f)
+        ) {
+        if(it%2==0) {
+            PrivateLiveEvent()
+        }else {
             PublicActiveEvent(index, height, imageUrls)
-       // }
+             }
+        }
     }
 }
 
@@ -290,8 +299,20 @@ fun UserData() {
             Image(painter = painterResource(id = R.drawable.girl), contentDescription = "", contentScale = ContentScale.Crop)
         }
         Spacer(modifier = Modifier.width(8.dp))
-        Text(text = "Kriti shinde", fontFamily = FontFamily(Font(R.font.dongle_bold)), color= Color.White,fontSize = 25.sp)
-
+        Text(
+            text = "Kriti Shinde",
+            fontFamily = FontFamily(Font(R.font.dongle_bold)),
+            color = Color.Black,
+            fontWeight = FontWeight.Bold,
+            fontSize = 25.sp,
+            style = TextStyle(
+                shadow = Shadow(
+                    color = Color.White.copy(alpha = 0.8f), // Light glow effect
+                    offset = Offset(0f, 0f),
+                    blurRadius = 8f
+                )
+            )
+        )
     }
 
 }
@@ -344,7 +365,7 @@ fun ActiveButton() {
         shape = RoundedCornerShape(8.dp),
         backgroundColor = Color(
             0xFFA52C06
-        ).copy(alpha = 0.8f), elevation = 0.dp
+        ).copy(alpha = 0.9f), elevation = 0.dp
     ) {
         Text(
             text = "ACTIVE",

@@ -61,6 +61,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.zIndex
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
@@ -74,6 +76,8 @@ import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens.dialogBox.DialogLoading
 import com.example.finalapp.ui.imagePrefix
 import com.example.finalapp.ui.theme.floatingActionBtnColor
+import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
+import com.example.finalapp.utils.constants.Constants.DONGLE_NORMAL
 import com.example.finalapp.utils.testdata.Item
 import kotlinx.coroutines.launch
 
@@ -91,6 +95,9 @@ fun DroppedProfilesNew(
     val screenWidth = LocalConfiguration.current.screenWidthDp
     var query by remember { mutableStateOf("") }
     var showPredictionBoxForSearch by remember {
+        mutableStateOf(false)
+    }
+    var showDateDialog by remember {
         mutableStateOf(false)
     }
     var showSearchUI by remember {
@@ -112,42 +119,42 @@ fun DroppedProfilesNew(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             AnimatedVisibility(visible = scrollBehavior.state.overlappedFraction == 0f) {
-                Row(modifier = Modifier
-                    .fillMaxWidth()
-                    .height(60.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
-                    OutlinedTextField(
-                        value = query,
-                        onValueChange = {
-                            query = it
-                            showPredictionBoxForSearch = it.isNotEmpty()
-                        },
-                        label = {
-                            Text(
-                                text = "Search Profiles",
-                                fontFamily = FontFamily(Font(R.font.dongle_bold))
-                            )
-                        },
-                        placeholder = { Text(text = labelText) },
-                        modifier = Modifier
-                            .clickable {
-                                labelText = "Search location"
-                            }
-                            .fillMaxWidth()
-                            .padding(4.dp),
-                        shape = RoundedCornerShape(20.dp)
-                    )
-                }
+                Column(
+                    modifier=Modifier,
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                OutlinedTextField(
+                    value = query,
+                    onValueChange = {
+                        query = it
+                        showPredictionBoxForSearch = it.isNotEmpty()
+                    },
+                    label = {
+                        Text(
+                            text = "Search Profiles",
+                            fontFamily = FontFamily(Font(R.font.dongle_bold))
+                        )
+                    },
+                    placeholder = { Text(text = labelText) },
+                    modifier = Modifier
+                        .clickable {
+                            labelText = "Search location"
+                        }
+                        .fillMaxWidth()
+                        .padding(4.dp),
+                    shape = RoundedCornerShape(20.dp)
+                )
                 if (showPredictionBoxForSearch) {
                     Box(
                         modifier = Modifier
-                            .zIndex(2f)
                             .fillMaxWidth()
                             .height(200.dp)
                             .padding(start = 20.dp, end = 20.dp)
                             .border(1.dp, color = Color.LightGray)
 
                     ) {
-                        LazyColumn(modifier = Modifier.zIndex(1f)) {
+                        LazyColumn(modifier = Modifier) {
                             items(predictions) { prediction ->
                                 Text(
                                     text = prediction.getPrimaryText(null).toString(),
@@ -165,35 +172,51 @@ fun DroppedProfilesNew(
                         }
                     }
                 }
-            }
-            AnimatedVisibility(visible = scrollBehavior.state.overlappedFraction == 0f) {
-                    Row(
+
+                Row(
+                    modifier = Modifier
+                        .zIndex(0f)
+                        .fillMaxWidth()
+                        .height(40.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.calendar),
+                        contentDescription = "",
                         modifier = Modifier
-                            .zIndex(0f)
-                            .fillMaxWidth()
-                            .height(40.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        Text(text = "Last 1 Week ")
-                        Image(painter = painterResource(id = R.drawable.edit_new), contentDescription ="",modifier=Modifier.size(30.dp), colorFilter = ColorFilter.tint(
-                            Color.Black) )
-                        Card(modifier = Modifier
+                            .size(30.dp)
+                            .clickable { showDateDialog = !showDateDialog },
+                        colorFilter = ColorFilter.tint(
+                            Color.Black
+                        )
+                    )
+                    Text(text = "Last 1 Week ", fontFamily = DONGLE_NORMAL)
+                    Card(
+                        modifier = Modifier
                             .clickable {
                                 scope.launch {
-                                   eventsViewModel.loadDroppedProfiles()
+                                    eventsViewModel.loadDroppedProfiles()
                                 }
-                            }.width(80.dp),
-                            shape = RoundedCornerShape(8.dp),
-                            colors = CardDefaults.cardColors(containerColor = floatingActionBtnColor)
-                        ) {
-                            Text(text = "Search",color= Color.White , fontSize = 20.sp,fontFamily = FontFamily(Font(R.font.dongle_bold)), modifier = Modifier.fillMaxSize(), textAlign = TextAlign.Center)
+                            }
+                            .width(80.dp),
+                        shape = RoundedCornerShape(8.dp),
+                        colors = CardDefaults.cardColors(containerColor = floatingActionBtnColor)
+                    ) {
+                        Text(
+                            text = "Search",
+                            color = Color.White,
+                            fontSize = 20.sp,
+                            fontFamily = FontFamily(Font(R.font.dongle_bold)),
+                            modifier = Modifier.fillMaxSize(),
+                            textAlign = TextAlign.Center
+                        )
 
-                        }
-                       // DateRangePicker(newDate = "", onDateChange ={} )
                     }
+                    // DateRangePicker(newDate = "", onDateChange ={} )
                 }
-
+            }
+        }
             if(droppedProfiles==null && !triggerFetch){
                 Card(modifier = Modifier
                     .padding(start = 4.dp)
@@ -343,18 +366,13 @@ fun DropProfileSearchedList(
     }
 }
 @Composable
-fun DateRangePicker(newDate:String,onDateChange:(String)->Unit) {
-    OutlinedTextField(
-        value = newDate, 
-        onValueChange ={onDateChange(it)}, 
-        modifier= Modifier
-            .fillMaxWidth(0.7f)
-            .padding(end = 16.dp),
-        shape = RoundedCornerShape(20.dp),
-        trailingIcon = { Image(painter = painterResource(id = R.drawable.calendar), contentDescription ="" )},
-        
-        
-    )
+fun DateRangePicker(newDate:String,onDateChange:(String)->Unit,onDismiss:()->Unit) {
+    Dialog(
+        onDismissRequest = { onDismiss() },
+        properties = DialogProperties(dismissOnBackPress = true,dismissOnClickOutside = false)
+    ) {
+
+    }
     
 }
 
@@ -379,7 +397,6 @@ fun DroppedProfile(profile: DropProfileResponse, onProfileClicked:()->Unit) {
         Box(
             modifier = Modifier.fillMaxSize() // Box to overlay content
         ) {
-            // Image in the background
             GlideImage(
                 model = imagePrefix+ profile.image, // Replace with your image resource
                 contentDescription = "Background Image",

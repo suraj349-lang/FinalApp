@@ -72,6 +72,7 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import com.example.finalapp.viewmodels.SplashViewModel
 import com.example.finalapp.ui.API_KEY
+import com.example.finalapp.utils.UserLocation
 import com.example.finalapp.utils.constants.Constants
 import com.google.android.libraries.places.api.Places
 import io.socket.client.IO
@@ -363,16 +364,16 @@ fun getReadableLocation(latitude: Double, longitude: Double, context: Context): 
 
         if (addresses?.isNotEmpty() == true) {
             val address = addresses[0]
-            addressText = "${address.getAddressLine(0)}, ${address.locality}"
-            // Use the addressText in your app
-            Log.d(TAG, addressText)
-            val addressComponents = addressText.split(", ")
+            UserLocation.city =address.locality ?: ""
+            UserLocation.state=address.adminArea ?: ""
+            UserLocation.country=address.countryName ?: ""
+            UserLocation.district=address.subLocality?: ""
+            UserLocation.street=address.thoroughfare ?: ""
+            val countryCode=address.countryCode ?: ""
+            UserLocation.pinCode=address.postalCode ?: ""
+            val landmark=address.featureName
 
-            // Check if there are enough components
-            if (addressComponents.size >= 2) {
-                // The state is the second component
-                Log.d(TAG,addressComponents[1])
-            }
+            addressText = "${address.getAddressLine(0)}, ${address.locality}"
         }
 
     } catch (e: IOException) {

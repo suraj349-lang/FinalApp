@@ -10,12 +10,20 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -108,6 +116,7 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
                 R.drawable.chat_new
             ) { showQR = showDialog.OPEN }
         },
+        modifier = Modifier.windowInsetsPadding(WindowInsets.systemBars),
         bottomBar = {
             AnimatedVisibility(
                 visible = scrollBehavior.state.overlappedFraction == 0f, // Hide on scroll
@@ -117,7 +126,7 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
                 BottomBar(
                     navController = navController,
                     state = buttonsVisible,
-                    modifier = Modifier.height(30.dp)
+                    modifier = Modifier.height(30.dp).navigationBarsPadding()
                 )
             }
         },
@@ -209,7 +218,7 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
                     HorizontalPager(
                         state = pagerState,
                         modifier = Modifier
-                            .fillMaxWidth()
+                            .fillMaxWidth().imePadding()
                     ) { page ->
                         when (page) {
                             0 -> ActiveEvents(eventsViewModel = eventsViewModel, videos = listOf("1","2","3","4","5","6"),)//PublicLivePost(videos = listOf("1","2","3","4","5","6") )//PrivateLivePost(videos = listOf("1","2","3","4","5","6") )//LivePosts( scrollBehavior,eventsViewModel, offersList, padding)
