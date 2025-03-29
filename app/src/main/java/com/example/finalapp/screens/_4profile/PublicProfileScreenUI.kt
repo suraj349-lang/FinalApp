@@ -187,7 +187,7 @@ fun PublicProfileScreenUI(navController: NavHostController,authViewModel:AuthVie
             }
             Column(modifier = Modifier.padding(start = 16.dp,end=16.dp,top=10.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 MyLiveEvents(){
-                    navController.navigate(SCREENS.CREATE_EVENT.route)
+//                    navController.navigate(SCREENS.CREATE_EVENT.route)
                 }
                 RecentDrops(){
                     showCustomDialog=!showCustomDialog

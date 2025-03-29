@@ -152,7 +152,7 @@ dependencies {
     // Swipe refresh
     implementation 'com.google.accompanist:accompanist-swiperefresh:0.24.13-rc'
 
-
-
+    //image cropper
+    implementation("com.vanniktech:android-image-cropper:4.5.0")
 
 }

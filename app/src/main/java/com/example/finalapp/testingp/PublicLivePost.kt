@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.modifier.modifierLocalProvider
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -34,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
+import com.example.finalapp.screens._1home.utils.shareDeepLink
 import com.example.finalapp.ui.theme.PURPLE
 import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
@@ -80,6 +82,7 @@ fun PublicActiveEvent(index:Int,height:Boolean,imageUrls: List<String>) {
     var height by remember {
         mutableStateOf(height)
     }
+    val context= LocalContext.current
     var image by remember {
         mutableStateOf(imageUrls.get(0))
     }
@@ -92,7 +95,7 @@ fun PublicActiveEvent(index:Int,height:Boolean,imageUrls: List<String>) {
         .padding(4.dp)
         .border(width = 1.dp, color = Color.LightGray)) {
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().imePadding(),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -133,7 +136,9 @@ fun PublicActiveEvent(index:Int,height:Boolean,imageUrls: List<String>) {
                     backgroundColor = Color(0xFF110107).copy(alpha = 0.2f),
                     shape = CircleShape, elevation = 0.dp
                 ) {
-                    ShareIcon()
+                    ShareIcon(){
+                        shareDeepLink(context,"0808-dfbsdj-sddgfj3") // TODO postId to be mended again
+                    }
                 }
                 Card(
                     modifier = Modifier

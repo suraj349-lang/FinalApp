@@ -45,8 +45,14 @@
             android:theme="@style/Theme.FinalApp">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="social" android:host="post" />
             </intent-filter>
         </activity>
         <provider
@@ -56,10 +62,8 @@
             android:grantUriPermissions="true">
             <meta-data
                 android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/path_provider"
+                android:resource="@xml/filepaths"
                 />
-
-
         </provider>
     </application>
 

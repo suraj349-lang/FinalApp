@@ -62,7 +62,7 @@ fun PastRaisedOffer(authViewModel: AuthViewModel, eventsViewModel: EventsViewMod
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { navController.navigate(SCREENS.CREATE_EVENT.route) },Modifier.size(75.dp), backgroundColor = Color.White, contentColor = Color.Black) {
+            FloatingActionButton(onClick = { navController.navigate("") },Modifier.size(75.dp), backgroundColor = Color.White, contentColor = Color.Black) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "", modifier = Modifier.size(40.dp))
 
 

@@ -12,3 +12,4 @@ val TAB_ITEMS = listOf(
     TabItem("Nearby"),
     TabItem("Dropzone")
 )
+const val imagePickerText="Click to capture or choose an image!"

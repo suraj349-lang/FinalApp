@@ -71,8 +71,10 @@ import com.example.finalapp.screens.dialogBox.DialogLoading
 import com.example.finalapp.viewmodels.EventsViewModel
 import com.example.finalapp.screens.dialogBox.GalleryPickerForDropProfile
 import com.example.finalapp.screens.dialogBox.ImageCaptureFromCameraForDropProfile
+import com.example.finalapp.ui.imagePickerText
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.ui.theme.topAppBarTextColor
+import com.example.finalapp.utils.AppIcons
 import java.io.File
 
 
@@ -359,7 +361,7 @@ fun CreateEvent(
                                             horizontalArrangement = Arrangement.Center
                                         ) {
                                             Text(
-                                                text = "Choose from Camera / Gallery.",
+                                                text = imagePickerText,
                                                 fontSize = 16.sp,
                                                 fontWeight = FontWeight.SemiBold,
                                                 color = Color.Black
@@ -379,7 +381,7 @@ fun CreateEvent(
                                                     horizontalAlignment = Alignment.CenterHorizontally,
                                                     modifier = Modifier.fillMaxSize()
                                                 ) {
-                                                    Image(painterResource(id = R.drawable.camera),
+                                                    Image(painterResource(id =AppIcons.CAMERA_ICON),
                                                         contentDescription = "",
                                                         modifier = Modifier
                                                             .size(50.dp)
@@ -395,7 +397,7 @@ fun CreateEvent(
                                                     horizontalAlignment = Alignment.CenterHorizontally,
                                                     modifier = Modifier.fillMaxSize()
                                                 ) {
-                                                    Image(painterResource(id = R.drawable.gallery),
+                                                    Image(painterResource(id =AppIcons.GALLERY_ICON),
                                                         contentDescription = "",
                                                         modifier = Modifier
                                                             .size(50.dp)

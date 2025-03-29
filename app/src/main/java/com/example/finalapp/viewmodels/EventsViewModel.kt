@@ -34,6 +34,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
@@ -91,6 +92,9 @@ class EventsViewModel @Inject constructor(private val eventsRepository: EventsRe
         ).flow.cachedIn(viewModelScope)
 
     }
+    fun emptyNearByUsersList(){
+        nearByUserResponse.value=flowOf(PagingData.empty());
+    }
 //    fun getNearByUsers(lat:Double, long: Double)=viewModelScope.launch(Dispatchers.IO) {
 //        eventsRepository.getAllDirectChatUsers(lat,long)
 //            .onStart {
@@ -120,6 +124,7 @@ class EventsViewModel @Inject constructor(private val eventsRepository: EventsRe
     fun setDirectChatRequestStateToSuccess(){
         directChatRequestState.value=RequestState.Success("")
     }
+
 
 //----------------------------------------------------------------------------------------------------------------------------------//
 

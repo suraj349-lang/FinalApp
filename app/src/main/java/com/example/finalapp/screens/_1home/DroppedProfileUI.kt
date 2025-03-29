@@ -24,7 +24,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Surface
 import androidx.compose.ui.Alignment
@@ -70,13 +69,11 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
-import com.example.finalapp.model.DropProfileModel
 import com.example.finalapp.model.DropProfileResponse
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens.dialogBox.DialogLoading
 import com.example.finalapp.ui.imagePrefix
 import com.example.finalapp.ui.theme.floatingActionBtnColor
-import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
 import com.example.finalapp.utils.constants.Constants.DONGLE_NORMAL
 import com.example.finalapp.utils.testdata.Item
 import kotlinx.coroutines.launch
@@ -84,7 +81,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DroppedProfilesNew(
+fun DroppedProfilesUI(
     scrollBehavior: TopAppBarScrollBehavior,
     navController: NavHostController,
     eventsViewModel: EventsViewModel,
@@ -240,7 +237,7 @@ fun DroppedProfilesNew(
                     }
                 }
             }else{
-                val droppedProfiles = droppedProfiles!!.collectAsLazyPagingItems()
+                val droppedProfilesList = droppedProfiles!!.collectAsLazyPagingItems()
                 Column(
                     modifier = Modifier
                         .zIndex(0f)
@@ -253,8 +250,8 @@ fun DroppedProfilesNew(
                         columns = StaggeredGridCells.Fixed(2),
                         contentPadding = PaddingValues(2.dp),
                     ) {
-                        items(droppedProfiles.itemCount) { index ->
-                            val item = droppedProfiles[index]
+                        items(droppedProfilesList.itemCount) { index ->
+                            val item = droppedProfilesList[index]
                             if (item != null) {
                                 DroppedProfile(item){
                                     Log.d("DropProfileTesting", "DroppedProfilesNew:callback called ")
@@ -273,7 +270,7 @@ fun DroppedProfilesNew(
                                 }
                             }
                         }
-                        droppedProfiles.apply {
+                        droppedProfilesList.apply {
                             when {
                                 loadState.refresh is LoadState.Loading -> {
                                     item {

@@ -58,7 +58,7 @@ fun TrendingScreen(navController:NavHostController) {
                 navController = navController,
                 state = buttonsVisible,
                 modifier = Modifier.height(45.dp)
-            )
+            ){}
         }
     ) {
         Surface(modifier = Modifier

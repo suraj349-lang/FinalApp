@@ -58,6 +58,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
@@ -100,7 +101,11 @@ fun DirectChatScreen(
             eventsViewModel.checked.value=!checked
             eventsViewModel.shareChatFunction(DirectChatRequest( "677b4df1842c1c465293fc2f",authViewModel.latitude.value,authViewModel.longitude.value))
         }
-        eventsViewModel.shareProfileClicked.value=false
+        else {
+           // eventsViewModel.emptyNearByUsersList()
+        }
+        eventsViewModel.shareProfileClicked.value = false
+
     }
     Scaffold(
         content = { paddingValues ->
@@ -181,17 +186,30 @@ fun DirectChatProfiles(scrollBehavior: TopAppBarScrollBehavior, nearByUsersList:
                 }
 
             }
+            nearbyUsers.apply {
+                when {
+                    loadState.refresh is LoadState.Loading -> {
+                        item { DialogLoading() }
+                    }
+                    loadState.append is LoadState.Loading -> {
+                        item { DialogLoading() }
+                    }
+                    loadState.refresh is LoadState.Error -> {
+                        val error = (loadState.refresh as LoadState.Error).error
+                        item {
+                            Text(
+                                text = "Error: ${error.message}",
+                                color = Color.Red,
+                                fontFamily = DONGLE_BOLD
+                            )
+                        }
+                    }
+                }
+            }
         }
+
     }
 }
-/*
- items(droppedProfiles.itemCount) { index ->
-                            val item = droppedProfiles[index]
-                            if (item != null) {
-                                DroppedProfile(item)
-                            }
-                        }
- */
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
@@ -284,7 +302,9 @@ fun ShareProfileForDirectChat(onShareProfileClicked:()->Unit) {
                 ), elevation = CardDefaults.cardElevation(100.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-                    Row(modifier = Modifier.fillMaxWidth().padding(bottom = 10.dp), verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Row(modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 10.dp), verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                         Image(painter = painterResource(id = R.drawable.location_new), contentDescription ="", modifier = Modifier.size(30.dp) )
                         UserLocation.street?.let { Text(text = it, fontFamily = DONGLE_BOLD, fontSize =20.sp, color = Color.Black) }
                     }

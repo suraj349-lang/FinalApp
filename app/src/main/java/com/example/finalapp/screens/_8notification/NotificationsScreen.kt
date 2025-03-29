@@ -34,7 +34,7 @@ fun NotificationsScreenUI(navController:NavHostController){
             false,
             R.drawable.settings
         ) },
-        bottomBar = { BottomBar(navController =navController , state = buttonVisible,modifier = Modifier.height(45.dp)) }
+        bottomBar = { BottomBar(navController =navController , state = buttonVisible,modifier = Modifier.height(45.dp)){} }
     ) {
         Surface(Modifier.fillMaxSize()) {
             ChatScreenUIFCM()

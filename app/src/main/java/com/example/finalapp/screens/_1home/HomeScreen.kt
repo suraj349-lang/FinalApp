@@ -11,13 +11,10 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.consumeWindowInsets
-import androidx.compose.foundation.layout.exclude
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -66,12 +63,12 @@ import com.example.finalapp.R
 import com.example.finalapp.viewmodels.AuthViewModel
 import com.example.finalapp.screens._1home.utils.HomeFloatingActionButton
 import com.example.finalapp.screens._1home.utils.HomeTopBar
+import com.example.finalapp.screens._3createEvent.CreateEventBottomSheet
 import com.example.finalapp.viewmodels.EventsViewModel
 import com.example.finalapp.screens.dialogBox.ShowQRDialog
 import com.example.finalapp.screens.dialogBox.showDialog
 import com.example.finalapp.testing.items
 import com.example.finalapp.testingp.ActiveEvents
-import com.example.finalapp.testingp.PublicLivePost
 import com.example.finalapp.ui.TAB_ITEMS
 import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.viewmodels.ImageUploadViewModel
@@ -103,6 +100,9 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
     }
 
     val pagerState = rememberPagerState(0, pageCount = { 3 })
+    var showSheet by remember {
+        mutableStateOf(false)
+    }
 
 
     Scaffold(
@@ -126,8 +126,11 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
                 BottomBar(
                     navController = navController,
                     state = buttonsVisible,
-                    modifier = Modifier.height(30.dp).navigationBarsPadding()
-                )
+                    modifier = Modifier
+                        .height(30.dp)
+                        .navigationBarsPadding()){
+                           showSheet=true
+                        }
             }
         },
         floatingActionButton = {
@@ -194,7 +197,8 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
                             )
                         },
                         backgroundColor = Color.Transparent,
-                        modifier = Modifier.border(width = 0.dp, color = Color.White)
+                        modifier = Modifier
+                            .border(width = 0.dp, color = Color.White)
                             .padding(bottom = 0.dp)
                             .fillMaxWidth()
                             .height(35.dp)
@@ -218,12 +222,13 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
                     HorizontalPager(
                         state = pagerState,
                         modifier = Modifier
-                            .fillMaxWidth().imePadding()
+                            .fillMaxWidth()
+                            .imePadding()
                     ) { page ->
                         when (page) {
-                            0 -> ActiveEvents(eventsViewModel = eventsViewModel, videos = listOf("1","2","3","4","5","6"),)//PublicLivePost(videos = listOf("1","2","3","4","5","6") )//PrivateLivePost(videos = listOf("1","2","3","4","5","6") )//LivePosts( scrollBehavior,eventsViewModel, offersList, padding)
+                            0 -> ActiveEvents(eventsViewModel = eventsViewModel, videos = listOf("1","2","3","4","5","6"), navController = navController)//PublicLivePost(videos = listOf("1","2","3","4","5","6") )//PrivateLivePost(videos = listOf("1","2","3","4","5","6") )//LivePosts( scrollBehavior,eventsViewModel, offersList, padding)
                             1 -> DirectChatScreen(scrollBehavior,authViewModel,eventsViewModel,navController)
-                            2 -> DroppedProfilesNew(scrollBehavior,navController ,eventsViewModel)
+                            2 -> DroppedProfilesUI(scrollBehavior,navController ,eventsViewModel)
                                 //DroppedProfiles(navController = navController, eventsViewModel = eventsViewModel)
                         }
                     }
@@ -231,5 +236,10 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
             }
         }
     }
+    CreateEventBottomSheet(
+        showSheet = showSheet,
+        onDismiss = { showSheet = false },
+        navHostController = navController
+    )
 }
 

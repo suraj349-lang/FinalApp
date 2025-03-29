@@ -46,7 +46,7 @@ sealed class Destinations(
         name = "Trending"
     )
     object CreateEvent : Destinations(
-        route = SCREENS.CREATE_EVENT.route,
+        route = "",
         icon = R.drawable.create_event_new,
         name = "Create Event"
     )
@@ -67,8 +67,7 @@ sealed class Destinations(
 
 @Composable
 fun BottomBar(
-    navController: NavHostController, state: MutableState<Boolean>, modifier: Modifier = Modifier
-) {
+    navController: NavHostController, state: MutableState<Boolean>, modifier: Modifier = Modifier, onCreateEventClick: () -> Unit={}) {
     val screens = listOf(
         Destinations.HomeScreen, Destinations.Trending,Destinations.CreateEvent,Destinations.ProfileScreen,Destinations.Settings
     )
@@ -87,16 +86,13 @@ fun BottomBar(
 
                 },
                 onClick = {
-                    if(currentRoute!=screen.route) {
-                        navController.navigate(screen.route)
+                    if (screen == Destinations.CreateEvent) {
+                        onCreateEventClick()
+                    } else {
+                        if (currentRoute != screen.route) {
+                            navController.navigate(screen.route)
+                        }
                     }
-//                    {
-//                        popUpTo(navController.graph.findStartDestination().id) {
-//                            saveState = true
-//                        }
-//                        launchSingleTop = true
-//                        restoreState = true
-//                    }
                 },
                 colors = NavigationBarItemDefaults.colors(
                     indicatorColor = Color.Transparent

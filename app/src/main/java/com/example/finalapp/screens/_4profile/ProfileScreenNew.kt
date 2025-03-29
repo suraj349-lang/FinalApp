@@ -1,5 +1,6 @@
 package com.example.finalapp.screens._4profile
 
+import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -56,15 +57,21 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
 import com.example.finalapp.database.Profile
 import com.example.finalapp.navigation.SCREENS
+import com.example.finalapp.screens._3createEvent.CreateEventBottomSheet
 import com.example.finalapp.screens.dialogBox.DialogError
 import com.example.finalapp.screens.dialogBox.DialogLoading
 import com.example.finalapp.screens.dialogBox.DropProfileDialog
+import com.example.finalapp.screens.dialogBox.GalleryPickerForDropProfile
+import com.example.finalapp.screens.dialogBox.ImageCaptureFromCameraForDropProfile
+import com.example.finalapp.ui.theme.PURPLE
 import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.utils.ProfileObject
 import com.example.finalapp.utils.RequestState
 import com.example.finalapp.viewmodels.AuthViewModel
 import com.example.finalapp.viewmodels.EventsViewModel
 import com.example.finalapp.viewmodels.ImageUploadViewModel
+import java.io.File
+import java.net.URI
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
@@ -72,6 +79,26 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
     var showCustomDialog by remember {
         mutableStateOf(false)
     }
+    var showSheetForImageUpdate by remember {
+        mutableStateOf(false)
+    }
+    var showSheet by remember {
+        mutableStateOf(false)
+    }
+    var temporaryImage by remember {
+        mutableStateOf(ProfileObject.profile?.profileImage)
+    }
+    var cameraDialog by remember {
+        mutableStateOf(false)
+    }
+    var galleryDialog by remember {
+        mutableStateOf(false)
+    }
+    var imageUri by remember {
+        mutableStateOf(Uri.EMPTY)
+    }
+    var imageFile by mutableStateOf<File?>(null)
+
     if (showCustomDialog) {
         DropProfileDialog(authViewModel ,eventsViewModel , imageUploadViewModel ,navController ) { showCustomDialog = !showCustomDialog }
         Log.d("Suraj", "Profile Screen : Drop Profile ")
@@ -84,14 +111,14 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)
-                    .background(color = floatingActionBtnColor) //Color(0xFFE4EE05)
+                    .background(color = PURPLE) //Color(0xFFE4EE05)
             ) {
                 Box(modifier = Modifier
                     .fillMaxSize()
                     .background(
                         brush = Brush.verticalGradient(
                             colors = listOf(
-                                Color.Transparent, Color(0xFF1B1A1A)
+                                Color.Transparent, Color(0xFFDA598D) // 0xFF1B1A1A
                             ), startY = 0f, endY = 600f
                         )
                     )) {
@@ -128,7 +155,9 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                                 horizontalArrangement = Arrangement.Start
                             ) {
                                 Card(
-                                    modifier = Modifier.size(60.dp),
+                                    modifier = Modifier
+                                        .size(60.dp)
+                                        .clickable { showSheetForImageUpdate = true },
                                     shape = RoundedCornerShape(12.dp),
                                     border = BorderStroke(1.dp, color = Color.Black),
                                     elevation = 20.dp
@@ -182,7 +211,7 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                                     .fillMaxWidth(1f)
                                     .height(30.dp), backgroundColor = Color.White.copy(alpha = 0.5f),shape = RoundedCornerShape(30.dp)) {
                                     Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-                                        Text(text = "Public Profile", color = Color.White, fontWeight = FontWeight.Bold)
+                                        Text(text = "Edit Profile", color = Color.White, fontWeight = FontWeight.Bold)
                                     }
 
                                 }
@@ -198,7 +227,7 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
             }
             Column(modifier = Modifier.padding(start = 16.dp,end=16.dp,top=10.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 MyLiveEvents(){
-                    navController.navigate(SCREENS.CREATE_EVENT.route)
+                    showSheet=true
                 }
                 RecentDrops(){
                     showCustomDialog=!showCustomDialog
@@ -209,7 +238,28 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
         }
 
     }
+    CreateEventBottomSheet(
+        showSheet = showSheet,
+        onDismiss = {showSheet=false },
+        navHostController = navController
+    )
+    ImageUpdateBottomSheet(
+        showSheet = showSheetForImageUpdate,
+        onDismiss = {showSheetForImageUpdate=false },
+        temporaryImage,
+        navHostController = navController
+    )
+//    ImageUpdateDialogBox(
+//        showSheet=showSheetForImageUpdate,
+//        onDismiss = {showSheetForImageUpdate=false},
+//        temporaryImage,
+//        onCameraClicked = {cameraDialog=true},
+//        onGalleryClicked = {galleryDialog=true}
+//    )
 
+    if (cameraDialog) { ImageCaptureFromCameraForDropProfile({imageFile=it}){imageUri=it} }
+    if(galleryDialog) GalleryPickerForDropProfile(navController = navController,{imageFile=it}) { imageUri = it }
+    if(imageUri!=Uri.EMPTY) navController.navigate(SCREENS.IMAGE_CROPPER.route)
 }
 
 

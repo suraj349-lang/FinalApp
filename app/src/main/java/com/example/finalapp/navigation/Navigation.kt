@@ -29,6 +29,7 @@ import com.example.finalapp.screens._1home.HomeScreenUI
 import com.example.finalapp.screens._8notification.NotificationsScreenUI
 import com.example.finalapp.screens._2search.TrendingScreen
 import com.example.finalapp.screens._3createEvent.CreateEvent
+import com.example.finalapp.screens._3createEvent.CreateEventBottomSheet
 import com.example.finalapp.screens._5settings.SettingsScreenUI
 import com.example.finalapp.testing.TabView
 import com.example.finalapp.screens._3createEvent.PastRaisedOffer
@@ -53,6 +54,8 @@ import com.example.finalapp.screens._5settings.SafetyAndPrivacy
 import com.example.finalapp.screens._5settings.SafetyCentre
 import com.example.finalapp.screens._5settings.SavedLoginInfo
 import com.example.finalapp.screens._5settings.TermsOfService
+import com.example.finalapp.screens.common.AutoImageCropper
+import com.example.finalapp.screens.common.ImageCropperScreen
 import com.example.finalapp.screens.onboarding.screen.WelcomeScreen
 import com.example.finalapp.testingp.Tiktok
 import com.example.finalapp.viewmodels.ImageUploadViewModel
@@ -80,7 +83,8 @@ sealed class SCREENS(val route:String){
     object ALL_USERS:SCREENS("all_users")
     object SEARCH:SCREENS("search")
     object DROP_PROFILE:SCREENS("drop_profile")
-    object CREATE_EVENT:SCREENS("create_event")
+    object CREATE_EVENT_PRIVATE:SCREENS("create_event_private")
+    object CREATE_EVENT_PUBLIC:SCREENS("create_event_public")
     object PAST_OFFERS:SCREENS("past_offers")
     object TABVIEW:SCREENS("tab_view")
     object TIKTOK:SCREENS("tiktok")
@@ -91,6 +95,7 @@ sealed class SCREENS(val route:String){
             return "drop_profile_user_profile/$profileJson"
         }
     }
+    object IMAGE_CROPPER:SCREENS("auto_image_cropper")
     //-----------------SETTINGS-------------------------------------------------------------------------------------------
     object EDIT_NAME:SCREENS("edit_name")
     object EDIT_USER_NAME:SCREENS("edit_user_name")
@@ -188,12 +193,10 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
             //todo for testing purpose
             TabView(navController,imageUploadViewModel,authViewModel)
         }
-
-        composable(SCREENS.CREATE_EVENT.route) {
+        composable(SCREENS.CREATE_EVENT_PRIVATE.route) {
             CreateEvent(eventsViewModel, navController)
         }
-
-        composable(SCREENS.PREMIUM_CREATE_EVENT.route) {
+        composable(SCREENS.CREATE_EVENT_PUBLIC.route) {
             PremiumCreateEvent(authViewModel, eventsViewModel, navController)
         }
         composable(SCREENS.TIKTOK.route){
@@ -265,6 +268,9 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
         }
         composable(SCREENS.LOG_OUT.route){
             Logout(navController = navController)
+        }
+        composable(SCREENS.IMAGE_CROPPER.route){
+            AutoImageCropper()
         }
 
     }

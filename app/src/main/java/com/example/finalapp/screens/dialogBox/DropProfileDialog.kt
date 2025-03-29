@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -57,6 +58,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -71,11 +73,14 @@ import com.example.finalapp.R
 import com.example.finalapp.model.DropProfileModel
 import com.example.finalapp.screens._1home.utils.OfferResponseDataAndAction
 import com.example.finalapp.screens._4profile.createImageFile
+import com.example.finalapp.ui.imagePickerText
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.ui.theme.topAppBarTextColor
 import com.example.finalapp.utils.ProfileObject
 import com.example.finalapp.utils.RequestState
+import com.example.finalapp.utils.UserLocation
 import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
+import com.example.finalapp.utils.constants.Constants.DONGLE_LIGHT
 import com.example.finalapp.viewmodels.AuthViewModel
 import com.example.finalapp.viewmodels.EventsViewModel
 import com.example.finalapp.viewmodels.ImageUploadViewModel
@@ -145,14 +150,17 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                     ))
                 {
                     Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
-                        Image(painter = painterResource(id = R.drawable.app_icon), contentDescription ="app icon", modifier = Modifier
-                            .size(40.dp)
-                            .padding(start = 8.dp, end = 8.dp) , colorFilter = ColorFilter.tint(//topAppBarTextColor
-                            Color.White))
-                        Text(text = "Drop Profile", modifier = Modifier.fillMaxWidth(), color = Color.White, fontSize = 24.sp,textAlign = TextAlign.Start, fontFamily = DONGLE_BOLD)
+                        Image(painter = painterResource(id = R.drawable.app_icon), contentDescription ="app icon", modifier = Modifier.size(40.dp).padding(start = 8.dp, end = 8.dp) , colorFilter = ColorFilter.tint(Color.White))
+                        Text(
+                            text = "Drop Profile",
+                            modifier = Modifier.fillMaxWidth(),
+                            color = Color.White,
+                            fontSize = 28.sp,
+                            textAlign = TextAlign.Start,
+                            fontFamily = DONGLE_BOLD,
+                            lineHeight = 26.sp // Adjust line height if needed
+                        )
                     }
-
-
                 }
 
                 Card(
@@ -192,7 +200,7 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                                         horizontalArrangement = Arrangement.Center
                                     ) {
                                         Text(
-                                            text = "Choose from Camera / Gallery.",
+                                            text = imagePickerText,
                                             fontSize = 24.sp,
                                             fontWeight = FontWeight.SemiBold,
                                             color = Color.Black,
@@ -213,7 +221,7 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                                                 horizontalAlignment = Alignment.CenterHorizontally,
                                                 modifier = Modifier.fillMaxSize()
                                             ) {
-                                                Image(painterResource(id = R.drawable.cameranew),
+                                                Image(painterResource(id = R.drawable.camera_colored),
                                                     contentDescription = "",
                                                     modifier = Modifier
                                                         .size(50.dp)
@@ -229,10 +237,10 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                                                 horizontalAlignment = Alignment.CenterHorizontally,
                                                 modifier = Modifier.fillMaxSize()
                                             ) {
-                                                Image(painterResource(id = R.drawable.gallery_new),
+                                                Image(painterResource(id = R.drawable.gallery_colored),
                                                     contentDescription = "",
                                                     modifier = Modifier
-                                                        .size(50.dp)
+                                                        .size(55.dp)
                                                         .clickable {
                                                             keyForGallery = 1
 
@@ -351,6 +359,7 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                         )
                     ) {
                         Text(text = "Drop Profile", fontFamily = DONGLE_BOLD, fontSize = 22.sp)
+
                     }
 
                     when (dropProfileState){
@@ -376,6 +385,23 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
 
             }
         }
+    }
+}
+
+
+@Composable
+fun UserLocationUI() {
+    Row(modifier = Modifier
+        .fillMaxWidth()
+        .height(20.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+       // Image(painter = painterResource(id = R.drawable.location_new), contentDescription ="", modifier = Modifier.size(18.dp) )
+        UserLocation.street?.let {
+            Text(
+                it,fontFamily = DONGLE_BOLD, overflow = TextOverflow.Ellipsis, maxLines = 1,modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 15.dp), fontSize = 20.sp, color = Color.DarkGray, textAlign = TextAlign.Start)
+        }
+
     }
 }
 
