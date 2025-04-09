@@ -60,6 +60,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.finalapp.R
+import com.example.finalapp.screens._1home.events.ActiveEvents
 import com.example.finalapp.viewmodels.AuthViewModel
 import com.example.finalapp.screens._1home.utils.HomeFloatingActionButton
 import com.example.finalapp.screens._1home.utils.HomeTopBar
@@ -68,7 +69,6 @@ import com.example.finalapp.viewmodels.EventsViewModel
 import com.example.finalapp.screens.dialogBox.ShowQRDialog
 import com.example.finalapp.screens.dialogBox.showDialog
 import com.example.finalapp.testing.items
-import com.example.finalapp.testingp.ActiveEvents
 import com.example.finalapp.ui.TAB_ITEMS
 import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.viewmodels.ImageUploadViewModel

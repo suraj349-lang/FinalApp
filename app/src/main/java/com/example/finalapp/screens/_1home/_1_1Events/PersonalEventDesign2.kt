@@ -49,7 +49,7 @@ import com.example.finalapp.utils.constants.Constants
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun PersonalEventDesign2(offer: OfferModel) {
+fun PersonalEventDesign3(offer: OfferModel) {
     Surface(modifier = Modifier.fillMaxSize()) {
         Box(
             modifier = Modifier

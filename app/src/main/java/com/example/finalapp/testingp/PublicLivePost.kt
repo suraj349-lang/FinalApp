@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
+import com.example.finalapp.screens._1home._1_1Events.CommentBottomSheet
 import com.example.finalapp.screens._1home.utils.shareDeepLink
 import com.example.finalapp.ui.theme.PURPLE
 import com.example.finalapp.ui.theme.floatingActionBtnColor
@@ -89,13 +90,18 @@ fun PublicActiveEvent(index:Int,height:Boolean,imageUrls: List<String>) {
     var index by remember {
         mutableStateOf(index)
     }
+    var showBottomSheet by remember {
+        mutableStateOf(false)
+    }
 
     Box(modifier = Modifier
         .fillMaxSize()
         .padding(4.dp)
         .border(width = 1.dp, color = Color.LightGray)) {
         Column(
-            modifier = Modifier.fillMaxSize().imePadding(),
+            modifier = Modifier
+                .fillMaxSize()
+                .imePadding(),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -211,24 +217,29 @@ fun PublicActiveEvent(index:Int,height:Boolean,imageUrls: List<String>) {
            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(80.dp).background(Color.White)
+                    .height(80.dp)
+                    .background(Color.White)
             ) {
                 UserReactions(imageUrls) { image = it }
             }
-            AddCommentOnPost(){}
+            AddCommentOnPost(){showBottomSheet=!showBottomSheet}
             EventComments()
 
         }
+    }
+    CommentBottomSheet(showSheet = showBottomSheet) {
+        showBottomSheet=false
     }
 
 }
 
 @Composable
-fun AddCommentOnPost(onCommentClicked: (String) -> Unit) {
+fun AddCommentOnPost(onCommentClicked: () -> Unit) {
     val comment by remember {
         mutableStateOf("")
     }
-    Box(modifier = Modifier.padding(top=8.dp)
+    Box(modifier = Modifier
+        .padding(top = 8.dp)
         .fillMaxWidth()
         .height(50.dp)
         .background(
@@ -238,7 +249,7 @@ fun AddCommentOnPost(onCommentClicked: (String) -> Unit) {
 //                    Color(0xFFF5EDF0)
 //                )
 //            )
-        Color.White
+            Color.White
         ))
     {
         Row(
@@ -259,7 +270,7 @@ fun AddCommentOnPost(onCommentClicked: (String) -> Unit) {
                 Image(painter = painterResource(id = R.drawable.people), contentDescription ="", modifier = Modifier.size(30.dp), colorFilter = ColorFilter.tint(Color.DarkGray) )
                 Text(text = "300k" , fontSize = 12.sp, fontFamily = DONGLE_NORMAL, color = Color.DarkGray)
             }
-            Column( horizontalAlignment = Alignment.CenterHorizontally) {
+            Column( horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.clickable { onCommentClicked() }) {
                 Image(painter = painterResource(id = R.drawable.comment_filled), contentDescription ="", modifier = Modifier.size(30.dp), colorFilter = ColorFilter.tint(Color.DarkGray) )
                 Text(text = "144k" , fontSize = 12.sp, fontFamily = DONGLE_NORMAL, color = Color.DarkGray)
             }
@@ -267,7 +278,7 @@ fun AddCommentOnPost(onCommentClicked: (String) -> Unit) {
                 Image(painter = painterResource(id = R.drawable.war_room), contentDescription ="", modifier = Modifier.size(30.dp),colorFilter = ColorFilter.tint(Color.DarkGray) )
                 Text(text = "100" , fontSize = 12.sp, fontFamily = DONGLE_NORMAL, color = Color.DarkGray)
             }
-            Button(onClick = { onCommentClicked(comment) }, modifier = Modifier.height(40.dp),shape= RoundedCornerShape(8.dp),colors = ButtonDefaults.buttonColors(backgroundColor = Color.DarkGray)) {
+            Button(onClick = { }, modifier = Modifier.height(40.dp),shape= RoundedCornerShape(8.dp),colors = ButtonDefaults.buttonColors(backgroundColor = Color.DarkGray)) {
                 Text(text = "+JOIN", fontFamily = DONGLE_BOLD, fontSize = 20.sp,color=Color.White)
             }
         }

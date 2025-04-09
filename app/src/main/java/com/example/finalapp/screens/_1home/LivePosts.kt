@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import com.example.finalapp.model.OfferModel
-import com.example.finalapp.screens._1home._1_1Events.PersonalEventDesign2
+import com.example.finalapp.screens._1home._1_1Events.PrivateLiveEvent1
 import com.example.finalapp.screens._1home.utils.HomeError
 import com.example.finalapp.screens.dialogBox.DialogLoading
 import com.example.finalapp.utils.RequestState
@@ -37,7 +37,7 @@ fun LivePosts(
                     Log.d("offerData", "HomeScreenUI: $offer")
                     //VectorsListScreen(offer)
                     // PersonalEvent(offer)
-                    PersonalEventDesign2(offer)
+                    //PrivateLiveEvent1(offer)
 
                 }
             }

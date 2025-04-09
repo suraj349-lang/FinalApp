@@ -9,6 +9,7 @@ object Constants {
     const val TEMP_SOCKET_URL="http://192.168.29.95:5001/";
     const val BASE_URL="http://192.168.29.95:5000/"
     const val APP_NAME="Carbon"
+    val LOGIN_METHOD=LoginMethod.EMAIL
     const val TAG= APP_NAME
     val FONT_EXTRA_LIGHT= FontFamily(Font(R.font.k2d_extralight));
     val FONT_LIGHT= FontFamily(Font(R.font.k2d_light));
@@ -16,4 +17,9 @@ object Constants {
     val DONGLE_BOLD=FontFamily(Font(R.font.dongle_bold));
     val DONGLE_NORMAL=FontFamily(Font(R.font.dongle_regular));
     val DONGLE_LIGHT=FontFamily(Font(R.font.dongle_light));
+}
+
+enum class LoginMethod {
+    EMAIL,
+    PHONE
 }

@@ -46,48 +46,7 @@ import com.example.finalapp.viewmodels.EventsViewModel
 import kotlinx.coroutines.launch
 
 
-@OptIn(ExperimentalFoundationApi::class)
-@androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
-@Composable
-fun ActiveEvents(
-    eventsViewModel: EventsViewModel,
-    modifier: Modifier = Modifier,
-    videos: List<String>,
-    initialPage: Int? = 0,
-    navController: NavHostController
 
-    ) {
-    val pagerState = rememberPagerState(initialPage = initialPage ?: 0, pageCount = { videos.size })
-    val fling = PagerDefaults.flingBehavior(
-        state = pagerState, lowVelocityAnimationSpec = tween(
-            easing = LinearEasing, durationMillis = 300
-        )
-    )
-    val index by remember {
-        mutableStateOf(0)
-    }
-    val height by remember {
-        mutableStateOf(false)
-    }
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        VerticalPager(
-            pageSize = PageSize.Fill,
-            state = pagerState,
-            flingBehavior = fling,
-            beyondBoundsPageCount = 1,//todo set to 1 to save memory
-            modifier = modifier.weight(1f)
-        ) {
-        if(it%2==0) {
-            PrivateLiveEventInUse(navController )
-        }else {
-            PublicActiveEvent(index, height, imageUrls)
-        }
-        }
-    }
-}
 @Preview(showBackground = true)
 @Composable
 fun  PrivateLiveEvent2() {
