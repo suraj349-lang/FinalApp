@@ -67,6 +67,8 @@ dependencies {
     implementation 'androidx.media3:media3-common:1.4.0-rc01'
     implementation 'com.google.firebase:firebase-storage:21.0.0'
     implementation 'androidx.security:security-crypto-ktx:1.1.0-alpha03'
+    implementation 'com.google.android.material:material:1.5.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.2.0'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.2.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
@@ -153,6 +155,8 @@ dependencies {
     implementation 'com.google.accompanist:accompanist-swiperefresh:0.24.13-rc'
 
     //image cropper
-    implementation("com.vanniktech:android-image-cropper:4.5.0")
+   /// implementation("com.vanniktech:android-image-cropper:4.5.0")
+
+    implementation("com.github.CanHub:Android-Image-Cropper:4.0.0")
 
 }

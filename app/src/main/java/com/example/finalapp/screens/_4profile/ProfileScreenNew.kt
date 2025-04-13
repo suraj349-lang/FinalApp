@@ -1,7 +1,6 @@
 package com.example.finalapp.screens._4profile
 
 import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -18,7 +17,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -27,12 +25,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
 import androidx.compose.material.Divider
-import androidx.compose.material.Icon
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,34 +39,25 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
-import com.example.finalapp.database.Profile
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens._3createEvent.CreateEventBottomSheet
-import com.example.finalapp.screens.dialogBox.DialogError
-import com.example.finalapp.screens.dialogBox.DialogLoading
 import com.example.finalapp.screens.dialogBox.DropProfileDialog
 import com.example.finalapp.screens.dialogBox.GalleryPickerForDropProfile
 import com.example.finalapp.screens.dialogBox.ImageCaptureFromCameraForDropProfile
 import com.example.finalapp.ui.theme.PURPLE
-import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.utils.ProfileObject
-import com.example.finalapp.utils.RequestState
 import com.example.finalapp.viewmodels.AuthViewModel
 import com.example.finalapp.viewmodels.EventsViewModel
 import com.example.finalapp.viewmodels.ImageUploadViewModel
 import java.io.File
-import java.net.URI
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
@@ -97,11 +83,21 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
     var imageUri by remember {
         mutableStateOf(Uri.EMPTY)
     }
+    var showImageCropper by remember {
+        mutableStateOf(false)
+    }
     var imageFile by mutableStateOf<File?>(null)
 
     if (showCustomDialog) {
         DropProfileDialog(authViewModel ,eventsViewModel , imageUploadViewModel ,navController ) { showCustomDialog = !showCustomDialog }
-        Log.d("Suraj", "Profile Screen : Drop Profile ")
+    }
+    var newUri by remember {
+        mutableStateOf(Uri.EMPTY)
+    }
+    if(showImageCropper){
+        ImageCropperAndChooser(showChooser = showImageCropper) {
+            newUri=it
+        }
     }
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier
@@ -157,13 +153,13 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                                 Card(
                                     modifier = Modifier
                                         .size(60.dp)
-                                        .clickable { showSheetForImageUpdate = true },
+                                        .clickable { showSheetForImageUpdate = true;/*showImageCropper = true*/ },
                                     shape = RoundedCornerShape(12.dp),
                                     border = BorderStroke(1.dp, color = Color.Black),
                                     elevation = 20.dp
                                 ) {
                                     GlideImage(
-                                        model= ProfileObject.profile?.profileImage,
+                                        model= if(newUri!=Uri.EMPTY)  newUri else ProfileObject.profile?.profileImage,
                                         contentDescription = "",
                                         contentScale = ContentScale.Crop
                                     )

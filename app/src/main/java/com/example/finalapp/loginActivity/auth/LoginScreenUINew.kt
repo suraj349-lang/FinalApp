@@ -1,4 +1,4 @@
-package com.example.finalapp.screens.auth
+package com.example.finalapp.loginActivity.auth
 
 import android.annotation.SuppressLint
 import android.widget.Toast

@@ -14,14 +14,14 @@ import com.example.finalapp.model.DropProfileResponse
 import com.example.finalapp.model.User
 import com.example.finalapp.viewmodels.ChatViewModel
 import com.example.finalapp.viewmodels.AuthViewModel
-import com.example.finalapp.screens.auth.util.EnterOTPScreenUI
+import com.example.finalapp.loginActivity.auth.util.EnterOTPScreenUI
 
-import com.example.finalapp.screens.auth.LoginScreenUI
-import com.example.finalapp.screens.auth.SignupScreenUI
-import com.example.finalapp.screens.auth.SplashScreenUI
-import com.example.finalapp.screens.auth.util.OtpBox
+import com.example.finalapp.loginActivity.auth.LoginScreenUI
+import com.example.finalapp.loginActivity.auth.SignupScreenUI
+import com.example.finalapp.loginActivity.auth.SplashScreenUI
+import com.example.finalapp.loginActivity.auth.util.OtpBox
 import com.example.finalapp.screens._6chat.ChatScreenUI
-import com.example.finalapp.screens.auth.FinalUserCreation
+import com.example.finalapp.loginActivity.auth.FinalUserCreation
 import com.example.finalapp.viewmodels.EventsViewModel
 import com.example.finalapp.screens._6chat.ChatListScreen
 import com.example.finalapp.screens._4profile.GalleryPicker
@@ -29,6 +29,7 @@ import com.example.finalapp.screens._1home.HomeScreenUI
 import com.example.finalapp.screens._8notification.NotificationsScreenUI
 import com.example.finalapp.screens._2search.TrendingScreen
 import com.example.finalapp.screens._3createEvent.CreateEvent
+import com.example.finalapp.screens._3createEvent.CreateEvent1
 import com.example.finalapp.screens._3createEvent.CreateEventBottomSheet
 import com.example.finalapp.screens._5settings.SettingsScreenUI
 import com.example.finalapp.testing.TabView
@@ -54,8 +55,6 @@ import com.example.finalapp.screens._5settings.SafetyAndPrivacy
 import com.example.finalapp.screens._5settings.SafetyCentre
 import com.example.finalapp.screens._5settings.SavedLoginInfo
 import com.example.finalapp.screens._5settings.TermsOfService
-import com.example.finalapp.screens.common.AutoImageCropper
-import com.example.finalapp.screens.common.ImageCropperScreen
 import com.example.finalapp.screens.onboarding.screen.WelcomeScreen
 import com.example.finalapp.testingp.Tiktok
 import com.example.finalapp.viewmodels.ImageUploadViewModel
@@ -64,66 +63,7 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-const val NavArg="name"
-sealed class SCREENS(val route:String){
-    object SPLASH:SCREENS("splash_Screen")
-    object LOGIN:SCREENS("login_Screen")
-    object SIGNUP:SCREENS("signup_screen")
-    object HOME:SCREENS("home_screen")
-    object PROFILE:SCREENS("profile_screen")
-    object OTP:SCREENS("enter-otp")
-    object FINALUSERCREATION:SCREENS("final_user_creation")
-    object SETTINGS:SCREENS("settings_screen")
-    object NOTIFICATIONS:SCREENS("notifications_screen")
-    object CHAT:SCREENS("chat_screen")
-    object SINGLE_CHAT:SCREENS("singleChat/{userNumber}")
-    object  OTP2:SCREENS("otp")
-    object GALLERY:SCREENS("gallery_picker")
-    object WELCOME:SCREENS("welcome")
-    object ALL_USERS:SCREENS("all_users")
-    object SEARCH:SCREENS("search")
-    object DROP_PROFILE:SCREENS("drop_profile")
-    object CREATE_EVENT_PRIVATE:SCREENS("create_event_private")
-    object CREATE_EVENT_PUBLIC:SCREENS("create_event_public")
-    object PAST_OFFERS:SCREENS("past_offers")
-    object TABVIEW:SCREENS("tab_view")
-    object TIKTOK:SCREENS("tiktok")
-    object PREMIUM_CREATE_EVENT:SCREENS("premium")
-    object DROP_PROFILE_USER_PROFILE:SCREENS("drop_profile_user_profile/{dropProfileResponse}"){
-        fun passProfile(dropProfileResponse: DropProfileResponse):String{
-            val profileJson=Uri.encode(Json.encodeToString(dropProfileResponse))
-            return "drop_profile_user_profile/$profileJson"
-        }
-    }
-    object IMAGE_CROPPER:SCREENS("auto_image_cropper")
-    //-----------------SETTINGS-------------------------------------------------------------------------------------------
-    object EDIT_NAME:SCREENS("edit_name")
-    object EDIT_USER_NAME:SCREENS("edit_user_name")
-    object PHONE_NUMBER:SCREENS("phone_number")
-    object PASSWORD:SCREENS("password")
-    object DELETE_ACCOUNT:SCREENS("delete_account")
 
-    //-----------------------------------------------------------------//
-    object BUGS_AND_SUGGESTION:SCREENS("bugs")
-    object SAFETY_AND_PRIVACY:SCREENS("safety")
-    object HELP_CENTRE:SCREENS("help_centre")
-    //--------------------------------------------------------------------//
-    object PRIVACY_POLICY:SCREENS("privacy_policy")
-    object SAFETY_CENTRE:SCREENS("safety_centre")
-    object TERMS_OF_SERVICE:SCREENS("terms_of_service")
-    object OTHER_LEGAL:SCREENS("other_legal")
-
-    //-----------------------------------------------------------------//
-    object CLEAR_SEARCH_HISTORY:SCREENS("clear_search_history")
-    object PERMISSIONS:SCREENS("permissions")
-    object BLOCKED_USERS:SCREENS("blocked_users")
-    object SAVED_LOGIN_INFO:SCREENS("saved_login_info")
-    object MY_DATA:SCREENS("my_data")
-    object LOG_OUT:SCREENS("log_out")
-
-
-
-}
 @OptIn(ExperimentalAnimationApi::class, ExperimentalPagerApi::class)
 @Composable
 fun Navigation(authViewModel: AuthViewModel, screen: String) {
@@ -194,7 +134,8 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
             TabView(navController,imageUploadViewModel,authViewModel)
         }
         composable(SCREENS.CREATE_EVENT_PRIVATE.route) {
-            CreateEvent(eventsViewModel, navController)
+          //  CreateEvent(eventsViewModel, navController)
+            CreateEvent1()
         }
         composable(SCREENS.CREATE_EVENT_PUBLIC.route) {
             PremiumCreateEvent(authViewModel, eventsViewModel, navController)
@@ -269,9 +210,9 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
         composable(SCREENS.LOG_OUT.route){
             Logout(navController = navController)
         }
-        composable(SCREENS.IMAGE_CROPPER.route){
-            AutoImageCropper()
-        }
+//        composable(SCREENS.IMAGE_CROPPER.route){
+//            AutoImageCropper()
+//        }
 
     }
 

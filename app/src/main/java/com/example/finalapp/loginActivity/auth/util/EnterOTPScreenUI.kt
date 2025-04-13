@@ -1,4 +1,4 @@
-package com.example.finalapp.screens.auth.util
+package com.example.finalapp.loginActivity.auth.util
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement

@@ -53,6 +53,7 @@ fun CreateEventBottomSheet(  showSheet: Boolean,
                 Spacer(Modifier.height(8.dp))
 
                 Button(onClick = {
+                  //  navHostController.navigate(SCREENS.CREATE_EVENT_PRIVATE.route)
                     navHostController.navigate(SCREENS.CREATE_EVENT_PRIVATE.route)
                     onDismiss()
                 }, modifier = Modifier

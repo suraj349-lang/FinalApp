@@ -1,4 +1,4 @@
-package com.example.finalapp.screens.auth.util
+package com.example.finalapp.loginActivity.auth.util
 
 import android.graphics.Rect
 import android.view.ViewTreeObserver

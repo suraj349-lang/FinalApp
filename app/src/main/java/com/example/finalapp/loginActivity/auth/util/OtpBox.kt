@@ -1,4 +1,4 @@
-package com.example.finalapp.screens.auth.util
+package com.example.finalapp.loginActivity.auth.util
 
 import android.annotation.SuppressLint
 import android.util.Log

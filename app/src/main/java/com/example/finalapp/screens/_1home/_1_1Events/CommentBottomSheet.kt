@@ -41,68 +41,6 @@ import com.example.finalapp.utils.ProfileObject
 import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
 import com.example.finalapp.utils.constants.Constants.DONGLE_LIGHT
 
-//
-//@OptIn(ExperimentalMaterial3Api::class)
-//@Composable
-//fun CommentBottomSheet(
-//    showSheet: Boolean,
-//    onDismiss: () -> Unit
-//) {
-//    if (showSheet) {
-//        ModalBottomSheet(
-//            onDismissRequest = { onDismiss() },
-//            modifier = Modifier
-//                .fillMaxHeight(0.9f) // 90% of screen height
-//        ) {
-//            Box(
-//                modifier = Modifier
-//                    .fillMaxSize()
-//            ) {
-//                // Scrollable Comment List
-//                LazyColumn(
-//                    modifier = Modifier
-//                        .fillMaxSize()
-//                        .padding(bottom = 80.dp) // Leaves space for input field
-//                        .padding(horizontal = 16.dp)
-//                ) {
-//                    items(20) {
-//                        Text(
-//                            text = "Testing comment",
-//                            fontFamily = DONGLE_BOLD,
-//                            fontSize = 20.sp,
-//                            modifier = Modifier.padding(16.dp)
-//                        )
-//                    }
-//                }
-//
-//                // Fixed Input Row at Bottom
-//                Row(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .align(Alignment.BottomCenter) // Sticks to bottom
-//                        .background(Color.White)
-//                        .padding(horizontal = 16.dp, vertical = 8.dp)
-//                        .imePadding() // Pushes up when keyboard appears
-//                        .navigationBarsPadding(), // Keeps above system buttons
-//                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-//                    verticalAlignment = Alignment.CenterVertically
-//                ) {
-//                    OutlinedTextField(
-//                        value = "",
-//                        onValueChange = {},
-//                        modifier = Modifier.weight(1f)
-//                    )
-//                    Button(
-//                        onClick = { /* TODO: Handle comment */ },
-//                        colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray)
-//                    ) {
-//                        Text(text = "Comment", fontSize = 20.sp, fontFamily = DONGLE_BOLD, color = Color.White)
-//                    }
-//                }
-//            }
-//        }
-//    }
-//}
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
 @Composable

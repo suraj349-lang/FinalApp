@@ -28,7 +28,7 @@ import coil.compose.rememberAsyncImagePainter
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 
-
+/*
 @Composable
 fun AutoImageCropper() {
     val context = LocalContext.current
@@ -75,3 +75,4 @@ fun AutoImageCropper() {
         }
     }
 }
+*/

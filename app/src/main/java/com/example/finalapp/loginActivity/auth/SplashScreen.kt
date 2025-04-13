@@ -1,4 +1,4 @@
-package com.example.finalapp.screens.auth
+package com.example.finalapp.loginActivity.auth
 
 import android.view.animation.OvershootInterpolator
 import androidx.compose.animation.core.Animatable
