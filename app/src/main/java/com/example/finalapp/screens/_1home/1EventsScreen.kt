@@ -1,0 +1,97 @@
+package com.example.finalapp.screens._1home
+
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.pager.PageSize
+import androidx.compose.foundation.pager.PagerDefaults
+import androidx.compose.foundation.pager.VerticalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.navigation.NavHostController
+import com.example.finalapp.R
+import com.example.finalapp.model.EventRequestDTO
+import com.example.finalapp.model.EventResponse
+import com.example.finalapp.screens._1home.commonUI.HomeError
+import com.example.finalapp.screens._1home.privateEvent.PrivateEvent
+import com.example.finalapp.screens._1home.publicEvent.PublicEvent
+import com.example.finalapp.screens.common.NoDataFound
+import com.example.finalapp.screens.dialogBox.DialogLoading
+import com.example.finalapp.testingDataAndScreen.imageUrls
+import com.example.finalapp.utils.RequestState
+import com.example.finalapp.viewmodels.EventsViewModel
+
+@OptIn(ExperimentalFoundationApi::class)
+@androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
+@Composable
+fun EventsScreen(
+    eventsViewModel: EventsViewModel,
+    modifier: Modifier = Modifier,
+    initialPage: Int? = 0,
+    navController: NavHostController
+) {
+    val pagerState = rememberPagerState(
+        initialPage = initialPage ?: 0,
+        pageCount = { (eventsViewModel.eventsListResponse.value as? RequestState.Success<List<EventRequestDTO>>)?.data?.size ?: 0 }
+    )
+    val fling = PagerDefaults.flingBehavior(
+        state = pagerState,
+        lowVelocityAnimationSpec = tween(easing = LinearEasing, durationMillis = 300)
+    )
+    val index by remember { mutableStateOf(0) }
+    val height by remember { mutableStateOf(false) }
+    val eventsState by eventsViewModel.eventsListResponse.collectAsState()
+
+    when (eventsState) {
+        is RequestState.Loading -> {
+            DialogLoading()
+        }
+        is RequestState.Error -> {
+            Column(modifier=Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(text = eventsState.toString())
+                HomeError(eventsViewModel = eventsViewModel)
+
+            }
+        }
+        is RequestState.Success -> {
+            val eventList = (eventsState as RequestState.Success<List<EventResponse>>).data
+            if(eventList.isNotEmpty()) {
+                Column(modifier = Modifier.fillMaxSize()) {
+                    VerticalPager(
+                        pageSize = PageSize.Fill,
+                        state = pagerState,
+                        flingBehavior = fling,
+                        beyondBoundsPageCount = 1,
+                        modifier = modifier.weight(1f)
+                    ) { page ->
+                        val event = eventList[page]
+                        if (event.isPrivate) {
+                            PrivateEvent(event,navController) // or PrivateLiveEventInUse(navController)
+                        } else {
+                            PublicEvent(
+                                event,
+                                navController,
+                                index = index,
+                                height = height,
+                                imageUrls = imageUrls
+                            ) // pass necessary info
+                        }
+                    }
+                }
+            }else{
+               NoDataFound("No Events Found!", R.drawable.search)
+            }
+        }
+        else -> {}
+    }
+}

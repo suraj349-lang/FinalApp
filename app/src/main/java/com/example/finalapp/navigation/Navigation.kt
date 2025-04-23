@@ -1,6 +1,5 @@
 package com.example.finalapp.navigation
 
-import android.net.Uri
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -11,7 +10,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.finalapp.model.DropProfileResponse
-import com.example.finalapp.model.User
 import com.example.finalapp.viewmodels.ChatViewModel
 import com.example.finalapp.viewmodels.AuthViewModel
 import com.example.finalapp.loginActivity.auth.util.EnterOTPScreenUI
@@ -28,9 +26,7 @@ import com.example.finalapp.screens._4profile.GalleryPicker
 import com.example.finalapp.screens._1home.HomeScreenUI
 import com.example.finalapp.screens._8notification.NotificationsScreenUI
 import com.example.finalapp.screens._2search.TrendingScreen
-import com.example.finalapp.screens._3createEvent.CreateEvent
-import com.example.finalapp.screens._3createEvent.CreateEvent1
-import com.example.finalapp.screens._3createEvent.CreateEventBottomSheet
+import com.example.finalapp.screens._3createEvent.createEvent.CreateEventNew
 import com.example.finalapp.screens._5settings.SettingsScreenUI
 import com.example.finalapp.testing.TabView
 import com.example.finalapp.screens._3createEvent.PastRaisedOffer
@@ -56,11 +52,10 @@ import com.example.finalapp.screens._5settings.SafetyCentre
 import com.example.finalapp.screens._5settings.SavedLoginInfo
 import com.example.finalapp.screens._5settings.TermsOfService
 import com.example.finalapp.screens.onboarding.screen.WelcomeScreen
-import com.example.finalapp.testingp.Tiktok
+import com.example.finalapp.testingDataAndScreen.Tiktok
 import com.example.finalapp.viewmodels.ImageUploadViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 
@@ -73,7 +68,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
     val eventsViewModel= hiltViewModel<EventsViewModel>()
     val chatViewModel= hiltViewModel<ChatViewModel>()
 
-    NavHost(navController = navController, startDestination =SCREENS.HOME.route){
+    NavHost(navController = navController, startDestination =SCREENS.LOGIN.route){
         composable(SCREENS.SPLASH.route){
             SplashScreenUI(navController,screen)
         }
@@ -108,7 +103,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
         composable(SCREENS.SINGLE_CHAT.route, arguments = listOf(navArgument("userNumber"){type= NavType.StringType}))
           {navBackStackEntry->
             val userNumber=navBackStackEntry.arguments?.getString("userNumber")
-            ChatScreenUI(userNumber, navController ,chatViewModel)
+            ChatScreenUI(userNumber!!, navController ,chatViewModel)
         }
         composable(SCREENS.OTP2.route){
             OtpBox()
@@ -135,7 +130,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
         }
         composable(SCREENS.CREATE_EVENT_PRIVATE.route) {
           //  CreateEvent(eventsViewModel, navController)
-            CreateEvent1()
+            CreateEventNew(navController,eventsViewModel)
         }
         composable(SCREENS.CREATE_EVENT_PUBLIC.route) {
             PremiumCreateEvent(authViewModel, eventsViewModel, navController)

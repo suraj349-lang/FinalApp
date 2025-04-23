@@ -9,16 +9,13 @@ import kotlinx.serialization.Serializable
 data class Profile(
     @PrimaryKey(autoGenerate = true)
     val id:Int=0 ,
-    val userId:String,
-    val name:String,
-    val username:String,
-    val number:String,
-    val address:String,
-    val profileImage:String
-
-){
-    constructor():this(0,"","","","","","")
-}
+    val userId:String="",
+    val name:String="",
+    val username:String="",
+    val number:String="",
+    val address:String="",
+    val profileImage:String=""
+)
 
 @Serializable
 @Entity(tableName = "chat_table")

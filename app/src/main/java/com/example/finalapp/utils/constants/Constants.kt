@@ -5,9 +5,10 @@ import androidx.compose.ui.text.font.FontFamily
 import com.example.finalapp.R
 
 object Constants {
-    const val SOCKET_CHAT_BASE_URL="http://192.168.29.95:80/chat/"
-    const val TEMP_SOCKET_URL="http://192.168.29.95:5001/";
-    const val BASE_URL="http://192.168.29.95:5000/"
+    const val IP_ADD="192.168.29.95"
+    const val SOCKET_CHAT_BASE_URL="http://${IP_ADD}:80/chat/"
+    const val TEMP_SOCKET_URL="http://${IP_ADD}:5001/";
+    const val BASE_URL="http://${IP_ADD}:5000/"
     const val APP_NAME="Carbon"
     val LOGIN_METHOD=LoginMethod.EMAIL
     const val TAG= APP_NAME

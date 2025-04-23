@@ -3,6 +3,7 @@ package com.example.finalapp.screens._6chat
 import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -56,6 +57,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -68,6 +70,7 @@ import com.example.finalapp.R
 import com.example.finalapp.database.Chat
 import com.example.finalapp.datastore.StoreUserData
 import com.example.finalapp.navigation.SCREENS
+import com.example.finalapp.utils.ProfileObject
 import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
 import com.example.finalapp.utils.constants.Constants.TAG
 import com.example.finalapp.viewmodels.ChatViewModel
@@ -77,80 +80,107 @@ import javax.inject.Inject
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun ChatScreenUI(sentTo: String?="",navController: NavHostController,chatViewModel: ChatViewModel) {
-    val context= LocalContext.current
+fun ChatScreenUI(sentTo: String,navController: NavHostController,chatViewModel: ChatViewModel) {
     val messages by chatViewModel.messagesFromDB.collectAsState()
     val listState = rememberLazyListState()
     val scope= rememberCoroutineScope()
     var saveToDb by remember { mutableStateOf(false) }
     var inputText by remember { mutableStateOf("") }
-    val datastore=StoreUserData(context)
-    val loggedInNumber by datastore.getUserNumber.collectAsState(initial = "")
-    chatViewModel.loggedInNumber.value=loggedInNumber.toString()
-    val sentTo="7250260100"
-    val userNumber="6376099670"
+    val userNumber= ProfileObject.profile?.number
 
 
     LaunchedEffect(messages){
         listState.animateScrollToItem(messages.size)
-        if (sentTo != null) {
-            chatViewModel.getChat(sentTo)
-        }
+        chatViewModel.getChat(sentTo)
     }
     Scaffold(
-        topBar = { SingleChatTopBar(title = sentTo!!, navController =navController ) }) {
+        topBar = { SingleChatTopBar(title = sentTo, navController =navController ) }) {
 
         Column(modifier = Modifier.padding(it)) {
-            LazyColumn(state = listState, modifier = Modifier.weight(1f)) {
+            LazyColumn(state = listState,reverseLayout=true, modifier = Modifier.weight(1f)) {
                 items(items=messages) { message ->
-                    MessageItem( message.message, message.sentFrom==userNumber)
+                    MessageItemUI( message.message, message.sentFrom==userNumber)
                 }
             }
             Row(modifier = Modifier
                 .padding(start = 16.dp, end = 16.dp)
                 .fillMaxWidth()
                 .heightIn(min = 56.dp, max = 150.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
-                Card(modifier = Modifier.size(40.dp), shape = CircleShape, colors = CardDefaults.cardColors(containerColor = Color.LightGray)) {
-                    Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-                        Image(
-                            painter = painterResource(id = R.drawable.cameranew),
-                            contentDescription = "",
-                            colorFilter = ColorFilter.tint(color = Color.DarkGray),
-                            alignment = Alignment.Center,
-                            modifier = Modifier
-                                .size(30.dp)
-                                .padding(2.dp)
-                        )
-                    }
-
-                }
-
                 OutlinedTextField(
                     value = inputText,
                     onValueChange = { inputText = it },
                     modifier = Modifier
-                        .fillMaxWidth(0.7f)
+                        .fillMaxWidth()
                         .defaultMinSize(minHeight = 48.dp)
                         .heightIn(min = 48.dp, max = 150.dp),
                     placeholder = {
                         Text(
-                            text = "Send Chat",
+                            text = "Type message....",
                             fontSize = 14.sp,
                             modifier = Modifier.align(Alignment.Top)
                         )
                     },
+                    trailingIcon={
+                                 Row(modifier = Modifier
+                                     .wrapContentSize()
+                                     .padding(end = 16.dp), verticalAlignment = Alignment.Bottom) {
+                                     if(inputText.isEmpty()) {
+                                         Image(
+                                             painter = painterResource(id = R.drawable.cameranew),
+                                             contentDescription = "",
+                                             colorFilter = ColorFilter.tint(color = Color.DarkGray),
+                                             alignment = Alignment.Center,
+                                             modifier = Modifier
+                                                 .size(28.dp).clickable {
+                                                     // TODO open the gallery or camera option to pick image from
+                                                 }
+                                         )
+                                     }else {
+                                         Text(text = "Send", modifier = Modifier.clickable {
+                                             val chat = Chat(
+                                                 sentTo = sentTo,
+                                                 sentFrom = userNumber!!,
+                                                 message = inputText,
+                                                 received = false,
+                                                 sent = 0,
+                                                 seen = false
+                                             )
+                                             scope.launch {
+                                                 saveToDb = chatViewModel.saveChatToDB(chat)
+
+                                                 Log.d("socketManager", "1: ChatScreenUI:$saveToDb ------->  $chat ")
+
+                                                 if (saveToDb) {
+                                                     chatViewModel.sendMessage(
+                                                         userNumber,
+                                                         sentTo,
+                                                         inputText.ifEmpty {
+                                                             "testing"
+                                                         }
+                                                     )
+                                                     inputText = ""
+                                                 }
+                                             }
+                                         },fontFamily = DONGLE_BOLD, fontSize = 24.sp, color = Color.DarkGray)
+                                     }
+                                 }
+                    },
                     textStyle = TextStyle(fontSize = 14.sp),
-                    shape = RoundedCornerShape(30.dp),
+                    shape = RoundedCornerShape(12.dp),
                     maxLines=10,
                     colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color.DarkGray, unfocusedBorderColor = Color.DarkGray, cursorColor = Color.Red)
                 )
-
-                Card(modifier = Modifier
+            }
+        }
+    }
+}
+/*
+ Card(modifier = Modifier
                     .size(48.dp)
                     .clickable {
                         val chat = Chat(
-                            sentTo = sentTo, //sentTo
-                            sentFrom = userNumber,//loggedInNumber.toString(),
+                            sentTo = sentTo!!, //sentTo
+                            sentFrom = userNumber!!,//loggedInNumber.toString(),
                             message = inputText,
                             received = false,
                             sent = 0,
@@ -162,7 +192,13 @@ fun ChatScreenUI(sentTo: String?="",navController: NavHostController,chatViewMod
                             Log.d("socketManager", "1: ChatScreenUI:$saveToDb ------->  $chat ")
 
                             if (saveToDb) {
-                                chatViewModel.sendMessage(userNumber,sentTo,if(inputText.isNullOrEmpty()) { "testing"}else inputText)
+                                chatViewModel.sendMessage(
+                                    userNumber,
+                                    sentTo,
+                                    inputText.ifEmpty {
+                                        "testing"
+                                    }
+                                )
                                 inputText = ""
                             }
                         }
@@ -180,51 +216,7 @@ fun ChatScreenUI(sentTo: String?="",navController: NavHostController,chatViewMod
                     }
 
                 }
-            }
-        }
-    }
-}
-
-
-
-@Composable
-fun MessageItem(msg: String,isSentByLoggedInUser:Boolean) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 4.dp),
-        contentAlignment = if (isSentByLoggedInUser) Alignment.CenterEnd else Alignment.CenterStart
-    ) {
-        Surface(
-            shape = RoundedCornerShape(16.dp),
-            color = if (isSentByLoggedInUser) Color(0xFFF5F3F3) else Color.DarkGray.copy(alpha = 0.5f)
-        ) {
-            Column(
-                modifier = Modifier
-                    .padding(2.dp)
-                    .widthIn(max = 240.dp)
-            ) {
-                Text(text = if (isSentByLoggedInUser) "Me" else "Female", fontFamily = DONGLE_BOLD)
-                Text(
-                    text = msg,
-                   // style = MaterialTheme.typography.titleMedium,
-                    fontSize = 16.sp,
-                    textAlign = if (isSentByLoggedInUser) TextAlign.End else TextAlign.Start,
-                    softWrap = true // Enable auto line wrapping
-                )
-                Text(
-                    text = "08:38", // Replace with actual timestamp
-                   // style = MaterialTheme.typography.labelSmall,
-                    fontSize = 8.sp,
-                    textAlign = if (isSentByLoggedInUser) TextAlign.Start else TextAlign.End
-
-                )
-            }
-        }
-    }
-}
-
-
+ */
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -292,4 +284,3 @@ fun SingleChatTopBar(title: String, navController: NavHostController) {
         }
     )
 }
-

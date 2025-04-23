@@ -60,10 +60,9 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.finalapp.R
-import com.example.finalapp.screens._1home.events.ActiveEvents
 import com.example.finalapp.viewmodels.AuthViewModel
-import com.example.finalapp.screens._1home.utils.HomeFloatingActionButton
-import com.example.finalapp.screens._1home.utils.HomeTopBar
+import com.example.finalapp.screens._1home.commonUI.HomeFloatingActionButton
+import com.example.finalapp.screens._1home.commonUI.HomeTopBar
 import com.example.finalapp.screens._3createEvent.CreateEventBottomSheet
 import com.example.finalapp.viewmodels.EventsViewModel
 import com.example.finalapp.screens.dialogBox.ShowQRDialog
@@ -84,7 +83,6 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val buttonsVisible = remember { mutableStateOf(true) }
     val eventsViewModel = hiltViewModel<EventsViewModel>()
-    val offersList = eventsViewModel.offersList.value
     val scope = rememberCoroutineScope()
     val heightInDp = LocalConfiguration.current.screenHeightDp.dp * 0.78f
     var showQR: showDialog by remember { mutableStateOf(showDialog.CLOSE) }
@@ -226,7 +224,7 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
                             .imePadding()
                     ) { page ->
                         when (page) {
-                            0 -> ActiveEvents(eventsViewModel = eventsViewModel, videos = listOf("1","2","3","4","5","6"), navController = navController)//PublicLivePost(videos = listOf("1","2","3","4","5","6") )//PrivateLivePost(videos = listOf("1","2","3","4","5","6") )//LivePosts( scrollBehavior,eventsViewModel, offersList, padding)
+                            0 -> EventsScreen(eventsViewModel = eventsViewModel, navController = navController)//PublicLivePost(videos = listOf("1","2","3","4","5","6") )//PrivateLivePost(videos = listOf("1","2","3","4","5","6") )//LivePosts( scrollBehavior,eventsViewModel, offersList, padding)
                             1 -> DirectChatScreen(scrollBehavior,authViewModel,eventsViewModel,navController)
                             2 -> DroppedProfilesUI(scrollBehavior,navController ,eventsViewModel)
                                 //DroppedProfiles(navController = navController, eventsViewModel = eventsViewModel)

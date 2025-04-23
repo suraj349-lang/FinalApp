@@ -31,7 +31,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -57,16 +56,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import com.bumptech.glide.integration.compose.CrossFade
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
-import com.example.finalapp.model.OfferModel
+import com.example.finalapp.model.EventRequestDTO
 import com.example.finalapp.navigation.SCREENS
-import com.example.finalapp.repository.Resource
 import com.example.finalapp.screens.dialogBox.DialogLoading
 import com.example.finalapp.viewmodels.EventsViewModel
 import com.example.finalapp.screens.dialogBox.GalleryPickerForDropProfile
@@ -118,11 +114,11 @@ fun CreateEvent(
         mutableStateOf(0)
     }
     val buttonsVisible = remember { mutableStateOf(true) }
-    val isLoading=eventsViewModel.isLoading.collectAsState()
-    val isSuccess=eventsViewModel.isSuccess.collectAsState()
+    val isLoading=eventsViewModel.createEventIsLoading.collectAsState()
+    val isSuccess=eventsViewModel.createEventIsSuccess.collectAsState()
     if(isSuccess.value) {
         Toast.makeText(LocalContext.current,"Event Created",Toast.LENGTH_SHORT).show()
-        eventsViewModel.isSuccess.value=false
+        eventsViewModel.createEventIsSuccess.value=false
         navController.navigate(SCREENS.HOME.route)
     }
     if(isLoading.value) DialogLoading()
@@ -479,15 +475,7 @@ fun CreateEvent(
                     )
                     Button(
                         onClick = {
-                            eventsViewModel.createEvent(
-                                OfferModel(
-                                    image= uri.toString(),
-                                    category = "Event",
-                                    location =  eventLocation,
-                                    offer = "date",
-                                    expirationTime=expirationTime
-                                )
-                            )
+                            eventsViewModel.createEvent(data = EventRequestDTO())
                         },
                         shape = RoundedCornerShape(6.dp),
                         modifier = Modifier

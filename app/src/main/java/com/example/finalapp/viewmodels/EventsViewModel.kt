@@ -12,16 +12,16 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.example.finalapp.model.DirectChat
 import com.example.finalapp.model.DirectChatRequest
-import com.example.finalapp.model.DropProfileModel
 import com.example.finalapp.model.DropProfileResponse
-import com.example.finalapp.model.OfferModel
-import com.example.finalapp.model.User
-import com.example.finalapp.model.SingleOfferModel
+import com.example.finalapp.model.EventRequestDTO
+import com.example.finalapp.model.EventResponse
+import com.example.finalapp.model.EventResponseDTO
+import com.example.finalapp.model.PremiumEventResponseDTO
 import com.example.finalapp.paging.DirectChatUsersPagingSource
 import com.example.finalapp.paging.DropProfilePagingSource
 import com.example.finalapp.repository.EventsRepository
 import com.example.finalapp.repository.Resource
-import com.example.finalapp.testingp.imageUrls
+import com.example.finalapp.testingDataAndScreen.imageUrls
 import com.example.finalapp.utils.RequestState
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.AutocompletePrediction
@@ -34,9 +34,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 
@@ -46,7 +43,7 @@ import kotlin.Exception
 
 @HiltViewModel
 class EventsViewModel @Inject constructor(private val eventsRepository: EventsRepository, @ApplicationContext context: Context): ViewModel(){
-    val publicImage= MutableStateFlow(imageUrls.get(9))
+
     private val placesClient by lazy { Places.createClient(context) }
     var checked= mutableStateOf(false)
     var shareProfileClicked= mutableStateOf(false)
@@ -59,8 +56,6 @@ class EventsViewModel @Inject constructor(private val eventsRepository: EventsRe
         }
     }
 
-
-
     //--------------------------------------------------------------------------------------------------------------------------------------------//
     private val _triggerFetch = MutableStateFlow(false)
     val triggerFetch: StateFlow<Boolean> = _triggerFetch.asStateFlow()
@@ -69,7 +64,7 @@ class EventsViewModel @Inject constructor(private val eventsRepository: EventsRe
     private val _droppedProfilesFlow = MutableStateFlow<Flow<PagingData<DropProfileResponse>>?>(null)
     val droppedProfiles: StateFlow<Flow<PagingData<DropProfileResponse>>?> = _droppedProfilesFlow.asStateFlow()
 
-    fun loadDroppedProfiles() {
+    fun loadDroppedProfiles(location:String) {
         _droppedProfilesFlow.value = Pager(
             config = PagingConfig(pageSize = 10, prefetchDistance = 5),
             pagingSourceFactory = { DropProfilePagingSource(eventsRepository) }
@@ -160,28 +155,6 @@ class EventsViewModel @Inject constructor(private val eventsRepository: EventsRe
         }
     }
 
-
-
-//----------------------------------------------------------------------------------------------------------------------------------//
-
-    val offerResponse:MutableState<RequestState<SingleOfferModel>> = mutableStateOf(RequestState.Idle)
-    var key :MutableState<Int> = mutableStateOf(0);
-    fun premiumCreateEvent(offerData:OfferModel)=viewModelScope.launch(Dispatchers.IO) {
-        eventsRepository.sendCreateEventData(offerData)
-                .onStart {
-                    offerResponse.value=RequestState.Loading;
-                    Log.d("Data received",offerResponse.value.toString())
-                }
-                .catch {
-                    Log.d("Data received","error found")
-                    offerResponse.value=RequestState.Error(it)
-                    Log.d("Data received",offerResponse.value.toString())
-                 }
-                .collect {
-                    offerResponse.value = RequestState.Success(it);
-                    Log.d("Data received",offerResponse.value.toString())
-                }
-    }
 //-----------------------------------------------------------------------------------------------------------------------------------------------//
 
 
@@ -222,59 +195,83 @@ class EventsViewModel @Inject constructor(private val eventsRepository: EventsRe
 //        }
 //    }
 
-    //--------------------------------------------------------------------------------------------------------------------//
-    var offersList= mutableStateOf<List<OfferModel>>(emptyList())
 
-    val allOffers: MutableState<RequestState<List<OfferModel>>> = mutableStateOf(RequestState.Idle)
+
+    //--------------------------------------------------------------------------------------------------------------------//
+    private val _eventsListResponse = MutableStateFlow<RequestState<List<EventResponse>>>(RequestState.Idle)
+    val eventsListResponse: StateFlow<RequestState<List<EventResponse>>> = _eventsListResponse.asStateFlow()
 
     fun getAllEvents()=viewModelScope.launch(Dispatchers.IO) {
+        val TAG="GET_ALL_EVENTS_RESPONSE";
         eventsRepository.getAllEvents()
             .onStart {
-                allOffers.value = RequestState.Loading
-                Log.d("ZUNE", "all profiles start ${allOffers.value}")
+                _eventsListResponse.value = RequestState.Loading
+                Log.d(TAG, "all profiles start ${_eventsListResponse.value}")
 
             }.catch {
-                allOffers.value = RequestState.Error(it)
-                Log.d("ZUNE", "all profiles error ${allOffers.value}")
+                _eventsListResponse.value = RequestState.Error(it)
+                Log.d(TAG, "all profiles error ${_eventsListResponse.value}")
 
             }.collect {
-                allOffers.value = RequestState.Success(it.data)
-                Log.d("ZUNE", "all profiles data ${allOffers.value}")
+                _eventsListResponse.value = RequestState.Success(it.data)
+                Log.d(TAG, "all profiles data ${_eventsListResponse.value}")
 
             }
     }
 
-   var createEventResponse = MutableStateFlow(SingleOfferModel(false,100, OfferModel("","","","","")))
-    var isLoading = MutableStateFlow(false)
-    var isSuccess= MutableStateFlow(false)
-    fun createEvent(data:OfferModel){
-        isLoading.value=true
+    var createEventResponse = MutableStateFlow(EventResponseDTO())
+    var createEventIsLoading = MutableStateFlow(false)
+    var createEventIsSuccess= MutableStateFlow(false)
+    fun createEvent(data:EventRequestDTO){
+        createEventIsLoading.value=true
         viewModelScope.launch(Dispatchers.IO) {
 //            if(data.location=="") return@launch
             try {
                 when(val response=eventsRepository.createEvent(data)){
                     is Resource.Success->{
                         createEventResponse.value= response.data!!
-                        isSuccess.value=true;
-                      //  isLoading.value=false
+                        createEventIsSuccess.value=true
 
                     }
                     is Resource.Error->{
                         Log.d("TAG","create event ${response.message.toString()}")
-                     //   isLoading.value=false
                     }
-                    else->{//isLoading.value=false
+                    else->{
                      }
                 }
             }catch (e:Exception){
                 Log.d("TAG","create event ${e.message.toString()}")
             }
             finally {
-                isLoading.value=false
+                createEventIsLoading.value=false
             }
 
         }
 
+    }
+
+
+
+//----------------------------------------------------------------------------------------------------------------------------------//
+
+    val premiumCreateEventResponse:MutableState<RequestState<PremiumEventResponseDTO>> = mutableStateOf(RequestState.Idle)
+    var premiumCreateEventKey :MutableState<Int> = mutableStateOf(0);
+    fun premiumCreateEvent(event:EventRequestDTO)=viewModelScope.launch(Dispatchers.IO) {
+        val TAG="PREMIUM_CREATE_EVENT_RESPONSE"
+        eventsRepository.sendPremiumCreateEventData(event)
+            .onStart {
+                premiumCreateEventResponse.value=RequestState.Loading;
+                Log.d(TAG,premiumCreateEventResponse.value.toString())
+            }
+            .catch {
+                Log.d(TAG,"error found")
+                premiumCreateEventResponse.value=RequestState.Error(it)
+                Log.d(TAG,premiumCreateEventResponse.value.toString())
+            }
+            .collect {
+                premiumCreateEventResponse.value = RequestState.Success(it);
+                Log.d(TAG,premiumCreateEventResponse.value.toString())
+            }
     }
 
 

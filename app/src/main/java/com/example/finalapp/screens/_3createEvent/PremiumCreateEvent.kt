@@ -68,7 +68,7 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
 import com.example.finalapp.viewmodels.AuthViewModel
-import com.example.finalapp.model.OfferModel
+import com.example.finalapp.model.EventRequestDTO
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.viewmodels.EventsViewModel
 import com.example.finalapp.screens.dialogBox.GalleryPickerForDropProfile
@@ -371,20 +371,23 @@ fun PremiumCreateEvent(authViewModel: AuthViewModel, eventsViewModel: EventsView
                                     ).show()
                                 } else {
                                     eventsViewModel.premiumCreateEvent(
-                                        OfferModel(
+                                        event = EventRequestDTO(
+                                          //  userId = "",
+                                            //title = "",
+                                            //description = null,
                                             image = uri.toString(),
                                             category = category,
                                             location = address,
-                                            offer = offerText,
-                                            expirationTime = "0800"
+                                            offer = offerText
                                         )
                                     )
+
                                 }
                             }) {
                             Text("Create Event", color = Color.White)
 
                         }
-                        when (val result = eventsViewModel.offerResponse.value) {
+                        when (val result = eventsViewModel.premiumCreateEventResponse.value) {
                             is RequestState.Idle -> {
 
                             }
@@ -412,7 +415,7 @@ fun PremiumCreateEvent(authViewModel: AuthViewModel, eventsViewModel: EventsView
                                     "Event Created successfully",
                                     Toast.LENGTH_SHORT
                                 ).show()
-                                eventsViewModel.offerResponse.value = RequestState.Idle
+                                eventsViewModel.premiumCreateEventResponse.value = RequestState.Idle
                                 //  navController.navigate(SCREENS.PAST_OFFERS.route)
 
                             }

@@ -34,6 +34,7 @@ class ChatViewModel @Inject constructor(private val chatDatabaseRepository: Chat
     val socketManager = SocketManager()
     fun connectSocket(userNumber:String) {
         socketManager.connect(userNumber){
+            // TODO callback to update the chat list as onMessageReceived() called
 //            _messagesFromDB.update { currentList->
 //                currentList+it
 //            }

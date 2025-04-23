@@ -57,31 +57,23 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavHostController
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
 import com.example.finalapp.model.ChatUser
 import com.example.finalapp.navigation.SCREENS
+import com.example.finalapp.utils.ProfileObject
+import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
 import com.example.finalapp.viewmodels.ChatViewModel
 
 
 val users:List<ChatUser> = listOf (
     ChatUser("Female",R.drawable.girl,"6376099670"),
-//    ChatUser("Bahubali",R.drawable.profile_image_2,"+917250260100"),
-//    ChatUser("Sakshi",R.drawable.profile_image_1,"+917250260100"),
-//    ChatUser("Supriya",R.drawable.profile_image_3,"+917250260100"),
-//    ChatUser("Sakshi Vashishth",R.drawable.girl,"+917250260100"),
-//    ChatUser("Manthan",R.drawable.girl,"+917250260100"),
-//    ChatUser("Tedha",R.drawable.girl,"+917250260100"),
-//    ChatUser("Bahubali",R.drawable.profile_image_2,"+917250260100"),
-//    ChatUser("Sakshi",R.drawable.profile_image_1,"+917250260100"),
-//    ChatUser("Supriya",R.drawable.profile_image_3,"+917250260100"),
-//    ChatUser("Sakshi Vashishth",R.drawable.girl,"+917250260100"),
-//    ChatUser("Manthan",R.drawable.girl,"+917250260100"),
-
 )
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ChatListScreen(navController: NavHostController,chatViewModel: ChatViewModel) {
-    val userNumber="6376099670"
+    val userNumber= ProfileObject.profile?.number
     val listOfUsers: List<ChatUser> by remember {
         mutableStateOf(users)
     }
@@ -91,7 +83,7 @@ fun ChatListScreen(navController: NavHostController,chatViewModel: ChatViewModel
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             when (event) {
-                Lifecycle.Event.ON_START -> chatViewModel.connectSocket(userNumber )
+                Lifecycle.Event.ON_START -> userNumber?.let { chatViewModel.connectSocket(it) }
                 Lifecycle.Event.ON_DESTROY -> chatViewModel.disconnectSocket()
                 else -> {}
             }
@@ -104,7 +96,7 @@ fun ChatListScreen(navController: NavHostController,chatViewModel: ChatViewModel
 
     Scaffold(topBar = {
         ChatTopBar(
-            title = "Chat",
+            title = "Chats",
             navController = navController
         )
     }, bottomBar = {BottomBar(navController = navController, state =buttonsVisible )}
@@ -115,7 +107,7 @@ fun ChatListScreen(navController: NavHostController,chatViewModel: ChatViewModel
             LazyRow(modifier = Modifier
                 .background(color = Color.White)
                 .fillMaxWidth()
-                .height(40.dp)) {
+                .height(50.dp)) {
                 items(chatRowListItems){item->
                     ChatRowItem(item)
                 }
@@ -135,7 +127,7 @@ fun ChatListScreen(navController: NavHostController,chatViewModel: ChatViewModel
 fun ChatRowItem(item: String) {
     Card(modifier = Modifier
         .wrapContentSize()
-        .padding(8.dp), shape = RoundedCornerShape(12.dp), colors = CardDefaults.cardColors(containerColor = Color.LightGray)) {
+        .padding(8.dp), colors = CardDefaults.cardColors(containerColor = Color.LightGray)) {
         Column(
             Modifier.wrapContentSize(),
             verticalArrangement = Arrangement.Center,
@@ -143,16 +135,16 @@ fun ChatRowItem(item: String) {
         ) {
             Text(
                 text =item,
-                color = Color.DarkGray,
+                color = Color.Black,
                 fontFamily = FontFamily(Font(R.font.dongle_bold)),
-                fontSize = 12.sp,
-                modifier = Modifier.padding(4.dp)
+                fontSize = 16.sp,
+                modifier = Modifier.padding(6.dp)
             )
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
 @Composable
 fun ChatTopBar(title: String, navController: NavHostController) {
         TopAppBar(
@@ -161,7 +153,7 @@ fun ChatTopBar(title: String, navController: NavHostController) {
             ),
             title = {
                 Text(
-                    title,textAlign= TextAlign.Center, modifier = Modifier.fillMaxWidth(0.6f), color = Color( 0xFF000000), fontSize = 20.sp
+                    title,textAlign= TextAlign.Center, fontFamily = DONGLE_BOLD, modifier = Modifier.fillMaxWidth(0.6f), color = Color( 0xFF000000), fontSize = 20.sp
                 )
             },
             navigationIcon = {
@@ -171,10 +163,10 @@ fun ChatTopBar(title: String, navController: NavHostController) {
                         shape = CircleShape,
                         colors = CardDefaults.cardColors(containerColor = Color.LightGray)
                     ) {
-                        Image(
-                            painterResource(id = R.drawable.person_new_filled),
-                            colorFilter = ColorFilter.tint(Color.DarkGray),
+                        GlideImage(
+                            model=ProfileObject.profile?.profileImage!!,
                             contentDescription = "",
+                            contentScale=ContentScale.Crop,
                             modifier = Modifier
                                 .clickable { navController.navigate(SCREENS.PROFILE.route) }
                                 .padding(4.dp)
@@ -209,7 +201,7 @@ fun ChatTopBar(title: String, navController: NavHostController) {
                         contentDescription = "",
                         colorFilter = ColorFilter.tint(Color.DarkGray),
                         modifier = Modifier
-                            .clickable { navController.navigate(SCREENS.PROFILE.route) }
+                            .clickable { /* TODO menu option */ }
                             .padding(8.dp)
 
                     )

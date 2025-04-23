@@ -34,8 +34,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.finalapp.R
 import com.example.finalapp.viewmodels.AuthViewModel
-import com.example.finalapp.navigation.SCREENS
-import com.example.finalapp.screens._1home.utils.HomeTopBar
+import com.example.finalapp.screens._1home.commonUI.HomeTopBar
 import com.example.finalapp.viewmodels.EventsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -64,12 +63,8 @@ fun PastRaisedOffer(authViewModel: AuthViewModel, eventsViewModel: EventsViewMod
         floatingActionButton = {
             FloatingActionButton(onClick = { navController.navigate("") },Modifier.size(75.dp), backgroundColor = Color.White, contentColor = Color.Black) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "", modifier = Modifier.size(40.dp))
-
-
             }
-
-
-    }, floatingActionButtonPosition = FabPosition.Center) { paddingValues ->
+        }, floatingActionButtonPosition = FabPosition.Center) { paddingValues ->
         Surface(modifier = Modifier
             .padding(paddingValues)
             .fillMaxSize()) {

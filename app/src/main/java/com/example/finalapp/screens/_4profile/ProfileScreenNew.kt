@@ -244,7 +244,9 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
         onDismiss = {showSheetForImageUpdate=false },
         temporaryImage,
         navHostController = navController
-    )
+    ){
+        showImageCropper=true
+    }
 //    ImageUpdateDialogBox(
 //        showSheet=showSheetForImageUpdate,
 //        onDismiss = {showSheetForImageUpdate=false},

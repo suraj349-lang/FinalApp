@@ -6,10 +6,11 @@ import com.example.finalapp.model.DirectChat
 import com.example.finalapp.model.DirectChatApiResponse
 import com.example.finalapp.model.DirectChatRequest
 import com.example.finalapp.model.GetDropProfileResponseModel
-import com.example.finalapp.model.OfferModel
-import com.example.finalapp.model.SingleOfferModel
+import com.example.finalapp.model.EventRequestDTO
+import com.example.finalapp.model.EventResponseDTO
 import com.example.finalapp.model.ImageUploadResponse
-import com.example.finalapp.model.OfferResponseModel
+import com.example.finalapp.model.AllEventsResponseDTO
+import com.example.finalapp.model.PremiumEventResponseDTO
 import com.example.finalapp.network.ApiService
 import com.example.finalapp.screens._4profile.uriToMultipart
 import com.example.finalapp.utils.ApiResponse
@@ -32,15 +33,15 @@ class EventsRepository @Inject constructor(private val api: ApiService) {
         return api.getDirectChatUsers(lat,long,page)
     }
 
-    fun sendCreateEventData(offerData: OfferModel): Flow<SingleOfferModel> = flow  {
-        emit(api.premiumCreateEvent(offerData))
+    fun sendPremiumCreateEventData(event: EventRequestDTO): Flow<PremiumEventResponseDTO> = flow  {
+        emit(api.premiumCreateEvent(event))
     }.flowOn(Dispatchers.IO)
 
     suspend fun getAllDropProfiles(page:Int): Response<GetDropProfileResponseModel> {
         return api.getAllDropProfiles(page)
     }
 
-   suspend fun createEvent(data:OfferModel):Resource<SingleOfferModel>{
+   suspend fun createEvent(data:EventRequestDTO):Resource<EventResponseDTO>{
         return try {
           Resource.Loading(data=true)
            val createEventsResponse =api.createEvent(data)
@@ -54,7 +55,7 @@ class EventsRepository @Inject constructor(private val api: ApiService) {
        }
 
    }
-    fun getAllEvents(): Flow<OfferResponseModel> = flow {
+    fun getAllEvents(): Flow<AllEventsResponseDTO> = flow {
         emit(api.getAllEvents())
     }.flowOn(Dispatchers.IO)
 

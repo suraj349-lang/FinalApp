@@ -59,7 +59,9 @@ enum class SheetValue { Collapsed, PartiallyExpanded, Expanded }
 fun ImageUpdateBottomSheet(  showSheet: Boolean,
                              onDismiss: () -> Unit,
                              image:String?,
-                             navHostController: NavHostController) {
+                             navHostController: NavHostController,
+                             onGalleryClicked: () -> Unit
+) {
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
     )
@@ -94,7 +96,7 @@ fun ImageUpdateBottomSheet(  showSheet: Boolean,
                         Text(text = "Remove image", fontFamily = DONGLE_BOLD,color = Color.DarkGray, fontSize = 14.sp)
 
                     }
-                    Column(modifier = Modifier.wrapContentSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                    Column(modifier = Modifier.wrapContentSize().clickable { onGalleryClicked() }, verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
                         Image(
                             painter = painterResource(id = AppIcons.GALLERY_ICON),
                             contentDescription = ""

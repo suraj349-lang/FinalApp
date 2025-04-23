@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.finalapp.R
 import com.example.finalapp.fcm.screen.ChatScreenUIFCM
-import com.example.finalapp.screens._1home.utils.HomeTopBar
+import com.example.finalapp.screens._1home.commonUI.HomeTopBar
 
 
 @OptIn(ExperimentalMaterial3Api::class)

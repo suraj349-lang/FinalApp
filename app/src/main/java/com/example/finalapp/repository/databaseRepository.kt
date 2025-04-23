@@ -10,13 +10,15 @@ import javax.inject.Inject
 
 class ProfileDatabaseRepository @Inject constructor(private val profileDao: ProfileDao){
 
-    fun getProfileDataFromDb():Flow<Profile> {
+    fun getProfileDataFromDb():Flow<Profile?> {
         return profileDao.getProfileData()
     }
     suspend fun saveProfileDataInDb(profile: Profile){
         profileDao.saveProfileData(profile =profile)
     }
-
+    suspend fun updateProfileDataInDB(profile: Profile) {
+         profileDao.updateProfile(profile)
+    }
     fun deleteProfileData(){
 
     }

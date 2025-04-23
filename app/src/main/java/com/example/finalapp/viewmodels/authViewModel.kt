@@ -23,10 +23,12 @@ import com.example.finalapp.model.User
 import com.example.finalapp.utils.LoginState
 import com.example.finalapp.utils.ProfileObject
 import com.example.finalapp.utils.RequestState
+import com.example.finalapp.utils.TokenObject
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -43,7 +45,6 @@ class AuthViewModel @Inject constructor(
     @ApplicationContext private val context: Context): ViewModel()
    {
        private var _userFromDb:MutableStateFlow<RequestState<Profile>> = MutableStateFlow(RequestState.Idle)
-       val userFromDb:StateFlow<RequestState<Profile>> =_userFromDb
 
        fun getProfileData() = viewModelScope.launch {
            _userFromDb.value = RequestState.Loading
@@ -53,47 +54,62 @@ class AuthViewModel @Inject constructor(
                }.catch {
                    _userFromDb.value = RequestState.Error(it)
                }.collect {
-                   if (it.name.isNotEmpty()) {
-                       _userFromDb.value = RequestState.Success(it)
-                       ProfileObject.profile=it
-                   } else {
-                       _userFromDb.value = RequestState.Error(Throwable("No user found"))
+                   if(it !=null) {
+                       if (it.name.isNotEmpty()) {
+                           _userFromDb.value = RequestState.Success(it)
+                           ProfileObject.profile = it
+                       } else {
+                           _userFromDb.value = RequestState.Error(Throwable("No user found"))
+                       }
                    }
 
                }
+       }
+
+       fun updateUserFromDbToIdle() {
+           _userFromDb.value = RequestState.Idle
+       }
+
+       fun updateUserFromDbToError() {
+           _userFromDb.value = RequestState.Error(Throwable("Error"))
 
        }
 
-        fun updateUserFromDbToIdle(){
-           _userFromDb.value=RequestState.Idle
+       //--------------------------update user in database-----------------------------------------------------------
+       suspend fun updateProfileInDB(profile: Profile) {
+           val update = viewModelScope.async {
+               profileDatabaseRepository.updateProfileDataInDB(profile)
+           }
+            update.await()
        }
-       fun updateUserFromDbToError(){
-           _userFromDb.value=RequestState.Error(Throwable("Error"))
-
-       }
 
 
-
-    var latitude= mutableStateOf(0.0)
-    var longitude= mutableStateOf(0.0)
-    var address= MutableStateFlow<String>("")
-    val currentLocation= MutableStateFlow(LatLng(latitude.value,longitude.value))
-    val city= MutableStateFlow("")
-    var permission= mutableStateOf(ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+       //--------------------------------------------------------------------------------------------------------
 
 
+       var latitude = mutableStateOf(0.0)
+       var longitude = mutableStateOf(0.0)
+       var address = MutableStateFlow<String>("")
+       val currentLocation = MutableStateFlow(LatLng(latitude.value, longitude.value))
+       val city = MutableStateFlow("")
+       var permission = mutableStateOf(
+           ActivityCompat.checkSelfPermission(
+               context,
+               Manifest.permission.ACCESS_FINE_LOCATION
+           ) == PackageManager.PERMISSION_GRANTED
+       )
 
 
-    var key= mutableStateOf(0)
-    var keyForFinalUserCreation:MutableState<RESPONSE> = mutableStateOf( RESPONSE.KEY_OFF)
-    var name= mutableStateOf("")
-    var profileName:MutableState<String> = mutableStateOf("")
-    var otp=" "
+       var key = mutableStateOf(0)
+       var keyForFinalUserCreation: MutableState<RESPONSE> = mutableStateOf(RESPONSE.KEY_OFF)
+       var name = mutableStateOf("")
+       var profileName: MutableState<String> = mutableStateOf("")
+       var otp = " "
 
 
-    private val _loginState = MutableStateFlow<LoginState<User>>(LoginState.Idle)
-    val loginState:StateFlow<LoginState<User>> = _loginState;
-    val userData= mutableStateOf(User())
+       private val _loginState = MutableStateFlow<LoginState<User>>(LoginState.Idle)
+       val loginState: StateFlow<LoginState<User>> = _loginState;
+       val userData = mutableStateOf(User())
 
     fun loginUser(loginMethod: LoginMethod, credentials:String,password: String)=viewModelScope.launch(Dispatchers.IO) {
         _loginState.value=LoginState.Loading
@@ -110,6 +126,7 @@ class AuthViewModel @Inject constructor(
                 if (response.success) {
                         saveProfileData(response.data);
                     try {
+                        TokenObject.token=response.data.token
                         sharedPreferences.edit().putString("token", response.data.token).apply()
                         _loginState.value = LoginState.Success(response.data)
                     } catch (e: Exception) {
@@ -154,7 +171,8 @@ class AuthViewModel @Inject constructor(
             profileDatabaseRepository.saveProfileDataInDb(profile = profile)
         }
     }
-    //------------------------------------------------------------------------------------------------------------//
+
+       //------------------------------------------------------------------------------------------------------------//
 
 
     fun hashPassword(password: String): String {

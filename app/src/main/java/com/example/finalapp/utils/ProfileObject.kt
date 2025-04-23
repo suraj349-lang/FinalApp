@@ -7,10 +7,16 @@ object ProfileObject {
 }
 
 object UserLocation{
+    var address :String ?=null
     var street: String? =null
     var city: String? =null
     var district : String? =null
     var state: String? =null
     var country: String? =null
     var pinCode: String? =null
+}
+
+object TokenObject{
+    var token:String=""
+    var currentLocation:String=""
 }

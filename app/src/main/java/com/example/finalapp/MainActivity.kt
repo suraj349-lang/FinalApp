@@ -364,6 +364,7 @@ fun getReadableLocation(latitude: Double, longitude: Double, context: Context): 
 
         if (addresses?.isNotEmpty() == true) {
             val address = addresses[0]
+            UserLocation.address= address.getAddressLine(0)
             UserLocation.city =address.locality ?: ""
             UserLocation.state=address.adminArea ?: ""
             UserLocation.country=address.countryName ?: ""

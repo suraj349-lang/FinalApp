@@ -1,13 +1,11 @@
 package com.example.finalapp.screens.dialogBox
 
 import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -40,7 +38,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import com.example.finalapp.R
-import com.example.finalapp.screens._1home.utils.OfferResponseDataAndAction
+import com.example.finalapp.screens._1home.commonUI.OfferResponseDataAndAction
 import com.example.finalapp.viewmodels.EventsViewModel
 import com.example.finalapp.ui.theme.DarkBlue
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
@@ -105,7 +103,7 @@ fun CustomAlertDialog(eventsViewModel: EventsViewModel, navController: NavHostCo
 
                     Button(
                         onClick = {
-                            eventsViewModel.key.value = 1;
+                            eventsViewModel.premiumCreateEventKey.value = 1;
                             enabled=false;
                             //TODO nothing on click right now
 
@@ -126,7 +124,7 @@ fun CustomAlertDialog(eventsViewModel: EventsViewModel, navController: NavHostCo
                         Text(text = "Upload")
                     }
                 }
-                if(eventsViewModel.key.value==1){
+                if(eventsViewModel.premiumCreateEventKey.value==1){
                     Log.d("Data received","runned this")
                     OfferResponseDataAndAction(eventsViewModel,navController)
 
