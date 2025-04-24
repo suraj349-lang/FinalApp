@@ -5,11 +5,12 @@ import androidx.compose.ui.text.font.FontFamily
 import com.example.finalapp.R
 
 object Constants {
-    const val IP_ADD="192.168.29.95"
+    const val IP_ADD="192.168.1.13"//"192.168.29.95"
     const val SOCKET_CHAT_BASE_URL="http://${IP_ADD}:80/chat/"
     const val TEMP_SOCKET_URL="http://${IP_ADD}:5001/";
     const val BASE_URL="http://${IP_ADD}:5000/"
     const val APP_NAME="Carbon"
+    val APP_ICON= R.drawable.app_icon_dynamic
     val LOGIN_METHOD=LoginMethod.EMAIL
     const val TAG= APP_NAME
     val FONT_EXTRA_LIGHT= FontFamily(Font(R.font.k2d_extralight));
@@ -18,6 +19,8 @@ object Constants {
     val DONGLE_BOLD=FontFamily(Font(R.font.dongle_bold));
     val DONGLE_NORMAL=FontFamily(Font(R.font.dongle_regular));
     val DONGLE_LIGHT=FontFamily(Font(R.font.dongle_light));
+
+    val APP_NAME_FONT= FontFamily(Font(R.font.alfaslabone))
 }
 
 enum class LoginMethod {

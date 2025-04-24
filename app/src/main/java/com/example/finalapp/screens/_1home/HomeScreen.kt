@@ -82,9 +82,7 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
     var selectedItemIndex by rememberSaveable { mutableStateOf(0) }
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val buttonsVisible = remember { mutableStateOf(true) }
-    val eventsViewModel = hiltViewModel<EventsViewModel>()
     val scope = rememberCoroutineScope()
-    val heightInDp = LocalConfiguration.current.screenHeightDp.dp * 0.78f
     var showQR: showDialog by remember { mutableStateOf(showDialog.CLOSE) }
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
 

@@ -56,10 +56,13 @@ import com.example.finalapp.model.User
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens.dialogBox.DialogLoading
 import com.example.finalapp.ui.theme.DarkBlue
+import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.ui.theme.topAppBarTextColor
 import com.example.finalapp.utils.LoginState
 import com.example.finalapp.utils.constants.Constants
+import com.example.finalapp.utils.constants.Constants.APP_ICON
+import com.example.finalapp.utils.constants.Constants.APP_NAME_FONT
 import kotlinx.coroutines.launch
 
 
@@ -88,7 +91,8 @@ fun LoginScreenUI(navController: NavController,authViewModel: AuthViewModel) {
 
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(
-            verticalArrangement = Arrangement.Center,
+            modifier=Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             when (loginState){
@@ -106,13 +110,12 @@ fun LoginScreenUI(navController: NavController,authViewModel: AuthViewModel) {
                 }
 
             }
-            Image(
-                painter = painterResource(id = R.drawable.app_icon),
-                contentDescription = "",
-                modifier = Modifier.size(100.dp)
-
-            )
-            Text(text=Constants.APP_NAME, fontSize = 45.sp, modifier = Modifier.padding(top=8.dp, bottom = 0.dp), color = statusAndTopAppBarColor, style = MaterialTheme.typography.titleMedium)
+//            Image(
+//                painter = painterResource(id = APP_ICON),
+//                contentDescription = "",
+//                modifier = Modifier.size(100.dp)
+//            )
+            Text(text=Constants.APP_NAME, fontSize = 45.sp, modifier = Modifier.padding(top=8.dp, bottom = 0.dp), color = floatingActionBtnColor, fontFamily = APP_NAME_FONT)
             Spacer(modifier = Modifier.height(10.dp))
 
             Column(
@@ -178,8 +181,8 @@ fun LoginScreenUI(navController: NavController,authViewModel: AuthViewModel) {
                     modifier = Modifier.width(120.dp),
                     shape = RoundedCornerShape(6.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = statusAndTopAppBarColor,
-                        contentColor = topAppBarTextColor
+                        containerColor = floatingActionBtnColor,
+                        contentColor = Color.White
                     )
                 ) {
                     Text(text = "LOGIN")

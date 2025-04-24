@@ -42,7 +42,7 @@ sealed class SCREENS(val route:String){
     }
     object IMAGE_CROPPER:SCREENS("auto_image_cropper")
 
-
+    object CAMERAX_SCREEN:SCREENS("camerax_screen")
 
 
 

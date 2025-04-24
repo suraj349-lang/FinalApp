@@ -133,6 +133,7 @@ class MainActivity : ComponentActivity() {
                     FinalApp(authViewModel,screen) { getLocation(this, authViewModel) }
                 } else {
                     PermissionsUI(authViewModel,onGoToAppSettingsClick = ::openAppSettings)
+
                     val permissionViewModel = viewModel<MainViewModel>()
                     val dialogQueue = permissionViewModel.visiblePermissionDialogQueue
                     val run by remember { mutableStateOf(0) }

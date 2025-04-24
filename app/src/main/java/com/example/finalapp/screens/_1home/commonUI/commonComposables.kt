@@ -65,6 +65,7 @@ import com.example.finalapp.ui.theme.homeTopBarIconsColor
 import com.example.finalapp.ui.theme.statusBarColor
 import com.example.finalapp.utils.RequestState
 import com.example.finalapp.utils.constants.Constants
+import com.example.finalapp.utils.constants.Constants.APP_NAME_FONT
 import com.example.finalapp.viewmodels.AuthViewModel
 import com.example.finalapp.viewmodels.EventsViewModel
 import com.example.finalapp.viewmodels.ImageUploadViewModel
@@ -122,7 +123,7 @@ fun HomeTopBar(
                 title,
                 fontSize = 20.sp,
                 fontWeight=FontWeight.SemiBold,
-                modifier = Modifier, color = homeTopBarIconsColor, fontFamily = Constants.FONT_MEDIUM
+                modifier = Modifier, color = homeTopBarIconsColor, fontFamily = APP_NAME_FONT
             )
             }
         },
@@ -256,7 +257,10 @@ fun HomeFloatingActionButton(authViewModel: AuthViewModel, eventsViewModel: Even
     var showCustomDialog by remember { mutableStateOf(false) }
 
     FloatingActionButton(
-        onClick = { showCustomDialog = !showCustomDialog},
+        onClick = {
+           // showCustomDialog = !showCustomDialog
+                  navController.navigate(SCREENS.CAMERAX_SCREEN.route)
+                  },
         shape= RoundedCornerShape(8.dp),
         modifier = Modifier
             .wrapContentSize()

@@ -85,8 +85,8 @@ import java.io.File
 fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewModel, imageUploadViewModel: ImageUploadViewModel, navController: NavHostController, onDismiss: () -> Unit) {
     var caption by remember{ mutableStateOf("testing") }
     val context= LocalContext.current
-    var enabled=true;
-    val location by authViewModel.currentLocation.collectAsState()
+    val enabled=true;
+    val location by  authViewModel.currentLocation.collectAsState()
     var uri by remember { mutableStateOf(Uri.EMPTY) }
     var imageFile by mutableStateOf<File?>(null)
     var key by remember { mutableStateOf(false) }
@@ -100,7 +100,7 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
     var activeBtnKey by remember {
         mutableStateOf(0)
     }
-    var expirationTime by remember {
+    val expirationTime by remember {
         mutableStateOf(
             when(activeBtnKey){
                 0-> "12"

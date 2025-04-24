@@ -51,6 +51,7 @@ import com.example.finalapp.screens._5settings.SafetyAndPrivacy
 import com.example.finalapp.screens._5settings.SafetyCentre
 import com.example.finalapp.screens._5settings.SavedLoginInfo
 import com.example.finalapp.screens._5settings.TermsOfService
+import com.example.finalapp.screens.common.CameraXScreen
 import com.example.finalapp.screens.onboarding.screen.WelcomeScreen
 import com.example.finalapp.testingDataAndScreen.Tiktok
 import com.example.finalapp.viewmodels.ImageUploadViewModel
@@ -208,6 +209,9 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
 //        composable(SCREENS.IMAGE_CROPPER.route){
 //            AutoImageCropper()
 //        }
+        composable(SCREENS.CAMERAX_SCREEN.route){
+            CameraXScreen(navController = navController)
+        }
 
     }
 

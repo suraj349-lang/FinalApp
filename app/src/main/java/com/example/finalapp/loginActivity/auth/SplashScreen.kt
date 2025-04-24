@@ -28,6 +28,7 @@ import com.example.finalapp.R
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.utils.constants.Constants
+import com.example.finalapp.utils.constants.Constants.APP_NAME_FONT
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.delay
 
@@ -35,9 +36,7 @@ import kotlinx.coroutines.delay
 fun SplashScreenUI(navController: NavController, screen: String){
     val auth=FirebaseAuth.getInstance().currentUser;
 
-    val scale= remember {
-        Animatable(0f)
-    }
+    val scale= remember { Animatable(0f) }
     LaunchedEffect(key1 = true, block ={
         scale.animateTo(targetValue = 0.9f, animationSpec = tween(durationMillis = 800, easing = {
             OvershootInterpolator(8f).getInterpolation(it)
@@ -67,7 +66,7 @@ fun SplashScreenUI(navController: NavController, screen: String){
                 contentScale= ContentScale.Fit,
                 modifier = Modifier.size(95.dp)
             )
-            Text(text=Constants.APP_NAME, fontSize = 45.sp, modifier = Modifier.padding(top=8.dp, bottom = 0.dp), color = statusAndTopAppBarColor, style = MaterialTheme.typography.titleMedium)
+            Text(text=Constants.APP_NAME, fontSize = 45.sp, modifier = Modifier.padding(top=8.dp, bottom = 0.dp), color = statusAndTopAppBarColor, fontFamily = APP_NAME_FONT)
 
 
         }

@@ -58,10 +58,13 @@ import com.example.finalapp.model.User
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens.dialogBox.DialogLoading
 import com.example.finalapp.ui.theme.DarkBlue
+import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.ui.theme.topAppBarTextColor
 import com.example.finalapp.utils.LoginState
 import com.example.finalapp.utils.constants.Constants
+import com.example.finalapp.utils.constants.Constants.APP_ICON
+import com.example.finalapp.utils.constants.Constants.APP_NAME_FONT
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -96,12 +99,12 @@ fun LoginScreenUINew(navController: NavController,authViewModel: AuthViewModel) 
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Image(
-                painter = painterResource(id = R.drawable.app_icon),
+                painter = painterResource(id = APP_ICON),
                 contentDescription = "",
                 modifier = Modifier.size(100.dp)
 
             )
-            Text(text=Constants.APP_NAME, fontSize = 45.sp, modifier = Modifier.padding(top=8.dp, bottom = 0.dp), color = statusAndTopAppBarColor, style = MaterialTheme.typography.titleMedium)
+            Text(text=Constants.APP_NAME, fontSize = 45.sp, modifier = Modifier.padding(top=8.dp, bottom = 0.dp), color = floatingActionBtnColor, fontFamily = APP_NAME_FONT)
             Spacer(modifier = Modifier.height(10.dp))
 
             Column(
