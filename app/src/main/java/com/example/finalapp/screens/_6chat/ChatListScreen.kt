@@ -27,6 +27,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -35,6 +36,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -60,30 +63,26 @@ import androidx.navigation.NavHostController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
-import com.example.finalapp.model.ChatUser
+import com.example.finalapp.model.ChatList
 import com.example.finalapp.navigation.SCREENS
+import com.example.finalapp.ui.imagePrefix
 import com.example.finalapp.utils.ProfileObject
+import com.example.finalapp.utils.RequestState
 import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
 import com.example.finalapp.viewmodels.ChatViewModel
 
 
-val users:List<ChatUser> = listOf (
-    ChatUser("Female",R.drawable.girl,"6376099670"),
-)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ChatListScreen(navController: NavHostController,chatViewModel: ChatViewModel) {
     val userNumber= ProfileObject.profile?.number
-    val listOfUsers: List<ChatUser> by remember {
-        mutableStateOf(users)
-    }
-    val chatRowListItems=listOf("All","Unread","Unreplied")
+    val chatRowListItems=listOf("All","Unread","UnReplied")
     val buttonsVisible = remember { mutableStateOf(true) }
     val lifecycleOwner= LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             when (event) {
-                Lifecycle.Event.ON_START -> userNumber?.let { chatViewModel.connectSocket(it) }
+                Lifecycle.Event.ON_START -> chatViewModel.connectSocket()
                 Lifecycle.Event.ON_DESTROY -> chatViewModel.disconnectSocket()
                 else -> {}
             }
@@ -93,6 +92,12 @@ fun ChatListScreen(navController: NavHostController,chatViewModel: ChatViewModel
             lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
+    LaunchedEffect(key1 = Unit  ){
+         chatViewModel.getUserChatList(ProfileObject.profile?.userId!!)
+    }
+
+    val chatListState by chatViewModel.getUserChatList.collectAsState()
+
 
     Scaffold(topBar = {
         ChatTopBar(
@@ -112,13 +117,26 @@ fun ChatListScreen(navController: NavHostController,chatViewModel: ChatViewModel
                     ChatRowItem(item)
                 }
             }
-            LazyColumn(modifier = Modifier) {
-                itemsIndexed(listOfUsers) { i, user ->
-                    UserItem(navController, user)
-                    Divider(modifier = Modifier.fillMaxWidth(), color = Color(0xFFF1EAEA))
-
+            when(chatListState){
+                is RequestState.Loading ->{ Text(text = "Loading")}
+                is RequestState.Error ->{
+                    Text(text = "Error getting users ${(chatListState as RequestState.Error).error.message}")
                 }
+                is RequestState.Success ->{
+                    val users=remember{ (chatListState as RequestState.Success<List<ChatList>>).data }
+                    LazyColumn(modifier = Modifier) {
+                        itemsIndexed(users) { i, user ->
+                            UserItem(navController, user){
+                                chatViewModel.profileImage.value=it
+                            }
+                            Divider(modifier = Modifier.fillMaxWidth(), color = Color(0xFFF1EAEA))
+
+                        }
+                    }
+                }
+                is RequestState.Idle ->{}
             }
+
         }
     }
 }
@@ -211,15 +229,17 @@ fun ChatTopBar(title: String, navController: NavHostController) {
         )
     }
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun UserItem(navController: NavHostController, user: ChatUser){
+fun UserItem(navController: NavHostController, user: ChatList,setProfileImage:(String)->Unit){
 
     Card(modifier = Modifier
         .padding(start = 8.dp, end = 8.dp)
         .fillMaxWidth()
         .height(60.dp)
         .clickable {
-            navController.navigate("singleChat/${user.number}")
+            setProfileImage(user.withUserId.profileImage)
+            navController.navigate("singleChat/${user.withUserId.username}/${user.withUserId._id}")
         },
         colors = CardDefaults.cardColors(containerColor = Color(0xFFFFFFFE))
     ) {
@@ -236,7 +256,7 @@ fun UserItem(navController: NavHostController, user: ChatUser){
 //                    .border(1.dp, Color.DarkGray, CircleShape)
 //            )
             Card(modifier = Modifier.size(50.dp), shape = CircleShape, colors = CardDefaults.cardColors(containerColor = Color.Transparent)) {
-                Image(painter = painterResource(id = user.image), contentDescription = "",modifier = Modifier
+                GlideImage(model =if( imagePrefix+user.withUserId.profileImage != imagePrefix) imagePrefix+user.withUserId.profileImage else R.drawable.femaleprofile, contentDescription = "",modifier = Modifier
                     .padding(2.dp)
                     .size(40.dp)
                     .clip(CircleShape),
@@ -247,7 +267,7 @@ fun UserItem(navController: NavHostController, user: ChatUser){
                 .fillMaxSize()
                 .padding(start = 8.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.Start) {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text(text = user.name, fontSize = 16.sp, color = Color.Black)
+                    Text(text = user.withUserId.username, fontSize = 16.sp, color = Color.Black)
                     Text(text = "08:38", fontSize = 12.sp, color = Color.LightGray)
                 }
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {

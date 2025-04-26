@@ -96,7 +96,7 @@ fun PrivateEvent(event: EventResponse, navController: NavHostController) {
                         .wrapContentHeight()
                         .align(Alignment.BottomCenter)) {
                         //------------------ username and user image----------------------------------------------------
-                        UsernameAndUserProfileImage(event.user.username)
+                        UsernameAndUserProfileImage(event.user?.username)
 
                         Divider(modifier = Modifier.fillMaxWidth(), thickness = 1.dp, color = Color.LightGray)
 
@@ -287,7 +287,7 @@ fun ApproveOrJoin4(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun UsernameAndUserProfileImage(username:String) {
+fun UsernameAndUserProfileImage(username:String?) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -314,7 +314,7 @@ fun UsernameAndUserProfileImage(username:String) {
                     )
                 }
                 Spacer(modifier = Modifier.width(12.dp))
-                Text(username,
+                Text(username ?: "testing",
                     fontFamily = DONGLE,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 24.sp,

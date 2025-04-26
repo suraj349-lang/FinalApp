@@ -1,10 +1,13 @@
 package com.example.finalapp.screens._6chat
 
+
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -12,21 +15,40 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
+import com.example.finalapp.R
+import com.example.finalapp.ui.imagePrefix
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Outline
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
 
+
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun MessageItemUI(
     msg: String,
     isSentByLoggedInUser: Boolean,
     timestamp: String = "08:38"
 ) {
-    val backgroundColor = if (isSentByLoggedInUser) Color(0xFF8E24AA) else Color(0xFF2E2E2E)
-    val textColor = Color.White
+    val backgroundColor = if (isSentByLoggedInUser) Color(0xFFF7F2F2) else Color(0xFFD58FE7)
+    val textColor = Color.Black
     val alignment = if (isSentByLoggedInUser) Arrangement.End else Arrangement.Start
 
     Row(
@@ -35,6 +57,173 @@ fun MessageItemUI(
             .padding(horizontal = 12.dp, vertical = 4.dp),
         horizontalArrangement = alignment
     ) {
+        Row(
+            modifier = Modifier
+                .clip(BubbleShape(isSentByUser = isSentByLoggedInUser))
+                .background(backgroundColor)
+                .padding(horizontal = 12.dp, vertical = 8.dp)
+                .widthIn(max = 280.dp)
+                .animateContentSize(
+                    animationSpec = tween(durationMillis = 200, easing = FastOutSlowInEasing)
+                ),
+            verticalAlignment = Alignment.Bottom
+        ) {
+            Text(
+                buildAnnotatedString {
+                    append(msg)
+                    append("   ") // small gap
+                    withStyle(
+                        style = SpanStyle(
+                            fontSize = 10.sp,
+                            color = Color.LightGray
+                        )
+                    ) {
+                        append(timestamp)
+                    }
+                },
+                fontSize = 15.sp,
+                color = textColor,
+                softWrap = true,
+                maxLines = Int.MAX_VALUE,
+                modifier = Modifier.widthIn(max = 280.dp)
+            )
+        }
+
+    }
+}
+class BubbleShape(private val isSentByUser: Boolean) : Shape {
+    override fun createOutline(
+        size: Size,
+        layoutDirection: LayoutDirection,
+        density: Density
+    ): Outline {
+        return with(density) {
+            val cornerRadius = 16.dp.toPx()
+            val tailWidth = 8.dp.toPx()
+            val tailHeight = 12.dp.toPx()
+            val tailYOffset = 10.dp.toPx()
+
+            val path = Path()
+
+            if (isSentByUser) {
+                // Sent Message (tail on top-end, rotated)
+                path.moveTo(0f + cornerRadius, 0f)
+
+                path.lineTo(size.width - cornerRadius - tailWidth, 0f)
+                path.quadraticBezierTo(
+                    size.width - tailWidth, 0f,
+                    size.width - tailWidth, cornerRadius
+                )
+
+                // Tail
+                path.lineTo(size.width - tailWidth, tailYOffset)
+                path.lineTo(size.width, tailYOffset - tailHeight / 2)
+                path.lineTo(size.width - tailWidth, tailYOffset + tailHeight)
+
+                // Right side
+                path.lineTo(size.width - tailWidth, size.height - cornerRadius)
+                path.quadraticBezierTo(
+                    size.width - tailWidth, size.height,
+                    size.width - tailWidth - cornerRadius, size.height
+                )
+
+                // Bottom side
+                path.lineTo(cornerRadius, size.height)
+                path.quadraticBezierTo(0f, size.height, 0f, size.height - cornerRadius)
+
+                // Left side
+                path.lineTo(0f, cornerRadius)
+                path.quadraticBezierTo(0f, 0f, cornerRadius, 0f)
+            } else {
+                // Received Message (tail on top-start, rotated)
+                path.moveTo(tailWidth + cornerRadius, 0f)
+
+                path.lineTo(size.width - cornerRadius, 0f)
+                path.quadraticBezierTo(size.width, 0f, size.width, cornerRadius)
+
+                path.lineTo(size.width, size.height - cornerRadius)
+                path.quadraticBezierTo(size.width, size.height, size.width - cornerRadius, size.height)
+
+                path.lineTo(tailWidth + cornerRadius, size.height)
+                path.quadraticBezierTo(tailWidth, size.height, tailWidth, size.height - cornerRadius)
+
+                // Tail
+                path.lineTo(tailWidth, tailYOffset + tailHeight)
+                path.lineTo(0f, tailYOffset - tailHeight / 2)
+                path.lineTo(tailWidth, tailYOffset)
+
+                // Left side
+                path.lineTo(tailWidth, cornerRadius)
+                path.quadraticBezierTo(tailWidth, 0f, tailWidth + cornerRadius, 0f)
+            }
+
+            path.close()
+            Outline.Generic(path)
+        }
+    }
+}
+
+
+/*
+
+
+        Row(
+            modifier = Modifier
+                .clip(
+                    RoundedCornerShape(
+                        topStart = if (isSentByLoggedInUser) 16.dp else 0.dp,
+                        topEnd = if (isSentByLoggedInUser) 0.dp else 16.dp,
+                        bottomEnd = 16.dp,
+                        bottomStart = 16.dp
+                    )
+                )
+                .background(backgroundColor)
+                .padding(horizontal = 12.dp, vertical = 8.dp)
+                .widthIn(max = 280.dp) // Limit width to ~80% of screen
+                .animateContentSize(
+                    animationSpec = tween(durationMillis = 200, easing = FastOutSlowInEasing)
+                ),
+            verticalAlignment = Alignment.Bottom
+        ) {
+            Text(
+                text = msg,
+                fontSize = 15.sp,
+                color = textColor,
+                softWrap = true,
+                modifier = Modifier.weight(1f, fill = false)
+            )
+            Spacer(modifier = Modifier.width(6.dp))
+            Text(
+                text = timestamp,
+                fontSize = 10.sp,
+                color = Color.DarkGray,
+                modifier = Modifier
+                    .align(Alignment.Bottom)
+                    .offset(y = 4.dp)
+            )
+        }
+@OptIn(ExperimentalGlideComposeApi::class)
+@Composable
+fun MessageItemUI(
+    msg: String,
+    profileImage:String,
+    isSentByLoggedInUser: Boolean,
+    timestamp: String = "08:38"
+) {
+    val backgroundColor = if (isSentByLoggedInUser) Color(0xFFF7F2F2) else Color(0xFFD58FE7)
+    //val textColor = if (isSentByLoggedInUser) Color.White else Color.Black
+    val textColor=Color.Black
+    val alignment = if (isSentByLoggedInUser) Arrangement.End else Arrangement.Start
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 12.dp, vertical = 4.dp),
+        horizontalArrangement = alignment
+    ) {
+//        if(!isSentByLoggedInUser){
+//            GlideImage(model = if(profileImage.isNotEmpty()) imagePrefix+profileImage else R.drawable.profile_new, contentDescription = "", modifier = Modifier.size(30.dp).clip(shape = CircleShape), contentScale = ContentScale.Crop)
+//        }
         Row(
             modifier = Modifier
                 .clip(RoundedCornerShape(18.dp))
@@ -58,13 +247,15 @@ fun MessageItemUI(
                 text = timestamp,
                 fontSize = 10.sp,
                 color = Color.LightGray,
-                modifier = Modifier.align(Alignment.Bottom).padding(top = 2.dp)
+                modifier = Modifier
+                    .align(Alignment.Bottom)
+                    .padding(top = 2.dp)
                     .offset(y = 4.dp)
             )
         }
     }
 }
-
+*/
 @Composable
 fun MessageItem(
     msg: String,

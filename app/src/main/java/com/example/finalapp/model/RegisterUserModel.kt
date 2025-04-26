@@ -24,11 +24,7 @@ data class User(
 ){
     constructor():this("","","","","","", emptyList(),"")
 }
-data class ChatUser(
-  val name:String,
-  val image:Int,
-  val number:String
-)
+
 data class ProfileResponse(
   val success: Boolean,
   val data: List<User>
@@ -38,3 +34,4 @@ data class OkResponse(
     val success: Boolean,
     val data: User
 )
+

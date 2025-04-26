@@ -14,7 +14,7 @@ data class EventRequestDTO(
 
 
 data class EventResponse(
-  val user: User = User(),
+  val user: User? = null,
   val title: String? = null, // for public only
   val description: String? = null, // for public only
   val image: String = "",

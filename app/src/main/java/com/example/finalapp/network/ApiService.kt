@@ -17,6 +17,7 @@ import com.example.finalapp.model.EventResponseDTO
 import com.example.finalapp.model.ImageUploadResponse
 import com.example.finalapp.model.LoginAPIResponse
 import com.example.finalapp.model.AllEventsResponseDTO
+import com.example.finalapp.model.ChatList
 import com.example.finalapp.model.PremiumEventResponseDTO
 import com.example.finalapp.utils.ApiResponse
 import okhttp3.MultipartBody
@@ -73,8 +74,20 @@ interface ApiService {
     @POST("/api/v1/user/uploadImage")
     suspend fun uploadImage(@Part image: MultipartBody.Part): ImageUploadResponse
 
+    //--------------------------Chat List --------------------------------------------------------
+    @GET("/api/v1/chats/getChatList")
+    suspend fun getUserChatList(@Query("userId") userId: String):ApiResponse<List<ChatList>>
+    @POST("/api/v1/chats/saveChatList")
+    suspend fun saveUserChatList(userID: String, chatListUserId: String):ApiResponse<ChatList>
+
+    @GET
+    suspend fun getChats(@Url url:String):ApiResponse<List<ChatList>>
+
+
+
 
 }
+
 
 interface NonAuthApiService{
     @POST("/api/v1/auth/login")

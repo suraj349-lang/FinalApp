@@ -4,8 +4,14 @@ import com.example.finalapp.database.Chat
 import com.example.finalapp.database.ChatDao
 import com.example.finalapp.database.Profile
 import com.example.finalapp.database.ProfileDao
+import com.example.finalapp.model.ChatList
+import com.example.finalapp.network.ApiService
+import com.example.finalapp.utils.ApiResponse
 import dagger.hilt.android.scopes.ViewModelScoped
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
 class ProfileDatabaseRepository @Inject constructor(private val profileDao: ProfileDao){
@@ -29,11 +35,24 @@ class ProfileDatabaseRepository @Inject constructor(private val profileDao: Prof
 }
 
 @ViewModelScoped
-class ChatDatabaseRepository @Inject constructor(private val chatDao: ChatDao){
-    suspend fun saveChat(chat: Chat){
-        chatDao.saveChat(chat =chat)
+class ChatDatabaseRepository @Inject constructor(private val chatDao: ChatDao,private val apiService: ApiService) {
+    suspend fun saveChat(chat: Chat) {
+        chatDao.saveChat(chat = chat)
     }
-     fun getChat(userNumber: String):Flow<List<Chat>>{
+
+    fun getChat(userNumber: String): Flow<List<Chat>> {
         return chatDao.getChat(userNumber)
     }
+
+    suspend fun getUserChatList(userID: String): Flow<ApiResponse<List<ChatList>>> = flow {
+        emit(apiService.getUserChatList(userID))
+    }.flowOn(Dispatchers.IO)
+
+    suspend fun saveUserChatList(userID: String, chatListUserId: String): ApiResponse<ChatList> {
+        return apiService.saveUserChatList(userID, chatListUserId)
+    }
+
+    suspend fun getMessages(userId: String, otherUserId: String): Flow<ApiResponse<List<ChatList>>> = flow {
+            emit( apiService.getChats("http://localhost:5001/api/chat/getMessages/${userId}/${otherUserId}"))
+        }.flowOn(Dispatchers.IO)
 }

@@ -168,8 +168,9 @@ fun CameraXScreen(navController: NavHostController) {
                         else
                             CameraSelector.DEFAULT_BACK_CAMERA
                 },
-                modifier = Modifier.align(Alignment.TopEnd)
-                    .padding(top= 60.dp, end = 30.dp)
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(top = 60.dp, end = 30.dp)
                     .background(Color.White.copy(alpha = 0.8f), shape = CircleShape)
             ) {
                 Image(
@@ -180,16 +181,21 @@ fun CameraXScreen(navController: NavHostController) {
             }
 
             Column(
-                modifier = Modifier.pointerInput(Unit) {
-                    detectVerticalDragGestures { _, dragAmount ->
-                        if (dragAmount < -20 && !isGalleryOpen) {
-                            isGalleryOpen=true
-                            launcher.launch("image/*")
-                        } } }
-                    .wrapContentSize().padding(bottom = 40.dp).align(Alignment.BottomCenter),
+                modifier = Modifier
+                    .pointerInput(Unit) {
+                        detectVerticalDragGestures { _, dragAmount ->
+                            if (dragAmount < -20 && !isGalleryOpen) {
+                                isGalleryOpen = true
+                                launcher.launch("image/*")
+                            }
+                        }
+                    }
+                    .wrapContentSize()
+                    .padding(bottom = 40.dp)
+                    .align(Alignment.BottomCenter),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Image(painter = painterResource(R.drawable.remove), contentDescription = "", modifier = Modifier.width(200.dp).height(30.dp).padding(bottom = 6.dp), colorFilter = ColorFilter.tint(color = Color.DarkGray))
+                Divider( modifier = Modifier.width(60.dp).padding(bottom = 10.dp),thickness=2.dp, color = Color.DarkGray)
                 // LazyRow with infinite scroll
                 LazyRow(
                     modifier = Modifier
@@ -197,7 +203,7 @@ fun CameraXScreen(navController: NavHostController) {
                         .height(80.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     contentPadding = PaddingValues(horizontal = 16.dp),
-                    reverseLayout = false
+                    reverseLayout = true
                 ) {
                     items(imageList) { uri ->
                         Image(
@@ -233,12 +239,15 @@ fun CameraXScreen(navController: NavHostController) {
                                 "IMG_${System.currentTimeMillis()}.jpg"
                             )
 
-                            val metadata = ImageCapture.Metadata().apply {
-                                isReversedHorizontal =
-                                    cameraSelector == CameraSelector.DEFAULT_FRONT_CAMERA
-                            }
+                            val metadata = ImageCapture
+                                .Metadata()
+                                .apply {
+                                    isReversedHorizontal =
+                                        cameraSelector == CameraSelector.DEFAULT_FRONT_CAMERA
+                                }
 
-                            val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile)
+                            val outputOptions = ImageCapture.OutputFileOptions
+                                .Builder(photoFile)
                                 .setMetadata(metadata)
                                 .build()
 
@@ -247,21 +256,31 @@ fun CameraXScreen(navController: NavHostController) {
                                 ContextCompat.getMainExecutor(context),
                                 object : ImageCapture.OnImageSavedCallback {
                                     override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                                        Toast.makeText(
-                                            context,
-                                            "Saved: ${photoFile.name}",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
+                                        Toast
+                                            .makeText(
+                                                context,
+                                                "Saved: ${photoFile.name}",
+                                                Toast.LENGTH_SHORT
+                                            )
+                                            .show()
                                         selectedImageUri = Uri.fromFile(photoFile)
-                                        navController.navigate("preview/${Uri.encode(selectedImageUri.toString())}")
+                                        navController.navigate(
+                                            "preview/${
+                                                Uri.encode(
+                                                    selectedImageUri.toString()
+                                                )
+                                            }"
+                                        )
                                     }
 
                                     override fun onError(exception: ImageCaptureException) {
-                                        Toast.makeText(
-                                            context,
-                                            "Failed: ${exception.message}",
-                                            Toast.LENGTH_SHORT
-                                        ).show()
+                                        Toast
+                                            .makeText(
+                                                context,
+                                                "Failed: ${exception.message}",
+                                                Toast.LENGTH_SHORT
+                                            )
+                                            .show()
                                     }
                                 }
                             )
@@ -271,7 +290,9 @@ fun CameraXScreen(navController: NavHostController) {
                     Image(
                         painter = painterResource(R.drawable.camera),
                         contentDescription = "Capture",
-                        modifier = Modifier.size(80.dp).padding(16.dp) // Camera icon size inside circle
+                        modifier = Modifier
+                            .size(80.dp)
+                            .padding(16.dp) // Camera icon size inside circle
                     )
                 }
 
@@ -279,7 +300,9 @@ fun CameraXScreen(navController: NavHostController) {
         }
     } else {
         Box(
-            modifier = Modifier.fillMaxSize().background(Color.Black),
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black),
             contentAlignment = Alignment.Center
         ) {
             Text("Waiting for permissions...", color = Color.White)

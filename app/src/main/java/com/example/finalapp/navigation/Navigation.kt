@@ -101,10 +101,15 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
         composable(SCREENS.CHAT.route){
             ChatListScreen(navController, chatViewModel)
         }
-        composable(SCREENS.SINGLE_CHAT.route, arguments = listOf(navArgument("userNumber"){type= NavType.StringType}))
+        composable(SCREENS.SINGLE_CHAT.route,
+            arguments = listOf(
+                navArgument("userName"){type= NavType.StringType},
+                navArgument("chatListUserId"){type= NavType.StringType}
+            ))
           {navBackStackEntry->
-            val userNumber=navBackStackEntry.arguments?.getString("userNumber")
-            ChatScreenUI(userNumber!!, navController ,chatViewModel)
+              val userName=navBackStackEntry.arguments?.getString("userName")
+              val chatListUserId=navBackStackEntry.arguments?.getString("chatListUserId")
+              ChatScreenUI(userName!!,chatListUserId!!, navController ,chatViewModel)
         }
         composable(SCREENS.OTP2.route){
             OtpBox()

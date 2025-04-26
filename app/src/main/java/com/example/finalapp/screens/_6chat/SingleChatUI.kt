@@ -1,27 +1,19 @@
 package com.example.finalapp.screens._6chat
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -30,16 +22,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -52,56 +40,90 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.modifier.modifierLocalProvider
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavHostController
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
 import com.example.finalapp.database.Chat
-import com.example.finalapp.datastore.StoreUserData
 import com.example.finalapp.navigation.SCREENS
+import com.example.finalapp.ui.imagePrefix
+import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.utils.ProfileObject
+import com.example.finalapp.utils.RequestState
 import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
-import com.example.finalapp.utils.constants.Constants.TAG
 import com.example.finalapp.viewmodels.ChatViewModel
 import kotlinx.coroutines.launch
-import javax.inject.Inject
+import kotlinx.coroutines.withContext
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun ChatScreenUI(sentTo: String,navController: NavHostController,chatViewModel: ChatViewModel) {
-    val messages by chatViewModel.messagesFromDB.collectAsState()
+fun ChatScreenUI(sentTo: String,chatListUserId:String,navController: NavHostController,chatViewModel: ChatViewModel) {
+
     val listState = rememberLazyListState()
     val scope= rememberCoroutineScope()
     var saveToDb by remember { mutableStateOf(false) }
     var inputText by remember { mutableStateOf("") }
     val userNumber= ProfileObject.profile?.number
-
-
-    LaunchedEffect(messages){
-        listState.animateScrollToItem(messages.size)
-        chatViewModel.getChat(sentTo)
+    val profileImage by remember {
+        mutableStateOf(chatViewModel.profileImage.value)
     }
-    Scaffold(
-        topBar = { SingleChatTopBar(title = sentTo, navController =navController ) }) {
 
-        Column(modifier = Modifier.padding(it)) {
-            LazyColumn(state = listState,reverseLayout=true, modifier = Modifier.weight(1f)) {
-                items(items=messages) { message ->
-                    MessageItemUI( message.message, message.sentFrom==userNumber)
+    val messages by chatViewModel.messagesFromServer.collectAsState(RequestState.Idle)
+    LaunchedEffect(messages) {
+        withContext(scope.coroutineContext) {
+            chatViewModel.getAllMessages(sentTo, chatListUserId)
+        }
+        when(val state=messages){
+            is RequestState.Success->{
+                if (state.data.isNotEmpty()) {
+                    listState.animateScrollToItem(state.data.lastIndex)
                 }
             }
+            else ->{}
+        }
+       // chatViewModel.getChat(sentTo)
+    }
+
+
+    Scaffold(
+        topBar = { SingleChatTopBar(title = sentTo,profileImage, navController =navController ) }) {
+
+        Column(modifier = Modifier
+            .padding(it)
+           // .background(Color.Black)
+        ) {
+            //-------------------------------MESSAGE ITEM ---------------------------------------------------
+            when (val state = messages) {
+                is RequestState.Success -> {
+                    LazyColumn(state = listState, modifier = Modifier.weight(1f)) {
+                        items(items = state.data) { message ->
+                            MessageItemUI(
+                                msg = message.message,
+                                isSentByLoggedInUser = message.sentFrom == ProfileObject.profile?.userId!!
+                            )
+                        }
+                    }
+                }
+                is RequestState.Loading -> {
+                    // Show loading spinner if you want
+                }
+                is RequestState.Error -> {
+                    // Show error message
+                }
+                else -> {
+                    // Idle state: maybe empty box
+                }
+            }
+
+            //------------------------------------------------------------------------------------------------//
+
+
             Row(modifier = Modifier
                 .padding(start = 16.dp, end = 16.dp)
                 .fillMaxWidth()
@@ -131,8 +153,9 @@ fun ChatScreenUI(sentTo: String,navController: NavHostController,chatViewModel: 
                                              colorFilter = ColorFilter.tint(color = Color.DarkGray),
                                              alignment = Alignment.Center,
                                              modifier = Modifier
-                                                 .size(28.dp).clickable {
-                                                     // TODO open the gallery or camera option to pick image from
+                                                 .size(28.dp)
+                                                 .clickable {
+                                                     navController.navigate(SCREENS.CAMERAX_SCREEN.route)
                                                  }
                                          )
                                      }else {
@@ -146,6 +169,7 @@ fun ChatScreenUI(sentTo: String,navController: NavHostController,chatViewModel: 
                                                  seen = false
                                              )
                                              scope.launch {
+                                                 /*
                                                  saveToDb = chatViewModel.saveChatToDB(chat)
 
                                                  Log.d("socketManager", "1: ChatScreenUI:$saveToDb ------->  $chat ")
@@ -160,6 +184,10 @@ fun ChatScreenUI(sentTo: String,navController: NavHostController,chatViewModel: 
                                                      )
                                                      inputText = ""
                                                  }
+                                                 */
+                                                 chatViewModel.sendMessage(ProfileObject.profile?.userId!!, chatListUserId, inputText.ifEmpty { "testing" })
+                                                 inputText = ""
+
                                              }
                                          },fontFamily = DONGLE_BOLD, fontSize = 24.sp, color = Color.DarkGray)
                                      }
@@ -218,16 +246,16 @@ fun ChatScreenUI(sentTo: String,navController: NavHostController,chatViewModel: 
                 }
  */
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
 @Composable
-fun SingleChatTopBar(title: String, navController: NavHostController) {
+fun SingleChatTopBar(title: String,profileImage:String, navController: NavHostController) {
     TopAppBar(
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color.White
-        ),
+//        colors = TopAppBarDefaults.topAppBarColors(
+//            containerColor = Color.Black
+//        ),
         title = {
             Text(
-                title,textAlign= TextAlign.Center, modifier = Modifier.fillMaxWidth(0.6f), color = Color( 0xFF000000), fontSize = 20.sp
+                title,textAlign= TextAlign.Start, modifier = Modifier.fillMaxWidth(0.6f), fontFamily = DONGLE_BOLD,color = floatingActionBtnColor, fontSize = 30.sp
             )
         },
         navigationIcon = {
@@ -235,7 +263,7 @@ fun SingleChatTopBar(title: String, navController: NavHostController) {
                 Card(
                     modifier = Modifier.size(30.dp),
                     shape = CircleShape,
-                    colors = CardDefaults.cardColors(containerColor = Color.LightGray)
+                    colors = CardDefaults.cardColors(containerColor = Color.White)
                 ) {
                     Image(
                         painterResource(id = R.drawable.back),
@@ -251,24 +279,20 @@ fun SingleChatTopBar(title: String, navController: NavHostController) {
                 Card(
                     modifier = Modifier.size(30.dp),
                     shape = CircleShape,
-                    colors = CardDefaults.cardColors(containerColor = Color.LightGray)
+                    colors = CardDefaults.cardColors(containerColor = Color.White)
                 ) {
-                    Image(
-                        painterResource(id = R.drawable.person_new_filled),
-                        colorFilter = ColorFilter.tint(Color.DarkGray),
+                    GlideImage(
+                        model =  imagePrefix + profileImage ,
                         contentDescription = "",
-                        modifier = Modifier
-                            .clickable { navController.navigate(SCREENS.PROFILE.route) }
-                            .padding(4.dp)
-
-                    )
+                        contentScale=ContentScale.Crop,
+                        modifier = Modifier.clickable { navController.navigate(SCREENS.PROFILE.route) })
                 }
             }
         }, actions = {
             Card(
                 modifier = Modifier.size(30.dp),
                 shape = CircleShape,
-                colors = CardDefaults.cardColors(containerColor = Color.LightGray)
+                colors = CardDefaults.cardColors(containerColor = Color.White)
             ) {
                 Image(
                     painterResource(id = R.drawable.menu),
