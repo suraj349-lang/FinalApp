@@ -1,5 +1,7 @@
 package com.example.finalapp.model
 
+import kotlinx.serialization.Serializable
+
 data class ChatList(
     val userId:String,
     val withUserId: WithUserId,
@@ -20,4 +22,14 @@ data class WithUserId(
 //},
 //"lastMessage": "",
 //"lastMessageTime": "2025-04-24T07:24:45.684Z",
-//"__v": 0
+//"__ v": 0
+
+@Serializable
+data class Message(
+    val senderId:String,
+    val receiverId:String,
+    val message:String,
+    val timestamp: String?,
+    val sent: Int = 0, // 0 = pending, 1 = sent
+    val received: Boolean = false
+)

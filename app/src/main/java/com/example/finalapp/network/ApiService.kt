@@ -18,6 +18,7 @@ import com.example.finalapp.model.ImageUploadResponse
 import com.example.finalapp.model.LoginAPIResponse
 import com.example.finalapp.model.AllEventsResponseDTO
 import com.example.finalapp.model.ChatList
+import com.example.finalapp.model.Message
 import com.example.finalapp.model.PremiumEventResponseDTO
 import com.example.finalapp.utils.ApiResponse
 import okhttp3.MultipartBody
@@ -81,7 +82,7 @@ interface ApiService {
     suspend fun saveUserChatList(userID: String, chatListUserId: String):ApiResponse<ChatList>
 
     @GET
-    suspend fun getChats(@Url url:String):ApiResponse<List<ChatList>>
+    suspend fun getChats(@Url url:String):ApiResponse<List<Message>>
 
 
 

@@ -30,3 +30,15 @@ data class Chat(
     val seen:Boolean,
 //    val timeStamp:Long?=null
 )
+
+
+data class ChatItem(
+    val id:String,
+    val sentTo:String,
+    val sentFrom:String,
+    val message:String,
+    val sent:Int,
+    val received:Boolean,
+    val seen:Boolean,
+)
+

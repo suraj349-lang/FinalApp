@@ -1,13 +1,13 @@
 package com.example.finalapp.screens._6chat
 
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -18,18 +18,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.bumptech.glide.integration.compose.GlideImage
-import com.example.finalapp.R
-import com.example.finalapp.ui.imagePrefix
-import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.text.SpanStyle
@@ -37,19 +31,22 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.dp
+import com.example.finalapp.utils.convertToIST
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun MessageItemUI(
     msg: String,
-    isSentByLoggedInUser: Boolean,
-    timestamp: String = "08:38"
+    timestamp: String?,
+    isSentByLoggedInUser: Boolean
 ) {
     val backgroundColor = if (isSentByLoggedInUser) Color(0xFFF7F2F2) else Color(0xFFD58FE7)
     val textColor = Color.Black
     val alignment = if (isSentByLoggedInUser) Arrangement.End else Arrangement.Start
+    var time=""
+    if(timestamp !=null) time= convertToIST(timestamp)
 
     Row(
         modifier = Modifier
@@ -78,7 +75,7 @@ fun MessageItemUI(
                             color = Color.LightGray
                         )
                     ) {
-                        append(timestamp)
+                        append(time)
                     }
                 },
                 fontSize = 15.sp,

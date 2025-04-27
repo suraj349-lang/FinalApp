@@ -92,8 +92,8 @@ fun ChatListScreen(navController: NavHostController,chatViewModel: ChatViewModel
             lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
-    LaunchedEffect(key1 = Unit  ){
-         chatViewModel.getUserChatList(ProfileObject.profile?.userId!!)
+    LaunchedEffect(key1 = Unit) {
+        chatViewModel.getUserChatList(ProfileObject.profile?.userId!!)
     }
 
     val chatListState by chatViewModel.getUserChatList.collectAsState()

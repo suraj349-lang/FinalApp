@@ -1,9 +1,13 @@
 package com.example.finalapp.screens._6chat
 
 import android.annotation.SuppressLint
+import android.os.Build
+import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -49,8 +53,11 @@ import androidx.navigation.NavHostController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
-import com.example.finalapp.database.Chat
+import com.example.finalapp.database.ChatItem
+import com.example.finalapp.model.Message
 import com.example.finalapp.navigation.SCREENS
+import com.example.finalapp.screens.dialogBox.DialogError
+import com.example.finalapp.screens.dialogBox.DialogLoading
 import com.example.finalapp.ui.imagePrefix
 import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.utils.ProfileObject
@@ -58,9 +65,9 @@ import com.example.finalapp.utils.RequestState
 import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
 import com.example.finalapp.viewmodels.ChatViewModel
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ChatScreenUI(sentTo: String,chatListUserId:String,navController: NavHostController,chatViewModel: ChatViewModel) {
@@ -75,10 +82,13 @@ fun ChatScreenUI(sentTo: String,chatListUserId:String,navController: NavHostCont
     }
 
     val messages by chatViewModel.messagesFromServer.collectAsState(RequestState.Idle)
-    LaunchedEffect(messages) {
-        withContext(scope.coroutineContext) {
-            chatViewModel.getAllMessages(sentTo, chatListUserId)
+    LaunchedEffect(chatViewModel.canFetch.value) {
+        if (chatViewModel.canFetch.value) {
+            chatViewModel.getAllMessages(ProfileObject.profile?.userId!!, chatListUserId)
+            chatViewModel.canFetch.value=false
         }
+    }
+    LaunchedEffect(key1 = messages){
         when(val state=messages){
             is RequestState.Success->{
                 if (state.data.isNotEmpty()) {
@@ -87,7 +97,6 @@ fun ChatScreenUI(sentTo: String,chatListUserId:String,navController: NavHostCont
             }
             else ->{}
         }
-       // chatViewModel.getChat(sentTo)
     }
 
 
@@ -99,25 +108,34 @@ fun ChatScreenUI(sentTo: String,chatListUserId:String,navController: NavHostCont
            // .background(Color.Black)
         ) {
             //-------------------------------MESSAGE ITEM ---------------------------------------------------
-            when (val state = messages) {
+            when ( messages) {
                 is RequestState.Success -> {
+                    val messageList=(messages as RequestState.Success<List<Message>>).data
                     LazyColumn(state = listState, modifier = Modifier.weight(1f)) {
-                        items(items = state.data) { message ->
+                        items(items = (messageList)){ message ->
                             MessageItemUI(
                                 msg = message.message,
-                                isSentByLoggedInUser = message.sentFrom == ProfileObject.profile?.userId!!
+                                message.timestamp,
+                                isSentByLoggedInUser = message.senderId == ProfileObject.profile?.userId!!
                             )
                         }
                     }
                 }
                 is RequestState.Loading -> {
-                    // Show loading spinner if you want
+                    Box(modifier = Modifier.weight(1f)) {
+                        DialogLoading()
+
+                    }
                 }
                 is RequestState.Error -> {
-                    // Show error message
+                    Box(modifier = Modifier.weight(1f)) {
+                        DialogError {
+
+                        }
+                    }
                 }
                 else -> {
-                    // Idle state: maybe empty box
+                    Box(modifier = Modifier.weight(1f)) {}
                 }
             }
 
@@ -160,16 +178,19 @@ fun ChatScreenUI(sentTo: String,chatListUserId:String,navController: NavHostCont
                                          )
                                      }else {
                                          Text(text = "Send", modifier = Modifier.clickable {
-                                             val chat = Chat(
-                                                 sentTo = sentTo,
-                                                 sentFrom = userNumber!!,
-                                                 message = inputText,
-                                                 received = false,
-                                                 sent = 0,
-                                                 seen = false
-                                             )
-                                             scope.launch {
-                                                 /*
+                                             if(inputText.trim().isNotEmpty()) {
+                                                 val tempId = System.currentTimeMillis().toString()
+                                                 val newChat = ChatItem(
+                                                     id = tempId,
+                                                     message = inputText.trim(),
+                                                     sentFrom = ProfileObject.profile?.userId!!,
+                                                     sentTo = chatListUserId,
+                                                     sent = 0,
+                                                     received = false,
+                                                     seen = false
+                                                 )
+                                                 scope.launch {
+                                                     /*
                                                  saveToDb = chatViewModel.saveChatToDB(chat)
 
                                                  Log.d("socketManager", "1: ChatScreenUI:$saveToDb ------->  $chat ")
@@ -185,9 +206,10 @@ fun ChatScreenUI(sentTo: String,chatListUserId:String,navController: NavHostCont
                                                      inputText = ""
                                                  }
                                                  */
-                                                 chatViewModel.sendMessage(ProfileObject.profile?.userId!!, chatListUserId, inputText.ifEmpty { "testing" })
-                                                 inputText = ""
+                                                     chatViewModel.sendMessage(newChat)
+                                                     inputText = ""
 
+                                                 }
                                              }
                                          },fontFamily = DONGLE_BOLD, fontSize = 24.sp, color = Color.DarkGray)
                                      }

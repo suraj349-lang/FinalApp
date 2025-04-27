@@ -1,12 +1,15 @@
 package com.example.finalapp.repository
 
+import android.util.Log
 import com.example.finalapp.database.Chat
 import com.example.finalapp.database.ChatDao
 import com.example.finalapp.database.Profile
 import com.example.finalapp.database.ProfileDao
 import com.example.finalapp.model.ChatList
+import com.example.finalapp.model.Message
 import com.example.finalapp.network.ApiService
 import com.example.finalapp.utils.ApiResponse
+import com.example.finalapp.utils.constants.Constants
 import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -52,7 +55,8 @@ class ChatDatabaseRepository @Inject constructor(private val chatDao: ChatDao,pr
         return apiService.saveUserChatList(userID, chatListUserId)
     }
 
-    suspend fun getMessages(userId: String, otherUserId: String): Flow<ApiResponse<List<ChatList>>> = flow {
-            emit( apiService.getChats("http://localhost:5001/api/chat/getMessages/${userId}/${otherUserId}"))
+    suspend fun getMessages(userId: String, otherUserId: String): Flow<ApiResponse<List<Message>>> = flow {
+        Log.d("Messageschat", "getAllMessages: called in repo")
+            emit( apiService.getChats("${Constants.TEMP_SOCKET_URL}api/chat/getMessages/${userId}/${otherUserId}"))
         }.flowOn(Dispatchers.IO)
 }

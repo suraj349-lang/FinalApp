@@ -1,7 +1,8 @@
 package com.example.finalapp.screens._6chat
 
 import android.util.Log
-import com.example.finalapp.database.Chat
+import com.example.finalapp.database.ChatItem
+import com.example.finalapp.model.Message
 import com.example.finalapp.utils.constants.Constants
 import io.socket.client.IO
 import io.socket.client.Socket
@@ -21,7 +22,7 @@ class SocketManager {
     }
 
 
-    fun connect(userNumber:String,onMessageReceived:(Chat)->Unit) {
+    fun connect(userNumber:String,onMessageReceived:(Message)->Unit) {
         mSocket?.connect()
         mSocket?.on(Socket.EVENT_CONNECT) {
             Log.d("SocketManager", "Connected to server")
@@ -35,9 +36,9 @@ class SocketManager {
                 val senderId = messageData.getString("senderId")
                 val receiverId = messageData.getString("receiverId")
                 val message = messageData.getString("message")
-                onMessageReceived(Chat( sentTo=receiverId, sentFrom = senderId, message = message,sent=1, received = false, seen = false));
+                val timestamp=messageData.getString("timestamp")
+                onMessageReceived(Message(senderId,receiverId,message,timestamp));
                 Log.d("SocketManager", "Message from $senderId: $message")
-                // Notify your ViewModel or UI about the new message
             }
         }
         mSocket?.on(Socket.EVENT_CONNECT_ERROR) { args ->
@@ -45,11 +46,11 @@ class SocketManager {
         }
     }
 
-    fun sendMessage(senderId: String, receiverId: String, message: String) {
+    fun sendMessage(newChatItem: ChatItem) {
         val messageData = JSONObject()
-        messageData.put("senderId", senderId)
-        messageData.put("receiverId", receiverId)
-        messageData.put("message", message)
+        messageData.put("senderId", newChatItem.sentFrom)
+        messageData.put("receiverId", newChatItem.sentTo)
+        messageData.put("message", newChatItem.message)
         Log.d("SocketManager", "Emitting sendMessage event with data: $messageData")
         mSocket?.emit("sendMessage", messageData)
         Log.d("SocketManager", "sendMessage event emitted")

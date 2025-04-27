@@ -1,12 +1,13 @@
 package com.example.finalapp.viewmodels
 
 import android.util.Log
-import android.view.PixelCopy.Request
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.finalapp.database.Chat
+import com.example.finalapp.database.ChatItem
 import com.example.finalapp.model.ChatList
+import com.example.finalapp.model.Message
 import com.example.finalapp.repository.ChatDatabaseRepository
 import com.example.finalapp.screens._6chat.SocketManager
 import com.example.finalapp.utils.ProfileObject
@@ -17,7 +18,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -27,17 +27,51 @@ import javax.inject.Inject
 @HiltViewModel
 class ChatViewModel @Inject constructor(private val chatDatabaseRepository: ChatDatabaseRepository): ViewModel() {
 
-
+    val canFetch= mutableStateOf(true)
     private val _messagesFromDB = MutableStateFlow<List<Chat>>(emptyList())
     val messagesFromDB: StateFlow<List<Chat>> = _messagesFromDB
-    private val _messagesFromServer = MutableStateFlow<RequestState<List<Chat>>>(RequestState.Idle)
-    val messagesFromServer: StateFlow<RequestState<List<Chat>>> = _messagesFromServer
-    val loggedInNumber = mutableStateOf("")
+    private val _messagesFromServer = MutableStateFlow<RequestState<List<Message>>>(RequestState.Idle)
+    val messagesFromServer: StateFlow<RequestState<List<Message>>> = _messagesFromServer
     val profileImage= mutableStateOf("")
 
     private val socketManager by lazy { SocketManager()}
     fun connectSocket() {
-//        socketManager.connect(ProfileObject.profile?.userId!!) { newChat ->
+        socketManager.connect(ProfileObject.profile?.userId!!) { receivedMessage ->
+            Log.d("Messageschat", "connectSocket:${receivedMessage} ")
+            _messagesFromServer.update { oldState ->
+                when (oldState) {
+                    is RequestState.Success -> {
+//                        val existingPendingMessage = oldState.data.find {
+//                            it.message == receivedMessage.message && it.senderId == receivedMessage.receiverId
+//                        }
+                        val existingPendingMessage = oldState.data.find {
+                            it.message == receivedMessage.message &&
+                                    it.senderId == receivedMessage.receiverId &&
+                                    it.receiverId == receivedMessage.senderId &&
+                                    it.timestamp == receivedMessage.timestamp
+                        }
+
+                        if (existingPendingMessage != null) {
+                            // Match found: update the sent/received status
+                            val updatedChats = oldState.data.map { chat ->
+                                if (chat.message == receivedMessage.message && chat.senderId == receivedMessage.receiverId ) {
+                                    chat.copy(sent =  1, received = true, timestamp = receivedMessage.timestamp)
+                                } else chat
+                            }
+                            RequestState.Success(updatedChats)
+                        } else {
+                            // No pending message found: it's a fresh incoming message
+                            RequestState.Success(oldState.data + receivedMessage)
+                        }
+                    }
+                    else -> oldState
+                }
+            }
+        }
+    }
+
+
+    //        socketManager.connect(ProfileObject.profile?.userId!!) { newChat ->
 //
 //            val currentState = _messagesFromServer.value
 //
@@ -51,44 +85,38 @@ class ChatViewModel @Inject constructor(private val chatDatabaseRepository: Chat
 //            }
 //
 //        }
-        socketManager.connect(ProfileObject.profile?.userId!!) { receivedChat ->
-            _messagesFromServer.update { oldState ->
-                when (oldState) {
-                    is RequestState.Success -> {
-                        val updatedChats = oldState.data.map { chat ->
-                            if (chat.message == receivedChat.message && chat.sent == 0) {
-                                chat.copy(sent = 1, received = true)
-                            } else chat
+
+    fun sendMessage(newChatItem: ChatItem) {
+        Log.d("SocketManager", "sendMessage in viewmodel:called ${newChatItem.sentFrom},${newChatItem.sentTo},${newChatItem.message} ")
+        socketManager.sendMessage(newChatItem)
+    }
+
+    fun getAllMessages(userID: String, otherUserID: String) = viewModelScope.launch {
+        Log.d("Messageschat", "getAllMessages: called in viewmodel")
+        chatDatabaseRepository.getMessages(userID, otherUserID)
+            .onStart {
+                _messagesFromServer.value = RequestState.Loading
+            }.catch {
+                _messagesFromServer.value = RequestState.Error(it)
+            }.collect { response ->
+                Log.d("Messageschat ", "getAllMessages: $response")
+                _messagesFromServer.update { oldState ->
+                    when (oldState) {
+                        is RequestState.Success -> {
+                            val combined =
+                                (oldState.data + response.data).distinctBy { it.timestamp }
+                            RequestState.Success(combined)
                         }
-                        RequestState.Success(updatedChats)
+
+                        else -> {
+                            RequestState.Success(response.data)
+                        }
                     }
-                    else -> oldState
                 }
+
             }
-        }
-
     }
 
-    fun sendMessage(senderId: String, receiverId: String, message: String) {
-        Log.d("SocketManager", "sendMessage in viewmodel:called ${senderId},${receiverId},${message} ")
-        socketManager.sendMessage(senderId, receiverId, message)
-    }
-    private val _messages=MutableStateFlow<RequestState<List<ChatList>>>(RequestState.Idle)
-    val messages:StateFlow<RequestState<List<ChatList>>> =_messages
-    fun getAllMessages(userID: String,otherUserID:String)=viewModelScope.launch {
-         chatDatabaseRepository.getMessages(userID,otherUserID)
-             .onStart {
-                 _messages.value=RequestState.Loading
-             }.catch {
-                 _messages.value=RequestState.Error(it)
-             }.collect { response ->
-                 if(response.status.uppercase()=="SUCCESS") {
-                     _messages.value = RequestState.Success(response.data)
-                 }else{
-                     _messages.value=RequestState.Error(Throwable("Error getting chats"))
-                 }
-             }
-    }
 
     fun resetProfileImage(){
         profileImage.value=""
