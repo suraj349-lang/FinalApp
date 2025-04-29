@@ -52,6 +52,7 @@ import com.example.finalapp.R
 import com.example.finalapp.model.DirectChat
 import com.example.finalapp.model.DirectChatRequest
 import com.example.finalapp.screens.dialogBox.DialogLoading
+import com.example.finalapp.ui.imagePrefix
 import com.example.finalapp.ui.theme.PURPLE
 import com.example.finalapp.utils.ProfileObject
 import com.example.finalapp.utils.RequestState
@@ -279,7 +280,7 @@ fun ShareProfileForDirectChat(onShareProfileClicked:()->Unit) {
                       shape = CircleShape,
                       border = BorderStroke(width = 1.dp, color = Color.LightGray)) {
                     GlideImage(
-                        model = ProfileObject.profile?.profileImage,
+                        model = imagePrefix+ProfileObject.profile?.profileImage,
                         contentDescription = "",
                         contentScale = ContentScale.Crop
                     )

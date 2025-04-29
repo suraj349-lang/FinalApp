@@ -4,6 +4,7 @@ package com.example.finalapp.screens._6chat
 
 import BottomBar
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -41,9 +43,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
@@ -57,6 +61,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavHostController
@@ -66,9 +71,14 @@ import com.example.finalapp.R
 import com.example.finalapp.model.ChatList
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.ui.imagePrefix
+import com.example.finalapp.utilComposable.CommonErrorScreen
+import com.example.finalapp.utilComposable.CommonLoadingScreen
 import com.example.finalapp.utils.ProfileObject
 import com.example.finalapp.utils.RequestState
+import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
+import com.example.finalapp.utils.constants.Constants.FONT_MEDIUM
+import com.example.finalapp.utils.constants.Constants.TAG
 import com.example.finalapp.viewmodels.ChatViewModel
 
 
@@ -97,30 +107,34 @@ fun ChatListScreen(navController: NavHostController,chatViewModel: ChatViewModel
     }
 
     val chatListState by chatViewModel.getUserChatList.collectAsState()
+    var showSearchBox by remember { mutableStateOf(false) }
 
 
     Scaffold(topBar = {
         ChatTopBar(
             title = "Chats",
             navController = navController
-        )
-    }, bottomBar = {BottomBar(navController = navController, state =buttonsVisible )}
+        ){
+            showSearchBox=true
+        }
+    },
+       // bottomBar = {BottomBar(navController = navController, state =buttonsVisible )}
     ) {
         Column(modifier = Modifier
             .fillMaxSize()
             .padding(it)) {
-            LazyRow(modifier = Modifier
-                .background(color = Color.White)
-                .fillMaxWidth()
-                .height(50.dp)) {
-                items(chatRowListItems){item->
-                    ChatRowItem(item)
-                }
-            }
+            //todo not needed row
+//            LazyRow(modifier = Modifier.background(color = Color.LightGray).fillMaxWidth().height(50.dp)) {
+//                items(chatRowListItems){item->
+//                    ChatRowItem(item)
+//                }
+//            }
+            Spacer(modifier = Modifier.height(10.dp))
             when(chatListState){
-                is RequestState.Loading ->{ Text(text = "Loading")}
+                is RequestState.Loading ->{ CommonLoadingScreen()}
                 is RequestState.Error ->{
-                    Text(text = "Error getting users ${(chatListState as RequestState.Error).error.message}")
+                    CommonErrorScreen("Error getting users")
+                    Log.d(TAG, "ChatListScreen: ${(chatListState as RequestState.Error).error.message}")
                 }
                 is RequestState.Success ->{
                     val users=remember{ (chatListState as RequestState.Success<List<ChatList>>).data }
@@ -145,7 +159,7 @@ fun ChatListScreen(navController: NavHostController,chatViewModel: ChatViewModel
 fun ChatRowItem(item: String) {
     Card(modifier = Modifier
         .wrapContentSize()
-        .padding(8.dp), colors = CardDefaults.cardColors(containerColor = Color.LightGray)) {
+        .padding(8.dp), colors = CardDefaults.cardColors(containerColor = Color.White)) {
         Column(
             Modifier.wrapContentSize(),
             verticalArrangement = Arrangement.Center,
@@ -164,66 +178,65 @@ fun ChatRowItem(item: String) {
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
 @Composable
-fun ChatTopBar(title: String, navController: NavHostController) {
+fun ChatTopBar(title: String, navController: NavHostController,onSearchClicked:()->Unit) {
         TopAppBar(
             colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = Color.White
             ),
+            modifier = Modifier.shadow(elevation = 10.dp),
             title = {
                 Text(
-                    title,textAlign= TextAlign.Center, fontFamily = DONGLE_BOLD, modifier = Modifier.fillMaxWidth(0.6f), color = Color( 0xFF000000), fontSize = 20.sp
+                    title,textAlign= TextAlign.Center, fontFamily = Constants.FONT_MEDIUM, modifier = Modifier.fillMaxWidth(0.6f), color = Color( 0xFF000000), fontSize = 20.sp
                 )
             },
             navigationIcon = {
-                Row(modifier = Modifier.fillMaxWidth(0.2f)) {
-                    Card(
-                        modifier = Modifier.size(30.dp),
-                        shape = CircleShape,
-                        colors = CardDefaults.cardColors(containerColor = Color.LightGray)
-                    ) {
-                        GlideImage(
-                            model=ProfileObject.profile?.profileImage!!,
-                            contentDescription = "",
-                            contentScale=ContentScale.Crop,
-                            modifier = Modifier
-                                .clickable { navController.navigate(SCREENS.PROFILE.route) }
-                                .padding(4.dp)
+                Row(modifier = Modifier) {
+                    Image(
+                        painterResource(id = R.drawable.back),
+                        contentDescription = "",
+                        colorFilter = ColorFilter.tint(Color.DarkGray),
+                        modifier = Modifier
+                            .size(30.dp)
+                            .clickable { navController.navigate(SCREENS.PROFILE.route) }
 
-                        )
-                    }
+                    )
                     Spacer(modifier = Modifier.width(16.dp))
                     Card(
                         modifier = Modifier.size(30.dp),
                         shape = CircleShape,
-                        colors = CardDefaults.cardColors(containerColor = Color.LightGray)
                     ) {
-                        Image(
-                            painterResource(id = R.drawable.search_new_filled),
+                        GlideImage(
+                            model= imagePrefix+ProfileObject.profile?.profileImage!!,
                             contentDescription = "",
-                            colorFilter = ColorFilter.tint(Color.DarkGray),
+                            contentScale=ContentScale.Crop,
                             modifier = Modifier
+                                .fillMaxSize()
                                 .clickable { navController.navigate(SCREENS.PROFILE.route) }
-                                .padding(8.dp)
 
                         )
                     }
+
                 }
             }, actions = {
-                Card(
-                    modifier = Modifier.size(30.dp),
-                    shape = CircleShape,
-                    colors = CardDefaults.cardColors(containerColor = Color.LightGray)
-                ) {
+//                Card(
+//                    modifier = Modifier.size(30.dp),
+//                    shape = CircleShape,
+//                    colors = CardDefaults.cardColors(containerColor = Color.LightGray)
+//                ) {
+//
+//                }
+                Row(modifier = Modifier.padding(end = 16.dp)) {
                     Image(
-                        painterResource(id = R.drawable.menu),
+                        painterResource(id = R.drawable.search_new_filled),
                         contentDescription = "",
                         colorFilter = ColorFilter.tint(Color.DarkGray),
                         modifier = Modifier
-                            .clickable { /* TODO menu option */ }
-                            .padding(8.dp)
+                            .size(24.dp)
+                            .clickable { onSearchClicked() }
 
                     )
                 }
+
 
             }
         )
@@ -267,11 +280,11 @@ fun UserItem(navController: NavHostController, user: ChatList,setProfileImage:(S
                 .fillMaxSize()
                 .padding(start = 8.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.Start) {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text(text = user.withUserId.username, fontSize = 16.sp, color = Color.Black)
+                    Text(text = user.withUserId.username, fontFamily =FONT_MEDIUM,fontSize = 18.sp, color = Color.Black, fontWeight = FontWeight.SemiBold)
                     Text(text = "08:38", fontSize = 12.sp, color = Color.LightGray)
                 }
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
-                    Text(text =  "hello",style = MaterialTheme.typography.titleMedium, fontSize = 8.sp,color= Color.DarkGray)
+                    Text(text =  "hello", fontSize = 14.sp,color= Color.Gray)
                 }
 
 

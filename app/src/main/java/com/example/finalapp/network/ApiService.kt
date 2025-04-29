@@ -1,5 +1,6 @@
 package com.example.finalapp.network
 
+import com.example.finalapp.fcm.stateObject.SendFcmTokenDto
 import com.example.finalapp.model.PreSignedUrlResponse
 import com.example.finalapp.model.SignupAPIResponse
 import com.example.finalapp.model.DirectChat
@@ -18,6 +19,7 @@ import com.example.finalapp.model.ImageUploadResponse
 import com.example.finalapp.model.LoginAPIResponse
 import com.example.finalapp.model.AllEventsResponseDTO
 import com.example.finalapp.model.ChatList
+import com.example.finalapp.model.FCMTokenResponse
 import com.example.finalapp.model.Message
 import com.example.finalapp.model.PremiumEventResponseDTO
 import com.example.finalapp.utils.ApiResponse
@@ -94,6 +96,10 @@ interface NonAuthApiService{
     @POST("/api/v1/auth/login")
     suspend fun postLoginData(@Body loginData:LoginModel): LoginAPIResponse
     //-----------------------------------------------------------------------------------//
+    @POST("/notification/updateFcmToken")
+    suspend fun updateFcmToken(@Body data:SendFcmTokenDto):FCMTokenResponse
+
+    //----------------------------------------------------------------------------------//
     @POST("/api/v1/auth/register")
     suspend fun postSignupData(@Body signupData:RegisterUserModel): SignupAPIResponse
     //-----------------------------------------------------------------------------------//

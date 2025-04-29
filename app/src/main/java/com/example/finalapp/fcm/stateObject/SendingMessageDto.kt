@@ -14,3 +14,8 @@ data class SendTokenDto(
     val token:String,
     val number:String
 )
+
+data class SendFcmTokenDto(
+    val fcmToken:String,
+    val userId:String
+)

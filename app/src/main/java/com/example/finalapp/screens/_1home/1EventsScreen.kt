@@ -76,6 +76,7 @@ fun EventsScreen(
                     ) { page ->
                         val event = eventList[page]
                         if (event.isPrivate) {
+
                             PrivateEvent(event,navController) // or PrivateLiveEventInUse(navController)
                         } else {
                             PublicEvent(

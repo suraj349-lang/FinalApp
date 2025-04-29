@@ -42,6 +42,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -110,7 +111,7 @@ fun HomeTopBar(
 
 
     TopAppBar(
-        modifier= Modifier
+        modifier= Modifier.shadow(elevation = 40.dp)
             .fillMaxWidth()
             .height(40.dp),
         colors = TopAppBarDefaults.topAppBarColors(

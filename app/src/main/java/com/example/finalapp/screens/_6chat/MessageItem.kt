@@ -9,6 +9,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,68 +27,163 @@ import androidx.compose.ui.unit.sp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.zIndex
+import com.example.finalapp.R
+import com.example.finalapp.utils.constants.Constants.DONGLE_LIGHT
 import com.example.finalapp.utils.convertToIST
+import java.net.ResponseCache
 
+//
+//@RequiresApi(Build.VERSION_CODES.O)
+//@OptIn(ExperimentalGlideComposeApi::class)
+//@Composable
+//fun MessageItemUI(
+//    msg: String,
+//    sent:Int,
+//    received: Boolean,
+//    timestamp: String?,
+//    isSentByLoggedInUser: Boolean
+//) {
+//    val backgroundColor = if (isSentByLoggedInUser) Color(0xFF797676) else Color(0xFFCF5630)
+//    val textColor = Color.White
+//    val alignment = if (isSentByLoggedInUser) Arrangement.End else Arrangement.Start
+//    var time=""
+//    if(timestamp !=null) time= convertToIST(timestamp)
+//
+//    Row(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .padding(horizontal = 12.dp, vertical = 4.dp),
+//        horizontalArrangement = alignment
+//    ) {
+//        Column() {
+//        Row(
+//            modifier = Modifier
+//                .clip(BubbleShape(isSentByUser = isSentByLoggedInUser))
+//                .background(backgroundColor)
+//                .padding(horizontal = 12.dp, vertical = 8.dp)
+//                .widthIn(max = 280.dp)
+//                .animateContentSize(
+//                    animationSpec = tween(durationMillis = 200, easing = FastOutSlowInEasing)
+//                ),
+//            verticalAlignment = Alignment.Bottom
+//        ) {
+//            Text(
+//                buildAnnotatedString {
+//                    append(msg)
+//                    append("   ") // small gap
+//                    withStyle(
+//                        style = SpanStyle(
+//                            fontSize = 14.sp,
+//                            color = Color.LightGray
+//                        )
+//                    ) {
+//                        append(time)
+//                    }
+//                },
+//                fontSize = 22.sp,
+//                color = textColor,
+//                softWrap = true,
+//                fontFamily=DONGLE_LIGHT,
+//                lineHeight=16.sp,
+//                maxLines = Int.MAX_VALUE,
+//                modifier = Modifier.widthIn(max = 280.dp)
+//            )
+//            if (received && isSentByLoggedInUser) {
+//                Icon(
+//                    painter = painterResource(id = R.drawable.check_double),
+//                    contentDescription = "",
+//                    modifier = Modifier.size(10.dp)
+//                )
+//            } else if (isSentByLoggedInUser && sent == 1) {
+//                Icon(
+//                    painter = painterResource(id = R.drawable.check),
+//                    contentDescription = "",
+//                    modifier = Modifier.size(10.dp)
+//                )
+//
+//            }
+//        }
+//
+//        }
+//
+//    }
+//}
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun MessageItemUI(
     msg: String,
+    sent: Int,
+    received: Boolean,
     timestamp: String?,
     isSentByLoggedInUser: Boolean
 ) {
-    val backgroundColor = if (isSentByLoggedInUser) Color(0xFFF7F2F2) else Color(0xFFD58FE7)
-    val textColor = Color.Black
-    val alignment = if (isSentByLoggedInUser) Arrangement.End else Arrangement.Start
-    var time=""
-    if(timestamp !=null) time= convertToIST(timestamp)
+    val backgroundColor = if (isSentByLoggedInUser) Color(0xFF797676) else Color(0xFFCF5630)
+    val textColor = Color.White
+    var time = ""
+    if (timestamp != null) time = convertToIST(timestamp)
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 12.dp, vertical = 4.dp),
-        horizontalArrangement = alignment
+        horizontalArrangement = if (isSentByLoggedInUser) Arrangement.End else Arrangement.Start
     ) {
-        Row(
+        Column(
             modifier = Modifier
                 .clip(BubbleShape(isSentByUser = isSentByLoggedInUser))
                 .background(backgroundColor)
-                .padding(horizontal = 12.dp, vertical = 8.dp)
-                .widthIn(max = 280.dp)
-                .animateContentSize(
-                    animationSpec = tween(durationMillis = 200, easing = FastOutSlowInEasing)
-                ),
-            verticalAlignment = Alignment.Bottom
+                .padding(horizontal = 12.dp, vertical = 4.dp)
+                .widthIn(max = 280.dp) // limit width for long texts
         ) {
             Text(
-                buildAnnotatedString {
-                    append(msg)
-                    append("   ") // small gap
-                    withStyle(
-                        style = SpanStyle(
-                            fontSize = 10.sp,
-                            color = Color.LightGray
-                        )
-                    ) {
-                        append(time)
-                    }
-                },
-                fontSize = 15.sp,
+                text = msg,
+                fontSize = 14.sp,
                 color = textColor,
-                softWrap = true,
-                maxLines = Int.MAX_VALUE,
-                modifier = Modifier.widthIn(max = 280.dp)
+                lineHeight = 18.sp,
             )
-        }
 
+            Row(
+                verticalAlignment = Alignment.Top,
+                modifier = Modifier.padding(start = 12.dp).align(Alignment.End) // ⬅️ align time and tick to the end inside bubble only
+            ) {
+                Text(
+                    text = time,
+                    fontSize = 10.sp,
+                    color = Color.LightGray
+                )
+                if (isSentByLoggedInUser) {
+                    Spacer(modifier = Modifier.width(4.dp))
+                    if (received) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.check_double),
+                            contentDescription = "Delivered",
+                            tint = Color.LightGray,
+                            modifier = Modifier.size(14.dp)
+                        )
+                    } else if (sent == 1) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.check),
+                            contentDescription = "Sent",
+                            tint = Color.LightGray,
+                            modifier = Modifier.size(14.dp)
+                        )
+                    }
+                }
+            }
+        }
     }
 }
+
+
 class BubbleShape(private val isSentByUser: Boolean) : Shape {
     override fun createOutline(
         size: Size,

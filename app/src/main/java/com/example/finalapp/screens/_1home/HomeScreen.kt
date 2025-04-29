@@ -69,6 +69,7 @@ import com.example.finalapp.screens.dialogBox.ShowQRDialog
 import com.example.finalapp.screens.dialogBox.showDialog
 import com.example.finalapp.testing.items
 import com.example.finalapp.ui.TAB_ITEMS
+import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.viewmodels.ImageUploadViewModel
 import kotlinx.coroutines.launch
@@ -179,20 +180,16 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
                         .fillMaxSize()
                         .padding(padding)
                 ) {
-                    Divider(
-                        modifier = Modifier.fillMaxWidth(),
-                        thickness = 1.dp,
-                        color = Color(0xFFDCD6DD)
-                    )
+//
                     TabRow(
                         selectedTabIndex = pagerState.currentPage,
                         indicator = { tabPositions ->
                             TabRowDefaults.Indicator(
                                 Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage]),
-                                color = Color(0xFFEB1809)
+                                color = Color(0xFF0A010E) //0xFFEB1809
                             )
                         },
-                        backgroundColor = Color.Transparent,
+                        backgroundColor = Color(0xFFDF400E), //0xFFD5623E orange , 0xFFBCE697 green
                         modifier = Modifier
                             .border(width = 0.dp, color = Color.White)
                             .padding(bottom = 0.dp)
@@ -206,9 +203,9 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
                                 text = {
                                     Text(
                                         text = item.title,
-                                        color = if (pagerState.currentPage == index) Color(0xFF000000) else Color(0xFF636368),
-                                        fontFamily = FontFamily(Font(R.font.dongle_light)),
-                                        fontSize = 20.sp,
+                                        color = if (pagerState.currentPage == index) Color.White else Color.Black,
+                                        fontFamily = Constants.FONT_MEDIUM,//FontFamily(Font(R.font.dongle_light)),
+                                        fontSize = 12.sp,//20.sp,
                                         fontWeight = if (pagerState.currentPage == index) FontWeight.Bold else FontWeight.Normal
                                     )
                                 }

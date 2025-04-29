@@ -79,7 +79,7 @@ fun PrivateLiveEvent() {
                         .fillMaxWidth()
                         .fillMaxHeight(0.7f), contentScale = ContentScale.Crop)
                 Box(modifier = Modifier.align(Alignment.TopStart)) {
-                    ActiveButtonUi()
+                    ActiveButtonUI()
                 }
                 Column(modifier = Modifier
                     .fillMaxWidth()
@@ -259,10 +259,9 @@ val DONGLE=FontFamily(Font( R.font.dongle_bold))
 val SANS= FontFamily(Font(R.font.work_sans_regular))
 
 @Composable
-fun ActiveButtonUi() {
+fun ActiveButtonUI() {
     Column(modifier = Modifier
-        .wrapContentHeight()
-        .width(80.dp)
+        .wrapContentSize()
         .padding(8.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Column(modifier = Modifier
             .fillMaxWidth()

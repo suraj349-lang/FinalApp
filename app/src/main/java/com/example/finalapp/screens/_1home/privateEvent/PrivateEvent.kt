@@ -89,7 +89,9 @@ fun PrivateEvent(event: EventResponse, navController: NavHostController) {
                             .fillMaxWidth()
                             .fillMaxHeight(0.7f), contentScale = ContentScale.Crop)
                     //--------------------active button and expiration time----------------------
-                    Box(modifier = Modifier.align(Alignment.TopStart)){ ActiveButtonAndExpirationTime() }
+                    Box(modifier = Modifier.align(Alignment.TopStart)){
+                        ActiveButtonAndExpirationTime()
+                    }
                     //---------------------------------------------------------------------------
                     Column(modifier = Modifier
                         .fillMaxWidth()
@@ -106,8 +108,9 @@ fun PrivateEvent(event: EventResponse, navController: NavHostController) {
                             .wrapContentHeight()) {
                             Card(modifier = Modifier
                                 .fillMaxWidth()
-                                .height(50.dp)
-                                .padding(horizontal = 8.dp, vertical = 4.dp), colors = CardDefaults.cardColors(containerColor = Color.Transparent)) {
+                                .height(50.dp),
+                                shape= RoundedCornerShape(0.dp)
+                                , colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.7f))) {
                                 EventCommentsAndJoinButtonBar()
                             }
                         }
@@ -231,8 +234,7 @@ fun RunningText4(location:String) {
 @Composable
 fun ActiveButtonAndExpirationTime() {
     Column(modifier = Modifier
-        .wrapContentHeight()
-        .width(80.dp)
+        .wrapContentSize()
         .padding(8.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         Column(modifier = Modifier
             .fillMaxWidth()
@@ -289,7 +291,7 @@ fun ApproveOrJoin4(modifier: Modifier = Modifier) {
 @Composable
 fun UsernameAndUserProfileImage(username:String?) {
     Row(
-        modifier = Modifier
+        modifier = Modifier.padding(bottom = 8.dp)
             .fillMaxWidth()
             .wrapContentHeight()
     ) {
@@ -355,14 +357,14 @@ fun EventCommentsAndJoinButtonBar() {
                 .wrapContentWidth()
                 .fillMaxHeight()
                 .padding(start = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
+            verticalAlignment = Alignment.Bottom,
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxHeight()
                     .wrapContentWidth(),
-                verticalArrangement = Arrangement.Center,
+                verticalArrangement = Arrangement.Bottom,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Image(
@@ -370,13 +372,13 @@ fun EventCommentsAndJoinButtonBar() {
                     contentDescription = "",
                     modifier = Modifier.size(20.dp)
                 )
-                Text("Joined", fontSize = 8.sp)
+                Text("Joined", fontSize = 8.sp, fontWeight = FontWeight.SemiBold)
             }
             Column(
                 modifier = Modifier
                     .fillMaxHeight()
                     .wrapContentWidth(),
-                verticalArrangement = Arrangement.Center,
+                verticalArrangement = Arrangement.Bottom,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Image(
@@ -384,13 +386,13 @@ fun EventCommentsAndJoinButtonBar() {
                     contentDescription = "",
                     modifier = Modifier.size(20.dp)
                 )
-                Text("Comment", fontSize = 8.sp)
+                Text("Comment", fontSize = 8.sp, fontWeight = FontWeight.SemiBold)
             }
             Column(
                 modifier = Modifier
                     .fillMaxHeight()
                     .wrapContentWidth(),
-                verticalArrangement = Arrangement.Center,
+                verticalArrangement = Arrangement.Bottom,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Image(
@@ -404,7 +406,7 @@ fun EventCommentsAndJoinButtonBar() {
                 modifier = Modifier
                     .fillMaxHeight()
                     .wrapContentWidth(),
-                verticalArrangement = Arrangement.Center,
+                verticalArrangement = Arrangement.Bottom,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Image(

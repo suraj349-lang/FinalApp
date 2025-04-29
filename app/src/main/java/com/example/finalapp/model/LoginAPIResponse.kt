@@ -7,3 +7,8 @@ data class LoginAPIResponse(
     val code:Int,
     val data: User
 )
+
+data class FCMTokenResponse(
+    val success: Boolean,
+    val message:String
+)

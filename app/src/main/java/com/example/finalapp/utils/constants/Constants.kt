@@ -9,7 +9,7 @@ object Constants {
     const val SOCKET_CHAT_BASE_URL="http://${IP_ADD}:80/chat/"
     const val TEMP_SOCKET_URL="http://${IP_ADD}:5001/";
     const val BASE_URL="http://${IP_ADD}:5000/"
-    const val APP_NAME="Carbon"
+    const val APP_NAME="Spint"
     val APP_ICON= R.drawable.app_icon_dynamic
     val LOGIN_METHOD=LoginMethod.EMAIL
     const val TAG= APP_NAME

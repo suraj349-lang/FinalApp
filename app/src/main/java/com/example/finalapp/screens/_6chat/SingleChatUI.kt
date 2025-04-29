@@ -2,7 +2,6 @@ package com.example.finalapp.screens._6chat
 
 import android.annotation.SuppressLint
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -115,6 +114,8 @@ fun ChatScreenUI(sentTo: String,chatListUserId:String,navController: NavHostCont
                         items(items = (messageList)){ message ->
                             MessageItemUI(
                                 msg = message.message,
+                                sent =message.sent,
+                                received =message.received,
                                 message.timestamp,
                                 isSentByLoggedInUser = message.senderId == ProfileObject.profile?.userId!!
                             )

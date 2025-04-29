@@ -52,8 +52,10 @@ import com.example.finalapp.screens._3createEvent.CreateEventBottomSheet
 import com.example.finalapp.screens.dialogBox.DropProfileDialog
 import com.example.finalapp.screens.dialogBox.GalleryPickerForDropProfile
 import com.example.finalapp.screens.dialogBox.ImageCaptureFromCameraForDropProfile
+import com.example.finalapp.ui.imagePrefix
 import com.example.finalapp.ui.theme.PURPLE
 import com.example.finalapp.utils.ProfileObject
+import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.viewmodels.AuthViewModel
 import com.example.finalapp.viewmodels.EventsViewModel
 import com.example.finalapp.viewmodels.ImageUploadViewModel
@@ -111,27 +113,23 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
             ) {
                 Box(modifier = Modifier
                     .fillMaxSize()
-                    .background(
-                        brush = Brush.verticalGradient(
-                            colors = listOf(
-                                Color.Transparent, Color(0xFFDA598D) // 0xFF1B1A1A
-                            ), startY = 0f, endY = 600f
-                        )
-                    )) {
-                    Card(modifier = Modifier
-                        .padding(4.dp)
-                        .size(25.dp)
-                        .clickable { navController.navigateUp() }
-                        .align(Alignment.TopStart),
-                        backgroundColor = Color.Black.copy(alpha = 0.2f),
-                        shape = CircleShape) {
-                        Image(
-                            painterResource(id = R.drawable.back),
-                            contentDescription = "",
-                            contentScale = ContentScale.Crop, colorFilter = ColorFilter.tint(Color.White)
-                        )
-
-                    }
+//                    .background(
+//                        brush = Brush.verticalGradient(
+//                            colors = listOf(
+//                                Color.Transparent, Color(0xFFE43A05) // 0xFF1B1A1A
+//                            ), startY = 0f, endY = 600f
+//                        )
+//                    )
+                    .background(color= Color(0xFF25086B))){ // 0xFF1B1A1A
+                    Image(
+                        painterResource(id = R.drawable.back),
+                        contentDescription = "",
+                        modifier = Modifier.padding(16.dp)
+                            .size(30.dp)
+                            .clickable { navController.navigateUp() }
+                            .align(Alignment.TopStart),
+                        contentScale = ContentScale.Crop, colorFilter = ColorFilter.tint(Color.White)
+                    )
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
@@ -154,13 +152,14 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                                     modifier = Modifier
                                         .size(60.dp)
                                         .clickable { showSheetForImageUpdate = true;/*showImageCropper = true*/ },
-                                    shape = RoundedCornerShape(12.dp),
-                                    border = BorderStroke(1.dp, color = Color.Black),
+                                    shape = CircleShape,
+                                    border = BorderStroke(1.dp, color = Color.LightGray),
                                     elevation = 20.dp
                                 ) {
                                     GlideImage(
-                                        model= if(newUri!=Uri.EMPTY)  newUri else ProfileObject.profile?.profileImage,
+                                        model= if(newUri!=Uri.EMPTY)  newUri else imagePrefix+ProfileObject.profile?.profileImage,
                                         contentDescription = "",
+                                        modifier=Modifier.fillMaxSize(),
                                         contentScale = ContentScale.Crop
                                     )
 
@@ -174,6 +173,7 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                                         Text(
                                             text = it.name,
                                             fontWeight = FontWeight.Bold,
+                                            fontFamily=Constants.FONT_MEDIUM,
                                             color = Color.White,
                                             fontSize = 18.sp
                                         )

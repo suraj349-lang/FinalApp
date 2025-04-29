@@ -1,7 +1,8 @@
 package com.example.finalapp.model
 
 data class EventRequestDTO(
-  val user: String="66867295208440d0e3e36ed1",
+  val user: String="",
+  val userName:String="",
   val title: String? = null,
   val description: String? = null,
   val image: String = "",

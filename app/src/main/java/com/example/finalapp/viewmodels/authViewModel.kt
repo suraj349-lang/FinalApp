@@ -14,6 +14,7 @@ import com.example.finalapp.LatLng
 import com.example.finalapp.repository.AuthRepository
 import com.example.finalapp.loginActivity.auth.RESPONSE
 import com.example.finalapp.database.Profile
+import com.example.finalapp.fcm.stateObject.SendFcmTokenDto
 import com.example.finalapp.login.LoginMethod
 import com.example.finalapp.repository.ProfileDatabaseRepository
 import com.example.finalapp.model.LoginModel
@@ -25,6 +26,8 @@ import com.example.finalapp.utils.ProfileObject
 import com.example.finalapp.utils.RequestState
 import com.example.finalapp.utils.TokenObject
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.ktx.messaging
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -32,8 +35,10 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import java.security.MessageDigest
 import javax.inject.Inject
 
@@ -111,7 +116,7 @@ class AuthViewModel @Inject constructor(
        val loginState: StateFlow<LoginState<User>> = _loginState;
        val userData = mutableStateOf(User())
 
-    fun loginUser(loginMethod: LoginMethod, credentials:String,password: String)=viewModelScope.launch(Dispatchers.IO) {
+    fun loginUser(loginMethod: LoginMethod, credentials:String,password: String)=viewModelScope.launch(Dispatchers.Main) {
         _loginState.value=LoginState.Loading
        // val hashedPassword=hashPassword(password) // todo uncomment it
         val loginModel=LoginModel(credentials,password);
@@ -121,11 +126,20 @@ class AuthViewModel @Inject constructor(
             }.catch {
                 _loginState.value= LoginState.Error(it.message.toString())
             }.collect { response ->
-                Log.d("Login", "Full API response: ${response.toString()}") // Log the full response
+                Log.d("Login", "Full API response: $response") // Log the full response
 
                 if (response.success) {
                         saveProfileData(response.data);
                     try {
+                        val fcmToken= Firebase.messaging.token.await()
+                        if (fcmToken!=null) {
+                            repository.updateFcmToken(SendFcmTokenDto(userId = response.data._id, fcmToken = fcmToken))
+                                .catch {
+                                    Log.d("FCMTOKENUPDATE", "loginUser error:$it ")
+                                }.collect {
+                                    Log.d("FCMTOKENUPDATE", "loginUser Success: $it")
+                                }
+                        }
                         TokenObject.token=response.data.token
                         sharedPreferences.edit().putString("token", response.data.token).apply()
                         _loginState.value = LoginState.Success(response.data)

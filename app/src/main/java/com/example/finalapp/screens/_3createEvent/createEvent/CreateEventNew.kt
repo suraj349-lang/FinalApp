@@ -134,7 +134,7 @@ fun CreateEventNew(navController: NavController, eventsViewModel: EventsViewMode
                 }
                 CREATE_EVENT.MISCELLANEOUS ->{
                     CreateEventFinalScreen(uri = imageUri,caption, eventType =type){
-                        eventsViewModel.createEvent(EventRequestDTO(image = imageUri.toString(), category = type, location = ProfileObject.profile?.address!!, offer =caption, expirationTime = "!2"))
+                        eventsViewModel.createEvent(EventRequestDTO(user = ProfileObject.profile?.userId!!, userName = ProfileObject.profile?.username!!, image = imageUri.toString(), category = type, location = ProfileObject.profile?.address!!, offer =caption, expirationTime = "!2"))
                     }
                 }
             }

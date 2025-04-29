@@ -5,6 +5,7 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -54,6 +55,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.finalapp.R
+import com.example.finalapp.utils.constants.Constants
 
 @Composable
 fun NewPrivateUI2(modifier: Modifier = Modifier) {
@@ -118,7 +120,7 @@ fun NewPrivateUI2(modifier: Modifier = Modifier) {
                             Card(modifier = Modifier
                                 .fillMaxWidth()
                                 .height(60.dp)
-                                .padding(start = 8.dp, end = 8.dp, bottom = 4.dp)) {
+                                .padding(start = 8.dp, end = 8.dp)) {
                                 ItemsBar()
                             }
                         }
@@ -325,9 +327,9 @@ fun EventCaption(modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun ActiveButton(modifier: Modifier = Modifier) {
-    Card(modifier=Modifier.wrapContentSize(), colors = CardDefaults.cardColors(containerColor = Color(0xFF5B0505).copy(alpha = 0.9f)), shape = RoundedCornerShape(7.dp)) {
-        Text("ACTIVE", modifier = Modifier.padding(4.dp), color = Color.White, fontFamily = SANS, fontSize = 14.sp)}
+fun ActiveButton() {
+    Card(modifier=Modifier.wrapContentSize(), colors = CardDefaults.cardColors(containerColor = Color(0xFF026406).copy(alpha = 0.9f)), shape = RoundedCornerShape(7.dp), border = BorderStroke(width = 1.dp,color= Color(0xFF022504))) {
+        Text("ACTIVE", modifier = Modifier.padding(4.dp), color = Color.White, fontFamily = Constants.FONT_MEDIUM, fontSize = 16.sp)}
 }
 
 @Composable

@@ -34,7 +34,7 @@
             android:exported="false" />
 
         <service
-            android:name=".fcm.PushNotificationService"
+            android:name=".screens._8notification.pushNotificationService.PushNotificationService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />

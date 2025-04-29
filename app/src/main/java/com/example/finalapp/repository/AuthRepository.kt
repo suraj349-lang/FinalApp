@@ -1,5 +1,7 @@
 package com.example.finalapp.repository
 
+import com.example.finalapp.fcm.stateObject.SendFcmTokenDto
+import com.example.finalapp.model.FCMTokenResponse
 import com.example.finalapp.model.SignupAPIResponse
 import com.example.finalapp.model.LoginModel
 import com.example.finalapp.model.RegisterUserModel
@@ -12,7 +14,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
-@ViewModelScoped
+
 class AuthRepository @Inject constructor(private val noAuthApi:NonAuthApiService){
     fun sendLoginData(loginData: LoginModel): Flow<LoginAPIResponse> = flow  {
         emit(noAuthApi.postLoginData(loginData))
@@ -20,6 +22,10 @@ class AuthRepository @Inject constructor(private val noAuthApi:NonAuthApiService
 
     fun sendSignupData(signupData: RegisterUserModel): Flow<SignupAPIResponse> = flow {
         emit(noAuthApi.postSignupData(signupData))
+    }.flowOn(Dispatchers.IO)
+
+    fun updateFcmToken(data: SendFcmTokenDto): Flow<FCMTokenResponse> = flow  {
+        emit(noAuthApi.updateFcmToken(data))
     }.flowOn(Dispatchers.IO)
 }
 
