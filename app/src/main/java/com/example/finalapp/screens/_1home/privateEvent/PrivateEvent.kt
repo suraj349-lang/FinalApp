@@ -7,6 +7,7 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -65,6 +66,8 @@ import com.example.finalapp.screens._1home._1_1ExperimentScreenEvents.ActiveButt
 import com.example.finalapp.screens._1home._1_1ExperimentScreenEvents.DONGLE
 import com.example.finalapp.screens._1home._1_1ExperimentScreenEvents.SANS
 import com.example.finalapp.screens._1home._1_1ExperimentScreenEvents.images
+import com.example.finalapp.utils.constants.Constants
+import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
@@ -73,10 +76,10 @@ fun PrivateEvent(event: EventResponse, navController: NavHostController) {
     val window = (view.context as Activity).window
     Log.d("EventData", "PrivateEvent:${event} ")
 
-    SideEffect {
-        window.statusBarColor = Color.White.toArgb()
-        WindowInsetsControllerCompat(window, view).isAppearanceLightStatusBars = true
-    }
+//    SideEffect {
+//        window.statusBarColor = Color.White.toArgb()
+//        WindowInsetsControllerCompat(window, view).isAppearanceLightStatusBars = true
+//    }
         Surface(modifier = Modifier
             .fillMaxSize()) {
             Column(modifier = Modifier.fillMaxSize()) {
@@ -203,7 +206,8 @@ fun RunningText4(location:String) {
     }
 //0xFF41074B  0xFF8D5CE5
     Box(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
             .height(24.dp)
             .clip(RectangleShape)
             .background(Color(0xFF077CDA))
@@ -241,12 +245,17 @@ fun ActiveButtonAndExpirationTime() {
             .wrapContentHeight()) {
             ActiveButton()
         }
-//        Column(modifier = Modifier
-//            .fillMaxWidth()
-//            .wrapContentHeight()) {
-//            Image(painter = painterResource(R.drawable.send), contentDescription = "", modifier = Modifier.size(30.dp))
-//            Text("100k")
-//        }
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()) {
+            Card(modifier=Modifier.wrapContentSize(), colors = CardDefaults.cardColors(containerColor = Color(
+                0xFF1976D2
+            ).copy(alpha = 0.9f)),
+                shape = RoundedCornerShape(7.dp), border = BorderStroke(width = 1.dp,color= Color(
+                    0xFF71C4F1))) {
+                Text("08 hrs.", modifier = Modifier.padding(4.dp), color = Color.White, fontFamily = Constants.FONT_MEDIUM, fontSize = 12.sp)}
+        }
+
 //        Column(modifier = Modifier
 //            .fillMaxWidth()
 //            .wrapContentHeight()) {
@@ -291,7 +300,8 @@ fun ApproveOrJoin4(modifier: Modifier = Modifier) {
 @Composable
 fun UsernameAndUserProfileImage(username:String?) {
     Row(
-        modifier = Modifier.padding(bottom = 8.dp)
+        modifier = Modifier
+            .padding(bottom = 8.dp)
             .fillMaxWidth()
             .wrapContentHeight()
     ) {

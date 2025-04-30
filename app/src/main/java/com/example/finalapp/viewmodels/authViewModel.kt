@@ -114,19 +114,19 @@ class AuthViewModel @Inject constructor(
 
        private val _loginState = MutableStateFlow<LoginState<User>>(LoginState.Idle)
        val loginState: StateFlow<LoginState<User>> = _loginState;
-       val userData = mutableStateOf(User())
+       var userData = mutableStateOf(User())
 
     fun loginUser(loginMethod: LoginMethod, credentials:String,password: String)=viewModelScope.launch(Dispatchers.Main) {
         _loginState.value=LoginState.Loading
-       // val hashedPassword=hashPassword(password) // todo uncomment it
-        val loginModel=LoginModel(credentials,password);
+        val hashedPassword=hashPassword(password)
+        val loginModel=LoginModel(credentials,hashedPassword);
         repository.sendLoginData(loginModel)
             .onStart {
                 _loginState.value= LoginState.Loading
             }.catch {
                 _loginState.value= LoginState.Error(it.message.toString())
             }.collect { response ->
-                Log.d("Login", "Full API response: $response") // Log the full response
+                Log.d("Login", "Full API response: $response")
 
                 if (response.success) {
                         saveProfileData(response.data);

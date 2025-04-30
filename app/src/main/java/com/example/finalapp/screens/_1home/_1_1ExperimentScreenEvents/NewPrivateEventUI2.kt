@@ -44,6 +44,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.painterResource
@@ -326,10 +327,39 @@ fun EventCaption(modifier: Modifier = Modifier) {
 
 }
 
+//@Composable
+//fun ActiveButton() {
+//    Card(modifier=Modifier.wrapContentSize(), colors = CardDefaults.cardColors(containerColor = Color(0xFF0A630D).copy(alpha = 0.9f)),
+//        shape = RoundedCornerShape(7.dp), border = BorderStroke(width = 1.dp,color= Color(0xFF96F19A))) {
+//        Text("ACTIVE", modifier = Modifier.padding(4.dp), color = Color.White, fontFamily = Constants.FONT_MEDIUM, fontSize = 16.sp)}
+//}
 @Composable
 fun ActiveButton() {
-    Card(modifier=Modifier.wrapContentSize(), colors = CardDefaults.cardColors(containerColor = Color(0xFF026406).copy(alpha = 0.9f)), shape = RoundedCornerShape(7.dp), border = BorderStroke(width = 1.dp,color= Color(0xFF022504))) {
-        Text("ACTIVE", modifier = Modifier.padding(4.dp), color = Color.White, fontFamily = Constants.FONT_MEDIUM, fontSize = 16.sp)}
+    val alpha = remember { Animatable(1f) }
+
+    LaunchedEffect(Unit) {
+        while (true) {
+            alpha.animateTo(0f, animationSpec = tween(durationMillis = 500))
+            alpha.animateTo(1f, animationSpec = tween(durationMillis = 500))
+        }
+    }
+
+    Card(
+        modifier = Modifier
+            .wrapContentSize()
+            .graphicsLayer { this.alpha = alpha.value }, // Apply alpha here
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFEAF304).copy(alpha = 0.9f)), //0xFF0A630D
+        shape = RoundedCornerShape(7.dp),
+        border = BorderStroke(width = 1.dp, color = Color(0xFFFFFFFF)) //0xFF96F19A
+    ) {
+        Text(
+            "ACTIVE",
+            modifier = Modifier.padding(4.dp),
+            color = Color.DarkGray,
+            fontFamily = Constants.FONT_MEDIUM,
+            fontSize = 16.sp
+        )
+    }
 }
 
 @Composable

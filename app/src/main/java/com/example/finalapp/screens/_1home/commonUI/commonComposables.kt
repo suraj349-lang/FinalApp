@@ -255,7 +255,7 @@ fun ShimmerEffect(showShimmer: Boolean = true, targetValue: Float = 10000f): Bru
 
 @Composable
 fun HomeFloatingActionButton(authViewModel: AuthViewModel, eventsViewModel: EventsViewModel, imageUploadViewModel: ImageUploadViewModel, navController: NavHostController) {
-    var showCustomDialog by remember { mutableStateOf(false) }
+    var showCustomDialog=eventsViewModel.showDropDialog.value
 
     FloatingActionButton(
         onClick = {
@@ -282,7 +282,7 @@ fun HomeFloatingActionButton(authViewModel: AuthViewModel, eventsViewModel: Even
         }
     }
     if (showCustomDialog) {
-        DropProfileDialog(authViewModel ,eventsViewModel , imageUploadViewModel ,navController ) { showCustomDialog = !showCustomDialog }
+        DropProfileDialog(authViewModel ,eventsViewModel , imageUploadViewModel ,navController ) { showCustomDialog = !showCustomDialog;eventsViewModel.showDropDialog.value=false }
         Log.d("Suraj", "HomeFloatingActionButton:entered to drop profile dialog ")
     }
 }

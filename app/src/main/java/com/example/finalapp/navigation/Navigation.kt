@@ -1,5 +1,8 @@
 package com.example.finalapp.navigation
 
+import android.net.Uri
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -52,6 +55,7 @@ import com.example.finalapp.screens._5settings.SafetyCentre
 import com.example.finalapp.screens._5settings.SavedLoginInfo
 import com.example.finalapp.screens._5settings.TermsOfService
 import com.example.finalapp.screens.common.CameraXScreen
+import com.example.finalapp.screens.common.ImagePreviewScreen
 import com.example.finalapp.screens.onboarding.screen.WelcomeScreen
 import com.example.finalapp.testingDataAndScreen.Tiktok
 import com.example.finalapp.viewmodels.ImageUploadViewModel
@@ -60,6 +64,7 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalAnimationApi::class, ExperimentalPagerApi::class)
 @Composable
 fun Navigation(authViewModel: AuthViewModel, screen: String) {
@@ -145,14 +150,32 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
             val list= listOf<String>("1","2","3","4","5","6")
             Tiktok(videos = list)
         }
+        // when the dropped profile is clicked then it is shown
         composable(route=SCREENS.DROP_PROFILE_USER_PROFILE.route, arguments = listOf(navArgument("dropProfileResponse"){ type= NavType.StringType })){navBackStackEntry ->
             val json=navBackStackEntry.arguments?.getString("dropProfileResponse")
             val dropProfileResponse=json?.let { Json.decodeFromString<DropProfileResponse>(it) }
             DropProfileUserProfile(navController,dropProfileResponse)
 
         }
-        
-        
+        composable("preview/{encodedUri}") { backStackEntry ->
+            val encodedUri = backStackEntry.arguments?.getString("encodedUri") ?: ""
+            val uri = Uri.parse(Uri.decode(encodedUri))
+            ImagePreviewScreen(uri = uri,eventsViewModel,{
+                navController.navigate(SCREENS.HOME.route) {
+                    popUpTo(navController.graph.startDestinationId) {
+                        inclusive = false
+                    }
+                    launchSingleTop = true
+                    restoreState = true
+                }
+                eventsViewModel.showDropDialog.value=true
+            }){
+                navController.navigateUp()
+            }
+        }
+
+
+
         // SETTINGS---------------------------------------------------------------------------------------------------------------------------------------------------
         composable(SCREENS.EDIT_NAME.route){
             EditName(navController = navController)

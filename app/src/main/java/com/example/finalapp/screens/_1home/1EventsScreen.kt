@@ -1,5 +1,6 @@
 package com.example.finalapp.screens._1home
 
+import android.util.Log
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -28,6 +29,7 @@ import com.example.finalapp.screens._1home.publicEvent.PublicEvent
 import com.example.finalapp.screens.common.NoDataFound
 import com.example.finalapp.screens.dialogBox.DialogLoading
 import com.example.finalapp.testingDataAndScreen.imageUrls
+import com.example.finalapp.utilComposable.CommonErrorScreen
 import com.example.finalapp.utils.RequestState
 import com.example.finalapp.viewmodels.EventsViewModel
 
@@ -44,10 +46,10 @@ fun EventsScreen(
         initialPage = initialPage ?: 0,
         pageCount = { (eventsViewModel.eventsListResponse.value as? RequestState.Success<List<EventRequestDTO>>)?.data?.size ?: 0 }
     )
-    val fling = PagerDefaults.flingBehavior(
-        state = pagerState,
-        lowVelocityAnimationSpec = tween(easing = LinearEasing, durationMillis = 300)
-    )
+//    val fling = PagerDefaults.flingBehavior(
+//        state = pagerState,
+//        lowVelocityAnimationSpec = tween(easing = LinearEasing, durationMillis = 300)
+//    )
     val index by remember { mutableStateOf(0) }
     val height by remember { mutableStateOf(false) }
     val eventsState by eventsViewModel.eventsListResponse.collectAsState()
@@ -58,8 +60,10 @@ fun EventsScreen(
         }
         is RequestState.Error -> {
             Column(modifier=Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(text = eventsState.toString())
-                HomeError(eventsViewModel = eventsViewModel)
+                Log.e("Error in getting events", "EventsScreen:${(eventsState as RequestState.Error).error} ", )
+                CommonErrorScreen(error = "Unable to fetch events.",true){
+                    eventsViewModel.getAllEvents()
+                }
 
             }
         }
@@ -70,7 +74,7 @@ fun EventsScreen(
                     VerticalPager(
                         pageSize = PageSize.Fill,
                         state = pagerState,
-                        flingBehavior = fling,
+                      //  flingBehavior = fling,
                         beyondBoundsPageCount = 1,
                         modifier = modifier.weight(1f)
                     ) { page ->

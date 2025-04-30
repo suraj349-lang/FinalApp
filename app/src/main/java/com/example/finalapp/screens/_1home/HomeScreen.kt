@@ -8,6 +8,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -26,10 +27,14 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
 import androidx.compose.material.TabRowDefaults
 import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalDrawerSheet
@@ -42,12 +47,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
@@ -72,16 +79,15 @@ import com.example.finalapp.ui.TAB_ITEMS
 import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.viewmodels.ImageUploadViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
 
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewModel, imageUploadViewModel: ImageUploadViewModel, authViewModel: AuthViewModel) {
-    var selectedItemIndex by rememberSaveable { mutableStateOf(0) }
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val buttonsVisible = remember { mutableStateOf(true) }
     val scope = rememberCoroutineScope()
     var showQR: showDialog by remember { mutableStateOf(showDialog.CLOSE) }
@@ -100,6 +106,26 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
     var showSheet by remember {
         mutableStateOf(false)
     }
+    var isRefreshing by remember { mutableStateOf(false) }
+    LaunchedEffect(isRefreshing) {
+        if (isRefreshing && pagerState.currentPage==0) {
+            delay(1000L)
+            eventsViewModel.getAllEvents()
+            delay(500L)
+            isRefreshing = false
+        }
+        else if (isRefreshing && pagerState.currentPage==1) {
+            isRefreshing = false
+        }
+        else {
+            isRefreshing = false
+        }
+    }
+
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = isRefreshing,
+        onRefresh = { isRefreshing = true }
+    )
 
 
     Scaffold(
@@ -134,62 +160,21 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
             HomeFloatingActionButton(authViewModel, eventsViewModel, imageUploadViewModel , navController)
         }
     ) { padding ->
-        ModalNavigationDrawer(
-            drawerContent = {
-                ModalDrawerSheet(
-                    modifier = Modifier
-                        .fillMaxHeight()
-                        .fillMaxWidth(0.5f),
-                    drawerContainerColor = Color.Transparent,
-                    drawerContentColor = Color.Black
-                ) {
-                    items.forEachIndexed { index, item ->
-                        Spacer(modifier = Modifier.height(10.dp))
-                        NavigationDrawerItem(
-                            colors = NavigationDrawerItemDefaults.colors(
-                                selectedContainerColor = Color(0xFF035697),
-                                unselectedContainerColor = Color(0xFFFFFFFF).copy(alpha = 0.8f)
-                            ),
-                            label = { Text(text = item.title) },
-                            selected = index == selectedItemIndex,
-                            onClick = {
-                                selectedItemIndex = index
-                                scope.launch { drawerState.close() }
-                            },
-                            icon = {
-                                Image(
-                                    painterResource(id = if (index == selectedItemIndex) item.selectedIcon else item.unselectedIcon),
-                                    contentDescription = "",
-                                    modifier = Modifier.size(40.dp)
-                                )
-                            },
-                            modifier = Modifier
-                                .padding(NavigationDrawerItemDefaults.ItemPadding)
-                                .wrapContentSize(),
-                            shape = RoundedCornerShape(6.dp)
-                        )
-                    }
-                }
-            },
-            drawerState = drawerState,
-            gesturesEnabled = true
-        ) {
             Surface(modifier = Modifier.fillMaxSize()) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(padding)
                 ) {
-//
                     TabRow(
                         selectedTabIndex = pagerState.currentPage,
                         indicator = { tabPositions ->
                             TabRowDefaults.Indicator(
                                 Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage]),
-                                color = Color(0xFF0A010E) //0xFFEB1809
+                                color = Color(0xFFDF400E) //0xFFEB1809
                             )
                         },
-                        backgroundColor = Color(0xFFDF400E), //0xFFD5623E orange , 0xFFBCE697 green
+                        backgroundColor = Color(0xFFFFFFFF), //0xFFD5623E orange , 0xFFBCE697 green
                         modifier = Modifier
                             .border(width = 0.dp, color = Color.White)
                             .padding(bottom = 0.dp)
@@ -203,7 +188,7 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
                                 text = {
                                     Text(
                                         text = item.title,
-                                        color = if (pagerState.currentPage == index) Color.White else Color.Black,
+                                        color = if (pagerState.currentPage == index) Color(0xFFDF400E) else Color.DarkGray,
                                         fontFamily = Constants.FONT_MEDIUM,//FontFamily(Font(R.font.dongle_light)),
                                         fontSize = 12.sp,//20.sp,
                                         fontWeight = if (pagerState.currentPage == index) FontWeight.Bold else FontWeight.Normal
@@ -212,22 +197,29 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
                             )
                         }
                     }
-                    HorizontalPager(
-                        state = pagerState,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .imePadding()
-                    ) { page ->
-                        when (page) {
-                            0 -> EventsScreen(eventsViewModel = eventsViewModel, navController = navController)//PublicLivePost(videos = listOf("1","2","3","4","5","6") )//PrivateLivePost(videos = listOf("1","2","3","4","5","6") )//LivePosts( scrollBehavior,eventsViewModel, offersList, padding)
-                            1 -> DirectChatScreen(scrollBehavior,authViewModel,eventsViewModel,navController)
-                            2 -> DroppedProfilesUI(scrollBehavior,navController ,eventsViewModel)
-                                //DroppedProfiles(navController = navController, eventsViewModel = eventsViewModel)
+                    Box(modifier = Modifier.fillMaxSize().pullRefresh(pullRefreshState)) {
+                        HorizontalPager(
+                            state = pagerState,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .imePadding()
+                        ) { page ->
+                            when (page) {
+                                0 -> EventsScreen(eventsViewModel = eventsViewModel, navController = navController)
+                                1 -> DirectChatScreen(scrollBehavior, authViewModel, eventsViewModel, navController)
+                                2 -> DroppedProfilesUI(scrollBehavior, navController, eventsViewModel)
+                            }
                         }
+
+                        PullRefreshIndicator(
+                            refreshing = isRefreshing,
+                            state = pullRefreshState,
+                            modifier = Modifier.align(Alignment.TopCenter)
+                        )
                     }
+
                 }
             }
-        }
     }
     CreateEventBottomSheet(
         showSheet = showSheet,

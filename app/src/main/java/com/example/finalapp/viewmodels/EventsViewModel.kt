@@ -1,6 +1,7 @@
 package com.example.finalapp.viewmodels
 
 import android.content.Context
+import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -55,6 +56,9 @@ class EventsViewModel @Inject constructor(private val eventsRepository: EventsRe
             job.join()
         }
     }
+    //-------------------------------------------------------------------------------------------------------//
+    val dropProfileUploadUri= mutableStateOf(Uri.EMPTY)
+    val showDropDialog= mutableStateOf(false)
 
     //--------------------------------------------------------------------------------------------------------------------------------------------//
     private val _triggerFetch = MutableStateFlow(false)

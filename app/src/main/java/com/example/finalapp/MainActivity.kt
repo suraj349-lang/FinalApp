@@ -200,6 +200,7 @@ fun Activity.openAppSettings() {
 
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun FinalApp(
     authViewModel: AuthViewModel,
@@ -365,15 +366,17 @@ fun getReadableLocation(latitude: Double, longitude: Double, context: Context): 
 
         if (addresses?.isNotEmpty() == true) {
             val address = addresses[0]
+            UserLocation.latitude=latitude
+            UserLocation.longitude=longitude
             UserLocation.address= address.getAddressLine(0)
             UserLocation.city =address.locality ?: ""
             UserLocation.state=address.adminArea ?: ""
             UserLocation.country=address.countryName ?: ""
             UserLocation.district=address.subLocality?: ""
             UserLocation.street=address.thoroughfare ?: ""
-            val countryCode=address.countryCode ?: ""
+            UserLocation.countryCode=address.countryCode ?: ""
             UserLocation.pinCode=address.postalCode ?: ""
-            val landmark=address.featureName
+            UserLocation.landmark=address.featureName
 
             addressText = "${address.getAddressLine(0)}, ${address.locality}"
         }

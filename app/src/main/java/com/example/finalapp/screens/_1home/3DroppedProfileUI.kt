@@ -74,7 +74,9 @@ import com.example.finalapp.model.DropProfileResponse
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens.dialogBox.DialogLoading
 import com.example.finalapp.ui.imagePrefix
+import com.example.finalapp.utilComposable.CommonErrorScreen
 import com.example.finalapp.utils.ProfileObject
+import com.example.finalapp.utils.RequestState
 import com.example.finalapp.utils.UserLocation
 import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
 import com.example.finalapp.utils.testdata.Item
@@ -251,7 +253,10 @@ fun DroppedProfilesUI(
                                 loadState.refresh is LoadState.Error -> {
                                     val error = (loadState.refresh as LoadState.Error).error
                                     item {
-                                        Text(text = "Error: ${error.message}", color = Color.Red)
+                                        Log.e("Error in dropped profiles", "DroppedProfilesUI: $error ", )
+                                        CommonErrorScreen(error = "Error getting profiles.",true){
+                                            eventsViewModel.loadDroppedProfiles("")
+                                        }
                                     }
                                 }
                             }
@@ -425,7 +430,7 @@ fun DroppedProfileLocation(location: String, trim: Boolean=false) {
         modifier = Modifier
             .fillMaxWidth()
             .height(24.dp)
-            .clip(if(trim) RoundedCornerShape(12.dp) else RectangleShape)
+            .clip(if (trim) RoundedCornerShape(12.dp) else RectangleShape)
             .background(Color(0xFF077CDA))
             .onGloballyPositioned { coordinates ->
                 containerWidth.value = coordinates.size.width.toFloat()
@@ -436,7 +441,9 @@ fun DroppedProfileLocation(location: String, trim: Boolean=false) {
             Image(
                 painter = painterResource(R.drawable.location_new),
                 contentDescription = "",
-                modifier = Modifier.size(20.dp).padding(horizontal = 4.dp)
+                modifier = Modifier
+                    .size(20.dp)
+                    .padding(horizontal = 4.dp)
             )
             Text(
                 text = location,

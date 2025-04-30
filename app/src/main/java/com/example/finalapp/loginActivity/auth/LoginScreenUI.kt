@@ -1,8 +1,11 @@
 package com.example.finalapp.loginActivity.auth
 
 import android.annotation.SuppressLint
+import android.text.Layout
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -24,8 +27,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
@@ -40,6 +46,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -63,6 +71,7 @@ import com.example.finalapp.utils.LoginState
 import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.utils.constants.Constants.APP_ICON
 import com.example.finalapp.utils.constants.Constants.APP_NAME_FONT
+import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
 import kotlinx.coroutines.launch
 
 
@@ -70,12 +79,12 @@ import kotlinx.coroutines.launch
 @SuppressLint("UnrememberedMutableState")
 @Composable
 fun LoginScreenUI(navController: NavController,authViewModel: AuthViewModel) {
-    val scope= rememberCoroutineScope()
-    val context= LocalContext.current
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
 
-    val addString="+91";
+    val addString = "+91";
     val maxLength = 10;
-    val loginMethod=PhoneLogin()
+    val loginMethod = PhoneLogin()
     var loginNumberText by rememberSaveable { mutableStateOf("7250260100") }
     var loginPasswordText by remember { mutableStateOf("1234567") }
 
@@ -87,61 +96,115 @@ fun LoginScreenUI(navController: NavController,authViewModel: AuthViewModel) {
     val keyboardController = LocalSoftwareKeyboardController.current
 
     var passwordVisibility by remember { mutableStateOf(false) }
-    val icon = if (passwordVisibility) painterResource(id = R.drawable.round_visibility_24) else painterResource(id = R.drawable.round_visibility_off_24)
+    val icon =
+        if (passwordVisibility) painterResource(id = R.drawable.round_visibility_24) else painterResource(
+            id = R.drawable.round_visibility_off_24
+        )
+    when (loginState) {
+        is LoginState.Loading -> { /* DialogLoading() */
+        }
+
+        is LoginState.Success -> {
+            authViewModel.userData.value = (loginState as LoginState.Success).data
+            navController.navigate(SCREENS.HOME.route)
+        }
+
+        is LoginState.Error -> {
+            Log.e("Login Error", "LoginScreenUI: ${(loginState as LoginState.Error).error} ",)
+            Toast.makeText(context, "Unable to login.", Toast.LENGTH_SHORT).show()
+        }
+
+        LoginState.Idle -> {
+
+        }
+
+    }
 
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(
-            modifier=Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .background(color = floatingActionBtnColor),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            when (loginState){
-                is LoginState.Loading -> DialogLoading()
-                is LoginState.Success->
-                {
-                       authViewModel.userData.value= (loginState as LoginState.Success).data
-                       navController.navigate(SCREENS.HOME.route)
-                }
-                is LoginState.Error->{
-                    Toast.makeText(context,(loginState as LoginState.Error).error, Toast.LENGTH_SHORT).show()
-                }
-                LoginState.Idle->{
-
-                }
-
+            Text(
+                text = "Welcome back!",
+                fontSize = 30.sp,
+                modifier = Modifier
+                    .padding(top = 8.dp, start = 16.dp, bottom = 32.dp)
+                    .fillMaxWidth(),
+                color = Color.White,
+                fontFamily = Constants.FONT_MEDIUM
+            )
+            Text(
+                text = Constants.APP_NAME,
+                fontSize = 45.sp,
+                modifier = Modifier.padding(top = 8.dp, bottom = 0.dp),
+                color = Color.White,
+                fontFamily = APP_NAME_FONT
+            )
+            /*
+            Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = Constants.APP_NAME,
+                    fontSize = 45.sp,
+                    modifier = Modifier.padding(top = 8.dp, bottom = 0.dp),
+                    color = Color.White,
+                    fontFamily = APP_NAME_FONT
+                )
+                Text(
+                    text = "connect dynamically...",
+                    fontSize = 8.sp,
+                    modifier = Modifier.padding(start = 84.dp, bottom = 0.dp),
+                    color = Color.White,
+                    fontFamily = Constants.FONT_MEDIUM
+                )
             }
-//            Image(
-//                painter = painterResource(id = APP_ICON),
-//                contentDescription = "",
-//                modifier = Modifier.size(100.dp)
-//            )
-            Text(text=Constants.APP_NAME, fontSize = 45.sp, modifier = Modifier.padding(top=8.dp, bottom = 0.dp), color = floatingActionBtnColor, fontFamily = APP_NAME_FONT)
+             */
             Spacer(modifier = Modifier.height(10.dp))
 
             Column(
-                verticalArrangement = Arrangement.Center,
+                verticalArrangement = Arrangement.spacedBy(20.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-               OutlinedTextField(
+                OutlinedTextField(
                     value = loginNumberText,
                     onValueChange = {
                         if (it.length <= maxLength) loginNumberText = it
-                        else Toast.makeText(context, "Can be 10 digits only !", Toast.LENGTH_SHORT).show()
+                        else Toast.makeText(context, "Can be 10 digits only !", Toast.LENGTH_SHORT)
+                            .show()
                     },
-//                    textStyle = LocalTextStyle.current.copy(fontSize = 22.sp),
-                    label = { Text(text = "Number", style = MaterialTheme.typography.bodyMedium) },
+                    textStyle = TextStyle(
+                        fontFamily = Constants.FONT_MEDIUM
+                    ),
+                    label = {
+                        Text(
+                            text = if (loginNumberText.isEmpty()) "Enter number..." else "Number",
+                            fontFamily = Constants.FONT_MEDIUM
+                        )
+                    },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color.Black,
+                        unfocusedTextColor = Color.Black,
+                        cursorColor = Color.Black,
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color.White,
+                        unfocusedLabelColor = Color.LightGray,
+                        focusedLabelColor = Color.LightGray,
+                    ),
                     leadingIcon = {
                         Text(
                             text = "+91",
                             fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp,textAlign=TextAlign.Justify,
-                            color = Color(0xFF035206)
+                            fontSize = 18.sp, textAlign = TextAlign.Justify,
+                            color = Color.Black
                         )
                     },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number,
-                        imeAction = ImeAction.Done)
-                    ,keyboardActions = KeyboardActions(
+                        imeAction = ImeAction.Done
+                    ), keyboardActions = KeyboardActions(
                         onDone = { keyboardController?.hide() })
                     //visualTransformation = CameroonNumberVisualTransformation(),
 
@@ -150,14 +213,37 @@ fun LoginScreenUI(navController: NavController,authViewModel: AuthViewModel) {
                 OutlinedTextField(
                     value = loginPasswordText,
                     onValueChange = { loginPasswordText = it },
-                    label = { Text(text = "Password", style = MaterialTheme.typography.bodyMedium) },
+                    textStyle = TextStyle(
+                        fontFamily = Constants.FONT_MEDIUM
+                    ),
+                    label = {
+                        Text(
+                            text = if (loginPasswordText.isEmpty()) "Enter password..." else "Password",
+                            fontFamily = Constants.FONT_MEDIUM
+                        )
+                    },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Password,
                         imeAction = ImeAction.Done
                     ),
+                    colors = TextFieldDefaults.colors(
+                        focusedTextColor = Color.Black,
+                        unfocusedTextColor = Color.Black,
+                        cursorColor = Color.Black,
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color.White,
+                        unfocusedLabelColor = Color.LightGray,
+                        focusedLabelColor = Color.LightGray
+                    ),
                     trailingIcon = {
-                        IconButton(onClick = { passwordVisibility = !passwordVisibility }) {
-                            Icon(painter = icon, contentDescription = "Password visibility icon")
+                        if (loginPasswordText.isNotEmpty()) {
+                            IconButton(onClick = { passwordVisibility = !passwordVisibility }) {
+                                Icon(
+                                    painter = icon,
+                                    contentDescription = "Password visibility icon",
+                                    tint = Color.Black
+                                )
+                            }
                         }
                     },
                     keyboardActions = KeyboardActions(
@@ -167,13 +253,16 @@ fun LoginScreenUI(navController: NavController,authViewModel: AuthViewModel) {
                     else PasswordVisualTransformation()
                 )
 
-                Spacer(modifier = Modifier.height(10.dp))
                 Button(
                     onClick = {
                         scope.launch {
-                            if(loginMethod.validate(loginNumberText)){
-                                authViewModel.loginUser(loginMethod,"$addString$loginNumberText", loginPasswordText)
-                            }else{
+                            if (loginMethod.validate(loginNumberText)) {
+                                authViewModel.loginUser(
+                                    loginMethod,
+                                    "$addString$loginNumberText",
+                                    loginPasswordText
+                                )
+                            } else {
                                 authViewModel.setValidationError("Invalid phone")
                             }
                         }
@@ -181,25 +270,31 @@ fun LoginScreenUI(navController: NavController,authViewModel: AuthViewModel) {
                     modifier = Modifier.width(120.dp),
                     shape = RoundedCornerShape(6.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = floatingActionBtnColor,
-                        contentColor = Color.White
+                        containerColor = Color.White,
+                        contentColor = Color.DarkGray
                     )
                 ) {
-                    Text(text = "LOGIN")
+                    Text(text = "LOGIN", fontFamily = Constants.FONT_MEDIUM, fontSize = 20.sp)
                 }
 
 //                if(authViewModel.key.value==1) {
 //                    LoginResponseDataAndAction(authViewModel, navController)
 //                }
             }
-            Row(modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight()
-                .padding(top = 8.dp), horizontalArrangement = Arrangement.Center) {
-                Text(text = "New member ? ", color = statusAndTopAppBarColor, style = MaterialTheme.typography.bodyMedium)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .padding(top = 8.dp), horizontalArrangement = Arrangement.Center
+            ) {
                 Text(
-                    text = "Create Account", color = DarkBlue,
-                    style = MaterialTheme.typography.bodyMedium,
+                    text = "New member?  ",
+                    color = Color.White,
+                    fontFamily = Constants.FONT_MEDIUM
+                )
+                Text(
+                    text = "Create Account", color = Color.White,
+                    fontFamily = Constants.FONT_MEDIUM,
                     fontWeight = FontWeight.ExtraBold,
                     modifier = Modifier.clickable {
                         navController.navigate(SCREENS.SIGNUP.route)

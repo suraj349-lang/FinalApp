@@ -45,7 +45,7 @@ import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
 import com.example.finalapp.utils.constants.Constants.DONGLE_LIGHT
 import com.example.finalapp.utils.constants.Constants.DONGLE_NORMAL
-
+// when the dropped profile is clicked then it is shown
 @Composable
 fun DropProfileUserProfile(navController: NavHostController,dropProfileResponse: DropProfileResponse?) {
     val buttonsVisible = remember { mutableStateOf(false) }

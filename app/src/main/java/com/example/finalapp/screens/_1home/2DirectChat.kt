@@ -54,6 +54,7 @@ import com.example.finalapp.model.DirectChatRequest
 import com.example.finalapp.screens.dialogBox.DialogLoading
 import com.example.finalapp.ui.imagePrefix
 import com.example.finalapp.ui.theme.PURPLE
+import com.example.finalapp.utilComposable.CommonErrorScreen
 import com.example.finalapp.utils.ProfileObject
 import com.example.finalapp.utils.RequestState
 import com.example.finalapp.utils.UserLocation
@@ -78,7 +79,7 @@ fun DirectChatScreen(
     LaunchedEffect(key1 =shareProfileClicked){
         if(shareProfileClicked ){
             eventsViewModel.checked.value=!checked
-            eventsViewModel.sendDirectChatData(DirectChatRequest( "677b4df1842c1c465293fc2f",authViewModel.latitude.value,authViewModel.longitude.value))
+            eventsViewModel.sendDirectChatData(DirectChatRequest( ProfileObject.profile?.userId!!,authViewModel.latitude.value,authViewModel.longitude.value))
         }
         else {
            // eventsViewModel.emptyNearByUsersList()
@@ -159,7 +160,7 @@ fun DirectChatProfiles(scrollBehavior: TopAppBarScrollBehavior, eventsViewModel:
             DialogLoading()
         }
         is RequestState.Error -> {
-            Text("Error: ${(chatState as RequestState.Error)}")
+            CommonErrorScreen(error = "Unable to get users.")
         }
         is RequestState.Success -> {
             LazyColumn(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)) {
@@ -262,18 +263,13 @@ fun ShareProfileForDirectChat(onShareProfileClicked:()->Unit) {
         Image(painter = painterResource(id = R.drawable.whatsapp), contentDescription ="", contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize() )
         Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
             Card(
-                modifier = Modifier.fillMaxWidth(0.8f).wrapContentHeight(),
+                modifier = Modifier
+                    .fillMaxWidth(0.8f)
+                    .wrapContentHeight(),
                 shape = RoundedCornerShape(12.dp),
                 colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F7FA)),
                 elevation = CardDefaults.cardElevation(100.dp)) {
                 Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-//                    Row(modifier = Modifier
-//                        .fillMaxWidth()
-//                        .padding(bottom = 10.dp), verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-//                        Image(painter = painterResource(id = R.drawable.location_new), contentDescription ="", modifier = Modifier.size(30.dp) )
-//                        UserLocation.address?.let { DroppedProfileLocation(location = it) }
-//                        UserLocation.address?.let { Text(text = it, fontFamily = DONGLE_BOLD, overflow = TextOverflow.Ellipsis, maxLines = 1,fontSize =20.sp, color = Color.Black) }
-//                    }
                     UserLocation.address?.let { DroppedProfileLocation(location = it,true) }
                     Card(
                       modifier = Modifier.size(150.dp),

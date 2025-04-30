@@ -87,8 +87,10 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
     val context= LocalContext.current
     val enabled=true;
     val location by  authViewModel.currentLocation.collectAsState()
-    var uri by remember { mutableStateOf(Uri.EMPTY) }
+    var uri = eventsViewModel.dropProfileUploadUri.value
     var imageFile by mutableStateOf<File?>(null)
+    if(uri != Uri.EMPTY) imageFile = uriToFile(uri, context )
+
     var key by remember { mutableStateOf(false) }
     var keyForGallery by remember { mutableStateOf(0) }
     if (key) { ImageCaptureFromCameraForDropProfile({imageFile=it}){uri=it} }
@@ -139,7 +141,9 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                     ))
                 {
                     Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
-                        Image(painter = painterResource(id = R.drawable.app_icon), contentDescription ="app icon", modifier = Modifier.size(40.dp).padding(start = 8.dp, end = 8.dp) , colorFilter = ColorFilter.tint(Color.White))
+                        Image(painter = painterResource(id = R.drawable.app_icon), contentDescription ="app icon", modifier = Modifier
+                            .size(40.dp)
+                            .padding(start = 8.dp, end = 8.dp) , colorFilter = ColorFilter.tint(Color.White))
                         Text(
                             text = "Drop Profile",
                             modifier = Modifier.fillMaxWidth(),
@@ -318,6 +322,7 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
 
                     Button(
                         onClick = {
+                            Log.i("DropProfile", "DropProfileDialog:button clicked ")
                             eventsViewModel.premiumCreateEventKey.value = 1
                             //todo later on turn enalbed to true
                           //  enabled = false;

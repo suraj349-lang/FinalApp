@@ -7,6 +7,8 @@ object ProfileObject {
 }
 
 object UserLocation{
+    var latitude:Double? =null
+    var longitude:Double? =null
     var address :String ?=null
     var street: String? =null
     var city: String? =null
@@ -14,6 +16,8 @@ object UserLocation{
     var state: String? =null
     var country: String? =null
     var pinCode: String? =null
+    var countryCode: String? =null
+    var landmark: String? =null
 }
 
 object TokenObject{

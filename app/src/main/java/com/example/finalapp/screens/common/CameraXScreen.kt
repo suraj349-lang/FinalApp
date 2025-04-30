@@ -203,7 +203,6 @@ fun CameraXScreen(navController: NavHostController) {
                         .height(80.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                     contentPadding = PaddingValues(horizontal = 16.dp),
-                    reverseLayout = true
                 ) {
                     items(imageList) { uri ->
                         Image(
