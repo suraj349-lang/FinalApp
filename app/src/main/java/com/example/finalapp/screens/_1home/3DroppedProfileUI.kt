@@ -74,9 +74,8 @@ import com.example.finalapp.model.DropProfileResponse
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens.dialogBox.DialogLoading
 import com.example.finalapp.ui.imagePrefix
-import com.example.finalapp.utilComposable.CommonErrorScreen
+import com.example.finalapp.screens.common.CommonErrorScreen
 import com.example.finalapp.utils.ProfileObject
-import com.example.finalapp.utils.RequestState
 import com.example.finalapp.utils.UserLocation
 import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
 import com.example.finalapp.utils.testdata.Item

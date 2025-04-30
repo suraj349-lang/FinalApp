@@ -1,9 +1,10 @@
-package com.example.finalapp.utilComposable
+package com.example.finalapp.screens.common
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
@@ -24,8 +25,8 @@ import com.example.finalapp.utils.constants.Constants
 fun CommonErrorScreen(error:String,showButton:Boolean=false,onRetryClicked:()->Unit ={}) {
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-            Image(painter = painterResource(id = R.drawable.search_new_filled), contentDescription ="", modifier = Modifier.size(50.dp) )
-            Text(error, fontSize = 28.sp, fontFamily = Constants.FONT_MEDIUM)
+            Image(painter = painterResource(id = R.drawable.search_new_filled), contentDescription ="", modifier = Modifier.size(30.dp) )
+            Text(error, fontSize = 20.sp, modifier = Modifier.padding(vertical = 20.dp), color= Color.DarkGray,fontFamily = Constants.FONT_MEDIUM)
             Button(onClick = { onRetryClicked()}, colors = ButtonDefaults.buttonColors(backgroundColor = Color(
                 0xFF460561
             )

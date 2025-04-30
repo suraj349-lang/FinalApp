@@ -1,17 +1,13 @@
 package com.example.finalapp.screens._1home
 
 import android.util.Log
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.pager.PageSize
-import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -23,13 +19,12 @@ import androidx.navigation.NavHostController
 import com.example.finalapp.R
 import com.example.finalapp.model.EventRequestDTO
 import com.example.finalapp.model.EventResponse
-import com.example.finalapp.screens._1home.commonUI.HomeError
 import com.example.finalapp.screens._1home.privateEvent.PrivateEvent
 import com.example.finalapp.screens._1home.publicEvent.PublicEvent
 import com.example.finalapp.screens.common.NoDataFound
 import com.example.finalapp.screens.dialogBox.DialogLoading
 import com.example.finalapp.testingDataAndScreen.imageUrls
-import com.example.finalapp.utilComposable.CommonErrorScreen
+import com.example.finalapp.screens.common.CommonErrorScreen
 import com.example.finalapp.utils.RequestState
 import com.example.finalapp.viewmodels.EventsViewModel
 

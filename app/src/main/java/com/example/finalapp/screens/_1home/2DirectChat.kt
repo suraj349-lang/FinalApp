@@ -54,7 +54,7 @@ import com.example.finalapp.model.DirectChatRequest
 import com.example.finalapp.screens.dialogBox.DialogLoading
 import com.example.finalapp.ui.imagePrefix
 import com.example.finalapp.ui.theme.PURPLE
-import com.example.finalapp.utilComposable.CommonErrorScreen
+import com.example.finalapp.screens.common.CommonErrorScreen
 import com.example.finalapp.utils.ProfileObject
 import com.example.finalapp.utils.RequestState
 import com.example.finalapp.utils.UserLocation

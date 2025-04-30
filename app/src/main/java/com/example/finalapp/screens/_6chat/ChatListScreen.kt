@@ -2,17 +2,14 @@ package com.example.finalapp.screens._6chat
 
 
 
-import BottomBar
 import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -21,17 +18,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -51,17 +43,14 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.zIndex
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavHostController
@@ -71,12 +60,11 @@ import com.example.finalapp.R
 import com.example.finalapp.model.ChatList
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.ui.imagePrefix
-import com.example.finalapp.utilComposable.CommonErrorScreen
-import com.example.finalapp.utilComposable.CommonLoadingScreen
+import com.example.finalapp.screens.common.CommonErrorScreen
+import com.example.finalapp.screens.common.CommonLoadingScreen
 import com.example.finalapp.utils.ProfileObject
 import com.example.finalapp.utils.RequestState
 import com.example.finalapp.utils.constants.Constants
-import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
 import com.example.finalapp.utils.constants.Constants.FONT_MEDIUM
 import com.example.finalapp.utils.constants.Constants.TAG
 import com.example.finalapp.viewmodels.ChatViewModel
@@ -131,7 +119,8 @@ fun ChatListScreen(navController: NavHostController,chatViewModel: ChatViewModel
 //            }
             Spacer(modifier = Modifier.height(10.dp))
             when(chatListState){
-                is RequestState.Loading ->{ CommonLoadingScreen()}
+                is RequestState.Loading ->{ CommonLoadingScreen()
+                }
                 is RequestState.Error ->{
                     CommonErrorScreen("Error getting users")
                     Log.d(TAG, "ChatListScreen: ${(chatListState as RequestState.Error).error.message}")
