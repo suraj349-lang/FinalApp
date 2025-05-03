@@ -17,6 +17,7 @@ import com.example.finalapp.model.DropProfileResponse
 import com.example.finalapp.model.EventRequestDTO
 import com.example.finalapp.model.EventResponse
 import com.example.finalapp.model.EventResponseDTO
+import com.example.finalapp.model.GetDropProfileResponseModel
 import com.example.finalapp.model.PremiumEventResponseDTO
 import com.example.finalapp.paging.DirectChatUsersPagingSource
 import com.example.finalapp.paging.DropProfilePagingSource
@@ -219,6 +220,48 @@ class EventsViewModel @Inject constructor(private val eventsRepository: EventsRe
             }.collect {
                 _eventsListResponse.value = RequestState.Success(it.data)
                 Log.d(TAG, "all profiles data ${_eventsListResponse.value}")
+
+            }
+    }
+
+    //----------------------------Get user events for Profile----------------------------------------------------------------------------------------//
+    private val _userEventsListResponse = MutableStateFlow<RequestState<List<EventResponse>>>(RequestState.Idle)
+    val userEventsListResponse: StateFlow<RequestState<List<EventResponse>>> = _userEventsListResponse.asStateFlow()
+
+    fun getUserEvents(id:String)=viewModelScope.launch(Dispatchers.IO) {
+        val TAG="GET_EVENTS_RESPONSE";
+        eventsRepository.getUserEvents(id)
+            .onStart {
+                _userEventsListResponse.value = RequestState.Loading
+
+            }.catch {
+                _userEventsListResponse.value = RequestState.Error(it)
+                Log.d(TAG, "user events error ${_userEventsListResponse.value}")
+
+            }.collect {
+                _userEventsListResponse.value = RequestState.Success(it.data)
+                Log.d(TAG, "user events data ${_userEventsListResponse.value}")
+
+            }
+    }
+
+    //----------------------------------Get users Dropped Profiles----------------------------------------------------------------------------------//
+    private val _userDropProfilesListResponse = MutableStateFlow<RequestState<GetDropProfileResponseModel>>(RequestState.Idle)
+    val userDropProfilesListResponse: StateFlow<RequestState<GetDropProfileResponseModel>> = _userDropProfilesListResponse.asStateFlow()
+
+    fun getUserDropProfiles(id:String)=viewModelScope.launch(Dispatchers.IO) {
+        val TAG="GET_EVENTS_RESPONSE_drop";
+        eventsRepository.getUserDropProfiles(id)
+            .onStart {
+                _userDropProfilesListResponse.value = RequestState.Loading
+
+            }.catch {
+                _userDropProfilesListResponse.value = RequestState.Error(it)
+                Log.d(TAG, "user drop profile error $it")
+
+            }.collect {
+                _userDropProfilesListResponse.value = RequestState.Success(it)
+                Log.d(TAG, "user drop profile data ${_userDropProfilesListResponse.value}")
 
             }
     }

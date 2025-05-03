@@ -41,7 +41,7 @@ fun CreateEventBottomSheet(  showSheet: Boolean,
     if (showSheet){
         ModalBottomSheet(onDismissRequest = { onDismiss()}) {
             Column(modifier = Modifier.padding(start = 16.dp,end=16.dp, bottom = 60.dp)) {
-                Text("Create Event", fontSize = 20.sp, fontWeight = FontWeight.Bold, fontFamily = Constants.DONGLE_BOLD)
+                Text("Create Event", fontSize = 20.sp, fontWeight = FontWeight.Bold, fontFamily = Constants.FONT_MEDIUM)
                 Spacer(Modifier.height(12.dp))
 
                 Button(
@@ -50,7 +50,7 @@ fun CreateEventBottomSheet(  showSheet: Boolean,
                 ) {
                     Text("📢 Public Event", fontFamily = Constants.DONGLE_BOLD, color = Color.White ,fontSize = 20.sp)
                 }
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(18.dp))
 
                 Button(onClick = {
                   //  navHostController.navigate(SCREENS.CREATE_EVENT_PRIVATE.route)

@@ -17,42 +17,31 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
-import androidx.compose.material.Divider
-import androidx.compose.material.Icon
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.example.finalapp.R
-import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens.dialogBox.DropProfileDialog
 import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.viewmodels.AuthViewModel
@@ -186,12 +175,12 @@ fun PublicProfileScreenUI(navController: NavHostController,authViewModel:AuthVie
                 }
             }
             Column(modifier = Modifier.padding(start = 16.dp,end=16.dp,top=10.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                MyLiveEvents(){
-//                    navController.navigate(SCREENS.CREATE_EVENT.route)
-                }
-                RecentDrops(){
-                    showCustomDialog=!showCustomDialog
-                }
+//                MyLiveEvents(){
+////                    navController.navigate(SCREENS.CREATE_EVENT.route)
+//                }
+//                RecentDrops(response.data) {
+//                    showCustomDialog=!showCustomDialog
+//                }
                 UserStats()
             }
 

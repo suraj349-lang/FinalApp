@@ -29,7 +29,7 @@ import com.example.finalapp.screens._4profile.GalleryPicker
 import com.example.finalapp.screens._1home.HomeScreenUI
 import com.example.finalapp.screens._8notification.NotificationsScreenUI
 import com.example.finalapp.screens._2search.TrendingScreen
-import com.example.finalapp.screens._3createEvent.createEvent.CreateEventNew
+import com.example.finalapp.screens._3createEvent.CreateEventNew
 import com.example.finalapp.screens._5settings.SettingsScreenUI
 import com.example.finalapp.testing.TabView
 import com.example.finalapp.screens._3createEvent.PastRaisedOffer

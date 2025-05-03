@@ -47,6 +47,7 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
 import com.example.finalapp.navigation.SCREENS
+import com.example.finalapp.ui.imagePrefix
 import com.example.finalapp.utils.AppIcons
 import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
@@ -74,7 +75,7 @@ fun ImageUpdateBottomSheet(  showSheet: Boolean,
                 Box(modifier = Modifier
                     .fillMaxWidth()
                     .height(400.dp)) {
-                    GlideImage(model = image, contentDescription ="", modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop )
+                    GlideImage(model = imagePrefix+image, contentDescription ="", modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop )
                 }
                 Text(
                     "Update Image",

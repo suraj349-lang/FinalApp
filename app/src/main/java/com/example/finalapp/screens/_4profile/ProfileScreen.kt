@@ -87,18 +87,9 @@ fun ProfileScreenUI(
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val buttonsVisible = remember { mutableStateOf(false) }
-    val width= LocalConfiguration.current.screenWidthDp
-    val context= LocalContext.current
-    val dataStore=StoreUserData(context)
-    var name by remember {
-        mutableStateOf("")
-    }
     val userInfo by imageUploadViewModel.firstUserData.collectAsState()
-    LaunchedEffect(key1 = true){
-        name= dataStore.getUserNumber.toString()
-    }
     LaunchedEffect(key1 = true ){
-         imageUploadViewModel.getUserData("917250260100")
+
     }
     when (val result=imageUploadViewModel.getUserData.value){
         is RequestState.Success->{

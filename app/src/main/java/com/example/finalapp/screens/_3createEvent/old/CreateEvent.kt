@@ -1,4 +1,4 @@
-package com.example.finalapp.screens._3createEvent
+package com.example.finalapp.screens._3createEvent.old
 
 
 import BottomBar
@@ -63,6 +63,7 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
 import com.example.finalapp.model.EventRequestDTO
 import com.example.finalapp.navigation.SCREENS
+import com.example.finalapp.screens._3createEvent.CreateEventTopBar
 import com.example.finalapp.screens.dialogBox.DialogLoading
 import com.example.finalapp.viewmodels.EventsViewModel
 import com.example.finalapp.screens.dialogBox.GalleryPickerForDropProfile

@@ -59,6 +59,13 @@ class EventsRepository @Inject constructor(private val api: ApiService) {
         emit(api.getAllEvents())
     }.flowOn(Dispatchers.IO)
 
+    fun getUserEvents(id:String): Flow<AllEventsResponseDTO> = flow {
+        emit(api.getUserEvents(id))
+    }.flowOn(Dispatchers.IO)
+    fun getUserDropProfiles(id:String): Flow<GetDropProfileResponseModel> = flow {
+        emit(api.getUserDropProfiles(id))
+    }.flowOn(Dispatchers.IO)
+
 
     suspend fun uploadImage(imageUri: Uri, context: Context): Flow<ImageUploadResponse> = flow {
         emit(withContext(Dispatchers.IO) {

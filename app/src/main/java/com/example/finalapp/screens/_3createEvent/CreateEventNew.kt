@@ -1,4 +1,4 @@
-package com.example.finalapp.screens._3createEvent.createEvent
+package com.example.finalapp.screens._3createEvent
 
 import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
@@ -104,7 +104,7 @@ fun CreateEventNew(navController: NavController, eventsViewModel: EventsViewMode
 
     Scaffold(
         topBar = {
-            CreateEventTopBar()
+            CreateEventTopBar2()
         }
         , modifier = Modifier.fillMaxSize()) { paddingValues ->
         Surface(modifier = Modifier
@@ -146,7 +146,7 @@ fun CreateEventNew(navController: NavController, eventsViewModel: EventsViewMode
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CreateEventTopBar() {
+fun CreateEventTopBar2() {
     TopAppBar(title = { Text(text = "Create Event")},
         actions = {
 
@@ -156,7 +156,7 @@ fun CreateEventTopBar() {
         })
     
 }
-@OptIn(ExperimentalGlideComposeApi::class)
+
 @Composable
 fun CreateEventImageScreen(onImageUriChange:(Uri?)->Unit,onNextClicked:()->Unit) {
     val context = LocalContext.current

@@ -32,6 +32,7 @@ import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Part
+import retrofit2.http.Path
 import retrofit2.http.Query
 import retrofit2.http.Url
 
@@ -55,6 +56,12 @@ interface ApiService {
     suspend fun createEvent(@Body event:EventRequestDTO): EventResponseDTO
     @GET("/api/v1/event")
     suspend fun getAllEvents(): AllEventsResponseDTO
+
+    @GET("/api/v1/event/getUserEvents/{id}")
+    suspend fun getUserEvents(@Path("id") id:String): AllEventsResponseDTO
+
+    @GET("/api/v1/dropProfile/dropProfileByUser")
+    suspend fun getUserDropProfiles(@Query("id") id:String): GetDropProfileResponseModel
     //---------------------------------------------------------------------//
     @GET("api/getPreSignedUrl")
     suspend fun getPreSignedUrl(@Query("id") id:String): PreSignedUrlResponse

@@ -83,10 +83,9 @@ import java.io.File
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewModel, imageUploadViewModel: ImageUploadViewModel, navController: NavHostController, onDismiss: () -> Unit) {
-    var caption by remember{ mutableStateOf("testing") }
+    var caption by remember{ mutableStateOf("") }
     val context= LocalContext.current
     val enabled=true;
-    val location by  authViewModel.currentLocation.collectAsState()
     var uri = eventsViewModel.dropProfileUploadUri.value
     var imageFile by mutableStateOf<File?>(null)
     if(uri != Uri.EMPTY) imageFile = uriToFile(uri, context )
@@ -337,7 +336,7 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                                             createdBy = profile.userId
                                         )
                                     }
-                                imageUploadViewModel.s3ImageUploadFunction("suraj3494",it)
+                                imageUploadViewModel.s3ImageUploadFunction(ProfileObject.profile?.userId!!,it)
                                 }
                         },
                         shape= RoundedCornerShape(6.dp),

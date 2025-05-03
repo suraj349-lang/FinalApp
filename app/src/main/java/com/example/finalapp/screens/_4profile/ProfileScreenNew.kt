@@ -1,6 +1,7 @@
 package com.example.finalapp.screens._4profile
 
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -24,10 +25,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,14 +51,18 @@ import androidx.navigation.NavHostController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
+import com.example.finalapp.model.DropProfileResponse
+import com.example.finalapp.model.EventResponse
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens._3createEvent.CreateEventBottomSheet
+import com.example.finalapp.screens.common.CommonErrorScreen
 import com.example.finalapp.screens.dialogBox.DropProfileDialog
 import com.example.finalapp.screens.dialogBox.GalleryPickerForDropProfile
 import com.example.finalapp.screens.dialogBox.ImageCaptureFromCameraForDropProfile
 import com.example.finalapp.ui.imagePrefix
 import com.example.finalapp.ui.theme.PURPLE
 import com.example.finalapp.utils.ProfileObject
+import com.example.finalapp.utils.RequestState
 import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.viewmodels.AuthViewModel
 import com.example.finalapp.viewmodels.EventsViewModel
@@ -64,31 +72,17 @@ import java.io.File
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewModel,eventsViewModel:EventsViewModel,imageUploadViewModel:ImageUploadViewModel) {
-    var showCustomDialog by remember {
-        mutableStateOf(false)
-    }
-    var showSheetForImageUpdate by remember {
-        mutableStateOf(false)
-    }
-    var showSheet by remember {
-        mutableStateOf(false)
-    }
-    var temporaryImage by remember {
-        mutableStateOf(ProfileObject.profile?.profileImage)
-    }
-    var cameraDialog by remember {
-        mutableStateOf(false)
-    }
-    var galleryDialog by remember {
-        mutableStateOf(false)
-    }
-    var imageUri by remember {
-        mutableStateOf(Uri.EMPTY)
-    }
-    var showImageCropper by remember {
-        mutableStateOf(false)
-    }
+    var showCustomDialog by remember { mutableStateOf(false) }
+    var showSheetForImageUpdate by remember { mutableStateOf(false) }
+    var showSheet by remember { mutableStateOf(false) }
+    val temporaryImage by remember { mutableStateOf(ProfileObject.profile?.profileImage) }
+    val cameraDialog by remember { mutableStateOf(false) }
+    val galleryDialog by remember { mutableStateOf(false) }
+    var imageUri by remember { mutableStateOf(Uri.EMPTY) }
+    var showImageCropper by remember { mutableStateOf(false) }
     var imageFile by mutableStateOf<File?>(null)
+    val userEventsList by eventsViewModel.userEventsListResponse.collectAsState()
+    val userDropProfilesList by eventsViewModel.userDropProfilesListResponse.collectAsState()
 
     if (showCustomDialog) {
         DropProfileDialog(authViewModel ,eventsViewModel , imageUploadViewModel ,navController ) { showCustomDialog = !showCustomDialog }
@@ -100,6 +94,11 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
         ImageCropperAndChooser(showChooser = showImageCropper) {
             newUri=it
         }
+    }
+    LaunchedEffect(key1 = ProfileObject.profile?.userId!! ){
+        eventsViewModel.getUserEvents(ProfileObject.profile?.userId!!)
+        eventsViewModel.getUserDropProfiles(ProfileObject.profile?.userId!!)
+
     }
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier
@@ -120,11 +119,12 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
 //                            ), startY = 0f, endY = 600f
 //                        )
 //                    )
-                    .background(color= Color(0xFF25086B))){ // 0xFF1B1A1A
+                    .background(color = Color(0xFF25086B))){ // 0xFF1B1A1A
                     Image(
                         painterResource(id = R.drawable.back),
                         contentDescription = "",
-                        modifier = Modifier.padding(16.dp)
+                        modifier = Modifier
+                            .padding(16.dp)
                             .size(30.dp)
                             .clickable { navController.navigateUp() }
                             .align(Alignment.TopStart),
@@ -151,11 +151,16 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                                 Card(
                                     modifier = Modifier
                                         .size(60.dp)
-                                        .clickable { showSheetForImageUpdate = true;/*showImageCropper = true*/ },
+                                        .clickable {
+                                            showSheetForImageUpdate =
+                                                true;/*showImageCropper = true*/
+                                        },
                                     shape = CircleShape,
                                     border = BorderStroke(1.dp, color = Color.LightGray),
                                     elevation = 20.dp
                                 ) {
+
+                                    //user dp
                                     GlideImage(
                                         model= if(newUri!=Uri.EMPTY)  newUri else imagePrefix+ProfileObject.profile?.profileImage,
                                         contentDescription = "",
@@ -222,12 +227,28 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
             }
             }
             Column(modifier = Modifier.padding(start = 16.dp,end=16.dp,top=10.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                MyLiveEvents(){
-                    showSheet=true
+                when(val response=userEventsList){
+                    is RequestState.Loading -> CircularProgressIndicator()
+                    is RequestState.Error -> CommonErrorScreen(error = "Error getting events!")
+                    is RequestState.Success -> {
+                        MyLiveEvents(response.data){
+                            showSheet=true
+                        }
+                    }
+                    else ->{}
                 }
-                RecentDrops(){
-                    showCustomDialog=!showCustomDialog
+                when(val response=userDropProfilesList){
+                    is RequestState.Loading -> CircularProgressIndicator()
+                    is RequestState.Error -> CommonErrorScreen(error = "Error getting events!")
+                    is RequestState.Success -> {
+                        RecentDrops(response.data.data){
+                            showCustomDialog=!showCustomDialog
+                        }
+                    }
+                    else ->{}
                 }
+
+
                 UserStats()
             }
 
@@ -264,7 +285,8 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
 
 
 @Composable
-fun MyLiveEvents(onAddEventClicked:()->Unit) {
+fun MyLiveEvents(items: List<EventResponse>, onAddEventClicked:()->Unit) {
+    val eventsList=remember{ items}
     Column() {
             Row(
                 modifier = Modifier
@@ -276,7 +298,7 @@ fun MyLiveEvents(onAddEventClicked:()->Unit) {
                 Text(text = "My Live Events", color = Color.Black, fontWeight = FontWeight.Bold)
             }
         LazyRow{
-            items(items){item->
+            items(eventsList){item->
                 LiveEventItem(item)
 
             }
@@ -306,20 +328,22 @@ fun MyLiveEvents(onAddEventClicked:()->Unit) {
 
 }
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun LiveEventItem(item: LiveEventItem) {
+fun LiveEventItem(item: EventResponse) {
+    Log.i("CALLAPI", "LiveEventItem:$item ")
     Box(modifier = Modifier
         .size(180.dp) //120 earlier
         .padding(end = 8.dp, top = 8.dp)
         .clip(shape = RoundedCornerShape(6.dp))) {
-        Image(painterResource(id = item.image), contentDescription = "", contentScale = ContentScale.Crop)
+        GlideImage(model=  item.image/*R.drawable.profile_image_1*/ , contentDescription = "", contentScale = ContentScale.Crop) //todo add imagePrefix when upload is happening
         Row(modifier = Modifier
             .align(Alignment.BottomStart)
             .padding(4.dp)
             .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text(text = item.title, color = Color.White, fontWeight = FontWeight.SemiBold)
+            item.title?.let { Text(text = it, color = Color.White, fontWeight = FontWeight.SemiBold) }
             Card(shape = CircleShape,backgroundColor = Color.Black.copy(alpha = 0.4f)) {
-                Text(text=item.timeLeft.toString(), color = Color.White, modifier = Modifier.padding(2.dp))
+                Text(text=item.expirationTime, color = Color.White, modifier = Modifier.padding(2.dp))
             }
 
             
@@ -330,23 +354,13 @@ fun LiveEventItem(item: LiveEventItem) {
     }
 }
 
-data class LiveEventItem(
-    val image:Int,
-    val title:String,
-    val timeLeft:Int
-)
-val items= listOf(
-    LiveEventItem(R.drawable.profile_image_1,"Clubbing",4),
-    LiveEventItem(R.drawable.profile_image_2,"Trek",6),
-    LiveEventItem(R.drawable.profile_image_3,"Party",8),
-    LiveEventItem(R.drawable.femaleprofile,"Protest",12),
-    LiveEventItem(R.drawable.profile_image_1,"Celebration",4),
-    LiveEventItem(R.drawable.profile_image_2,"Results",6),
-    LiveEventItem(R.drawable.profile_image_3,"Mobbing",8),
-    LiveEventItem(R.drawable.femaleprofile,"News",12)
-)
+
 @Composable
-fun RecentDrops(onDropProfileClicked:()->Unit) {
+fun RecentDrops(
+    userDropProfilesList: List<DropProfileResponse>,
+    onDropProfileClicked: () -> Unit
+) {
+    val droppedProfilesList=remember{userDropProfilesList}
     Column() {
             Row(
                 modifier = Modifier
@@ -368,7 +382,7 @@ fun RecentDrops(onDropProfileClicked:()->Unit) {
             .fillMaxWidth()
             .height(0.5.dp), color = Color.LightGray)
         LazyRow(modifier = Modifier.padding(top =8.dp)){
-            items(itemsForRecentProfileDrop){item->
+            items(droppedProfilesList){item->
                 RecentProfileDropItem(item)
 
             }
@@ -399,11 +413,12 @@ fun RecentDrops(onDropProfileClicked:()->Unit) {
 
 }
 
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun RecentProfileDropItem(item: RecentProfileDrop) {
+fun RecentProfileDropItem(item: DropProfileResponse) {
         Box(
             modifier = Modifier
-                .size(100.dp) //120 earlier
+                .size(100.dp)
                 .padding(end = 8.dp)
                 .clip(shape = RoundedCornerShape(6.dp))
         ) {
@@ -419,8 +434,8 @@ fun RecentProfileDropItem(item: RecentProfileDrop) {
                     Text(text = item.location, fontWeight = FontWeight.SemiBold,color = Color(0xFF072747),
                         modifier = Modifier.padding(start=4.dp,top=2.dp), fontSize = 8.sp)
                 }
-                Image(
-                    painterResource(id = item.image),
+                GlideImage(
+                    model= imagePrefix+item.image,
                     contentDescription = "",
                     contentScale = ContentScale.Crop
                 )
@@ -429,21 +444,6 @@ fun RecentProfileDropItem(item: RecentProfileDrop) {
 
     }
 }
-data class RecentProfileDrop(
-    val image:Int,
-    val location:String,
-    val timeLeft:Int
-)
-val itemsForRecentProfileDrop= listOf(
-    RecentProfileDrop(R.drawable.profile_image_3,"Delhi",4),
-    RecentProfileDrop(R.drawable.profile_image_2,"C.P.",6),
-    RecentProfileDrop(R.drawable.profile_image_1,"Noida",8),
-    RecentProfileDrop(R.drawable.girl,"Greater noida",12),
-    RecentProfileDrop(R.drawable.profile_image_1,"Celebration",4),
-    RecentProfileDrop(R.drawable.profile_image_2,"Results",6),
-    RecentProfileDrop(R.drawable.profile_image_3,"Mobbing",8),
-    RecentProfileDrop(R.drawable.femaleprofile,"News",12)
-)
 
 @Composable
 fun UserStats() {
