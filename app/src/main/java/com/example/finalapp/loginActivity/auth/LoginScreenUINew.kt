@@ -51,8 +51,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.finalapp.R
 import com.example.finalapp.viewmodels.AuthViewModel
-import com.example.finalapp.datastore.StoreUserData
-import com.example.finalapp.login.EmailLogin
+import com.example.finalapp.datastore.StoreLoginState
 import com.example.finalapp.login.PhoneLogin
 import com.example.finalapp.model.User
 import com.example.finalapp.navigation.SCREENS
@@ -87,7 +86,6 @@ fun LoginScreenUINew(navController: NavController,authViewModel: AuthViewModel) 
         mutableStateOf(User())
     }
 
-    val datastore=StoreUserData(context )
     val keyboardController = LocalSoftwareKeyboardController.current
 
     var passwordVisibility by remember { mutableStateOf(false) }
@@ -160,7 +158,6 @@ fun LoginScreenUINew(navController: NavController,authViewModel: AuthViewModel) 
                 Button(
                     onClick = {
                         scope.launch {
-                            datastore.saveUserNumber("+91$phoneNumber")
                             //if(loginMethod.validate(phoneNumber)){
                                 authViewModel.loginUser(loginMethod,"$addString$phoneNumber", loginPasswordText)
                            // }else{

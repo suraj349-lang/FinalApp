@@ -1,46 +1,43 @@
 package com.example.finalapp.permissions
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.finalapp.Disposable
+import androidx.core.app.ActivityCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import com.example.finalapp.R
 import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.viewmodels.AuthViewModel
-import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.utils.constants.Constants.APP_ICON
 import com.example.finalapp.utils.constants.Constants.APP_NAME_FONT
@@ -53,7 +50,7 @@ fun PermissionsUI(authViewModel: AuthViewModel, onGoToAppSettingsClick: () -> Un
         Column(verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.background(brush = Brush.verticalGradient(colors = listOf(
             Color(0xFFF7F7F7), Color(0xFFE9E7E0) //
         )))) {
-            Disposable(authViewModel,lifecycleOwner = LocalLifecycleOwner.current)
+            LifeCycleOnResume(authViewModel,lifecycleOwner = LocalLifecycleOwner.current)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center,
@@ -117,6 +114,33 @@ fun PermissionsUI(authViewModel: AuthViewModel, onGoToAppSettingsClick: () -> Un
 
         }
 
+    }
+}
+
+@Composable
+fun LifeCycleOnResume(authViewModel: AuthViewModel, lifecycleOwner: LifecycleOwner){
+    val context= LocalContext.current
+    DisposableEffect(lifecycleOwner) {
+
+        // Create an observer that triggers our remembered callbacks
+        // for sending analytics events
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                authViewModel.permission.value= ActivityCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) == PackageManager.PERMISSION_GRANTED
+                Log.d(Constants.TAG,"on Resume")
+            }
+        }
+
+        // Add the observer to the lifecycle
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        // When the effect leaves the Composition, remove the observer
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
     }
 }
 

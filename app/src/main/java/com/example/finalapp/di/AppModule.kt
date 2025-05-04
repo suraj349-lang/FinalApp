@@ -3,11 +3,12 @@ package com.example.finalapp.di
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.room.Room
 import com.example.finalapp.database.FrisbeeDatabase
 import com.example.finalapp.network.ApiService
 import com.example.finalapp.network.NonAuthApiService
-import com.example.finalapp.repository.DataStoreRepository
 import com.example.finalapp.utils.constants.Constants
 import dagger.Module
 import dagger.Provides
@@ -19,24 +20,27 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import javax.inject.Singleton
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.preferencesDataStoreFile
+import androidx.datastore.preferences.core.Preferences
+import com.example.finalapp.datastore.StoreLoginState
+import kotlinx.coroutines.runBlocking
 
 @Module
 @InstallIn(SingletonComponent::class)
 class AppModule {
     @Provides
     @Singleton
-    fun provideToken(sharedPreferences: SharedPreferences): String {
-        return sharedPreferences.getString("token", "") ?: ""
-    }
-    @Provides
-    @Singleton
+    @MainPrefs
     fun provideSharedPreferences(@ApplicationContext context: Context): SharedPreferences {
-        return context.getSharedPreferences("my_prefs", Context.MODE_PRIVATE)
+        return context.getSharedPreferences(MAIN_PREFS, Context.MODE_PRIVATE)
     }
     @Provides
     @Singleton
-    fun provideOfferApi(token:String):ApiService{
-        Log.d("checking token", "Token provided to Retrofit: $token")
+    fun provideOfferApi( loginStore: StoreLoginState):ApiService{
+        val token= runBlocking {
+            loginStore.getTokenOnce()
+        }
         val authInterceptor = AuthInterceptor(token)
         val logging = HttpLoggingInterceptor()
         logging.setLevel(HttpLoggingInterceptor.Level.BODY)
@@ -82,11 +86,13 @@ class AppModule {
     @Singleton
     @Provides
     fun chatDao(database: FrisbeeDatabase) = database.chatDao()
+
     @Provides
     @Singleton
-    fun provideDataStoreRepository(
-        @ApplicationContext context: Context
-    ) = DataStoreRepository(context = context)
-
-
+    @LoginDataStore
+    fun provideDataStoreRepository(@ApplicationContext context: Context): DataStore<Preferences> {
+        return PreferenceDataStoreFactory.create {
+            context.preferencesDataStoreFile(LOGIN_DATA_STORE)
+        }
+    }
 }

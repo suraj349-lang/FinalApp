@@ -2,7 +2,6 @@ package com.example.finalapp.viewmodels
 
 import android.Manifest
 import android.content.Context
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.util.Log
 import androidx.compose.runtime.MutableState
@@ -14,6 +13,7 @@ import com.example.finalapp.LatLng
 import com.example.finalapp.repository.AuthRepository
 import com.example.finalapp.loginActivity.auth.RESPONSE
 import com.example.finalapp.database.Profile
+import com.example.finalapp.datastore.StoreLoginState
 import com.example.finalapp.fcm.stateObject.SendFcmTokenDto
 import com.example.finalapp.login.LoginMethod
 import com.example.finalapp.repository.ProfileDatabaseRepository
@@ -35,7 +35,6 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -46,7 +45,7 @@ import javax.inject.Inject
 class AuthViewModel @Inject constructor(
     private val repository: AuthRepository,
     private val profileDatabaseRepository: ProfileDatabaseRepository,
-    private val sharedPreferences: SharedPreferences,
+    private val storeLoginState:StoreLoginState,
     @ApplicationContext private val context: Context): ViewModel()
    {
        private var _userFromDb:MutableStateFlow<RequestState<Profile>> = MutableStateFlow(RequestState.Idle)
@@ -141,7 +140,8 @@ class AuthViewModel @Inject constructor(
                                 }
                         }
                         TokenObject.token=response.data.token
-                        sharedPreferences.edit().putString("token", response.data.token).apply()
+                        storeLoginState.saveLoginState(true)
+                        storeLoginState.saveUserToken( response.data.token)
                         _loginState.value = LoginState.Success(response.data)
                     } catch (e: Exception) {
                         _loginState.value = LoginState.Error("Issue in shared preference: ${e.message}")
