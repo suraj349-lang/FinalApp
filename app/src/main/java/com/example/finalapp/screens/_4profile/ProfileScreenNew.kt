@@ -1,7 +1,9 @@
 package com.example.finalapp.screens._4profile
 
 import android.net.Uri
+import android.text.Layout
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -15,6 +17,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -30,6 +34,7 @@ import androidx.compose.material.Divider
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -43,11 +48,16 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavHostController
+import coil.compose.SubcomposeAsyncImage
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
@@ -59,6 +69,7 @@ import com.example.finalapp.screens.common.CommonErrorScreen
 import com.example.finalapp.screens.dialogBox.DropProfileDialog
 import com.example.finalapp.screens.dialogBox.GalleryPickerForDropProfile
 import com.example.finalapp.screens.dialogBox.ImageCaptureFromCameraForDropProfile
+import com.example.finalapp.screens.dialogBox.uriToFile
 import com.example.finalapp.ui.imagePrefix
 import com.example.finalapp.ui.theme.PURPLE
 import com.example.finalapp.utils.ProfileObject
@@ -72,6 +83,7 @@ import java.io.File
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewModel,eventsViewModel:EventsViewModel,imageUploadViewModel:ImageUploadViewModel) {
+    val context= LocalContext.current
     var showCustomDialog by remember { mutableStateOf(false) }
     var showSheetForImageUpdate by remember { mutableStateOf(false) }
     var showSheet by remember { mutableStateOf(false) }
@@ -79,26 +91,56 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
     val cameraDialog by remember { mutableStateOf(false) }
     val galleryDialog by remember { mutableStateOf(false) }
     var imageUri by remember { mutableStateOf(Uri.EMPTY) }
-    var showImageCropper by remember { mutableStateOf(false) }
-    var imageFile by mutableStateOf<File?>(null)
+    val showImageCropper by remember { mutableStateOf(false) }
+    val startProfileImageUpload=imageUploadViewModel.startProfileImageUpload.collectAsState()
     val userEventsList by eventsViewModel.userEventsListResponse.collectAsState()
     val userDropProfilesList by eventsViewModel.userDropProfilesListResponse.collectAsState()
+
+    val imageUploadStatus by imageUploadViewModel.userProfileImageUpdateStatus.collectAsState()
+    val lifecycleOwner= LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_START) {
+                Log.i("profileImage", "ProfileScreenNew: onStart called")
+//                LaunchedEffect(key1 =startProfileImageUpload.value){
+                    //send for upload
+                    if(startProfileImageUpload.value) {
+                        val uri = imageUploadViewModel.profileImageUri.value
+                        var imageFile by mutableStateOf<File?>(null)
+                        if(uri != Uri.EMPTY) imageFile = uriToFile(uri, context )
+                        Log.i("profileImage", "ProfileScreenNew: called with $imageFile")
+                        imageUploadViewModel.uploadImageAndThen(userId = ProfileObject.profile?.userId!!, file = imageFile!!){url->
+                            Log.i("profileImage", "updateUserProfileImage: called with $url")
+                            imageUploadViewModel.updateUserProfileImage(ProfileObject.profile?.userId!!,url)
+                        }
+
+                        imageUploadViewModel.startProfileImageUpload.value=false
+                    }
+                //}
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        // When the effect leaves the Composition, remove the observer
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
 
     if (showCustomDialog) {
         DropProfileDialog(authViewModel ,eventsViewModel , imageUploadViewModel ,navController ) { showCustomDialog = !showCustomDialog }
     }
-    var newUri by remember {
-        mutableStateOf(Uri.EMPTY)
-    }
-    if(showImageCropper){
-        ImageCropperAndChooser(showChooser = showImageCropper) {
-            newUri=it
+//    if(showImageCropper){
+//        ImageCropperAndChooser(showChooser = showImageCropper) {
+//            newUri=it
+//        }
+//    }
+    LaunchedEffect(key1 = ProfileObject.profile?.userId!!){
+        if(eventsViewModel.canFetchEvents.value && eventsViewModel.canFetchDroppedProfiles.value) {
+            eventsViewModel.getUserEvents(ProfileObject.profile?.userId!!)
+            eventsViewModel.getUserDropProfiles(ProfileObject.profile?.userId!!)
         }
-    }
-    LaunchedEffect(key1 = ProfileObject.profile?.userId!! ){
-        eventsViewModel.getUserEvents(ProfileObject.profile?.userId!!)
-        eventsViewModel.getUserDropProfiles(ProfileObject.profile?.userId!!)
-
     }
     Surface(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier
@@ -112,13 +154,6 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
             ) {
                 Box(modifier = Modifier
                     .fillMaxSize()
-//                    .background(
-//                        brush = Brush.verticalGradient(
-//                            colors = listOf(
-//                                Color.Transparent, Color(0xFFE43A05) // 0xFF1B1A1A
-//                            ), startY = 0f, endY = 600f
-//                        )
-//                    )
                     .background(color = Color(0xFF25086B))){ // 0xFF1B1A1A
                     Image(
                         painterResource(id = R.drawable.back),
@@ -159,16 +194,29 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                                     border = BorderStroke(1.dp, color = Color.LightGray),
                                     elevation = 20.dp
                                 ) {
-
                                     //user dp
-                                    GlideImage(
-                                        model= if(newUri!=Uri.EMPTY)  newUri else imagePrefix+ProfileObject.profile?.profileImage,
-                                        contentDescription = "",
-                                        modifier=Modifier.fillMaxSize(),
-                                        contentScale = ContentScale.Crop
-                                    )
-
-
+                                    when(val response=imageUploadStatus){
+                                        is RequestState.Error -> Toast.makeText(context,"Error Uploading image",Toast.LENGTH_SHORT).show()
+                                        is RequestState.Success->{
+                                            GlideImage(
+                                                model=  "${imagePrefix}${response.data.profileImage}",
+                                                contentDescription = "",
+                                                modifier=Modifier.fillMaxSize(),
+                                                contentScale = ContentScale.Crop
+                                            )
+                                        }
+                                        is RequestState.Loading ->{
+                                            CircularProgressIndicator(color=Color.LightGray, modifier = Modifier.size(10.dp))
+                                        }
+                                        else ->{
+                                            GlideImage(
+                                                model=  imagePrefix+temporaryImage,
+                                                contentDescription = "",
+                                                modifier=Modifier.fillMaxSize(),
+                                                contentScale = ContentScale.Crop
+                                            )
+                                        }
+                                    }
                                 }
                                 Column(
                                     verticalArrangement = Arrangement.spacedBy(8.dp),
@@ -263,11 +311,11 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
     ImageUpdateBottomSheet(
         showSheet = showSheetForImageUpdate,
         onDismiss = {showSheetForImageUpdate=false },
-        temporaryImage,
-        navHostController = navController
-    ){
-        showImageCropper=true
-    }
+        currentProfileImage=temporaryImage,
+        navHostController = navController,
+        onChangeImageClicked={ navController.navigate("camerax/profile");/*showImageCropper=true*/}
+    )
+
 //    ImageUpdateDialogBox(
 //        showSheet=showSheetForImageUpdate,
 //        onDismiss = {showSheetForImageUpdate=false},
@@ -276,8 +324,8 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
 //        onGalleryClicked = {galleryDialog=true}
 //    )
 
-    if (cameraDialog) { ImageCaptureFromCameraForDropProfile({imageFile=it}){imageUri=it} }
-    if(galleryDialog) GalleryPickerForDropProfile(navController = navController,{imageFile=it}) { imageUri = it }
+//    if (cameraDialog) { ImageCaptureFromCameraForDropProfile({imageFile=it}){imageUri=it} }
+//    if(galleryDialog) GalleryPickerForDropProfile(navController = navController,{imageFile=it}) { imageUri = it }
     if(imageUri!=Uri.EMPTY) navController.navigate(SCREENS.IMAGE_CROPPER.route)
 }
 

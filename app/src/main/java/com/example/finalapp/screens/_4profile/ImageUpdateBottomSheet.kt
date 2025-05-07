@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,14 +16,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.BottomSheetScaffold
-import androidx.compose.material.BottomSheetValue
 import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.rememberBottomSheetState
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
@@ -45,11 +37,8 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
-import com.example.finalapp.R
-import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.ui.imagePrefix
 import com.example.finalapp.utils.AppIcons
-import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
 
 enum class SheetValue { Collapsed, PartiallyExpanded, Expanded }
@@ -57,11 +46,11 @@ enum class SheetValue { Collapsed, PartiallyExpanded, Expanded }
     ExperimentalMaterialApi::class
 )
 @Composable
-fun ImageUpdateBottomSheet(  showSheet: Boolean,
-                             onDismiss: () -> Unit,
-                             image:String?,
-                             navHostController: NavHostController,
-                             onGalleryClicked: () -> Unit
+fun ImageUpdateBottomSheet(showSheet: Boolean,
+                           onDismiss: () -> Unit,
+                           currentProfileImage:String?,
+                           navHostController: NavHostController,
+                           onChangeImageClicked: () -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
@@ -75,7 +64,7 @@ fun ImageUpdateBottomSheet(  showSheet: Boolean,
                 Box(modifier = Modifier
                     .fillMaxWidth()
                     .height(400.dp)) {
-                    GlideImage(model = imagePrefix+image, contentDescription ="", modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop )
+                    GlideImage(model = imagePrefix+currentProfileImage, contentDescription ="", modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop )
                 }
                 Text(
                     "Update Image",
@@ -97,24 +86,24 @@ fun ImageUpdateBottomSheet(  showSheet: Boolean,
                         Text(text = "Remove image", fontFamily = DONGLE_BOLD,color = Color.DarkGray, fontSize = 14.sp)
 
                     }
-                    Column(modifier = Modifier.wrapContentSize().clickable { onGalleryClicked() }, verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                    Column(modifier = Modifier.wrapContentSize().clickable { onChangeImageClicked() }, verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
                         Image(
                             painter = painterResource(id = AppIcons.GALLERY_ICON),
                             contentDescription = ""
                             , modifier = Modifier.size(50.dp)
                         )
-                        Text(text = "Gallery", fontFamily = DONGLE_BOLD,color = Color.DarkGray, fontSize = 14.sp)
+                        Text(text = "Change Image", fontFamily = DONGLE_BOLD,color = Color.DarkGray, fontSize = 14.sp)
 
                     }
-                    Column(modifier = Modifier.wrapContentSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-                        Image(
-                            painter = painterResource(id = AppIcons.CAMERA_ICON),
-                            contentDescription = ""
-                            , modifier = Modifier.size(50.dp)
-                        )
-                        Text(text = "Camera", fontFamily = DONGLE_BOLD,color = Color.DarkGray, fontSize = 14.sp)
-
-                    }
+//                    Column(modifier = Modifier.wrapContentSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+//                        Image(
+//                            painter = painterResource(id = AppIcons.CAMERA_ICON),
+//                            contentDescription = ""
+//                            , modifier = Modifier.size(50.dp)
+//                        )
+//                        Text(text = "Camera", fontFamily = DONGLE_BOLD,color = Color.DarkGray, fontSize = 14.sp)
+//
+//                    }
 
                 }
             }

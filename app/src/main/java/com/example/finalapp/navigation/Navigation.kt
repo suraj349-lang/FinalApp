@@ -12,6 +12,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.finalapp.enums.ImageUploadScreens
 import com.example.finalapp.model.DropProfileResponse
 import com.example.finalapp.viewmodels.ChatViewModel
 import com.example.finalapp.viewmodels.AuthViewModel
@@ -58,6 +59,7 @@ import com.example.finalapp.screens.common.CameraXScreen
 import com.example.finalapp.screens.common.ImagePreviewScreen
 import com.example.finalapp.screens.onboarding.screen.WelcomeScreen
 import com.example.finalapp.testingDataAndScreen.Tiktok
+import com.example.finalapp.utils.ProfileObject
 import com.example.finalapp.viewmodels.ImageUploadViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import kotlinx.serialization.decodeFromString
@@ -157,21 +159,40 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
             DropProfileUserProfile(navController,dropProfileResponse)
 
         }
-        composable("preview/{encodedUri}") { backStackEntry ->
+        composable("camerax/{screen}"){backStackEntry->
+            val lastScreen=backStackEntry.arguments?.getString("screen") ?: ""
+            CameraXScreen(navController = navController,lastScreen)
+        }
+        composable("preview/{screen}/{encodedUri}") { backStackEntry ->
             val encodedUri = backStackEntry.arguments?.getString("encodedUri") ?: ""
             val uri = Uri.parse(Uri.decode(encodedUri))
-            ImagePreviewScreen(uri = uri,eventsViewModel,{
-                navController.navigate(SCREENS.HOME.route) {
-                    popUpTo(navController.graph.startDestinationId) {
-                        inclusive = false
+            val lastScreen = backStackEntry.arguments?.getString("screen") ?: ""
+            ImagePreviewScreen(
+                uri = uri,
+                lastScreen=lastScreen,
+                imageUploadViewModel=imageUploadViewModel,
+                eventsViewModel=eventsViewModel,
+                onDoneClicked = {
+                    when(lastScreen){
+                        ImageUploadScreens.PROFILE.screen->{
+                            imageUploadViewModel.startProfileImageUpload.value=true
+                            navController.navigate(SCREENS.PROFILE.route)
+                        }
+                        ImageUploadScreens.CREATE_EVENT.screen->{}
+                        else->{
+                            navController.navigate(SCREENS.HOME.route) {
+                                popUpTo(navController.graph.startDestinationId) {
+                                    inclusive = false
+                                }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
+                            eventsViewModel.showDropDialog.value=true
+                        }
                     }
-                    launchSingleTop = true
-                    restoreState = true
+
                 }
-                eventsViewModel.showDropDialog.value=true
-            }){
-                navController.navigateUp()
-            }
+            ) { navController.navigateUp() }
         }
 
 
@@ -237,9 +258,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
 //        composable(SCREENS.IMAGE_CROPPER.route){
 //            AutoImageCropper()
 //        }
-        composable(SCREENS.CAMERAX_SCREEN.route){
-            CameraXScreen(navController = navController)
-        }
+
 
     }
 

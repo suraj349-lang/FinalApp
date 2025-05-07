@@ -174,7 +174,7 @@ fun ChatScreenUI(sentTo: String,chatListUserId:String,navController: NavHostCont
                                              modifier = Modifier
                                                  .size(28.dp)
                                                  .clickable {
-                                                     navController.navigate(SCREENS.CAMERAX_SCREEN.route)
+                                                     navController.navigate("camerax/singleChat")
                                                  }
                                          )
                                      }else {

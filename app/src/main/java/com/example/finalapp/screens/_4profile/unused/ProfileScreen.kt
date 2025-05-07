@@ -1,4 +1,4 @@
-package com.example.finalapp.screens._4profile
+package com.example.finalapp.screens._4profile.unused
 
 import BottomBar
 import android.annotation.SuppressLint
@@ -69,6 +69,7 @@ import com.example.finalapp.R
 import com.example.finalapp.viewmodels.AuthViewModel
 import com.example.finalapp.model.User
 import com.example.finalapp.navigation.SCREENS
+import com.example.finalapp.screens._4profile.ImageCaptureFromCamera
 import com.example.finalapp.screens.dialogBox.DialogBoxForCameraAndGallery
 import com.example.finalapp.screens.dialogBox.DialogBoxForImageEdit
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor

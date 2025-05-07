@@ -26,13 +26,10 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -44,11 +41,12 @@ import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.finalapp.R
+import com.example.finalapp.enums.ImageUploadScreens
 import java.io.File
 
 
 @Composable
-fun CameraXScreen(navController: NavHostController) {
+fun CameraXScreen(navController: NavHostController, screen: String) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
@@ -58,7 +56,10 @@ fun CameraXScreen(navController: NavHostController) {
     var imageList by remember { mutableStateOf<List<Uri>>(emptyList()) }
     var permissionsGranted by remember { mutableStateOf(false) }
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
-    var cameraSelector by remember { mutableStateOf(CameraSelector.DEFAULT_BACK_CAMERA) }
+
+    val cameraSide=if (screen != ImageUploadScreens.CREATE_EVENT.screen) CameraSelector.DEFAULT_FRONT_CAMERA else CameraSelector.DEFAULT_BACK_CAMERA
+    var cameraSelector by remember { mutableStateOf(cameraSide) }
+
     var isGalleryOpen by remember { mutableStateOf(false) }
 
 
@@ -93,7 +94,7 @@ fun CameraXScreen(navController: NavHostController) {
         isGalleryOpen = false
         if (uri != null) {
             selectedImageUri = uri
-            navController.navigate("preview/${Uri.encode(uri.toString())}")
+            navController.navigate("preview/$screen/${Uri.encode(uri.toString())}")
         }
     }
 
@@ -213,7 +214,7 @@ fun CameraXScreen(navController: NavHostController) {
                                 .size(64.dp)
                                 .clip(RoundedCornerShape(8.dp))
                                 .clickable {
-                                    navController.navigate("preview/${Uri.encode(uri.toString())}")
+                                    navController.navigate("preview/$screen/${Uri.encode(uri.toString())}")
                                 }
                         )
                     }
@@ -264,7 +265,7 @@ fun CameraXScreen(navController: NavHostController) {
                                             .show()
                                         selectedImageUri = Uri.fromFile(photoFile)
                                         navController.navigate(
-                                            "preview/${
+                                            "preview/$screen/${
                                                 Uri.encode(
                                                     selectedImageUri.toString()
                                                 )

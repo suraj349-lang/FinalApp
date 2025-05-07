@@ -45,6 +45,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -68,6 +69,7 @@ import com.example.finalapp.R
 import com.example.finalapp.model.EventRequestDTO
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens._4profile.EventTopic
+import com.example.finalapp.screens.dialogBox.uriToFile
 import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
 import com.example.finalapp.viewmodels.EventsViewModel
 import java.io.File
@@ -94,6 +96,7 @@ fun CreateEventNew(navController: NavController, eventsViewModel: EventsViewMode
     }
     val success by eventsViewModel.createEventIsSuccess.collectAsState()
     val loading by eventsViewModel.createEventIsLoading.collectAsState()
+    val context= LocalContext.current
     if(loading) CircularProgressIndicator()
     if(success){
         Toast.makeText(LocalContext.current,"Event created successfully",Toast.LENGTH_SHORT).show()
@@ -133,8 +136,25 @@ fun CreateEventNew(navController: NavController, eventsViewModel: EventsViewMode
                     }
                 }
                 CREATE_EVENT.MISCELLANEOUS ->{
-                    CreateEventFinalScreen(uri = imageUri,caption, eventType =type){
-                        eventsViewModel.createEvent(EventRequestDTO(user = ProfileObject.profile?.userId!!, userName = ProfileObject.profile?.username!!, image = imageUri.toString(), category = type, location = ProfileObject.profile?.address!!, offer =caption, expirationTime = "!2"))
+                    PrivateCreateEventPreview(uri = imageUri,caption, eventType =type){
+                        val uri = imageUri
+                        var imageFile by mutableStateOf<File?>(null)
+                        if(uri != Uri.EMPTY) imageFile = uriToFile(uri!!, context )
+                        imageFile?.let {
+                            eventsViewModel.uploadImageAndThenCreateEvent(ProfileObject.profile?.userId!!, it){imageKey->
+                                eventsViewModel.createEvent(
+                                    EventRequestDTO(
+                                        user = ProfileObject.profile?.userId!!,
+                                        userName = ProfileObject.profile?.username!!,
+                                        image = imageKey,
+                                        category = type,
+                                        location = ProfileObject.profile?.address!!,
+                                        offer =caption,
+                                        expirationTime = "12")
+                                )
+                            }
+                        }
+
                     }
                 }
             }

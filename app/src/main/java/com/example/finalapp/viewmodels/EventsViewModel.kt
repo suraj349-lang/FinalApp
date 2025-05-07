@@ -38,13 +38,17 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
+import java.io.File
 
 import javax.inject.Inject
 import kotlin.Exception
 
 
 @HiltViewModel
-class EventsViewModel @Inject constructor(private val eventsRepository: EventsRepository, @ApplicationContext context: Context): ViewModel(){
+class EventsViewModel @Inject constructor(
+    private val eventsRepository: EventsRepository,
+    private val s3Uploader: S3Uploader,
+    @ApplicationContext context: Context): ViewModel(){
 
     private val placesClient by lazy { Places.createClient(context) }
     var checked= mutableStateOf(false)
@@ -227,6 +231,7 @@ class EventsViewModel @Inject constructor(private val eventsRepository: EventsRe
     //----------------------------Get user events for Profile----------------------------------------------------------------------------------------//
     private val _userEventsListResponse = MutableStateFlow<RequestState<List<EventResponse>>>(RequestState.Idle)
     val userEventsListResponse: StateFlow<RequestState<List<EventResponse>>> = _userEventsListResponse.asStateFlow()
+    val canFetchEvents = mutableStateOf(true)
 
     fun getUserEvents(id:String)=viewModelScope.launch(Dispatchers.IO) {
         val TAG="GET_EVENTS_RESPONSE";
@@ -240,6 +245,7 @@ class EventsViewModel @Inject constructor(private val eventsRepository: EventsRe
 
             }.collect {
                 _userEventsListResponse.value = RequestState.Success(it.data)
+                canFetchEvents.value=false
                 Log.d(TAG, "user events data ${_userEventsListResponse.value}")
 
             }
@@ -248,7 +254,7 @@ class EventsViewModel @Inject constructor(private val eventsRepository: EventsRe
     //----------------------------------Get users Dropped Profiles----------------------------------------------------------------------------------//
     private val _userDropProfilesListResponse = MutableStateFlow<RequestState<GetDropProfileResponseModel>>(RequestState.Idle)
     val userDropProfilesListResponse: StateFlow<RequestState<GetDropProfileResponseModel>> = _userDropProfilesListResponse.asStateFlow()
-
+    val canFetchDroppedProfiles= mutableStateOf(true)
     fun getUserDropProfiles(id:String)=viewModelScope.launch(Dispatchers.IO) {
         val TAG="GET_EVENTS_RESPONSE_drop";
         eventsRepository.getUserDropProfiles(id)
@@ -261,9 +267,32 @@ class EventsViewModel @Inject constructor(private val eventsRepository: EventsRe
 
             }.collect {
                 _userDropProfilesListResponse.value = RequestState.Success(it)
+                canFetchDroppedProfiles.value=false
                 Log.d(TAG, "user drop profile data ${_userDropProfilesListResponse.value}")
 
             }
+    }
+//---------------------------------Create event ----------------------------------------------//
+    private val _imageUploadStatus=MutableStateFlow<RequestState<String>>(RequestState.Idle )
+    val imageUploadStatus:StateFlow<RequestState<String>> = _imageUploadStatus
+
+    fun uploadImageAndThenCreateEvent(userId: String, file: File, onSuccess: (url:String) -> Unit) {
+        viewModelScope.launch {
+            try {
+                _imageUploadStatus.value = RequestState.Loading
+                Log.i("uploadCreateImage", "uploadImageAndThen: called in viewModel")
+                val signedUrl = s3Uploader.getPreSignedUrl(userId)
+                val success = s3Uploader.uploadToS3(signedUrl.url, file)
+                if (success) {
+                    _imageUploadStatus.value = RequestState.Success(signedUrl.key)
+                    onSuccess(signedUrl.key)
+                } else {
+                    _imageUploadStatus.value = RequestState.Error(Exception("Upload failed"))
+                }
+            } catch (e: Exception) {
+                _imageUploadStatus.value = RequestState.Error(e)
+            }
+        }
     }
 
     var createEventResponse = MutableStateFlow(EventResponseDTO())

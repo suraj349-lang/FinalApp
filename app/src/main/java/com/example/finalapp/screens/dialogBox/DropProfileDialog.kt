@@ -111,7 +111,7 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
             }
         )
     }
-    val dropProfileState by imageUploadViewModel.dropProfileState.collectAsState()
+    val dropProfileState by imageUploadViewModel.imageUploadState.collectAsState()
 
 
     Dialog(

@@ -24,6 +24,10 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.datastore.preferences.core.Preferences
 import com.example.finalapp.datastore.StoreLoginState
+import com.example.finalapp.viewmodels.S3Uploader
+import com.example.finalapp.viewmodels.S3UploaderImpl
+import dagger.Binds
+import dagger.hilt.android.components.ViewModelComponent
 import kotlinx.coroutines.runBlocking
 
 @Module
@@ -95,4 +99,12 @@ class AppModule {
             context.preferencesDataStoreFile(LOGIN_DATA_STORE)
         }
     }
+
+    @Module
+    @InstallIn(ViewModelComponent::class)
+    abstract class S3UploaderModule {
+        @Binds
+        abstract fun bindS3Uploader(impl: S3UploaderImpl): S3Uploader
+    }
+
 }

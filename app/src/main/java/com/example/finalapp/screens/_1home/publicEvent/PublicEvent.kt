@@ -41,6 +41,7 @@ import com.example.finalapp.testingDataAndScreen.ActiveButton
 import com.example.finalapp.testingDataAndScreen.ReactionBar
 import com.example.finalapp.testingDataAndScreen.ShareIcon
 import com.example.finalapp.testingDataAndScreen.UserData
+import com.example.finalapp.ui.imagePrefix
 import com.example.finalapp.ui.theme.PURPLE
 import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
@@ -88,7 +89,7 @@ fun PublicEvent(
                     .border(width = 1.dp, color = Color.LightGray)
             ) {
                 GlideImage(
-                    model = image,
+                    model = imagePrefix+event.image,
                     contentDescription = "",
                     contentScale = ContentScale.Crop
                 )

@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 @Entity(tableName = "profile_table")
 data class Profile(
     @PrimaryKey(autoGenerate = true)
-    val id:Int=0 ,
+    val id:Int=0,
     val userId:String="",
     val name:String="",
     val username:String="",

@@ -59,6 +59,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.finalapp.R
+import com.example.finalapp.enums.ImageUploadScreens
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens.dialogBox.DropProfileDialog
 import com.example.finalapp.ui.theme.floatingActionBtnColor
@@ -260,7 +261,7 @@ fun HomeFloatingActionButton(authViewModel: AuthViewModel, eventsViewModel: Even
     FloatingActionButton(
         onClick = {
            // showCustomDialog = !showCustomDialog
-                  navController.navigate(SCREENS.CAMERAX_SCREEN.route)
+                  navController.navigate("camerax/${ImageUploadScreens.DROP_PROFILE.screen}")
                   },
         shape= RoundedCornerShape(8.dp),
         modifier = Modifier

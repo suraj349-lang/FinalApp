@@ -66,6 +66,7 @@ import com.example.finalapp.screens._1home._1_1ExperimentScreenEvents.ActiveButt
 import com.example.finalapp.screens._1home._1_1ExperimentScreenEvents.DONGLE
 import com.example.finalapp.screens._1home._1_1ExperimentScreenEvents.SANS
 import com.example.finalapp.screens._1home._1_1ExperimentScreenEvents.images
+import com.example.finalapp.ui.imagePrefix
 import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
 
@@ -87,7 +88,7 @@ fun PrivateEvent(event: EventResponse, navController: NavHostController) {
                     .fillMaxWidth()
                     .fillMaxHeight()){
                     // IMAGE
-                    GlideImage(model = event.image.ifEmpty { R.drawable.girl }, contentDescription = "",
+                    GlideImage(model = imagePrefix+event.image.ifEmpty { R.drawable.girl }, contentDescription = "",
                         Modifier
                             .fillMaxWidth()
                             .fillMaxHeight(0.7f), contentScale = ContentScale.Crop)

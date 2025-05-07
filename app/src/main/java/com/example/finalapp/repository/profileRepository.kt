@@ -50,6 +50,11 @@ class ProfileRepository @Inject constructor(private val api: ApiService,private 
         emit(api.updateUserImage(email,imageUrl))
     }.flowOn(Dispatchers.IO)
 
+    fun updateProfileImage(userId: String, imageUrl: String): Flow<OkResponse> = flow {
+        Log.i("profileImage", "updateProfileImage:called in repo ")
+        emit(api.updateProfileImage(userId,imageUrl))
+    }.flowOn(Dispatchers.IO)
+
 
     //--------------------------------------Get user data ---------------------------------//
     fun getUserData(number: String): Flow<OkResponse> = flow {

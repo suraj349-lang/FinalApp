@@ -1,13 +1,7 @@
 package com.example.finalapp.screens.common
 
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.Canvas
-import android.graphics.ColorMatrix
-import android.graphics.ColorMatrixColorFilter
-import android.graphics.Paint
 import android.net.Uri
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -15,7 +9,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -46,18 +39,23 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import coil.compose.rememberAsyncImagePainter
-import com.example.finalapp.screens.dialogBox.DropProfileDialog
+import com.example.finalapp.enums.ImageUploadScreens
 import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.viewmodels.EventsViewModel
+import com.example.finalapp.viewmodels.ImageUploadViewModel
 
 
 @Composable
-fun ImagePreviewScreen(uri: Uri, eventsViewModel: EventsViewModel,onDoneClicked: () -> Unit,onClose: () -> Unit) {
+fun ImagePreviewScreen(
+    uri: Uri,
+    lastScreen: String,
+    imageUploadViewModel: ImageUploadViewModel,
+    eventsViewModel: EventsViewModel,
+    onDoneClicked: () -> Unit,
+    onClose: () -> Unit
+) {
     BackHandler(onBack = onClose)
     val context = LocalContext.current
     var selectedFilter by remember { mutableStateOf(FilterType.Original) }
@@ -72,8 +70,25 @@ fun ImagePreviewScreen(uri: Uri, eventsViewModel: EventsViewModel,onDoneClicked:
     val filteredBitmap = remember(selectedFilter, originalBitmap) {
         originalBitmap?.let { applyFilter(it, selectedFilter) }
     }
-    Scaffold(modifier = Modifier.fillMaxSize(), topBar = {ImagePreviewTopBar(){
-        eventsViewModel.dropProfileUploadUri.value=uri ;onDoneClicked()} }) {
+    Scaffold(modifier = Modifier.fillMaxSize(),
+        topBar = {
+            ImagePreviewTopBar{
+                when(lastScreen){
+                    ImageUploadScreens.PROFILE.screen->{
+                        imageUploadViewModel.profileImageUri.value=uri
+                        onDoneClicked()
+                    }
+                    ImageUploadScreens.CREATE_EVENT.screen->{
+                        imageUploadViewModel.createEventImageUri.value=uri
+                        onDoneClicked()
+                    }
+                    else->{
+                        eventsViewModel.dropProfileUploadUri.value=uri
+                        onDoneClicked()
+                    }
+                }
+            }
+        }) {
         Box(
             modifier = Modifier
                 .padding(it)
