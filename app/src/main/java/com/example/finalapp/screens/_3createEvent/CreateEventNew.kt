@@ -97,6 +97,9 @@ fun CreateEventNew(navController: NavController, eventsViewModel: EventsViewMode
     val success by eventsViewModel.createEventIsSuccess.collectAsState()
     val loading by eventsViewModel.createEventIsLoading.collectAsState()
     val context= LocalContext.current
+    var showButton by remember {
+        mutableStateOf(false)
+    }
     if(loading) CircularProgressIndicator()
     if(success){
         Toast.makeText(LocalContext.current,"Event created successfully",Toast.LENGTH_SHORT).show()
@@ -105,9 +108,28 @@ fun CreateEventNew(navController: NavController, eventsViewModel: EventsViewMode
         }
     }
 
+
     Scaffold(
         topBar = {
-            CreateEventTopBar2()
+            CreateEventTopBar2(showButton){
+                val uri = imageUri
+                var imageFile by mutableStateOf<File?>(null)
+                if(uri != Uri.EMPTY) imageFile = uriToFile(uri!!, context )
+                imageFile?.let {
+                    eventsViewModel.uploadImageAndThenCreateEvent(ProfileObject.profile?.userId!!, it){imageKey->
+                        eventsViewModel.createEvent(
+                            EventRequestDTO(
+                                user = ProfileObject.profile?.userId!!,
+                                userName = ProfileObject.profile?.username!!,
+                                image = imageKey,
+                                category = type,
+                                location = ProfileObject.profile?.address!!,
+                                offer =caption,
+                                expirationTime = "12")
+                        )
+                    }
+                }
+            }
         }
         , modifier = Modifier.fillMaxSize()) { paddingValues ->
         Surface(modifier = Modifier
@@ -136,26 +158,8 @@ fun CreateEventNew(navController: NavController, eventsViewModel: EventsViewMode
                     }
                 }
                 CREATE_EVENT.MISCELLANEOUS ->{
-                    PrivateCreateEventPreview(uri = imageUri,caption, eventType =type){
-                        val uri = imageUri
-                        var imageFile by mutableStateOf<File?>(null)
-                        if(uri != Uri.EMPTY) imageFile = uriToFile(uri!!, context )
-                        imageFile?.let {
-                            eventsViewModel.uploadImageAndThenCreateEvent(ProfileObject.profile?.userId!!, it){imageKey->
-                                eventsViewModel.createEvent(
-                                    EventRequestDTO(
-                                        user = ProfileObject.profile?.userId!!,
-                                        userName = ProfileObject.profile?.username!!,
-                                        image = imageKey,
-                                        category = type,
-                                        location = ProfileObject.profile?.address!!,
-                                        offer =caption,
-                                        expirationTime = "12")
-                                )
-                            }
-                        }
-
-                    }
+                    showButton=true
+                    PrivateCreateEventPreview(uri = imageUri,caption, eventType =type)
                 }
             }
         }
@@ -166,15 +170,17 @@ fun CreateEventNew(navController: NavController, eventsViewModel: EventsViewMode
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CreateEventTopBar2() {
+fun CreateEventTopBar2(showButton:Boolean,onButtonClicked:()->Unit) {
     TopAppBar(title = { Text(text = "Create Event")},
         actions = {
-
-
-    }, navigationIcon = {
-        Image(painter = painterResource(id = R.drawable.back), contentDescription ="", modifier = Modifier.size(30.dp) )
-        })
-    
+            if(showButton) {
+                Button(onClick = { onButtonClicked()}) {
+                     Text(text = "Create Event")
+                }
+            } },
+        navigationIcon = {
+            Image(painter = painterResource(id = R.drawable.back), contentDescription ="", modifier = Modifier.size(30.dp) ) }
+    )
 }
 
 @Composable

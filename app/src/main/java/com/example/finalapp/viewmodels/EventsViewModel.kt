@@ -72,6 +72,8 @@ class EventsViewModel @Inject constructor(
     // Create Pager but don't collect initially
     private val _droppedProfilesFlow = MutableStateFlow<Flow<PagingData<DropProfileResponse>>?>(null)
     val droppedProfiles: StateFlow<Flow<PagingData<DropProfileResponse>>?> = _droppedProfilesFlow.asStateFlow()
+    private val _shouldLoadDroppedProfiles= MutableStateFlow(false)
+    val shouldLoadDroppedProfiles:StateFlow<Boolean>  = _shouldLoadDroppedProfiles
 
     fun loadDroppedProfiles(location:String) {
         _droppedProfilesFlow.value = Pager(
@@ -80,6 +82,10 @@ class EventsViewModel @Inject constructor(
         ).flow.cachedIn(viewModelScope)
 
         _triggerFetch.value = true
+    }
+
+    fun resetShouldLoadDroppedProfiles(){
+        _shouldLoadDroppedProfiles.value=true
     }
 
     //-------------------------------------------DIRECT CHAT--------------------------------------------------------------------------------------//

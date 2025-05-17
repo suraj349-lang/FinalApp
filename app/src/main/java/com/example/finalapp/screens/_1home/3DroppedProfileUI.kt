@@ -4,6 +4,7 @@ package com.example.finalapp.screens._1home
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -21,17 +22,21 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Surface
 import androidx.compose.ui.Alignment
 import androidx.compose.material.Text
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.TopAppBarScrollBehavior
@@ -75,6 +80,7 @@ import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens.dialogBox.DialogLoading
 import com.example.finalapp.ui.imagePrefix
 import com.example.finalapp.screens.common.CommonErrorScreen
+import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.utils.ProfileObject
 import com.example.finalapp.utils.UserLocation
 import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
@@ -82,15 +88,20 @@ import com.example.finalapp.utils.testdata.Item
 import kotlinx.coroutines.launch
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun DroppedProfilesUI(
+    pagerState: PagerState,
     scrollBehavior: TopAppBarScrollBehavior,
     navController: NavHostController,
     eventsViewModel: EventsViewModel,
 ) {
     val triggerFetch by eventsViewModel.triggerFetch.collectAsState()
     val droppedProfiles by eventsViewModel.droppedProfiles.collectAsState()
+    val droppedProfilesList = droppedProfiles?.collectAsLazyPagingItems()
+    var showLoader by remember {
+        mutableStateOf(false)
+    }
     var query by remember { mutableStateOf("") }
     var showPredictionBoxForSearch by remember {
         mutableStateOf(false)
@@ -107,10 +118,12 @@ fun DroppedProfilesUI(
     }
 
     val predictions by eventsViewModel.getAutocompletePredictions(query).collectAsState(emptyList())
-
-    LaunchedEffect(key1 = Unit){
-        scope.launch {
+    val shouldLoadDroppedProfiles by eventsViewModel.shouldLoadDroppedProfiles.collectAsState()
+    LaunchedEffect(pagerState.currentPage) {
+        // if page is not checked then on scrolling it will make the api call i.e. in the direct screen itself
+        if (pagerState.currentPage == 2 && !shouldLoadDroppedProfiles) {
             eventsViewModel.loadDroppedProfiles(ProfileObject.profile?.address!!)
+            eventsViewModel.resetShouldLoadDroppedProfiles()
         }
     }
 
@@ -128,8 +141,9 @@ fun DroppedProfilesUI(
                     verticalArrangement = Arrangement.Top,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                  UserLocation.address?.let { DroppedProfileLocation(location = it) }
-                OutlinedTextField(
+                    if(showLoader && droppedProfilesList?.itemCount==0) LinearProgressIndicator(modifier = Modifier.fillMaxWidth().height(8.dp), color = floatingActionBtnColor)
+                    UserLocation.address?.let { DroppedProfileLocation(location = it) }
+                    OutlinedTextField(
                     value = query,
                     onValueChange = {
                         query = it
@@ -202,7 +216,6 @@ fun DroppedProfilesUI(
                     }
                 }
             }else{
-                val droppedProfilesList = droppedProfiles!!.collectAsLazyPagingItems()
                 Column(
                     modifier = Modifier
                         .zIndex(0f)
@@ -215,41 +228,41 @@ fun DroppedProfilesUI(
                         columns = StaggeredGridCells.Fixed(2),
                         contentPadding = PaddingValues(2.dp),
                     ) {
-                        items(droppedProfilesList.itemCount) { index ->
-                            val item = droppedProfilesList[index]
-                            if (item != null) {
-                                DroppedProfile(item){
-                                    Log.d("DropProfileTesting", "DroppedProfilesNew:callback called ")
-                                    Log.d("DropProfileTesting", "DroppedProfilesNew:${item} ")
-                                    try {
-                                        val route= item.let {
-                                            SCREENS.DROP_PROFILE_USER_PROFILE.passProfile(it)
+                        droppedProfilesList?.itemCount?.let {
+                            items(it) { index ->
+                                val item = droppedProfilesList[index]
+                                if (item != null) {
+                                    DroppedProfile(item){
+                                        try {
+                                            val route= item.let {
+                                                SCREENS.DROP_PROFILE_USER_PROFILE.passProfile(it)
+                                            }
+                                            navController.navigate(route)
+                                        }catch (e:Exception){
+                                            Log.d("DropProfileTesting", "DroppedProfilesNew:${e.message} ")
                                         }
-                                        Log.d("DropProfileTesting", "DroppedProfilesNew:$route ")
-                                        navController.navigate(route)
-                                    }catch (e:Exception){
-                                        Log.d("DropProfileTesting", "DroppedProfilesNew:${e.message} ")
+
+
                                     }
-
-
                                 }
                             }
                         }
-                        droppedProfilesList.apply {
+                        droppedProfilesList?.apply {
                             when {
                                 loadState.refresh is LoadState.Loading -> {
                                     item {
-                                        DialogLoading()
+                                        showLoader=true
                                     }
                                 }
 
                                 loadState.append is LoadState.Loading -> {
                                     item {
-                                        DialogLoading()
+                                        showLoader=true
                                     }
                                 }
 
                                 loadState.refresh is LoadState.Error -> {
+                                    showLoader=false
                                     val error = (loadState.refresh as LoadState.Error).error
                                     item {
                                         Log.e("Error in dropped profiles", "DroppedProfilesUI: $error ", )

@@ -24,11 +24,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.finalapp.R
 import com.example.finalapp.navigation.SCREENS
-import com.example.finalapp.ui.theme.DarkBlue
-import com.example.finalapp.ui.theme.floatingActionBtnColor
-import com.example.finalapp.ui.theme.statusBarColor
-import com.example.finalapp.ui.theme.statusBarColorBlue
-import com.example.finalapp.ui.theme.topAppBarTextColor
 
 sealed class Destinations(
     val route: String,

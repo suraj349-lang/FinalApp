@@ -90,6 +90,7 @@ class ImageUploadViewModel @Inject constructor(
                 _userProfileImageUpdateStatus.value = RequestState.Error(it)
             }
             .collect{
+
                 ProfileObject.profile = ProfileObject.profile?.copy(profileImage =it.data.profileImage )
                 _userProfileImageUpdateStatus.value = RequestState.Success(it.data)
             }

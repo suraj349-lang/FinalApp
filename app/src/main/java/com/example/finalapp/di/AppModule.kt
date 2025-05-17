@@ -99,6 +99,14 @@ class AppModule {
             context.preferencesDataStoreFile(LOGIN_DATA_STORE)
         }
     }
+    @Provides
+    @Singleton
+    @UserDataStore
+    fun provideUserDataStoreRepository(@ApplicationContext context: Context): DataStore<Preferences> {
+        return PreferenceDataStoreFactory.create {
+            context.preferencesDataStoreFile(USER_DATA_STORE)
+        }
+    }
 
     @Module
     @InstallIn(ViewModelComponent::class)

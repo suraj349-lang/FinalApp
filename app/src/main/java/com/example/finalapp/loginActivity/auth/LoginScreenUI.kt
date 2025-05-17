@@ -1,7 +1,6 @@
 package com.example.finalapp.loginActivity.auth
 
 import android.annotation.SuppressLint
-import android.text.Layout
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
@@ -21,18 +20,18 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.Divider
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
@@ -47,7 +46,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -62,16 +60,15 @@ import com.example.finalapp.viewmodels.AuthViewModel
 import com.example.finalapp.login.PhoneLogin
 import com.example.finalapp.model.User
 import com.example.finalapp.navigation.SCREENS
-import com.example.finalapp.screens.dialogBox.DialogLoading
-import com.example.finalapp.ui.theme.DarkBlue
+import com.example.finalapp.screens.onboarding.util.OnBoardingPage
 import com.example.finalapp.ui.theme.floatingActionBtnColor
-import com.example.finalapp.ui.theme.statusAndTopAppBarColor
-import com.example.finalapp.ui.theme.topAppBarTextColor
 import com.example.finalapp.utils.LoginState
 import com.example.finalapp.utils.constants.Constants
-import com.example.finalapp.utils.constants.Constants.APP_ICON
 import com.example.finalapp.utils.constants.Constants.APP_NAME_FONT
-import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.rememberPagerState
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
@@ -144,24 +141,6 @@ fun LoginScreenUI(navController: NavController,authViewModel: AuthViewModel) {
                 color = Color.White,
                 fontFamily = APP_NAME_FONT
             )
-            /*
-            Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(
-                    text = Constants.APP_NAME,
-                    fontSize = 45.sp,
-                    modifier = Modifier.padding(top = 8.dp, bottom = 0.dp),
-                    color = Color.White,
-                    fontFamily = APP_NAME_FONT
-                )
-                Text(
-                    text = "connect dynamically...",
-                    fontSize = 8.sp,
-                    modifier = Modifier.padding(start = 84.dp, bottom = 0.dp),
-                    color = Color.White,
-                    fontFamily = Constants.FONT_MEDIUM
-                )
-            }
-             */
             Spacer(modifier = Modifier.height(10.dp))
 
             Column(
@@ -301,8 +280,82 @@ fun LoginScreenUI(navController: NavController,authViewModel: AuthViewModel) {
                     })
 
             }
+            LoginHorizontalPager()
         }
 
     }
 
+}
+
+
+@OptIn(ExperimentalPagerApi::class)
+@Composable
+fun LoginHorizontalPager() {
+    val pages = listOf(
+        OnBoardingPage.First,
+        OnBoardingPage.Second,
+        OnBoardingPage.Third,
+        OnBoardingPage.Fourth
+    )
+    val pagerState = rememberPagerState()
+    LaunchedEffect(pagerState) {
+        while (true) {
+            delay(2000L)
+            val nextPage = (pagerState.currentPage + 1) % pages.size
+            pagerState.animateScrollToPage(nextPage)
+        }
+    }
+    Column(modifier = Modifier
+        .padding(top = 24.dp)
+        .wrapContentHeight()
+        .fillMaxWidth()) {
+        Divider(modifier = Modifier
+            .height(2.dp)
+            .fillMaxWidth(), color = Color.DarkGray)
+        Spacer(modifier = Modifier.height(20.dp))
+        HorizontalPager(
+            modifier = Modifier,
+            count = 4,
+            state = pagerState,
+            verticalAlignment = Alignment.Top
+        ) { position ->
+            LoginPagerScreen(onBoardingPage = pages[position])
+        }
+
+    }
+}
+
+
+@Composable
+fun LoginPagerScreen(onBoardingPage: OnBoardingPage) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Top
+    ) {
+        Image(
+            modifier = Modifier.size(160.dp),
+            painter = painterResource(id = onBoardingPage.image),
+            contentDescription = "Pager Image"
+        )
+        Text(
+            modifier = Modifier
+                .fillMaxWidth(),
+            text = onBoardingPage.title,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+            color = Color.White
+        )
+        Text(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp)
+                .padding(top = 16.dp),
+            text = onBoardingPage.description,
+            fontFamily=Constants.FONT_MEDIUM,
+            textAlign = TextAlign.Center,
+            color = Color.White
+        )
+    }
 }

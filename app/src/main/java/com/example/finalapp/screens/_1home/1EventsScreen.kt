@@ -8,6 +8,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -15,6 +18,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
 import com.example.finalapp.R
 import com.example.finalapp.model.EventRequestDTO
@@ -25,7 +29,9 @@ import com.example.finalapp.screens.common.NoDataFound
 import com.example.finalapp.screens.dialogBox.DialogLoading
 import com.example.finalapp.testingDataAndScreen.imageUrls
 import com.example.finalapp.screens.common.CommonErrorScreen
+import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.utils.RequestState
+import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.viewmodels.EventsViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -35,7 +41,8 @@ fun EventsScreen(
     eventsViewModel: EventsViewModel,
     modifier: Modifier = Modifier,
     initialPage: Int? = 0,
-    navController: NavHostController
+    navController: NavHostController,
+    onRetryCalled:()->Unit
 ) {
     val pagerState = rememberPagerState(
         initialPage = initialPage ?: 0,
@@ -89,9 +96,18 @@ fun EventsScreen(
                     }
                 }
             }else{
-               NoDataFound("No Events Found!", R.drawable.search)
+                Column() {
+                    NoDataFound("No Events Found!", R.drawable.search, content ={ RetryButton(onRetryCalled=onRetryCalled)})
+                }
             }
         }
         else -> {}
+    }
+}
+
+@Composable
+fun RetryButton(onRetryCalled: () -> Unit) {
+    Button(onClick = { onRetryCalled()}, colors = ButtonDefaults.buttonColors(backgroundColor = floatingActionBtnColor)) {
+        Text(text = "Retry", fontFamily = Constants.FONT_MEDIUM, color = Color.White)
     }
 }

@@ -77,8 +77,7 @@ import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
 @Composable
 fun PrivateCreateEventPreview(uri: Uri?,
                               caption: String,
-                              eventType: String,
-                              onPostClick: () -> Unit) {
+                              eventType: String) {
     Surface(modifier = Modifier
         .fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -155,20 +154,6 @@ fun PrivateCreateEventPreview(uri: Uri?,
                             ) {
                                 RunningText4(ProfileObject.profile?.address!!)
                             }
-                        }
-                    }
-                    //------hot this weekend-----------------------------------------------------------------
-
-                    Row(modifier= Modifier
-                        .fillMaxWidth()
-                        .wrapContentHeight()) {
-                        Card(modifier = Modifier
-                            .fillMaxWidth()
-                            .height(80.dp), shape = RoundedCornerShape(0.dp), colors = CardDefaults.cardColors(containerColor = Color(
-                            0xFFF3EA97
-                        )
-                        )) {
-                            HotThisWeekendBanner4()
                         }
                     }
                     //----------------------------------------------------------------------------------------------

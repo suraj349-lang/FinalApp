@@ -76,7 +76,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
     val eventsViewModel= hiltViewModel<EventsViewModel>()
     val chatViewModel= hiltViewModel<ChatViewModel>()
 
-    NavHost(navController = navController, startDestination =SCREENS.SPLASH.route){
+    NavHost(navController = navController, startDestination =SCREENS.LOGIN.route){
         composable(SCREENS.SPLASH.route){
             SplashScreenUI(navController,screen)
         }

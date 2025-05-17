@@ -186,7 +186,7 @@ fun ChatTopBar(title: String, navController: NavHostController,onSearchClicked:(
                         colorFilter = ColorFilter.tint(Color.DarkGray),
                         modifier = Modifier
                             .size(30.dp)
-                            .clickable { navController.navigate(SCREENS.PROFILE.route) }
+                            .clickable { navController.navigateUp() }
 
                     )
                     Spacer(modifier = Modifier.width(16.dp))

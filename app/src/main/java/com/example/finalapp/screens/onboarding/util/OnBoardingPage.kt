@@ -18,14 +18,14 @@ sealed class OnBoardingPage(
 
     object Second : OnBoardingPage(
         image = R.drawable.offer,
-        title = "Private Offer",
-        description = "Raise an offer to the person on your feed."
+        title = "Private Event",
+        description = "Create an event to the person on your feed."
     )
 
     object Third : OnBoardingPage(
         image = R.drawable.offerforeverybody,
-        title = "Public Offer",
-        description = "Raise an offer to everyone in your nearby."
+        title = "Public Event",
+        description = "Create an event to everyone in your nearby."
     )
     object Fourth : OnBoardingPage(
         image = R.drawable.nightclub,

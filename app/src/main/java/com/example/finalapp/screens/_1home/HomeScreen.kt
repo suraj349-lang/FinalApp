@@ -6,27 +6,20 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
@@ -35,36 +28,24 @@ import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
-import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalDrawerSheet
-import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.NavigationDrawerItem
-import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.finalapp.R
 import com.example.finalapp.viewmodels.AuthViewModel
@@ -74,9 +55,7 @@ import com.example.finalapp.screens._3createEvent.CreateEventBottomSheet
 import com.example.finalapp.viewmodels.EventsViewModel
 import com.example.finalapp.screens.dialogBox.ShowQRDialog
 import com.example.finalapp.screens.dialogBox.showDialog
-import com.example.finalapp.testing.items
 import com.example.finalapp.ui.TAB_ITEMS
-import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.viewmodels.ImageUploadViewModel
 import kotlinx.coroutines.delay
@@ -205,9 +184,9 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
                                 .imePadding()
                         ) { page ->
                             when (page) {
-                                0 -> EventsScreen(eventsViewModel = eventsViewModel, navController = navController)
+                                0 -> EventsScreen(eventsViewModel = eventsViewModel, navController = navController, onRetryCalled = {eventsViewModel.getAllEvents()})
                                 1 -> DirectChatScreen(scrollBehavior, authViewModel, eventsViewModel, navController)
-                                2 -> DroppedProfilesUI(scrollBehavior, navController, eventsViewModel)
+                                2 -> DroppedProfilesUI(pagerState,scrollBehavior, navController, eventsViewModel)
                             }
                         }
 

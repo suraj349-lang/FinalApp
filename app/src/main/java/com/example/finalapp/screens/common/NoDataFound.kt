@@ -17,9 +17,10 @@ import com.example.finalapp.R
 import com.example.finalapp.utils.constants.Constants
 
 @Composable
-fun NoDataFound(text: String, image: Int) {
+fun NoDataFound(text: String, image: Int,content: @Composable() ()->Unit={}) {
     Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
         Image(painter = painterResource(id = image), contentDescription = "no events found",modifier=Modifier.size(50.dp))
         Text(text = text, fontFamily = Constants.DONGLE_BOLD, fontSize = 30.sp, color = Color.DarkGray)
+        content()
     }
 }

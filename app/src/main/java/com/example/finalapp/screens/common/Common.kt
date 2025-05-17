@@ -13,7 +13,9 @@ import com.example.finalapp.ui.theme.floatingActionBtnColor
 
 @Composable
 fun BackImage(onBackClicked: () -> Unit) {
-    Image(painter = painterResource(id = R.drawable.back) , contentDescription ="", modifier = Modifier.size(40.dp).clickable { onBackClicked() }, colorFilter = ColorFilter.tint(
-        floatingActionBtnColor
-    ) )
+    Image(
+        painter = painterResource(id = R.drawable.back) ,
+        contentDescription ="back button", modifier = Modifier.size(30.dp).clickable { onBackClicked() },
+        colorFilter = ColorFilter.tint(floatingActionBtnColor)
+    )
 }

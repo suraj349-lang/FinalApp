@@ -129,27 +129,3 @@ fun FinishButton(
         }
     }
 }
-
-//@Composable
-//@Preview(showBackground = true)
-//fun FirstOnBoardingScreenPreview() {
-//    Column(modifier = Modifier.fillMaxSize()) {
-//        PagerScreen(onBoardingPage = OnBoardingPage.First)
-//    }
-//}
-//
-//@Composable
-//@Preview(showBackground = true)
-//fun SecondOnBoardingScreenPreview() {
-//    Column(modifier = Modifier.fillMaxSize()) {
-//        PagerScreen(onBoardingPage = OnBoardingPage.Second)
-//    }
-//}
-//
-//@Composable
-//@Preview(showBackground = true)
-//fun ThirdOnBoardingScreenPreview() {
-//    Column(modifier = Modifier.fillMaxSize()) {
-//        PagerScreen(onBoardingPage = OnBoardingPage.Third)
-//    }
-//}
