@@ -136,7 +136,7 @@ fun HomeTopBar(
                         contentDescription = "",
                         colorFilter = ColorFilter.tint(color = homeTopBarIconsColor),
                         modifier = Modifier
-                            .padding(end = 16.dp)
+                            .padding(end = 20.dp)
                             .size(24.dp)
                             .clickable {
                                 onQRClicked()
@@ -147,7 +147,7 @@ fun HomeTopBar(
                         colorFilter = ColorFilter.tint(color = homeTopBarIconsColor),
                         modifier = Modifier
                             .clickable { navController.navigate(SCREENS.NOTIFICATIONS.route) }
-                            .padding(end = 16.dp)
+                            .padding(end = 20.dp)
                             .size(24.dp)
                     )
                     icon?.let { painterResource(id = it) }?.let {
