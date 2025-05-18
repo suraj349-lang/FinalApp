@@ -235,23 +235,5 @@ class ImageUploadViewModel @Inject constructor(
         imageUploadState.value=RequestState.Idle
     }
 
-    //----------------------------------Get user data ---------------------------------------------------------------------------------------//
-
-    val getUserData: MutableState<RequestState<User>> = mutableStateOf(RequestState.Idle)
-    var firstUserData= MutableStateFlow(User())
-    fun getUserData(number:String)=viewModelScope.launch(Dispatchers.IO){
-        profileRepository.getUserData(number)
-            .onStart {
-                getUserData.value = RequestState.Loading
-
-            }.catch {
-                getUserData.value = RequestState.Error(it)
-
-            }.collect {
-                getUserData.value = RequestState.Success(it.data)
-
-            }
-
-    }
 
 }

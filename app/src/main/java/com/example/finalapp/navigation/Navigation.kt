@@ -22,7 +22,7 @@ import com.example.finalapp.loginActivity.auth.LoginScreenUI
 import com.example.finalapp.loginActivity.auth.SignupScreenUI
 import com.example.finalapp.loginActivity.auth.SplashScreenUI
 import com.example.finalapp.loginActivity.auth.util.OtpBox
-import com.example.finalapp.screens._6chat.ChatScreenUI
+import com.example.finalapp.screens._6chat.SingleChatScreenUI
 import com.example.finalapp.loginActivity.auth.FinalUserCreation
 import com.example.finalapp.viewmodels.EventsViewModel
 import com.example.finalapp.screens._6chat.ChatListScreen
@@ -36,6 +36,7 @@ import com.example.finalapp.testing.TabView
 import com.example.finalapp.screens._3createEvent.PastRaisedOffer
 import com.example.finalapp.screens._3createEvent.PremiumCreateEvent
 import com.example.finalapp.screens._4profile.ProfileScreenNew
+import com.example.finalapp.screens._4profile.UserPublicProfile
 import com.example.finalapp.screens._4profile.dropProfileUserProfile.DropProfileUserProfile
 import com.example.finalapp.screens._5settings.BlockedUsers
 import com.example.finalapp.screens._5settings.BugsAndSuggestion
@@ -59,7 +60,6 @@ import com.example.finalapp.screens.common.CameraXScreen
 import com.example.finalapp.screens.common.ImagePreviewScreen
 import com.example.finalapp.screens.onboarding.screen.WelcomeScreen
 import com.example.finalapp.testingDataAndScreen.Tiktok
-import com.example.finalapp.utils.ProfileObject
 import com.example.finalapp.viewmodels.ImageUploadViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import kotlinx.serialization.decodeFromString
@@ -116,7 +116,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
           {navBackStackEntry->
               val userName=navBackStackEntry.arguments?.getString("userName")
               val chatListUserId=navBackStackEntry.arguments?.getString("chatListUserId")
-              ChatScreenUI(userName!!,chatListUserId!!, navController ,chatViewModel)
+              SingleChatScreenUI(userName!!,chatListUserId!!, navController ,chatViewModel)
         }
         composable(SCREENS.OTP2.route){
             OtpBox()
@@ -193,6 +193,12 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
 
                 }
             ) { navController.navigateUp() }
+        }
+
+        composable(route=SCREENS.USER_PUBLIC_PROFILE.route, arguments = listOf(navArgument("userId"){ type= NavType.StringType })){navBackStackEntry ->
+            val userId=navBackStackEntry.arguments?.getString("userId")
+            UserPublicProfile(eventsViewModel,navController,userId)
+
         }
 
 

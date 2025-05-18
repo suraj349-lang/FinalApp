@@ -48,8 +48,8 @@ class AuthViewModel @Inject constructor(
     private val storeLoginState:StoreLoginState,
     @ApplicationContext private val context: Context): ViewModel()
    {
+       //get user data from room------------------------------------------------------------------------------
        private var _userFromDb:MutableStateFlow<RequestState<Profile>> = MutableStateFlow(RequestState.Idle)
-
        fun getProfileData() = viewModelScope.launch {
            _userFromDb.value = RequestState.Loading
            profileDatabaseRepository.getProfileDataFromDb()
@@ -189,12 +189,11 @@ class AuthViewModel @Inject constructor(
        //------------------------------------------------------------------------------------------------------------//
 
 
-    fun hashPassword(password: String): String {
+    private fun hashPassword(password: String): String {
         val bytes = password.toByteArray()
         val digest = MessageDigest.getInstance("SHA-256")
         val hashedBytes = digest.digest(bytes)
         return hashedBytes.joinToString("") { "%02x".format(it) }
     }
-
     }
 

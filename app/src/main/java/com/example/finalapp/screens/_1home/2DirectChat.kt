@@ -1,8 +1,8 @@
 package com.example.finalapp.screens._1home
 
-import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -38,7 +39,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -51,6 +51,7 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
 import com.example.finalapp.model.DirectChat
 import com.example.finalapp.model.DirectChatRequest
+import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens.dialogBox.DialogLoading
 import com.example.finalapp.ui.imagePrefix
 import com.example.finalapp.ui.theme.PURPLE
@@ -122,6 +123,7 @@ fun DirectChatScreen(
                     DirectChatUI(
                         scrollBehavior,
                         eventsViewModel,
+                        navController,
                         checked
                     ) { eventsViewModel.shareProfileClicked.value = true }
                 }
@@ -137,23 +139,41 @@ fun DirectChatScreen(
 fun DirectChatUI(
     scrollBehavior: TopAppBarScrollBehavior,
     eventsViewModel: EventsViewModel,
+    navController: NavHostController,
     checked: Boolean,
     onShareProfileClicked: () -> Unit
 ) {
     if (!checked ) {
         ShareProfileForDirectChat{ onShareProfileClicked() }
     } else {
-        DirectChatProfiles(scrollBehavior, eventsViewModel )
+        DirectChatProfiles(scrollBehavior,navController, eventsViewModel )
     }
 
 
 }
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DirectChatProfiles(scrollBehavior: TopAppBarScrollBehavior, eventsViewModel: EventsViewModel) {
+fun DirectChatProfiles(
+    scrollBehavior: TopAppBarScrollBehavior,
+    navController: NavHostController,
+    eventsViewModel: EventsViewModel,
+) {
     val chatState by eventsViewModel.directChatResponse.collectAsState()
     val userList = eventsViewModel.nearByUsersList.collectAsLazyPagingItems()
-    val context = LocalContext.current
+    val saveToChatListSuccess by eventsViewModel.saveUserToChatListResponseState.collectAsState()
+    when(val response=saveToChatListSuccess){
+        is RequestState.Error ->  {
+            Text(text = response.error.toString())
+        }
+        is RequestState.Success ->{
+            navController.navigate(SCREENS.SINGLE_CHAT.createPath(response.data.withUserId.username,response.data.withUserId._id))
+            eventsViewModel.resetSaveToChatListSuccessToIdle()
+        }
+        is RequestState.Loading ->{
+            CircularProgressIndicator()
+        }
+        else  ->{}
+    }
 
     when (chatState) {
         is RequestState.Loading -> {
@@ -166,12 +186,16 @@ fun DirectChatProfiles(scrollBehavior: TopAppBarScrollBehavior, eventsViewModel:
             LazyColumn(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)) {
                 items(userList) { item ->
                     item?.let {
-                        DirectChatItem(it) {
-                            Toast.makeText(
-                                context,
-                                "Clicked to chat with this person",
-                                Toast.LENGTH_SHORT
-                            ).show()
+                        DirectChatItem(
+                            user=it,
+                            onProfileClicked = {
+                                navController.navigate(SCREENS.USER_PUBLIC_PROFILE.createPath(it.userId._id))
+                            }
+                        ) {
+                            eventsViewModel.saveUserToChatList(
+                                ProfileObject.profile?.userId!!,
+                                it.userId._id
+                            )
                         }
                     }
                 }
@@ -183,7 +207,11 @@ fun DirectChatProfiles(scrollBehavior: TopAppBarScrollBehavior, eventsViewModel:
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun DirectChatItem(user: DirectChat?, onDirectChatItemClicked: () -> Unit) {
+fun DirectChatItem(
+    user: DirectChat?,
+    onProfileClicked: () -> Unit,
+    onSendMessageClicked: () -> Unit
+) {
     Column(
         modifier = Modifier.wrapContentSize(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -191,13 +219,16 @@ fun DirectChatItem(user: DirectChat?, onDirectChatItemClicked: () -> Unit) {
 
         Card(
             modifier = Modifier
+                .clickable {
+                    onProfileClicked()
+                }
                 .size(150.dp)
                 .padding(top = 4.dp),
             shape = RoundedCornerShape(20.dp),
             border = BorderStroke(width = 1.dp, color = Color.LightGray)
         ) {
             GlideImage(
-                model = if(user?.userId?.profileImage?.isNotEmpty() == true) user.userId.profileImage else R.drawable.profile_image_2,
+                model = if(user?.userId?.profileImage?.isNotEmpty() == true) imagePrefix+user.userId.profileImage else "",
                 contentDescription = "",
                 contentScale = ContentScale.Crop
             )
@@ -212,11 +243,10 @@ fun DirectChatItem(user: DirectChat?, onDirectChatItemClicked: () -> Unit) {
                 fontSize = 25.sp,
                 fontFamily = DONGLE_BOLD
             )
-            // Text(text = " ,100m.", fontSize = 12.sp, fontFamily = FontFamily(Font(R.font.oreganoregular)))
         }
 
         Button(
-            onClick = { onDirectChatItemClicked() },
+            onClick = { onSendMessageClicked() },
             shape = RoundedCornerShape(6.dp),
             modifier = Modifier
                 .fillMaxWidth(0.5f) //.wrapContentHeight().fillMaxWidth(0.8f)

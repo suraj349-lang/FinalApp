@@ -11,6 +11,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.example.finalapp.model.ChatList
 import com.example.finalapp.model.DirectChat
 import com.example.finalapp.model.DirectChatRequest
 import com.example.finalapp.model.DropProfileResponse
@@ -19,9 +20,12 @@ import com.example.finalapp.model.EventResponse
 import com.example.finalapp.model.EventResponseDTO
 import com.example.finalapp.model.GetDropProfileResponseModel
 import com.example.finalapp.model.PremiumEventResponseDTO
+import com.example.finalapp.model.User
 import com.example.finalapp.paging.DirectChatUsersPagingSource
 import com.example.finalapp.paging.DropProfilePagingSource
+import com.example.finalapp.repository.ChatDatabaseRepository
 import com.example.finalapp.repository.EventsRepository
+import com.example.finalapp.repository.ProfileRepository
 import com.example.finalapp.repository.Resource
 import com.example.finalapp.testingDataAndScreen.imageUrls
 import com.example.finalapp.utils.RequestState
@@ -47,6 +51,8 @@ import kotlin.Exception
 @HiltViewModel
 class EventsViewModel @Inject constructor(
     private val eventsRepository: EventsRepository,
+    private val chatDatabaseRepository: ChatDatabaseRepository,
+    private val profileRepository: ProfileRepository,
     private val s3Uploader: S3Uploader,
     @ApplicationContext context: Context): ViewModel(){
 
@@ -357,7 +363,43 @@ class EventsViewModel @Inject constructor(
     }
 
 
+    private val _saveUserToChatListResponseState= MutableStateFlow<RequestState<ChatList>>(RequestState.Idle)
+    val saveUserToChatListResponseState: StateFlow<RequestState<ChatList>> = _saveUserToChatListResponseState
+    val saveToChatListSuccess= MutableStateFlow<Boolean>(false)
 
+    fun saveUserToChatList(currentUserId:String,otherUserUserId:String)=viewModelScope.launch {
+        chatDatabaseRepository.saveUserChatList(currentUserId,otherUserUserId)
+            .onStart {
+                _saveUserToChatListResponseState.value=RequestState.Loading
+            }
+            .catch {
+                _saveUserToChatListResponseState.value=RequestState.Error(it)
+            }
+            .collect {
+                _saveUserToChatListResponseState.value = RequestState.Success(it.data)
+            }
+    }
+    fun resetSaveToChatListSuccessToIdle(){
+        _saveUserToChatListResponseState.value=RequestState.Idle
+    }
 
+    //-------------------------------------------------------------------------------------------------------//
+
+    private val _userProfileResponse= MutableStateFlow<RequestState<User>>(RequestState.Idle)
+    val userProfileResponse: StateFlow<RequestState<User>>  = _userProfileResponse
+
+    fun getUserData(userID: String)=viewModelScope.launch{
+        _userProfileResponse.value=RequestState.Loading
+        profileRepository.getUserData(userID)
+            .onStart {
+                _userProfileResponse.value=RequestState.Loading
+            }
+            .catch {
+                _userProfileResponse.value=RequestState.Error(it)
+            }
+            .collect{
+                _userProfileResponse.value=RequestState.Success(it.data)
+            }
+    }
 
 }

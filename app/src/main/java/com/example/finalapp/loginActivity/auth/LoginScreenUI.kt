@@ -309,9 +309,6 @@ fun LoginHorizontalPager() {
         .padding(top = 24.dp)
         .wrapContentHeight()
         .fillMaxWidth()) {
-        Divider(modifier = Modifier
-            .height(2.dp)
-            .fillMaxWidth(), color = Color.DarkGray)
         Spacer(modifier = Modifier.height(20.dp))
         HorizontalPager(
             modifier = Modifier,

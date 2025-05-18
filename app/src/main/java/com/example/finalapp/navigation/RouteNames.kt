@@ -21,7 +21,11 @@ sealed class SCREENS(val route:String){
     object SEARCH:SCREENS("search")
     object NOTIFICATIONS:SCREENS("notifications_screen")
     object CHAT:SCREENS("chat_screen")
-    object SINGLE_CHAT:SCREENS("singleChat/{userName}/{chatListUserId}")
+    object SINGLE_CHAT:SCREENS("singleChat/{userName}/{chatListUserId}"){
+        fun createPath(userName:String,chatListUserId:String):String{
+            return "singleChat/${userName}/${chatListUserId}"
+        }
+    }
 
     object GALLERY:SCREENS("gallery_picker")
     object WELCOME:SCREENS("welcome")
@@ -38,6 +42,11 @@ sealed class SCREENS(val route:String){
         fun passProfile(dropProfileResponse: DropProfileResponse):String{
             val profileJson= Uri.encode(Json.encodeToString(dropProfileResponse))
             return "drop_profile_user_profile/$profileJson"
+        }
+    }
+    object USER_PUBLIC_PROFILE:SCREENS("user_public_profile/{userId}"){
+        fun createPath(userId: String):String{
+            return "user_public_profile/$userId"
         }
     }
     object IMAGE_CROPPER:SCREENS("auto_image_cropper")

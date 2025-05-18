@@ -71,7 +71,7 @@ interface ApiService {
 
     //---------------------------------------------------------------------//
     @GET("/api/v1/user/getUser")
-    suspend fun getUserData(@Query("number") number: String):OkResponse
+    suspend fun getUserData(@Query("userId") userId: String):OkResponse
 
     //---------------------------------------------------------------------//
     @PUT("/api/v1/user/update")
@@ -91,7 +91,7 @@ interface ApiService {
     @GET("/api/v1/chats/getChatList")
     suspend fun getUserChatList(@Query("userId") userId: String):ApiResponse<List<ChatList>>
     @POST("/api/v1/chats/saveChatList")
-    suspend fun saveUserChatList(userID: String, chatListUserId: String):ApiResponse<ChatList>
+    suspend fun saveUserChatList(@Query("userId")userId: String, @Query("otherUserId")otherUserId: String):ApiResponse<ChatList>
 
     @GET
     suspend fun getChats(@Url url:String):ApiResponse<List<Message>>

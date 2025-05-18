@@ -14,16 +14,8 @@ import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import android.util.Log
 import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
-import androidx.compose.animation.core.LinearEasing
-import androidx.compose.animation.core.RepeatMode
-import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.infiniteRepeatable
-import androidx.compose.animation.core.rememberInfiniteTransition
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -42,7 +34,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -51,7 +42,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -69,7 +59,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
@@ -103,7 +92,7 @@ import java.util.Locale
 @RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun ChatScreenUI(
+fun SingleChatScreenUI(
     sentTo: String,
     chatListUserId: String,
     navController: NavHostController,
@@ -130,6 +119,7 @@ fun ChatScreenUI(
             ) == PackageManager.PERMISSION_GRANTED
         )
     }
+    val chatUserImage by chatViewModel.profileImage.collectAsState()
 
 
     // Request mic permission on first launch
@@ -141,7 +131,7 @@ fun ChatScreenUI(
 
 
     LaunchedEffect(Unit) {
-        if (!hasMicPermission.value && activity != null) {
+        if (!hasMicPermission.value) {
             ActivityCompat.requestPermissions(activity, arrayOf(recordAudioPermission), 0)
         }
     }
@@ -190,7 +180,7 @@ fun ChatScreenUI(
     }
 
     Scaffold(
-        topBar = { SingleChatTopBar(title = sentTo, chatViewModel.profileImage.value, navController) }
+        topBar = { SingleChatTopBar(title = sentTo, chatUserImage, navController) }
     ) {
         Column(modifier = Modifier.padding(it)) {
             if (showLinearIndicator) {

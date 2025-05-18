@@ -73,9 +73,6 @@ import com.example.finalapp.viewmodels.ChatViewModel
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ChatListScreen(navController: NavHostController,chatViewModel: ChatViewModel) {
-    val userNumber= ProfileObject.profile?.number
-    val chatRowListItems=listOf("All","Unread","UnReplied")
-    val buttonsVisible = remember { mutableStateOf(true) }
     val lifecycleOwner= LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
@@ -119,8 +116,7 @@ fun ChatListScreen(navController: NavHostController,chatViewModel: ChatViewModel
 //            }
             Spacer(modifier = Modifier.height(10.dp))
             when(chatListState){
-                is RequestState.Loading ->{ CommonLoadingScreen()
-                }
+                is RequestState.Loading ->{ CommonLoadingScreen() }
                 is RequestState.Error ->{
                     CommonErrorScreen("Error getting users")
                     Log.d(TAG, "ChatListScreen: ${(chatListState as RequestState.Error).error.message}")
@@ -129,17 +125,15 @@ fun ChatListScreen(navController: NavHostController,chatViewModel: ChatViewModel
                     val users=remember{ (chatListState as RequestState.Success<List<ChatList>>).data }
                     LazyColumn(modifier = Modifier) {
                         itemsIndexed(users) { i, user ->
-                            UserItem(navController, user){
-                                chatViewModel.profileImage.value=it
+                            UserItem(navController, user){imageUrl->
+                                chatViewModel.profileImage.value=imageUrl
                             }
                             Divider(modifier = Modifier.fillMaxWidth(), color = Color(0xFFF1EAEA))
-
                         }
                     }
                 }
                 is RequestState.Idle ->{}
             }
-
         }
     }
 }
@@ -207,13 +201,6 @@ fun ChatTopBar(title: String, navController: NavHostController,onSearchClicked:(
 
                 }
             }, actions = {
-//                Card(
-//                    modifier = Modifier.size(30.dp),
-//                    shape = CircleShape,
-//                    colors = CardDefaults.cardColors(containerColor = Color.LightGray)
-//                ) {
-//
-//                }
                 Row(modifier = Modifier.padding(end = 16.dp)) {
                     Image(
                         painterResource(id = R.drawable.search_new_filled),
@@ -241,7 +228,7 @@ fun UserItem(navController: NavHostController, user: ChatList,setProfileImage:(S
         .height(60.dp)
         .clickable {
             setProfileImage(user.withUserId.profileImage)
-            navController.navigate("singleChat/${user.withUserId.username}/${user.withUserId._id}")
+            navController.navigate(SCREENS.SINGLE_CHAT.createPath(user.withUserId.username,user.withUserId._id))
         },
         colors = CardDefaults.cardColors(containerColor = Color(0xFFFFFFFE))
     ) {
@@ -275,8 +262,6 @@ fun UserItem(navController: NavHostController, user: ChatList,setProfileImage:(S
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
                     Text(text =  "hello", fontSize = 14.sp,color= Color.Gray)
                 }
-
-
 
             }
 

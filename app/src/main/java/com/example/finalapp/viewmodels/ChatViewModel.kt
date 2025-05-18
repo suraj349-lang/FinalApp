@@ -8,7 +8,10 @@ import com.example.finalapp.database.Chat
 import com.example.finalapp.database.ChatItem
 import com.example.finalapp.model.ChatList
 import com.example.finalapp.model.Message
+import com.example.finalapp.model.User
 import com.example.finalapp.repository.ChatDatabaseRepository
+import com.example.finalapp.repository.ProfileDatabaseRepository
+import com.example.finalapp.repository.ProfileRepository
 import com.example.finalapp.screens._6chat.SocketManager
 import com.example.finalapp.utils.ProfileObject
 import com.example.finalapp.utils.RequestState
@@ -18,6 +21,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -25,14 +29,17 @@ import javax.inject.Inject
 
 
 @HiltViewModel
-class ChatViewModel @Inject constructor(private val chatDatabaseRepository: ChatDatabaseRepository): ViewModel() {
+class ChatViewModel @Inject constructor(
+    private val chatDatabaseRepository: ChatDatabaseRepository
+    ): ViewModel() {
+
 
     val canFetch= mutableStateOf(true)
     private val _messagesFromDB = MutableStateFlow<List<Chat>>(emptyList())
     val messagesFromDB: StateFlow<List<Chat>> = _messagesFromDB
     private val _messagesFromServer = MutableStateFlow<RequestState<List<Message>>>(RequestState.Idle)
     val messagesFromServer: StateFlow<RequestState<List<Message>>> = _messagesFromServer
-    val profileImage= mutableStateOf("")
+    val profileImage= MutableStateFlow("")
 
     private val socketManager by lazy { SocketManager()}
     fun connectSocket() {
@@ -203,6 +210,7 @@ class ChatViewModel @Inject constructor(private val chatDatabaseRepository: Chat
                 _getUserChatList.value = RequestState.Success(it.data)
             }
     }
+
     //-------------------------------------------------------------------------------------------//
 
     fun disconnectSocket() {
