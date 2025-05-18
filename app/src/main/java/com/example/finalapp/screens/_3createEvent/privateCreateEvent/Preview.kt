@@ -1,9 +1,7 @@
-package com.example.finalapp.screens._3createEvent
+package com.example.finalapp.screens._3createEvent.privateCreateEvent
 
 
-import android.app.Activity
 import android.net.Uri
-import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -39,7 +37,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -47,31 +44,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.view.WindowInsetsControllerCompat
-import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
-import com.example.finalapp.model.EventResponse
 import com.example.finalapp.screens._1home._1_1ExperimentScreenEvents.ActiveButton
 import com.example.finalapp.screens._1home._1_1ExperimentScreenEvents.DONGLE
 import com.example.finalapp.screens._1home._1_1ExperimentScreenEvents.SANS
 import com.example.finalapp.screens._1home._1_1ExperimentScreenEvents.images
-import com.example.finalapp.ui.imagePrefix
 import com.example.finalapp.utils.ProfileObject
 import com.example.finalapp.utils.constants.Constants
-import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
