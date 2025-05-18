@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
@@ -51,7 +52,9 @@ import com.example.finalapp.utils.constants.Constants.DONGLE_NORMAL
 import com.example.finalapp.viewmodels.EventsViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
+import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.utils.RequestState
+import com.example.finalapp.utils.constants.Constants
 
 // when the dropped profile is clicked then it is shown
 @Composable
@@ -71,8 +74,15 @@ fun UserPublicProfile(eventsViewModel: EventsViewModel,navController:NavHostCont
             Scaffold(
                 bottomBar = {BottomBar(navController = navController, state = buttonsVisible)},
                 content = {
-                        UserPublicProfileUI(it,response.data){navController.navigateUp()}
-                    }
+                    UserPublicProfileUI(
+                        paddingValues = it,
+                        user = response.data,
+                        onSendMessageClicked = {
+                                               navController.navigate(SCREENS.SINGLE_CHAT.createPath(response.data.username,response.data._id))
+                        },
+                        onBackPressed = { navController.navigateUp() }
+                    )
+                }
             )
         }
         is RequestState.Error   -> {
@@ -88,7 +98,7 @@ fun UserPublicProfile(eventsViewModel: EventsViewModel,navController:NavHostCont
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun UserPublicProfileUI(paddingValues: PaddingValues, user: User?,onBackPressed:()->Unit) {
+fun UserPublicProfileUI(paddingValues: PaddingValues, user: User?,onSendMessageClicked:()->Unit,onBackPressed:()->Unit) {
     if (user!=null) {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
@@ -106,13 +116,6 @@ fun UserPublicProfileUI(paddingValues: PaddingValues, user: User?,onBackPressed:
                         .height(400.dp)) {
                         GlideImage(model =  imagePrefix+user.profileImage,
                             contentDescription ="" , contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
-                        Text(text = user.name, fontFamily = DONGLE_NORMAL, fontWeight = FontWeight.SemiBold, fontSize = 35.sp, color = Color.White, modifier = Modifier
-                            .align(Alignment.BottomStart)
-                            .padding(start = 16.dp))
-                        Image(painter = painterResource(id = R.drawable.share), contentDescription ="", modifier = Modifier
-                            .padding(end = 30.dp, bottom = 16.dp)
-                            .align(Alignment.BottomEnd)
-                            .size(20.dp), colorFilter = ColorFilter.tint(Color.White) )
                         Card(modifier = Modifier
                             .wrapContentSize()
                             .align(Alignment.TopStart)
@@ -135,20 +138,16 @@ fun UserPublicProfileUI(paddingValues: PaddingValues, user: User?,onBackPressed:
                     .wrapContentHeight(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically) {
-                    Row(modifier = Modifier
-                        .wrapContentHeight()
-                        .fillMaxWidth(0.6f)) {
-                        Card(modifier = Modifier.wrapContentSize(), shape = CircleShape) {
-                            GlideImage(model = imagePrefix+user.profileImage, contentDescription ="", modifier = Modifier.size(40.dp), contentScale = ContentScale.Crop )
-                        }
-                        Text(
+                    Text(
                             text = user.name,
-                            fontFamily = DONGLE_NORMAL,
-                            fontSize = 30.sp
-                        )
-                    }
+                            fontFamily = Constants.FONT_MEDIUM,
+                            fontSize = 24.sp
+                    )
+                    Image(painter = painterResource(id = R.drawable.share), contentDescription ="", modifier = Modifier
+                        .size(20.dp), colorFilter = ColorFilter.tint(Color.DarkGray)
+                    )
 
-                    Button(onClick = { /*TODO*/ }, colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF96053E))) {
+                    Button(onClick = { onSendMessageClicked() }, colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF96053E))) {
                         Text(text = "Send Message", color = Color.White, fontFamily = DONGLE_LIGHT, fontSize = 20.sp)
                     }
 

@@ -686,21 +686,22 @@ fun SingleChatTopBar(title: String,profileImage:String, navController: NavHostCo
                 }
             }
         }, actions = {
-            Card(
-                modifier = Modifier.size(30.dp),
-                shape = CircleShape,
-                colors = CardDefaults.cardColors(containerColor = Color.White)
-            ) {
-                Image(
-                    painterResource(id = R.drawable.menu),
-                    contentDescription = "",
-                    colorFilter = ColorFilter.tint(Color.DarkGray),
-                    modifier = Modifier
-                        .clickable { navController.navigate(SCREENS.PROFILE.route) }
-                        .padding(8.dp)
-
-                )
-            }
+            // TODO we will make this later on
+//            Card(
+//                modifier = Modifier.size(30.dp),
+//                shape = CircleShape,
+//                colors = CardDefaults.cardColors(containerColor = Color.White)
+//            ) {
+//                Image(
+//                    painterResource(id = R.drawable.menu),
+//                    contentDescription = "",
+//                    colorFilter = ColorFilter.tint(Color.DarkGray),
+//                    modifier = Modifier
+//                        .clickable {  }
+//                        .padding(8.dp)
+//
+//                )
+//            }
 
         }
     )

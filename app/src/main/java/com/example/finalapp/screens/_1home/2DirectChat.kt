@@ -184,19 +184,13 @@ fun DirectChatProfiles(
         }
         is RequestState.Success -> {
             LazyColumn(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)) {
-                items(userList) { item ->
-                    item?.let {
+                items(userList) { user ->
+                    user?.let {
                         DirectChatItem(
                             user=it,
-                            onProfileClicked = {
-                                navController.navigate(SCREENS.USER_PUBLIC_PROFILE.createPath(it.userId._id))
-                            }
-                        ) {
-                            eventsViewModel.saveUserToChatList(
-                                ProfileObject.profile?.userId!!,
-                                it.userId._id
-                            )
-                        }
+                            onProfileClicked = { navController.navigate(SCREENS.USER_PUBLIC_PROFILE.createPath(it.userId._id)) },
+                            onSendMessageClicked = { eventsViewModel.saveUserToChatList(ProfileObject.profile?.userId!!, it.userId._id) }
+                        )
                     }
                 }
             }

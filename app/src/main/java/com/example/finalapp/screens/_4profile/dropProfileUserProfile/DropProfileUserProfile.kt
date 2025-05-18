@@ -40,6 +40,7 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
 import com.example.finalapp.model.DropProfileResponse
+import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.ui.imagePrefix
 import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
@@ -53,7 +54,14 @@ fun DropProfileUserProfile(navController: NavHostController,dropProfileResponse:
         Scaffold(
             bottomBar = {BottomBar(navController = navController, state = buttonsVisible)},
             content = {
-            DropProfileUserProfileUI(it, dropProfileResponse){navController.navigateUp()}
+            DropProfileUserProfileUI(
+                paddingValues = it,
+                dropProfileResponse=dropProfileResponse,
+                onSendMessageClicked = {
+                 navController.navigate(SCREENS.SINGLE_CHAT.createPath(dropProfileResponse.createdBy.username,dropProfileResponse.createdBy._id))
+                },
+                onBackPressed = {navController.navigateUp()}
+            )
         })
 
     }
@@ -63,7 +71,7 @@ fun DropProfileUserProfile(navController: NavHostController,dropProfileResponse:
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun DropProfileUserProfileUI(paddingValues: PaddingValues, dropProfileResponse: DropProfileResponse?,onBackPressed:()->Unit) {
+fun DropProfileUserProfileUI(paddingValues: PaddingValues, dropProfileResponse: DropProfileResponse?,onSendMessageClicked:()->Unit,onBackPressed:()->Unit) {
     if (dropProfileResponse!=null) {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
@@ -121,7 +129,9 @@ fun DropProfileUserProfileUI(paddingValues: PaddingValues, dropProfileResponse: 
                         )
                     }
 
-                    Button(onClick = { /*TODO*/ }, colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF96053E))) {
+                    Button(onClick = { onSendMessageClicked() },
+                           colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF96053E))
+                    ) {
                         Text(text = "Send Message", color = Color.White, fontFamily = DONGLE_LIGHT, fontSize = 20.sp)
                     }
 
