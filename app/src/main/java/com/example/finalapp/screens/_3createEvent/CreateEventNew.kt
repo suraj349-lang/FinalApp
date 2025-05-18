@@ -106,6 +106,7 @@ fun CreateEventNew(navController: NavController, eventsViewModel: EventsViewMode
         navController.navigate(SCREENS.HOME.route){
             popUpTo(0)
         }
+        eventsViewModel.createEventIsSuccess.value=false
     }
 
 

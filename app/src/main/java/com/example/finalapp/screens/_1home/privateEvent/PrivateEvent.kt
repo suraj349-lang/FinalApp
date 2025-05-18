@@ -72,10 +72,7 @@ import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun PrivateEvent(event: EventResponse, navController: NavHostController) {
-    val view = LocalView.current
-    val window = (view.context as Activity).window
-    Log.d("EventData", "PrivateEvent:${event} ")
+fun PrivateEvent(event: EventResponse,navController: NavHostController) {
 
 //    SideEffect {
 //        window.statusBarColor = Color.White.toArgb()
@@ -91,7 +88,7 @@ fun PrivateEvent(event: EventResponse, navController: NavHostController) {
                     GlideImage(model = imagePrefix+event.image.ifEmpty { R.drawable.girl }, contentDescription = "",
                         Modifier
                             .fillMaxWidth()
-                            .fillMaxHeight(0.7f), contentScale = ContentScale.Crop)
+                            .fillMaxHeight(0.7f), contentScale = ContentScale.FillBounds)
                     //--------------------active button and expiration time----------------------
                     Box(modifier = Modifier.align(Alignment.TopStart)){
                         ActiveButtonAndExpirationTime()

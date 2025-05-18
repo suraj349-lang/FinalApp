@@ -108,10 +108,7 @@ fun UserPublicProfileUI(paddingValues: PaddingValues, user: User?,onSendMessageC
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                Row(modifier = Modifier
-                    .fillMaxWidth()
-                    .height(400.dp)) {
-                    Box(modifier = Modifier
+                Box(modifier = Modifier.padding( top= paddingValues.calculateTopPadding())
                         .fillMaxWidth()
                         .height(400.dp)) {
                         GlideImage(model =  imagePrefix+user.profileImage,
@@ -119,19 +116,16 @@ fun UserPublicProfileUI(paddingValues: PaddingValues, user: User?,onSendMessageC
                         Card(modifier = Modifier
                             .wrapContentSize()
                             .align(Alignment.TopStart)
-                            .padding(8.dp), shape = CircleShape, elevation = 20.dp, backgroundColor = Color.White.copy(alpha = 0.4f)) {
+                            .padding(8.dp), shape = CircleShape, elevation = 20.dp, backgroundColor = Color.White.copy(alpha = 0.8f)) {
                             Image(painter = painterResource(id = R.drawable.back), contentDescription ="", modifier = Modifier
                                 .clickable { onBackPressed() }
                                 .padding(4.dp)
-                                .size(30.dp), colorFilter = ColorFilter.tint(Color.White)
+                                .size(30.dp), colorFilter = ColorFilter.tint(Color.Black)
                             )
 
                         }
 
                     }
-
-                }
-
                 Row(modifier = Modifier
                     .padding(start = 16.dp, end = 16.dp)
                     .fillMaxWidth()
