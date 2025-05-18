@@ -11,15 +11,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.finalapp.R
+import com.example.finalapp.utils.constants.Constants
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateEventTopBar2(showButton:Boolean,onButtonClicked:()->Unit) {
-    TopAppBar(title = { Text(text = "Create Event") },
+    TopAppBar(title = { Text(text = "Create Event", fontFamily = Constants.FONT_MEDIUM) },
         actions = {
             if(showButton) {
                 Button(onClick = { onButtonClicked()}) {
-                    Text(text = "Create Event")
+                    Text(text = "Done", fontFamily = Constants.FONT_MEDIUM)
                 }
             } },
         navigationIcon = {

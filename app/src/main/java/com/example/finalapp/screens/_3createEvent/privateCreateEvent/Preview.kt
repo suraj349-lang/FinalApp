@@ -69,7 +69,7 @@ fun PrivateCreateEventPreview(uri: Uri?,
                               caption: String,
                               eventType: String) {
     Surface(modifier = Modifier
-        .fillMaxSize().padding(60.dp)) {
+        .fillMaxSize().padding(30.dp)) {
         Column(modifier = Modifier.fillMaxSize()) {
             Box(modifier = Modifier
                 .fillMaxWidth()
@@ -78,7 +78,7 @@ fun PrivateCreateEventPreview(uri: Uri?,
                 GlideImage(model = uri, contentDescription = "",
                     Modifier
                         .fillMaxWidth()
-                        .fillMaxHeight(0.7f), contentScale = ContentScale.Crop)
+                        .fillMaxHeight(0.7f), contentScale = ContentScale.FillBounds)
                 //--------------------active button and expiration time----------------------
                 Box(modifier = Modifier.align(Alignment.TopStart)){
                     ActiveButtonAndExpirationTime()
