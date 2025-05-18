@@ -1,5 +1,7 @@
-package com.example.finalapp.screens._3createEvent
+package com.example.finalapp.screens._3createEvent.createEvent
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -45,7 +47,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -60,6 +61,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.navigation.NavController
 import com.canhub.cropper.CropImageContract
@@ -68,6 +70,7 @@ import com.canhub.cropper.CropImageOptions
 import com.example.finalapp.R
 import com.example.finalapp.model.EventRequestDTO
 import com.example.finalapp.navigation.SCREENS
+import com.example.finalapp.screens._3createEvent.PrivateCreateEventPreview
 import com.example.finalapp.screens._4profile.EventTopic
 import com.example.finalapp.screens.dialogBox.uriToFile
 import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
@@ -212,6 +215,22 @@ fun CreateEventImageScreen(onImageUriChange:(Uri?)->Unit,onNextClicked:()->Unit)
             cropImageLauncher.launch(CropImageContractOptions(cameraImageUri.value, CropImageOptions()))
         }
     }
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            val uri = FileProvider.getUriForFile(
+                context,
+                "${context.packageName}.provider",
+                File(context.cacheDir, "temp_image.jpg")
+            )
+            cameraImageUri.value = uri
+            cameraLauncher.launch(uri)
+        } else {
+            Toast.makeText(context, "Camera permission is required", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     if (imageUri != null) {
         if (Build.VERSION.SDK_INT < 28) {
             bitmap = MediaStore.Images.Media.getBitmap(context.contentResolver, imageUri)
@@ -269,15 +288,22 @@ fun CreateEventImageScreen(onImageUriChange:(Uri?)->Unit,onNextClicked:()->Unit)
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable {
-                                        val uri = FileProvider.getUriForFile(
-                                            context,
-                                            "${context.packageName}.provider",
-                                            File(context.cacheDir, "temp_image.jpg")
-                                        )
-                                        cameraImageUri.value = uri
-                                        cameraLauncher.launch(uri)
+                                        if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
+                                            == PackageManager.PERMISSION_GRANTED
+                                        ) {
+                                            val uri = FileProvider.getUriForFile(
+                                                context,
+                                                "${context.packageName}.provider",
+                                                File(context.cacheDir, "temp_image.jpg")
+                                            )
+                                            cameraImageUri.value = uri
+                                            cameraLauncher.launch(uri)
+                                        } else {
+                                            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                                        }
                                         showChooser = false
                                     }
+
                             )
 
                         }

@@ -79,7 +79,7 @@ fun PrivateCreateEventPreview(uri: Uri?,
                               caption: String,
                               eventType: String) {
     Surface(modifier = Modifier
-        .fillMaxSize()) {
+        .fillMaxSize().padding(60.dp)) {
         Column(modifier = Modifier.fillMaxSize()) {
             Box(modifier = Modifier
                 .fillMaxWidth()

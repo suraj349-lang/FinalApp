@@ -27,7 +27,6 @@ import com.example.finalapp.repository.ChatDatabaseRepository
 import com.example.finalapp.repository.EventsRepository
 import com.example.finalapp.repository.ProfileRepository
 import com.example.finalapp.repository.Resource
-import com.example.finalapp.testingDataAndScreen.imageUrls
 import com.example.finalapp.utils.RequestState
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.AutocompletePrediction
@@ -81,7 +80,7 @@ class EventsViewModel @Inject constructor(
     private val _shouldLoadDroppedProfiles= MutableStateFlow(false)
     val shouldLoadDroppedProfiles:StateFlow<Boolean>  = _shouldLoadDroppedProfiles
 
-    fun loadDroppedProfiles(location:String) {
+    fun getDefaultDropProfiles(location:String) {
         _droppedProfilesFlow.value = Pager(
             config = PagingConfig(pageSize = 10, prefetchDistance = 5),
             pagingSourceFactory = { DropProfilePagingSource(eventsRepository) }

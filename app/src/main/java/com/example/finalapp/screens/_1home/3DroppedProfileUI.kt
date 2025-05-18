@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -30,7 +29,6 @@ import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Surface
 import androidx.compose.ui.Alignment
 import androidx.compose.material.Text
@@ -77,7 +75,6 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
 import com.example.finalapp.model.DropProfileResponse
 import com.example.finalapp.navigation.SCREENS
-import com.example.finalapp.screens.dialogBox.DialogLoading
 import com.example.finalapp.ui.imagePrefix
 import com.example.finalapp.screens.common.CommonErrorScreen
 import com.example.finalapp.ui.theme.floatingActionBtnColor
@@ -122,7 +119,7 @@ fun DroppedProfilesUI(
     LaunchedEffect(pagerState.currentPage) {
         // if page is not checked then on scrolling it will make the api call i.e. in the direct screen itself
         if (pagerState.currentPage == 2 && !shouldLoadDroppedProfiles) {
-            eventsViewModel.loadDroppedProfiles(ProfileObject.profile?.address!!)
+            eventsViewModel.getDefaultDropProfiles(ProfileObject.profile?.address!!)
             eventsViewModel.resetShouldLoadDroppedProfiles()
         }
     }
@@ -167,7 +164,7 @@ fun DroppedProfilesUI(
                                            .padding(end = 8.dp)
                                            .clickable {
                                                scope.launch {
-                                                   eventsViewModel.loadDroppedProfiles("")
+                                                   eventsViewModel.getDefaultDropProfiles("")
                                                }
                                            })
                     },
@@ -267,7 +264,7 @@ fun DroppedProfilesUI(
                                     item {
                                         Log.e("Error in dropped profiles", "DroppedProfilesUI: $error ", )
                                         CommonErrorScreen(error = "Error getting profiles.",true){
-                                            eventsViewModel.loadDroppedProfiles("")
+                                            eventsViewModel.getDefaultDropProfiles("")
                                         }
                                     }
                                 }

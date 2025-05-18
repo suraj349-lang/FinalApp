@@ -94,9 +94,15 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
             isRefreshing = false
         }
         else if (isRefreshing && pagerState.currentPage==1) {
+            delay(1000L)
+            eventsViewModel.loadDirectChatUsers(0.0,0.0)
+            delay(1000L)
             isRefreshing = false
         }
         else {
+            delay(1000L)
+            eventsViewModel.getDefaultDropProfiles("")
+            delay(500L)
             isRefreshing = false
         }
     }
