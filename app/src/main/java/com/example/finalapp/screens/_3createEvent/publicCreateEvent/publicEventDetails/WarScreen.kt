@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.primarySurface
@@ -28,15 +29,24 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -95,10 +105,39 @@ fun CommentItem(
     onReplyTextChange: (Comment, String) -> Unit,
     onSendReply: (Comment) -> Unit
 ) {
+    var isExpanded by remember { mutableStateOf(comment.isExpanded) }
+    var textLayoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
+    var isOverflowing by remember { mutableStateOf(false) }
+
+    val maxLines = if (isExpanded) Int.MAX_VALUE else 2
+
+    val fullText = "@${comment.username} ${comment.comment}"
+    val displayText = buildAnnotatedString {
+        withStyle(SpanStyle(fontWeight = FontWeight.Bold, fontSize = 10.sp, color = Color.Black)) {
+            append("@${comment.username} ")
+        }
+        withStyle(SpanStyle(fontSize = 13.sp, color = Color.White)) {
+            append(comment.comment)
+        }
+
+        if (!isExpanded && isOverflowing) {
+            pushStringAnnotation(tag = "MORE", annotation = "more")
+            withStyle(SpanStyle(color = Color.Yellow)) {
+                append("... more")
+            }
+            pop()
+        } else if (isExpanded) {
+            pushStringAnnotation(tag = "LESS", annotation = "less")
+            withStyle(SpanStyle(color = Color.Yellow)) {
+                append(" Show less")
+            }
+            pop()
+        }
+    }
+
     Column(modifier = Modifier.padding(start = (indentLevel * 16).dp)) {
 
         Row(
-            verticalAlignment = Alignment.Top, // better for multi-line
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(4.dp)
@@ -107,12 +146,12 @@ fun CommentItem(
                     shape = RoundedCornerShape(4.dp)
                 )
                 .padding(4.dp)
-
         ) {
             Image(
                 painter = painterResource(id = comment.profileImageRes),
                 contentDescription = null,
-                modifier = Modifier.padding(top=4.dp)
+                modifier = Modifier
+                    .padding(top = 4.dp)
                     .size(32.dp)
                     .clip(CircleShape),
                 contentScale = ContentScale.Crop
@@ -120,35 +159,43 @@ fun CommentItem(
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            Row(
-                modifier = Modifier.padding(top=4.dp).weight(1f),
-                verticalAlignment = Alignment.Top
-            ) {
-                Text(
-                    text = "@${comment.username} ",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 10.sp,
-                    color = Color.Black
-                )
-                Text(
-                    text = comment.comment,
-                    fontSize = 13.sp,
-                    color = Color.White
+            Column(modifier = Modifier.padding(top=4.dp).weight(1f)) {
+                ClickableText(
+                    text = displayText,
+                    maxLines = maxLines,
+                    overflow = TextOverflow.Ellipsis,
+                    onTextLayout = {
+                        textLayoutResult = it
+                        isOverflowing = it.hasVisualOverflow
+                    },
+                    style = TextStyle(fontSize = 13.sp),
+                    onClick = { offset ->
+                        displayText.getStringAnnotations(tag = "MORE", start = offset, end = offset)
+                            .firstOrNull()?.let {
+                                isExpanded = true
+                            }
+
+                        displayText.getStringAnnotations(tag = "LESS", start = offset, end = offset)
+                            .firstOrNull()?.let {
+                                isExpanded = false
+                            }
+                    }
                 )
             }
 
             if (comment.replies.isNotEmpty()) {
                 Image(
-                        painter = painterResource(
-                            id = if (comment.isExpanded)
-                                R.drawable.baseline_expand_less_24
-                            else
-                                R.drawable.baseline_expand_more_24
-                        ),
-                        contentDescription = "Toggle replies",
-                    modifier = Modifier.padding(end=4.dp).clickable { onToggleExpand(comment) }
-                    )
-
+                    painter = painterResource(
+                        id = if (comment.isExpanded)
+                            R.drawable.baseline_expand_less_24
+                        else
+                            R.drawable.baseline_expand_more_24
+                    ),
+                    contentDescription = "Toggle replies",
+                    modifier = Modifier
+                        .padding(end = 4.dp)
+                        .clickable { onToggleExpand(comment) }
+                )
             }
         }
 
@@ -188,11 +235,19 @@ fun CommentItem(
         // Recursively show replies
         if (comment.isExpanded) {
             comment.replies.forEach { reply ->
-                CommentItem(reply, indentLevel + 1, onToggleExpand, onToggleReplyBox, onReplyTextChange, onSendReply)
+                CommentItem(
+                    comment = reply,
+                    indentLevel = indentLevel + 1,
+                    onToggleExpand = onToggleExpand,
+                    onToggleReplyBox = onToggleReplyBox,
+                    onReplyTextChange = onReplyTextChange,
+                    onSendReply = onSendReply
+                )
             }
         }
     }
 }
+
 
 data class Comment(
     val id: String,
@@ -210,7 +265,7 @@ val comments = listOf(
     Comment(
         id = "1",
         username = "suraj_3494",
-        comment = "This app is amazing!",
+        comment = "This app is amazing!Best app in this genre!, this si the only thing that iw ant iin life to have and this is how i amg innna",
         profileImageRes = R.drawable.profile_image_1,
         replies = listOf(
             Comment(
