@@ -23,6 +23,7 @@ val DarkBlue=Color(0xFF08155E)
 val statusBarColor= Color(0xFFFFFFFF) //0xFFBFFFBC  //
 val homeTopBarIconsColor= Color(0xFF480963)//Color(0xFF6200EE);
 val floatingActionBtnColor= homeTopBarIconsColor//Color(0xFF6200EE)//Color(0xFF9980C5);
+val surfaceColor= Color(0xFF6200EE)
 
 val vectorScreenIcons=Color.Black.copy(alpha = 0.7f)
  val LIGHT_GREY_BG_COLOR = Color(0xFFF3F0F0)

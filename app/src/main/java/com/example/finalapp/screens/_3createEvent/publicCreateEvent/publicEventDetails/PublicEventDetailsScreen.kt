@@ -43,7 +43,7 @@ fun PublicEventDetailsScreenWrapper() {
         mutableStateOf("war")
     }
     Scaffold(
-        topBar = { PublicEventDetailsTopBar("Testing") },
+        topBar = { PublicEventDetailsTopBar("Farmer's Protest,India") },
         content = {
             Surface(modifier = Modifier
                 .fillMaxSize()
@@ -55,7 +55,7 @@ fun PublicEventDetailsScreenWrapper() {
 }
 
 
-@OptIn(ExperimentalPagerApi::class)
+
 @Composable
 fun PublicEventDetailsScreen(screen:String,onScreenChange:(String)->Unit) {
     Column(modifier = Modifier
