@@ -106,30 +106,33 @@ fun CommentItem(
     onSendReply: (Comment) -> Unit
 ) {
     var isExpanded by remember { mutableStateOf(comment.isExpanded) }
-    var textLayoutResult by remember { mutableStateOf<TextLayoutResult?>(null) }
-    var isOverflowing by remember { mutableStateOf(false) }
 
-    val maxLines = if (isExpanded) Int.MAX_VALUE else 2
+    val maxChars = 135
+    val isLongComment = comment.comment.length > maxChars
 
-    val fullText = "@${comment.username} ${comment.comment}"
+    val displayCommentText = when {
+        isExpanded || !isLongComment -> comment.comment
+        else -> comment.comment.take(maxChars)
+    }
+
     val displayText = buildAnnotatedString {
         withStyle(SpanStyle(fontWeight = FontWeight.Bold, fontSize = 10.sp, color = Color.Black)) {
             append("@${comment.username} ")
         }
         withStyle(SpanStyle(fontSize = 13.sp, color = Color.White)) {
-            append(comment.comment)
+            append(displayCommentText)
         }
 
-        if (!isExpanded && isOverflowing) {
+        if (!isExpanded && isLongComment) {
             pushStringAnnotation(tag = "MORE", annotation = "more")
             withStyle(SpanStyle(color = Color.Yellow)) {
                 append("... more")
             }
             pop()
-        } else if (isExpanded) {
+        } else if (isExpanded && isLongComment) {
             pushStringAnnotation(tag = "LESS", annotation = "less")
             withStyle(SpanStyle(color = Color.Yellow)) {
-                append(" Show less")
+                append(" show less")
             }
             pop()
         }
@@ -159,15 +162,11 @@ fun CommentItem(
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            Column(modifier = Modifier.padding(top=4.dp).weight(1f)) {
+            Column(modifier = Modifier
+                .padding(top = 4.dp)
+                .weight(1f)) {
                 ClickableText(
                     text = displayText,
-                    maxLines = maxLines,
-                    overflow = TextOverflow.Ellipsis,
-                    onTextLayout = {
-                        textLayoutResult = it
-                        isOverflowing = it.hasVisualOverflow
-                    },
                     style = TextStyle(fontSize = 13.sp),
                     onClick = { offset ->
                         displayText.getStringAnnotations(tag = "MORE", start = offset, end = offset)

@@ -280,7 +280,7 @@ fun LoginScreenUI(navController: NavController,authViewModel: AuthViewModel) {
                     })
 
             }
-            LoginHorizontalPager()
+//            LoginHorizontalPager()
         }
 
     }
