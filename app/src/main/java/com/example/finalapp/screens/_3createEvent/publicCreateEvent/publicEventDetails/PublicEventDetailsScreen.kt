@@ -1,4 +1,4 @@
-package com.example.finalapp.screens._3createEvent.publicEventDetails
+package com.example.finalapp.screens._3createEvent.publicCreateEvent.publicEventDetails
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Divider
@@ -31,16 +32,19 @@ import com.example.finalapp.R
 import com.example.finalapp.utils.constants.Constants
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+@Preview(showBackground = true)
 @Composable
 fun PublicEventDetailsScreenWrapper() {
     var warOrPosts by remember {
         mutableStateOf("war")
     }
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        topBar = {PublicEventDetailsTopBar("Testing")},
-        content = { it ->
+        topBar = { PublicEventDetailsTopBar("Testing") },
+        content = {
             Surface(modifier = Modifier
                 .fillMaxSize()
                 .padding(it)) {
@@ -51,40 +55,40 @@ fun PublicEventDetailsScreenWrapper() {
 }
 
 
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun PublicEventDetailsScreen(screen:String,onScreenChange:(String)->Unit) {
     Column(modifier = Modifier
-        .verticalScroll(rememberScrollState())
+       // .verticalScroll(rememberScrollState())
         .fillMaxSize()
-        .padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        .padding(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
         //background image
         Card(modifier = Modifier
             .fillMaxWidth()
-            .height(300.dp)) {
-            Image(painter = painterResource(id = R.drawable.back), contentDescription = "", modifier = Modifier.fillMaxSize(), contentScale = ContentScale.FillBounds)
+            .height(400.dp)) {
+            Image(painter = painterResource(id = R.drawable.profile_image_1), contentDescription = "", modifier = Modifier.fillMaxSize(), contentScale = ContentScale.FillWidth)
         }
 
         // details
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .height(60.dp)) {
-
-
-        }
+//        Row(modifier = Modifier
+//            .fillMaxWidth()
+//            .height(60.dp)) {
+//
+//
+//        }
         // war / Posts
         Row(modifier = Modifier
             .fillMaxWidth()
             .height(40.dp), verticalAlignment = Alignment.CenterVertically) {
           Card(
               Modifier
-                  .fillMaxSize()
-                  .padding(horizontal = 16.dp)) {
+                  .fillMaxSize()) {
               Row(modifier = Modifier.fillMaxSize(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                  Text(text = "War", fontFamily = Constants.FONT_MEDIUM, fontSize = 24.sp, color = Color.DarkGray, modifier = Modifier.clickable {
+                  Text(text = "War", fontFamily = Constants.FONT_MEDIUM, fontSize = 24.sp, color = Color.DarkGray, modifier = Modifier.padding(start = 20.dp).clickable {
                       onScreenChange("war")
                   })
-                  Divider(modifier = Modifier.fillMaxHeight(), thickness = 1.dp, color = Color.DarkGray)
-                  Text(text = "Posts", fontFamily = Constants.FONT_MEDIUM, fontSize = 24.sp, color = Color.DarkGray, modifier = Modifier.clickable {
+                  Divider(modifier = Modifier.fillMaxHeight().width(4.dp), thickness = 1.dp, color = Color.DarkGray)
+                  Text(text = "Posts", fontFamily = Constants.FONT_MEDIUM, fontSize = 24.sp, color = Color.DarkGray, modifier = Modifier.padding(end = 20.dp).clickable {
                       onScreenChange("posts")
                   })
               }
@@ -92,6 +96,7 @@ fun PublicEventDetailsScreen(screen:String,onScreenChange:(String)->Unit) {
           }
 
         }
+
         if(screen =="war"){
             WarScreen()
         }else{

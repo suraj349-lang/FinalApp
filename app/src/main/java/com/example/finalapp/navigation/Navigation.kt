@@ -35,6 +35,7 @@ import com.example.finalapp.screens._5settings.SettingsScreenUI
 import com.example.finalapp.testing.TabView
 import com.example.finalapp.screens._3createEvent.PastRaisedOffer
 import com.example.finalapp.screens._3createEvent.PremiumCreateEvent
+import com.example.finalapp.screens._3createEvent.publicCreateEvent.publicEventDetails.PublicEventDetailsScreenWrapper
 import com.example.finalapp.screens._4profile.ProfileScreenNew
 import com.example.finalapp.screens._4profile.UserPublicProfile
 import com.example.finalapp.screens._4profile.dropProfileUserProfile.DropProfileUserProfile
@@ -105,7 +106,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
         composable(SCREENS.NOTIFICATIONS.route){
             NotificationsScreenUI(navController)
         }
-        composable(SCREENS.CHAT.route){
+        composable(SCREENS.CHAT_LIST.route){
             ChatListScreen(navController, chatViewModel)
         }
         composable(SCREENS.SINGLE_CHAT.route,
@@ -147,6 +148,9 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
         }
         composable(SCREENS.CREATE_EVENT_PUBLIC.route) {
             PremiumCreateEvent(authViewModel, eventsViewModel, navController)
+        }
+        composable(SCREENS.PUBLIC_EVENT_DETAILS_SCREEN_WRAPPER.route){
+            PublicEventDetailsScreenWrapper()
         }
         composable(SCREENS.TIKTOK.route){
             val list= listOf<String>("1","2","3","4","5","6")

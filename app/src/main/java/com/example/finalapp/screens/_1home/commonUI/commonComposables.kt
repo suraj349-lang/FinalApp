@@ -66,7 +66,6 @@ import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.ui.theme.homeTopBarIconsColor
 import com.example.finalapp.ui.theme.statusBarColor
 import com.example.finalapp.utils.RequestState
-import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.utils.constants.Constants.APP_NAME_FONT
 import com.example.finalapp.viewmodels.AuthViewModel
 import com.example.finalapp.viewmodels.EventsViewModel
@@ -157,10 +156,8 @@ fun HomeTopBar(
                             modifier = Modifier
                                 .padding(end = 8.dp)
                                 .size(24.dp)
-                                //.rotate(-40f)
-                                // .shadow(elevation = 12.dp, shape = CircleShape, spotColor = Color.White)
                                 .clickable {
-                                    navController.navigate(SCREENS.CHAT.route)
+                                    navController.navigate(SCREENS.CHAT_LIST.route)
                                 })
                     }
                 }

@@ -1,5 +1,7 @@
 package com.example.finalapp.ui.theme
 
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.primarySurface
 import androidx.compose.ui.graphics.Color
 
 val Purple80 = Color(0xFFD0BCFF)
@@ -19,10 +21,11 @@ val topAppBarTextColor= Color(0xFFEBDB55); //0xFFEEE6A2
 val DarkBlue=Color(0xFF08155E)
 
 val statusBarColor= Color(0xFFFFFFFF) //0xFFBFFFBC  //
-val homeTopBarIconsColor= Color(0xFF480963);
-val floatingActionBtnColor= homeTopBarIconsColor//Color(0xFF9980C5);
+val homeTopBarIconsColor= Color(0xFF480963)//Color(0xFF6200EE);
+val floatingActionBtnColor= homeTopBarIconsColor//Color(0xFF6200EE)//Color(0xFF9980C5);
 
 val vectorScreenIcons=Color.Black.copy(alpha = 0.7f)
  val LIGHT_GREY_BG_COLOR = Color(0xFFF3F0F0)
 val LIGHT_GREEN= Color(0xFF5BBB07)
 val PURPLE= Color(0xFFBB074E)
+

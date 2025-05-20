@@ -10,6 +10,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -62,6 +63,7 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
 import com.example.finalapp.model.EventResponse
+import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens._1home._1_1ExperimentScreenEvents.ActiveButton
 import com.example.finalapp.screens._1home._1_1ExperimentScreenEvents.DONGLE
 import com.example.finalapp.screens._1home._1_1ExperimentScreenEvents.SANS
@@ -112,7 +114,7 @@ fun PrivateEvent(event: EventResponse,navController: NavHostController) {
                                 .height(50.dp),
                                 shape= RoundedCornerShape(0.dp)
                                 , colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.7f))) {
-                                EventCommentsAndJoinButtonBar()
+                                EventCommentsAndJoinButtonBar(onJoinButtonClicked = {navController.navigate("")})
                             }
                         }
                         //--------------event category and offer -----------------------------------------------------------
@@ -295,6 +297,7 @@ fun ApproveOrJoin4(modifier: Modifier = Modifier) {
     }
 }
 
+
 @Composable
 fun UsernameAndUserProfileImage(username:String?) {
     Row(
@@ -358,7 +361,7 @@ fun EventOffer(offer:String) {
 }
 
 @Composable
-fun EventCommentsAndJoinButtonBar() {
+fun EventCommentsAndJoinButtonBar(onJoinButtonClicked:()->Unit) {
     Row(modifier = Modifier.fillMaxSize(), horizontalArrangement = Arrangement.SpaceBetween) {
         Row(
             modifier = Modifier
@@ -425,7 +428,7 @@ fun EventCommentsAndJoinButtonBar() {
                 Text("Share", fontSize = 8.sp, fontWeight = FontWeight.SemiBold)
             }
         }
-        Card(modifier = Modifier.wrapContentSize()) {
+        Card(modifier = Modifier.wrapContentSize().clickable { onJoinButtonClicked() }) {
             Row(
                 modifier = Modifier
                     .fillMaxHeight()

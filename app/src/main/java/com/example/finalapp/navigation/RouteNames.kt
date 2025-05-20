@@ -20,7 +20,7 @@ sealed class SCREENS(val route:String){
     object SETTINGS:SCREENS("settings_screen")
     object SEARCH:SCREENS("search")
     object NOTIFICATIONS:SCREENS("notifications_screen")
-    object CHAT:SCREENS("chat_screen")
+    object CHAT_LIST:SCREENS("chat_screen")
     object SINGLE_CHAT:SCREENS("singleChat/{userName}/{chatListUserId}"){
         fun createPath(userName:String,chatListUserId:String):String{
             return "singleChat/${userName}/${chatListUserId}"
@@ -34,6 +34,7 @@ sealed class SCREENS(val route:String){
     object DROP_PROFILE:SCREENS("drop_profile")
     object CREATE_EVENT_PRIVATE:SCREENS("create_event_private")
     object CREATE_EVENT_PUBLIC:SCREENS("create_event_public")
+    object PUBLIC_EVENT_DETAILS_SCREEN_WRAPPER:SCREENS("publicEventDetailsScreenWrapper")
     object PAST_OFFERS:SCREENS("past_offers")
     object TABVIEW:SCREENS("tab_view")
     object TIKTOK:SCREENS("tiktok")

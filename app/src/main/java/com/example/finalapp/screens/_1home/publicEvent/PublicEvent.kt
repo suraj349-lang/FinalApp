@@ -4,12 +4,14 @@ package com.example.finalapp.screens._1home.publicEvent
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -35,6 +37,7 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
 import com.example.finalapp.model.EventResponse
+import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens._1home.commentBottomSheet.CommentBottomSheet
 import com.example.finalapp.screens._1home.commonUI.shareDeepLink
 import com.example.finalapp.testingDataAndScreen.ActiveButton
@@ -44,8 +47,10 @@ import com.example.finalapp.testingDataAndScreen.UserData
 import com.example.finalapp.ui.imagePrefix
 import com.example.finalapp.ui.theme.PURPLE
 import com.example.finalapp.ui.theme.floatingActionBtnColor
+import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
 import com.example.finalapp.utils.constants.Constants.DONGLE_NORMAL
+import kotlinx.coroutines.delay
 
 
 @OptIn(ExperimentalGlideComposeApi::class)
@@ -199,7 +204,14 @@ fun PublicEvent(
             ) {
                 UserReactions(imageUrls) { image = it }
             }
-            AddCommentOnPost(){showBottomSheet=!showBottomSheet}
+            PeopleCommentWarAndJoinButton(
+                onJoinClicked = {
+                    navController.navigate(SCREENS.PUBLIC_EVENT_DETAILS_SCREEN_WRAPPER.route)
+                },
+                onCommentClicked = {
+                    showBottomSheet=!showBottomSheet
+                }
+            )
             EventComments()
 
         }
@@ -211,10 +223,8 @@ fun PublicEvent(
 }
 
 @Composable
-fun AddCommentOnPost(onCommentClicked: () -> Unit) {
-    val comment by remember {
-        mutableStateOf("")
-    }
+fun PeopleCommentWarAndJoinButton(onJoinClicked:()->Unit,onCommentClicked: () -> Unit) {
+
     Box(modifier = Modifier
         .padding(top = 8.dp)
         .fillMaxWidth()
@@ -255,7 +265,7 @@ fun AddCommentOnPost(onCommentClicked: () -> Unit) {
                 Image(painter = painterResource(id = R.drawable.war_room), contentDescription ="", modifier = Modifier.size(30.dp),colorFilter = ColorFilter.tint(Color.DarkGray) )
                 Text(text = "100" , fontSize = 12.sp, fontFamily = DONGLE_NORMAL, color = Color.DarkGray)
             }
-            Button(onClick = { }, modifier = Modifier.height(40.dp),shape= RoundedCornerShape(8.dp),colors = ButtonDefaults.buttonColors(backgroundColor = Color.DarkGray)) {
+            Button(onClick = {onJoinClicked() }, modifier = Modifier.height(40.dp),shape= RoundedCornerShape(8.dp),colors = ButtonDefaults.buttonColors(backgroundColor = Color.DarkGray)) {
                 Text(text = "+JOIN", fontFamily = DONGLE_BOLD, fontSize = 20.sp,color=Color.White)
             }
         }
@@ -339,6 +349,16 @@ fun EventComments() {
 */
 @Composable
 fun EventComments() {
+    val listState = rememberLazyListState()
+
+    // Auto-scroll slowly in a loop
+    LaunchedEffect(Unit) {
+        while (true) {
+            // Scroll by a small offset every few milliseconds
+            listState.scrollBy(1f) // Try changing this to adjust speed
+            delay(30L)             // Lower = faster scroll
+        }
+    }
     Box(modifier = Modifier
         .fillMaxWidth()
         .fillMaxHeight(1f)
@@ -347,30 +367,34 @@ fun EventComments() {
     {
             Column() {
                 Text(text = "Event Comments", fontFamily = DONGLE_NORMAL, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = floatingActionBtnColor)
-                LazyColumn {
+                LazyColumn(state = listState,modifier = Modifier.fillMaxSize()) {
                     items(commentList) {
+                        Card(modifier = Modifier.padding(bottom = 3.dp)
+                            .fillMaxWidth()
+                            .height(30.dp), backgroundColor = Color.LightGray, shape = RoundedCornerShape(2.dp), elevation = 20.dp) {
                         Row(
                             modifier = Modifier
-                                .fillMaxWidth()
-                                .height(20.dp),
+                                .fillMaxSize(),
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Text(
                                 text = it.username,
-                                fontFamily = DONGLE_NORMAL,
-                                fontSize = 20.sp,
+                                fontFamily = Constants.FONT_MEDIUM,
+                                fontSize = 12.sp,
+                                color=Color.Black,
                                 fontWeight = FontWeight.Bold
                             )
                             Text(
                                 text = it.comment,
-                                fontFamily = DONGLE_NORMAL,
-                                fontSize = 20.sp,
+                                fontFamily = Constants.FONT_MEDIUM,
+                                fontSize = 12.sp,
+                                color=Color.Black,
                                 maxLines = 2,
                                 overflow = TextOverflow.Ellipsis
                             )
                         }
-
+                    }
                     }
                 }
             }
