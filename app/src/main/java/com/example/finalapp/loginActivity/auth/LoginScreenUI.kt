@@ -121,7 +121,7 @@ fun LoginScreenUI(navController: NavController,authViewModel: AuthViewModel) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(color = floatingActionBtnColor),
+                .background(color = Constants.LOGIN_BACKGROUND),
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -131,14 +131,14 @@ fun LoginScreenUI(navController: NavController,authViewModel: AuthViewModel) {
                 modifier = Modifier
                     .padding(top = 8.dp, start = 16.dp, bottom = 32.dp)
                     .fillMaxWidth(),
-                color = Color.White,
+                color = Constants.LOGIN_SURFACE,
                 fontFamily = Constants.FONT_MEDIUM
             )
             Text(
                 text = Constants.APP_NAME,
                 fontSize = 45.sp,
                 modifier = Modifier.padding(top = 8.dp, bottom = 0.dp),
-                color = Color.White,
+                color = Constants.LOGIN_SURFACE,
                 fontFamily = APP_NAME_FONT
             )
             Spacer(modifier = Modifier.height(10.dp))

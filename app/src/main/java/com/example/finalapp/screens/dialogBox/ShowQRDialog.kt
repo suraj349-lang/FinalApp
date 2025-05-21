@@ -1,6 +1,7 @@
 package com.example.finalapp.screens.dialogBox
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,6 +24,7 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import com.example.finalapp.R
 import com.example.finalapp.screens.qrcode.QRCode
+import com.example.finalapp.utils.ProfileObject
 
 
 @Composable
@@ -45,8 +47,10 @@ fun ShowQRDialog(image:Int, navController: NavHostController, onDismiss: () -> U
         ) {
             Column(modifier = Modifier.wrapContentSize().padding(16.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
 //               Image(painter = painterResource(id = image), contentDescription ="" )
-                QRCode(username = "singhSuraj94")
-                Column(modifier = Modifier.wrapContentSize(), verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally) {
+                QRCode(userId = ProfileObject.profile?.userId!!)
+                Column(modifier = Modifier.clickable {
+                    //TODO this has to be implemented
+                }.wrapContentSize(), verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally) {
                     Image(painter = painterResource(id = R.drawable.camera), contentDescription ="", modifier = Modifier.size(40.dp) )
 
                     Text("Scan QR")

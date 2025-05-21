@@ -1,6 +1,7 @@
 package com.example.finalapp.screens._2search
 
 import BottomBar
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -12,11 +13,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.OutlinedTextField
@@ -38,17 +39,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.modifier.modifierLocalConsumer
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.finalapp.R
 import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
 
 @Composable
 fun TrendingScreen(navController:NavHostController) {
     val buttonsVisible = remember { mutableStateOf(true) }
-    val scope = rememberCoroutineScope()
-    val items:List<String> = listOf("Alpha-1","Beta-1","Gamma-1","Delta-1","Delta-2","Gamma-2","Beta-2","Alpha-2","Cp Mall")
     Scaffold(
         topBar = {
            SearchTopBar()
@@ -67,7 +70,7 @@ fun TrendingScreen(navController:NavHostController) {
             Column(modifier = Modifier.fillMaxSize()) {
                 SearchBar()
                 TrendingCategories(categories)
-                StaggeredList(items = items)
+                TrendingPosts()
             }
 
 
@@ -90,7 +93,9 @@ fun TrendingCategories(categories: List<Category>) {
 
     LazyRow(
         state=lazyListState,
-        modifier = Modifier.fillMaxWidth().padding(start=10.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 10.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp) // Add space between items
     ) {
         items(categories) { category ->
@@ -159,28 +164,18 @@ fun SearchBar() {
     }
 
 @Composable
-fun StaggeredList(items: List<String>) {
-    val items=remember{items}
-    LazyVerticalGrid(
-        columns = GridCells.Adaptive(minSize = 128.dp),
-        contentPadding = PaddingValues(8.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+fun TrendingPosts() {
+    LazyColumn(
+        contentPadding = PaddingValues(16.dp),
     ) {
-        items(items.size) { index ->
+        items(30) { index ->
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp)
+                    .height(400.dp)
                     .background(Color.Gray)
             ) {
-                Text(
-                    text = items[index],
-                    color = Color.White,
-                    fontSize = 16.sp,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.align(Alignment.Center)
-                )
+                Image(painter = painterResource(id = R.drawable.profile_image_1), contentDescription ="",modifier=Modifier.fillMaxSize(), contentScale = ContentScale.FillBounds )
             }
         }
     }

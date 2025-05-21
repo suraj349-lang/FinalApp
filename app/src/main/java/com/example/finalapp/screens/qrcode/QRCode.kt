@@ -26,10 +26,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 @Composable
-fun QRCode(username:String) {
+fun QRCode(userId:String) {
     Image(
-        painter = rememberQrBitmapPainter("https://www.google.com"),
-        contentDescription = "QR code for username",
+        painter = rememberQrBitmapPainter(userId),
+        contentDescription = "QR code for userID",
         contentScale = ContentScale.FillBounds,
         modifier = Modifier.size(250.dp),
     )

@@ -39,11 +39,11 @@ sealed class Destinations(
         icon = R.drawable.home_new,
         name = "Home"
     )
-    object Trending : Destinations(
-        route = SCREENS.SEARCH.route,
-        icon = R.drawable.trending,
-        name = "Trending"
-    )
+//    object Trending : Destinations(
+//        route = SCREENS.SEARCH.route,
+//        icon = R.drawable.trending,
+//        name = "Trending"
+//    )
     object CreateEvent : Destinations(
         route = "",
         icon = R.drawable.create_event_new,
@@ -68,7 +68,7 @@ sealed class Destinations(
 fun BottomBar(
     navController: NavHostController, state: MutableState<Boolean>, modifier: Modifier = Modifier, onCreateEventClick: () -> Unit={}) {
     val screens = listOf(
-        Destinations.HomeScreen, Destinations.Trending,Destinations.CreateEvent,Destinations.ProfileScreen,Destinations.Settings
+        Destinations.HomeScreen, /*Destinations.Trending,*/Destinations.CreateEvent,Destinations.ProfileScreen,Destinations.Settings
     )
 //0xFFE4E4F1   0xFFF9F9FF -> screen color
     NavigationBar(containerColor = Color.White, modifier = Modifier.shadow(elevation = 40.dp).height(48.dp).fillMaxWidth()){

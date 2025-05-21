@@ -76,8 +76,10 @@ class MainActivity : ComponentActivity() {
     )
     @Inject
     lateinit var splashViewModel: SplashViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        handleDeepLink(intent)
         installSplashScreen().setKeepOnScreenCondition {
             !splashViewModel.isLoading.value
         }
@@ -156,9 +158,23 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-
     }
 
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        intent?.let { handleDeepLink(it) }
+    }
+
+    private fun handleDeepLink(intent: Intent) {
+        val data = intent.data
+        data?.let {
+            val path = it.path
+            val queryParams = it.query
+            val id = it.getQueryParameter("id")
+            Log.d("DeepLink", "Path: $path, ID: $id")
+            // Navigate or take action based on the data
+        }
+    }
 
 }
 

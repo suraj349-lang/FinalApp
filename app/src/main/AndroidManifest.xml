@@ -68,6 +68,10 @@
                     android:host="post"
                     android:scheme="social" />
             </intent-filter>
+            <data
+                android:scheme="http"
+                android:host="www.spint.com"
+                android:pathPrefix="/profile" />
         </activity>
         <activity
             android:name="com.canhub.cropper.CropImageActivity"

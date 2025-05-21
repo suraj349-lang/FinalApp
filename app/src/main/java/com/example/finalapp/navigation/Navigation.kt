@@ -12,6 +12,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import com.example.finalapp.enums.ImageUploadScreens
 import com.example.finalapp.model.DropProfileResponse
 import com.example.finalapp.viewmodels.ChatViewModel
@@ -199,7 +200,12 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
             ) { navController.navigateUp() }
         }
 
-        composable(route=SCREENS.USER_PUBLIC_PROFILE.route, arguments = listOf(navArgument("userId"){ type= NavType.StringType })){navBackStackEntry ->
+        composable(
+            route=SCREENS.USER_PUBLIC_PROFILE.route,
+            deepLinks = listOf(navDeepLink {
+                uriPattern = "https://www.spint.com/profile?userId={userId}"
+            }),
+            arguments = listOf(navArgument("userId"){ type= NavType.StringType })){navBackStackEntry ->
             val userId=navBackStackEntry.arguments?.getString("userId")
             UserPublicProfile(eventsViewModel,navController,userId)
 

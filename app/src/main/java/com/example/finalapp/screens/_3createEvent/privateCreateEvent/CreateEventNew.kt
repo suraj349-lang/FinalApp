@@ -83,6 +83,7 @@ fun CreateEventNew(navController: NavController, eventsViewModel: EventsViewMode
                                 category = type,
                                 location = ProfileObject.profile?.address!!,
                                 offer =caption,
+                                isPrivate = true,
                                 expirationTime = "12")
                         )
                     }
