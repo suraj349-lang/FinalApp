@@ -39,15 +39,15 @@ sealed class Destinations(
         icon = R.drawable.home_new,
         name = "Home"
     )
-//    object Trending : Destinations(
-//        route = SCREENS.SEARCH.route,
-//        icon = R.drawable.trending,
-//        name = "Trending"
-//    )
+    object Personal : Destinations(
+        route = SCREENS.PERSONAL.route,
+        icon = R.drawable.personal,
+        name = "Personal"
+    )
     object CreateEvent : Destinations(
         route = "",
         icon = R.drawable.create_event_new,
-        name = "Create Event"
+        name = "Create"
     )
     object ProfileScreen : Destinations(
         route = SCREENS.PROFILE.route,
@@ -68,7 +68,7 @@ sealed class Destinations(
 fun BottomBar(
     navController: NavHostController, state: MutableState<Boolean>, modifier: Modifier = Modifier, onCreateEventClick: () -> Unit={}) {
     val screens = listOf(
-        Destinations.HomeScreen, /*Destinations.Trending,*/Destinations.CreateEvent,Destinations.ProfileScreen,Destinations.Settings
+        Destinations.HomeScreen, /*Destinations.Personal,*/Destinations.CreateEvent,Destinations.ProfileScreen,Destinations.Settings
     )
 //0xFFE4E4F1   0xFFF9F9FF -> screen color
     NavigationBar(containerColor = Color.White, modifier = Modifier.shadow(elevation = 40.dp).height(48.dp).fillMaxWidth()){
@@ -81,11 +81,11 @@ fun BottomBar(
                 icon = {
                     Column( verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
                         if(active){
-                            Image(painter = painterResource(id = screen.icon), contentDescription ="",modifier=Modifier.size(24.dp), colorFilter = ColorFilter.tint( color =  floatingActionBtnColor ) )
-                            Text(text = screen.name.uppercase(), fontSize = 11.sp, style = MaterialTheme.typography.labelSmall, color =  floatingActionBtnColor, fontWeight = FontWeight.Bold  )
+                            Image(painter = painterResource(id = screen.icon), contentDescription ="",modifier=Modifier.size(20.dp), colorFilter = ColorFilter.tint( color =   Color.Black ) )
+                            Text(text = screen.name, fontSize = 11.sp, style = MaterialTheme.typography.labelSmall, color =  Color.Black, fontWeight = FontWeight.Bold  )
                         }else{
-                            Image(painter = painterResource(id = screen.icon), contentDescription ="",modifier=Modifier.size(24.dp), colorFilter = ColorFilter.tint( color =  Color.Gray) )
-                            Text(text = screen.name, fontSize = 8.sp, style = MaterialTheme.typography.labelSmall, color =  Color.Gray)
+                            Image(painter = painterResource(id = screen.icon), contentDescription ="",modifier=Modifier.size(20.dp), colorFilter = ColorFilter.tint( color =  Color.Gray) )
+                            Text(text = screen.name, fontSize = 11.sp, style = MaterialTheme.typography.labelSmall, color =  Color.Gray)
                         }
                     }
 

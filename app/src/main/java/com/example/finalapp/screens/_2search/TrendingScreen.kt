@@ -7,16 +7,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -33,28 +31,25 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.finalapp.R
+import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
 
 @Composable
-fun TrendingScreen(navController:NavHostController) {
+fun PersonalEventsScreen(navController:NavHostController) {
     val buttonsVisible = remember { mutableStateOf(true) }
     Scaffold(
         topBar = {
-           SearchTopBar()
+           PersonalEventTopBar()
         },
         bottomBar = {
             BottomBar(
@@ -65,17 +60,14 @@ fun TrendingScreen(navController:NavHostController) {
         }
     ) {
         Surface(modifier = Modifier
-            .fillMaxSize()
-            .padding(it)) {
+            .padding(it)
+            .fillMaxSize()) {
             Column(modifier = Modifier.fillMaxSize()) {
                 SearchBar()
-                TrendingCategories(categories)
+               // TrendingCategories(categories)
                 TrendingPosts()
             }
-
-
         }
-
     }
 }
 @Composable
@@ -124,9 +116,9 @@ fun TrendingCategories(categories: List<Category>) {
     }
 }
 @Composable
-fun SearchTopBar() {
+fun PersonalEventTopBar() {
     TopAppBar(
-        title = { Text(text = "Trending", fontFamily = DONGLE_BOLD, fontSize = 24.sp, color = Color.White )},
+        title = { Text(text = "Events", fontFamily = Constants.FONT_MEDIUM, fontSize = 24.sp, color = Color.White )},
         navigationIcon = {},
         actions = {},
         backgroundColor = Color(0xFF43075C)
@@ -142,7 +134,7 @@ fun SearchBar() {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(90.dp),
+                .wrapContentHeight(),
             colors = CardDefaults.cardColors(containerColor = Color(0xFFFFFFFE))
         ) {
             OutlinedTextField(
@@ -151,7 +143,7 @@ fun SearchBar() {
                 shape = RoundedCornerShape(30.dp),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 12.dp, end = 12.dp, top = 12.dp),
+                    .padding(start = 12.dp, end = 12.dp, top = 12.dp, bottom = 4.dp),
                 colors = TextFieldDefaults.outlinedTextFieldColors(
                     focusedBorderColor = Color.DarkGray,
                     unfocusedBorderColor = Color.DarkGray,
@@ -165,17 +157,15 @@ fun SearchBar() {
 
 @Composable
 fun TrendingPosts() {
-    LazyColumn(
-        contentPadding = PaddingValues(16.dp),
-    ) {
+    LazyColumn{
         items(30) { index ->
             Box(
-                modifier = Modifier
+                modifier = Modifier.padding(bottom = 16.dp)
                     .fillMaxWidth()
                     .height(400.dp)
                     .background(Color.Gray)
             ) {
-                Image(painter = painterResource(id = R.drawable.profile_image_1), contentDescription ="",modifier=Modifier.fillMaxSize(), contentScale = ContentScale.FillBounds )
+                Image(painter = painterResource(id = R.drawable.profile_image_1), contentDescription ="",modifier=Modifier.fillMaxSize(), contentScale = ContentScale.Crop )
             }
         }
     }

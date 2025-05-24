@@ -18,7 +18,7 @@ sealed class SCREENS(val route:String){
     object HOME:SCREENS("home_screen")
     object PROFILE:SCREENS("profile_screen")
     object SETTINGS:SCREENS("settings_screen")
-    object SEARCH:SCREENS("search")
+    object PERSONAL:SCREENS("personal")
     object NOTIFICATIONS:SCREENS("notifications_screen")
     object CHAT_LIST:SCREENS("chat_screen")
     object SINGLE_CHAT:SCREENS("singleChat/{userName}/{chatListUserId}"){

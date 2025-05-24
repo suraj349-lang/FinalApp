@@ -25,12 +25,13 @@ import com.example.finalapp.loginActivity.auth.SplashScreenUI
 import com.example.finalapp.loginActivity.auth.util.OtpBox
 import com.example.finalapp.screens._6chat.SingleChatScreenUI
 import com.example.finalapp.loginActivity.auth.FinalUserCreation
+import com.example.finalapp.qrScanning.QRScannerScreen
 import com.example.finalapp.viewmodels.EventsViewModel
 import com.example.finalapp.screens._6chat.ChatListScreen
 import com.example.finalapp.screens._4profile.GalleryPicker
 import com.example.finalapp.screens._1home.HomeScreenUI
 import com.example.finalapp.screens._8notification.NotificationsScreenUI
-import com.example.finalapp.screens._2search.TrendingScreen
+import com.example.finalapp.screens._2search.PersonalEventsScreen
 import com.example.finalapp.screens._3createEvent.privateCreateEvent.CreateEventNew
 import com.example.finalapp.screens._5settings.SettingsScreenUI
 import com.example.finalapp.testing.TabView
@@ -132,8 +133,8 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
         composable(SCREENS.ALL_USERS.route){
             //AllProfiles(profileViewModel)
         }
-        composable(SCREENS.SEARCH.route){
-            TrendingScreen(navController)
+        composable(SCREENS.PERSONAL.route){
+            PersonalEventsScreen(navController)
         }
 
         composable(SCREENS.PAST_OFFERS.route){
@@ -211,6 +212,9 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
 
         }
 
+        composable("qrcode"){
+            QRScannerScreen()
+        }
 
 
         // SETTINGS---------------------------------------------------------------------------------------------------------------------------------------------------

@@ -49,7 +49,7 @@ fun ShowQRDialog(image:Int, navController: NavHostController, onDismiss: () -> U
 //               Image(painter = painterResource(id = image), contentDescription ="" )
                 QRCode(userId = ProfileObject.profile?.userId!!)
                 Column(modifier = Modifier.clickable {
-                    //TODO this has to be implemented
+                    navController.navigate("qrcode")
                 }.wrapContentSize(), verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally) {
                     Image(painter = painterResource(id = R.drawable.camera), contentDescription ="", modifier = Modifier.size(40.dp) )
 

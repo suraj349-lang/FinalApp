@@ -27,8 +27,9 @@ import kotlinx.coroutines.withContext
 
 @Composable
 fun QRCode(userId:String) {
+    val baseUrl="http://www.spint.com/profile/"
     Image(
-        painter = rememberQrBitmapPainter(userId),
+        painter = rememberQrBitmapPainter(baseUrl+userId),
         contentDescription = "QR code for userID",
         contentScale = ContentScale.FillBounds,
         modifier = Modifier.size(250.dp),

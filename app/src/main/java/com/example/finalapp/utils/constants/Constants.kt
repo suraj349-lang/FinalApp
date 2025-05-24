@@ -6,7 +6,7 @@ import androidx.compose.ui.text.font.FontFamily
 import com.example.finalapp.R
 
 object Constants {
-    const val IP_ADD = "192.168.1.11"//""//"192.168.29.95"
+    const val IP_ADD = "192.168.29.95"//""//"192.168.29.95"
     const val SOCKET_CHAT_BASE_URL = "http://${IP_ADD}:80/chat/"
     const val TEMP_SOCKET_URL = "http://${IP_ADD}:5001/";
     const val BASE_URL = "http://${IP_ADD}:5000/"
