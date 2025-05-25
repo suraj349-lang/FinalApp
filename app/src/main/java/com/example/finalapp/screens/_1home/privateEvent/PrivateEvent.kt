@@ -90,7 +90,7 @@ fun PrivateEvent(event: EventResponse,navController: NavHostController) {
                     GlideImage(model = imagePrefix+event.image.ifEmpty { R.drawable.girl }, contentDescription = "",
                         Modifier
                             .fillMaxWidth()
-                            .fillMaxHeight(0.7f), contentScale = ContentScale.FillBounds)
+                            .fillMaxHeight(0.64f), contentScale = ContentScale.Crop)
                     //--------------------active button and expiration time----------------------
                     Box(modifier = Modifier.align(Alignment.TopStart)){
                         ActiveButtonAndExpirationTime()

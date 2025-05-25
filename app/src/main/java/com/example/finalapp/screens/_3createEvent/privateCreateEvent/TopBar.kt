@@ -9,6 +9,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.finalapp.R
@@ -19,7 +21,7 @@ import com.example.finalapp.utils.constants.Constants
 @Composable
 fun CreateEventTopBar2(showButton:Boolean,onButtonClicked:()->Unit) {
     TopAppBar(
-        title = { Text(text = "Create Event", fontFamily = Constants.FONT_MEDIUM) },
+        title = { Text(text = "Create Event", fontFamily = Constants.FONT_MEDIUM, color = Color.White) },
         colors = TopAppBarDefaults.mediumTopAppBarColors(containerColor = floatingActionBtnColor),
         actions = {
             if(showButton) {
@@ -28,6 +30,6 @@ fun CreateEventTopBar2(showButton:Boolean,onButtonClicked:()->Unit) {
                 }
             } },
         navigationIcon = {
-            Image(painter = painterResource(id = R.drawable.back), contentDescription ="", modifier = Modifier.size(30.dp) ) }
+            Image(painter = painterResource(id = R.drawable.back), contentDescription ="", modifier = Modifier.size(30.dp), colorFilter = ColorFilter.tint(Color.White)) }
     )
 }

@@ -74,11 +74,11 @@ fun DirectChatScreen(
 ) {
 
     val checked by eventsViewModel.checked
-    val shareProfileClicked by eventsViewModel.shareProfileClicked
+    val shareProfileClickedON by eventsViewModel.shareProfileClicked
     val directChatResponseState by eventsViewModel.directChatResponse.collectAsState()
     val nearByUsersList by eventsViewModel.nearByUsersList.collectAsState()
-    LaunchedEffect(key1 =shareProfileClicked){
-        if(shareProfileClicked ){
+    LaunchedEffect(key1 =shareProfileClickedON){
+        if(shareProfileClickedON ){
             eventsViewModel.checked.value=!checked
             eventsViewModel.sendDirectChatData(DirectChatRequest( ProfileObject.profile?.userId!!,authViewModel.latitude.value,authViewModel.longitude.value))
         }
@@ -272,7 +272,8 @@ fun SwitchWithIcon(checked: Boolean,onClick:(value:Boolean)->Unit) {
             checkedTrackColor = Color(0xFF053E77),
             uncheckedThumbColor = Color.DarkGray,
             uncheckedTrackColor = Color.LightGray,
-        ), modifier = Modifier.padding(0.dp)
+        ),
+        modifier = Modifier.padding(0.dp)
     )
 
 

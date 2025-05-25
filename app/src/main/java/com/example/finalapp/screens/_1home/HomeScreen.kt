@@ -56,6 +56,7 @@ import com.example.finalapp.viewmodels.EventsViewModel
 import com.example.finalapp.screens.dialogBox.ShowQRDialog
 import com.example.finalapp.screens.dialogBox.showDialog
 import com.example.finalapp.ui.TAB_ITEMS
+import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.viewmodels.ImageUploadViewModel
 import kotlinx.coroutines.delay
@@ -156,12 +157,13 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
                         indicator = { tabPositions ->
                             TabRowDefaults.Indicator(
                                 Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage]),
-                                color = Color(0xFFDF400E) //0xFFEB1809
+                                color = Color(0xFFDF400E) ,//0xFFEB1809
+                                height = 3.dp
                             )
                         },
-                        backgroundColor = Color(0xFFFFFFFF), //0xFFD5623E orange , 0xFFBCE697 green
+                        backgroundColor = floatingActionBtnColor.copy(alpha = 0.9f),//Color(0xFFFFFFFF), //0xFFD5623E orange , 0xFFBCE697 green
                         modifier = Modifier
-                            .border(width = 0.dp, color = Color.White)
+                         //   .border(width = 0.dp, color = Color.White)
                             .padding(bottom = 0.dp)
                             .fillMaxWidth()
                             .height(35.dp)
@@ -173,7 +175,7 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
                                 text = {
                                     Text(
                                         text = item.title,
-                                        color = if (pagerState.currentPage == index) Color(0xFFDF400E) else Color.DarkGray,
+                                        color = if (pagerState.currentPage == index) Color(0xFFFFFFFF) /*Color(0xFFDF400E)*/ else Color.LightGray,
                                         fontFamily = Constants.FONT_MEDIUM,//FontFamily(Font(R.font.dongle_light)),
                                         fontSize = 12.sp,//20.sp,
                                         fontWeight = if (pagerState.currentPage == index) FontWeight.Bold else FontWeight.Normal

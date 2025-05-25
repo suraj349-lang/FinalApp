@@ -66,6 +66,7 @@ import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.ui.theme.homeTopBarIconsColor
 import com.example.finalapp.ui.theme.statusBarColor
 import com.example.finalapp.utils.RequestState
+import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.utils.constants.Constants.APP_NAME_FONT
 import com.example.finalapp.viewmodels.AuthViewModel
 import com.example.finalapp.viewmodels.EventsViewModel
@@ -108,6 +109,8 @@ fun HomeTopBar(
     icon: Int? = null,
     onQRClicked: () -> Unit = {}
 ){
+    val baseColor= floatingActionBtnColor//statusBarColor
+    val iconAndTextColor= statusBarColor //homeTopBarIconsColor
 
 
     TopAppBar(
@@ -115,7 +118,7 @@ fun HomeTopBar(
             .fillMaxWidth()
             .height(40.dp),
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = statusBarColor
+            containerColor = baseColor
         ),
         scrollBehavior = scrollBehavior,
         title = {
@@ -123,8 +126,8 @@ fun HomeTopBar(
             Text(
                 title,
                 fontSize = 20.sp,
-                fontWeight=FontWeight.SemiBold,
-                modifier = Modifier, color = homeTopBarIconsColor, fontFamily = APP_NAME_FONT
+            //    fontWeight=FontWeight.SemiBold,
+                modifier = Modifier, color = iconAndTextColor, fontFamily = APP_NAME_FONT //Constants.FONT_MEDIUM,
             )
             }
         },
@@ -133,7 +136,7 @@ fun HomeTopBar(
                 Row(modifier = Modifier.fillMaxHeight(), verticalAlignment = Alignment.CenterVertically) {
                     Image(painter = painterResource(id = R.drawable.new_qr),
                         contentDescription = "",
-                        colorFilter = ColorFilter.tint(color = homeTopBarIconsColor),
+                        colorFilter = ColorFilter.tint(color = iconAndTextColor),
                         modifier = Modifier
                             .padding(end = 20.dp)
                             .size(24.dp)
@@ -143,7 +146,7 @@ fun HomeTopBar(
                     Image(
                         painter = painterResource(id = R.drawable.notification_new),
                         contentDescription = "",
-                        colorFilter = ColorFilter.tint(color = homeTopBarIconsColor),
+                        colorFilter = ColorFilter.tint(color = iconAndTextColor),
                         modifier = Modifier
                             .clickable { navController.navigate(SCREENS.NOTIFICATIONS.route) }
                             .padding(end = 20.dp)
@@ -152,7 +155,7 @@ fun HomeTopBar(
                     icon?.let { painterResource(id = it) }?.let {
                         Image(painter = it,
                             contentDescription = "",
-                            colorFilter = ColorFilter.tint(color = homeTopBarIconsColor),
+                            colorFilter = ColorFilter.tint(color = iconAndTextColor),
                             modifier = Modifier
                                 .padding(end = 8.dp)
                                 .size(24.dp)
