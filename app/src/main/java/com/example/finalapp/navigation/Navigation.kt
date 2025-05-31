@@ -31,7 +31,7 @@ import com.example.finalapp.screens._6chat.ChatListScreen
 import com.example.finalapp.screens._4profile.GalleryPicker
 import com.example.finalapp.screens._1home.HomeScreenUI
 import com.example.finalapp.screens._8notification.NotificationsScreenUI
-import com.example.finalapp.screens._2search.PersonalEventsScreen
+import com.example.finalapp.screens._2personalEvents.PersonalEventsScreen
 import com.example.finalapp.screens._3createEvent.privateCreateEvent.CreateEventNew
 import com.example.finalapp.screens._5settings.SettingsScreenUI
 import com.example.finalapp.testing.TabView

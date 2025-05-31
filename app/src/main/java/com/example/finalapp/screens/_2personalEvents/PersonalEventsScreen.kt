@@ -1,4 +1,4 @@
-package com.example.finalapp.screens._2search
+package com.example.finalapp.screens._2personalEvents
 
 import BottomBar
 import androidx.compose.foundation.Image
@@ -115,45 +115,6 @@ fun TrendingCategories(categories: List<Category>) {
         }
     }
 }
-@Composable
-fun PersonalEventTopBar() {
-    TopAppBar(
-        title = { Text(text = "Events", fontFamily = Constants.FONT_MEDIUM, fontSize = 24.sp, color = Color.White )},
-        navigationIcon = {},
-        actions = {},
-        backgroundColor = Color(0xFF43075C)
-    )
-
-}
-
-@Composable
-fun SearchBar() {
-    var searchText by remember {
-        mutableStateOf("")
-    }
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight(),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFFFFFFFE))
-        ) {
-            OutlinedTextField(
-                value = searchText,
-                onValueChange = { searchText = it },
-                shape = RoundedCornerShape(30.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 12.dp, end = 12.dp, top = 12.dp, bottom = 4.dp),
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = Color.DarkGray,
-                    unfocusedBorderColor = Color.DarkGray,
-                    cursorColor = Color.Red
-                ),
-                //textStyle = TextStyle(fontSize = 14.sp),
-                placeholder = { Text(text = "Search", fontFamily = DONGLE_BOLD) },
-            )
-        }
-    }
 
 @Composable
 fun TrendingPosts() {
@@ -171,19 +132,3 @@ fun TrendingPosts() {
     }
 }
 
-data class Category(
-    val name: String,
-    var isSelected: Boolean = false
-)
-val categories = listOf(
-    Category("All"),
-    Category("Sports"),
-    Category("Cinema"),
-    Category("Politics"),
-    Category("Entertainment"),
-    Category("News"),
-    Category("Comedy"),
-    Category("Crime"),
-    Category("Elections"),
-    Category("Protest")
-)

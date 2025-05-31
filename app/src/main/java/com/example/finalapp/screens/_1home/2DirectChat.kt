@@ -102,7 +102,7 @@ fun DirectChatScreen(
                             .padding(end = 16.dp, top = 8.dp)
                     ) {
                         SwitchWithIcon(checked) {
-                            eventsViewModel.shareProfileClicked.value = true
+                            eventsViewModel.shareProfileClicked.value = !eventsViewModel.shareProfileClicked.value
                         }
                     }
                 Column(modifier = Modifier.fillMaxSize()) {
