@@ -1,7 +1,6 @@
 package com.example.finalapp.screens._4profile
 
 import android.net.Uri
-import android.text.Layout
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
@@ -17,8 +16,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredHeight
-import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -57,18 +54,15 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavHostController
-import coil.compose.SubcomposeAsyncImage
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
 import com.example.finalapp.model.DropProfileResponse
 import com.example.finalapp.model.EventResponse
 import com.example.finalapp.navigation.SCREENS
-import com.example.finalapp.screens._3createEvent.CreateEventBottomSheet
+import com.example.finalapp.screens._3createEvent.CreateEventOrPingBottomSheet
 import com.example.finalapp.screens.common.CommonErrorScreen
 import com.example.finalapp.screens.dialogBox.DropProfileDialog
-import com.example.finalapp.screens.dialogBox.GalleryPickerForDropProfile
-import com.example.finalapp.screens.dialogBox.ImageCaptureFromCameraForDropProfile
 import com.example.finalapp.screens.dialogBox.uriToFile
 import com.example.finalapp.ui.imagePrefix
 import com.example.finalapp.ui.theme.PURPLE
@@ -303,7 +297,7 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
         }
 
     }
-    CreateEventBottomSheet(
+    CreateEventOrPingBottomSheet(
         showSheet = showSheet,
         onDismiss = {showSheet=false },
         navHostController = navController

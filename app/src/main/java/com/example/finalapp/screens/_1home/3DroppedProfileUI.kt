@@ -229,7 +229,7 @@ fun DroppedProfilesUI(
                             items(it) { index ->
                                 val item = droppedProfilesList[index]
                                 if (item != null) {
-                                    DroppedProfile(item){
+                                    DroppedProfileItem(item){
                                         try {
                                             val route= item.let {
                                                 SCREENS.DROP_PROFILE_USER_PROFILE.passProfile(it)
@@ -331,7 +331,7 @@ fun DropProfileSearchedList(
             items(droppedProfilesList.itemCount) { index ->
                 val item = droppedProfiles[index] // Access item safely
                 if (item != null) {
-                    DroppedProfile(item){
+                    DroppedProfileItem(item){
 
                     }
                 }
@@ -354,7 +354,7 @@ fun DateRangePicker(newDate:String,onDateChange:(String)->Unit,onDismiss:()->Uni
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun DroppedProfile(profile: DropProfileResponse, onProfileClicked:()->Unit) {
+fun DroppedProfileItem(profile: DropProfileResponse, onProfileClicked:()->Unit) {
     val configuration = LocalConfiguration.current
     val widthInDp = configuration.screenWidthDp.dp
     val heightInDp = configuration.screenHeightDp.dp * 0.5f

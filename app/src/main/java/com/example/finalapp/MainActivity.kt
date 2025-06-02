@@ -51,6 +51,7 @@ import java.io.IOException
 import java.util.Locale
 import android.location.LocationManager
 import androidx.activity.result.ActivityResultLauncher
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
@@ -78,6 +79,7 @@ class MainActivity : ComponentActivity() {
     lateinit var splashViewModel: SplashViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         super.onCreate(savedInstanceState)
         handleDeepLink(intent)
         installSplashScreen().setKeepOnScreenCondition {

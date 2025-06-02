@@ -1,7 +1,9 @@
-package com.example.finalapp.screens._2personalEvents
+package com.example.finalapp.screens._2pings
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.OutlinedTextField
@@ -16,7 +18,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import com.example.finalapp.R
 import com.example.finalapp.utils.constants.Constants
 
 
@@ -35,6 +39,7 @@ fun SearchBar() {
             value = searchText,
             onValueChange = { searchText = it },
             shape = RoundedCornerShape(30.dp),
+            maxLines=1,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 12.dp, end = 12.dp, top = 12.dp, bottom = 4.dp),
@@ -43,8 +48,8 @@ fun SearchBar() {
                 unfocusedBorderColor = Color.DarkGray,
                 cursorColor = Color.Red
             ),
-            //textStyle = TextStyle(fontSize = 14.sp),
-            placeholder = { Text(text = "Search", fontFamily = Constants.DONGLE_BOLD) },
+            placeholder = { Text(text = "Search", fontFamily = Constants.FONT_MEDIUM) },
+            trailingIcon = { Image(painter = painterResource(id = R.drawable.search_new), contentDescription = "", modifier = Modifier.size(20.dp))}
         )
     }
 }

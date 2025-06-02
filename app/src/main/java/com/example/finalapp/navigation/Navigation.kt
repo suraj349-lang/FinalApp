@@ -31,7 +31,7 @@ import com.example.finalapp.screens._6chat.ChatListScreen
 import com.example.finalapp.screens._4profile.GalleryPicker
 import com.example.finalapp.screens._1home.HomeScreenUI
 import com.example.finalapp.screens._8notification.NotificationsScreenUI
-import com.example.finalapp.screens._2personalEvents.PersonalEventsScreen
+import com.example.finalapp.screens._2pings.PingsScreenUI
 import com.example.finalapp.screens._3createEvent.privateCreateEvent.CreateEventNew
 import com.example.finalapp.screens._5settings.SettingsScreenUI
 import com.example.finalapp.testing.TabView
@@ -79,7 +79,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
     val eventsViewModel= hiltViewModel<EventsViewModel>()
     val chatViewModel= hiltViewModel<ChatViewModel>()
 
-    NavHost(navController = navController, startDestination =SCREENS.LOGIN.route){
+    NavHost(navController = navController, startDestination =SCREENS.SPLASH.route){
         composable(SCREENS.SPLASH.route){
             SplashScreenUI(navController,screen)
         }
@@ -133,8 +133,8 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
         composable(SCREENS.ALL_USERS.route){
             //AllProfiles(profileViewModel)
         }
-        composable(SCREENS.PERSONAL.route){
-            PersonalEventsScreen(navController)
+        composable(SCREENS.PINGS.route){
+            PingsScreenUI(navController)
         }
 
         composable(SCREENS.PAST_OFFERS.route){
@@ -144,7 +144,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
             //todo for testing purpose
             TabView(navController,imageUploadViewModel,authViewModel)
         }
-        composable(SCREENS.CREATE_EVENT_PRIVATE.route) {
+        composable(SCREENS.CREATE_PING.route) {
           //  CreateEvent(eventsViewModel, navController)
             CreateEventNew(navController,eventsViewModel)
         }

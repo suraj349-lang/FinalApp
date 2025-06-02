@@ -6,7 +6,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
@@ -51,7 +50,7 @@ import com.example.finalapp.R
 import com.example.finalapp.viewmodels.AuthViewModel
 import com.example.finalapp.screens._1home.commonUI.HomeFloatingActionButton
 import com.example.finalapp.screens._1home.commonUI.HomeTopBar
-import com.example.finalapp.screens._3createEvent.CreateEventBottomSheet
+import com.example.finalapp.screens._3createEvent.CreateEventOrPingBottomSheet
 import com.example.finalapp.viewmodels.EventsViewModel
 import com.example.finalapp.screens.dialogBox.ShowQRDialog
 import com.example.finalapp.screens.dialogBox.showDialog
@@ -208,7 +207,7 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
                 }
             }
     }
-    CreateEventBottomSheet(
+    CreateEventOrPingBottomSheet(
         showSheet = showSheet,
         onDismiss = { showSheet = false },
         navHostController = navController

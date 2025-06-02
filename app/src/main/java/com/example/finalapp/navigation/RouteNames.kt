@@ -18,7 +18,7 @@ sealed class SCREENS(val route:String){
     object HOME:SCREENS("home_screen")
     object PROFILE:SCREENS("profile_screen")
     object SETTINGS:SCREENS("settings_screen")
-    object PERSONAL:SCREENS("personal")
+    object PINGS:SCREENS("personal")
     object NOTIFICATIONS:SCREENS("notifications_screen")
     object CHAT_LIST:SCREENS("chat_screen")
     object SINGLE_CHAT:SCREENS("singleChat/{userName}/{chatListUserId}"){
@@ -32,7 +32,7 @@ sealed class SCREENS(val route:String){
     object ALL_USERS:SCREENS("all_users")
 
     object DROP_PROFILE:SCREENS("drop_profile")
-    object CREATE_EVENT_PRIVATE:SCREENS("create_event_private")
+    object CREATE_PING:SCREENS("create_ping")
     object CREATE_EVENT_PUBLIC:SCREENS("create_event_public")
     object PUBLIC_EVENT_DETAILS_SCREEN_WRAPPER:SCREENS("publicEventDetailsScreenWrapper")
     object PAST_OFFERS:SCREENS("past_offers")

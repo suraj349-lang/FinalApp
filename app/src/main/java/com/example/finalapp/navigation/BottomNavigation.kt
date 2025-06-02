@@ -1,11 +1,9 @@
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -27,37 +25,42 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.finalapp.R
 import com.example.finalapp.navigation.SCREENS
-import com.example.finalapp.ui.theme.floatingActionBtnColor
 
 sealed class Destinations(
     val route: String,
-    val icon: Int,
+    val activeIcon: Int,
+    val inactiveIcon:Int,
     val name:String
 ) {
     object HomeScreen : Destinations(
         route = SCREENS.HOME.route,
-        icon = R.drawable.home_new,
+        activeIcon = R.drawable.home_colored,
+        inactiveIcon=R.drawable.home_new,
         name = "Home"
     )
-    object Personal : Destinations(
-        route = SCREENS.PERSONAL.route,
-        icon = R.drawable.personal,
-        name = "Personal"
+    object Pings : Destinations(
+        route = SCREENS.PINGS.route,
+        activeIcon = R.drawable.ping,
+        inactiveIcon=R.drawable.ping,
+        name = "Pings"
     )
     object CreateEvent : Destinations(
         route = "",
-        icon = R.drawable.create_event_new,
+        activeIcon = R.drawable.create_colored,
+        inactiveIcon=R.drawable.create_event_new,
         name = "Create"
     )
     object ProfileScreen : Destinations(
         route = SCREENS.PROFILE.route,
-        icon = R.drawable.profile_new_empty,
+        activeIcon = R.drawable.profile_colored,
+        inactiveIcon=R.drawable.profile_new_empty,
         name = "Profile"
     )
 
     object Settings : Destinations(
         route = SCREENS.SETTINGS.route,
-        icon = R.drawable.settings_empty,
+        activeIcon = R.drawable.settings_colored,
+        inactiveIcon=R.drawable.settings_empty,
         name = "Settings"
     )
 
@@ -68,7 +71,7 @@ sealed class Destinations(
 fun BottomBar(
     navController: NavHostController, state: MutableState<Boolean>, modifier: Modifier = Modifier, onCreateEventClick: () -> Unit={}) {
     val screens = listOf(
-        Destinations.HomeScreen, /*Destinations.Personal,*/Destinations.CreateEvent,Destinations.ProfileScreen,Destinations.Settings
+        Destinations.HomeScreen, Destinations.Pings,Destinations.CreateEvent,Destinations.ProfileScreen,Destinations.Settings
     )
 //0xFFE4E4F1   0xFFF9F9FF -> screen color
     NavigationBar(containerColor = Color.White, modifier = Modifier.shadow(elevation = 40.dp).height(48.dp).fillMaxWidth()){
@@ -81,10 +84,10 @@ fun BottomBar(
                 icon = {
                     Column( verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
                         if(active){
-                            Image(painter = painterResource(id = screen.icon), contentDescription ="",modifier=Modifier.size(20.dp), colorFilter = ColorFilter.tint( color =   Color.Black ) )
+                            Image(painter = painterResource(id = screen.activeIcon), contentDescription ="",modifier=Modifier.size(20.dp) )
                             Text(text = screen.name, fontSize = 11.sp, style = MaterialTheme.typography.labelSmall, color =  Color.Black, fontWeight = FontWeight.Bold  )
                         }else{
-                            Image(painter = painterResource(id = screen.icon), contentDescription ="",modifier=Modifier.size(20.dp), colorFilter = ColorFilter.tint( color =  Color.Gray) )
+                            Image(painter = painterResource(id = screen.inactiveIcon), contentDescription ="",modifier=Modifier.size(20.dp), colorFilter = ColorFilter.tint( color =  Color.Gray) )
                             Text(text = screen.name, fontSize = 11.sp, style = MaterialTheme.typography.labelSmall, color =  Color.Gray)
                         }
                     }
