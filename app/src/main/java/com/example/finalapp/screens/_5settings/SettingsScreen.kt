@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.finalapp.navigation.SCREENS
+import com.example.finalapp.screens._3createEvent.CreateEventOrPingBottomSheet
 import com.example.finalapp.screens.common.BackImage
 import com.example.finalapp.ui.theme.LIGHT_GREEN
 import com.example.finalapp.ui.theme.LIGHT_GREY_BG_COLOR
@@ -40,12 +41,18 @@ import com.example.finalapp.utils.ProfileObject
 import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
 import com.example.finalapp.viewmodels.AuthViewModel
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.draw.shadow
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun SettingsScreenUI(navController: NavHostController,authViewModel: AuthViewModel){
     val buttonVisible= remember { mutableStateOf(false) };
+    var showSheet by remember {
+        mutableStateOf(false)
+    }
     val list= listOf(
         ProfileObject.profile?.let { MyAccount("Name", it.name,SCREENS.EDIT_NAME.route) },
         ProfileObject.profile?.let { MyAccount("Username", it.username,SCREENS.EDIT_USER_NAME.route) },
@@ -60,7 +67,7 @@ fun SettingsScreenUI(navController: NavHostController,authViewModel: AuthViewMod
 
     Scaffold(
         topBar = { SettingsTopBar { navController.navigate(SCREENS.HOME.route) } },
-        bottomBar = { BottomBar(navController =navController , state = buttonVisible,modifier = Modifier.height(45.dp)) }
+        bottomBar = { BottomBar(navController =navController , state = buttonVisible,modifier = Modifier.height(45.dp), onCreateEventClick = {showSheet=true}) }
     ) {
         Surface(
             Modifier
@@ -78,21 +85,30 @@ fun SettingsScreenUI(navController: NavHostController,authViewModel: AuthViewMod
         }
 
     }
+    CreateEventOrPingBottomSheet(
+        showSheet = showSheet,
+        onDismiss = {showSheet=false },
+        navHostController = navController
+    )
 
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsTopBar(onBackClicked:()->Unit) {
-    TopAppBar(title = {
-        Text(
-            "Settings",
-            fontSize = 20.sp,
-            fontWeight= FontWeight.SemiBold,
-            modifier = Modifier, color = homeTopBarIconsColor, fontFamily = Constants.FONT_MEDIUM
-        )
-    },
-    navigationIcon = { BackImage(onBackClicked)})
+fun SettingsTopBar(onBackClicked: () -> Unit) {
+    TopAppBar(
+        title = {
+            Text(
+                "Settings",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier,
+                color = homeTopBarIconsColor,
+                fontFamily = Constants.FONT_MEDIUM
+            )
+        },
+        modifier = Modifier.shadow(elevation = 40.dp),
+        navigationIcon = { BackImage(onBackClicked) })
 }
 
 @Composable
@@ -126,7 +142,8 @@ fun MyAccount(list: List<MyAccount>,navController: NavHostController) {
 @Composable
 fun MyAccountUI(item:MyAccount,navController: NavHostController) {
     Card(
-        modifier = Modifier.clickable { navController.navigate(item.route) }
+        modifier = Modifier
+            .clickable { navController.navigate(item.route) }
             .fillMaxWidth()
             .height(45.dp),
         shape = RoundedCornerShape(0.dp),
@@ -169,7 +186,8 @@ fun SupportAndFeedback(list: List<SupportAndFeedBack>,navController: NavHostCont
         }
         list.forEach { item ->
             Card(
-                modifier = Modifier.clickable { navController.navigate(item.route) }
+                modifier = Modifier
+                    .clickable { navController.navigate(item.route) }
                     .fillMaxWidth()
                     .height(45.dp),
                 shape = RoundedCornerShape(0.dp),
@@ -210,7 +228,8 @@ fun MoreInformation(list: List<MoreInformation>, navController: NavHostControlle
         }
         list.forEach { item ->
             Card(
-                modifier = Modifier.clickable { navController.navigate(item.route) }
+                modifier = Modifier
+                    .clickable { navController.navigate(item.route) }
                     .fillMaxWidth()
                     .height(45.dp),
                 shape = RoundedCornerShape(0.dp),
@@ -255,7 +274,8 @@ fun AccountActions(list: List<AccountAction>, navController: NavHostController) 
         }
         list.forEach { item ->
             Card(
-                modifier = Modifier.clickable { navController.navigate(item.route) }
+                modifier = Modifier
+                    .clickable { navController.navigate(item.route) }
                     .fillMaxWidth()
                     .height(45.dp),
                 shape = RoundedCornerShape(0.dp),

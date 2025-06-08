@@ -1,24 +1,16 @@
-package com.example.finalapp.screens._3createEvent.privateCreateEvent
+package com.example.finalapp.screens._3createEvent.createEvent
 
 import android.net.Uri
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.unit.dp
 import com.example.finalapp.utils.ProfileObject
 import android.widget.Toast
 import androidx.compose.material3.CircularProgressIndicator
@@ -38,7 +30,7 @@ enum class CREATE_EVENT {
     IMAGE,TYPE,CAPTION,LOCATION,PREVIEW
 }
 @Composable
-fun CreateEventNew(navController: NavController, eventsViewModel: EventsViewModel) {
+fun CreateEventMainScreen(navController: NavController, eventsViewModel: EventsViewModel) {
     var page by remember {
         mutableStateOf(CREATE_EVENT.IMAGE)
     }
@@ -49,6 +41,9 @@ fun CreateEventNew(navController: NavController, eventsViewModel: EventsViewMode
         mutableStateOf("")
     }
     var type by remember {
+        mutableStateOf("")
+    }
+    var location by remember {
         mutableStateOf("")
     }
     val success by eventsViewModel.createEventIsSuccess.collectAsState()
@@ -79,11 +74,11 @@ fun CreateEventNew(navController: NavController, eventsViewModel: EventsViewMode
                             EventRequestDTO(
                                 user = ProfileObject.profile?.userId!!,
                                 userName = ProfileObject.profile?.username!!,
+                                title=type,
                                 image = imageKey,
                                 category = type,
-                                location = ProfileObject.profile?.address!!,
+                                location = location,
                                 offer =caption,
-                                isPrivate = true,
                                 expirationTime = "12")
                         )
                     }
@@ -96,29 +91,30 @@ fun CreateEventNew(navController: NavController, eventsViewModel: EventsViewMode
             .padding(paddingValues)) {
             when(page){
                 CREATE_EVENT.IMAGE ->{
-                    CreateEventImageScreen({imageUri=it }){
+                    AddImageCreateEvent({imageUri=it }){
                          page= CREATE_EVENT.TYPE
                     }
                 }
                 CREATE_EVENT.TYPE ->{
-                    CreateEventTypeScreen(type ,{type=it }){
+                    AddEventTypeCreateEvent(type ,{type=it }){
                         page= CREATE_EVENT.CAPTION
                     }
 
                 }
                 CREATE_EVENT.CAPTION ->{
-                    CreateEventCaption(caption,{caption=it }){
+                    AddCaptionCreateEvent(caption,{caption=it }){
                         page= CREATE_EVENT.LOCATION
                     }
                 }
                 CREATE_EVENT.LOCATION ->{
-                    YourLocation{
+                    AddLocationCreateEvent{
+                        location=it;
                         page= CREATE_EVENT.PREVIEW
                     }
                 }
                 CREATE_EVENT.PREVIEW ->{
                     showButton=true
-                    PrivateCreateEventPreview(uri = imageUri,caption, eventType =type)
+                    PreviewCreateEvent(uri = imageUri,caption, eventType =type)
                 }
             }
         }
@@ -129,25 +125,5 @@ fun CreateEventNew(navController: NavController, eventsViewModel: EventsViewMode
 
 
 
-@Composable
-fun CreateEventCaption(caption:String,onCaptionChange:(String)->Unit,onNextClicked:()->Unit){
-    Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(text = "Add Caption")
-        OutlinedTextField(value =caption , onValueChange =onCaptionChange, modifier = Modifier.fillMaxWidth())
-        Button(onClick =  onNextClicked ) {
-            Text(text = "Next")
-        }
-    }
-}
 
-@Composable
-fun YourLocation(onNextClicked: () -> Unit) {
-    Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(text = "Your Location")
-        Text(text =ProfileObject.profile?.address!!, modifier = Modifier )
-        Button(onClick =  onNextClicked ) {
-            Text(text = "Next")
-        }
-    }
-}
 

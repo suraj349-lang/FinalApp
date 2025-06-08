@@ -90,9 +90,19 @@ class ImageUploadViewModel @Inject constructor(
                 _userProfileImageUpdateStatus.value = RequestState.Error(it)
             }
             .collect{
+                if(it.success) {
+                    try {
 
-                ProfileObject.profile = ProfileObject.profile?.copy(profileImage =it.data.profileImage )
-                _userProfileImageUpdateStatus.value = RequestState.Success(it.data)
+                        ProfileObject.profile =
+                            ProfileObject.profile?.copy(profileImage = it.data.profileImage)
+                        _userProfileImageUpdateStatus.value = RequestState.Success(it.data)
+                    } catch (e: Exception) {
+                        Log.e(TAG, "updateUserProfileImage: ${e.printStackTrace()}", e)
+
+                    }
+                }else{
+                    _userProfileImageUpdateStatus.value = RequestState.Error(Exception("Error uploading image"))
+                }
             }
     }
 

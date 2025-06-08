@@ -99,7 +99,7 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
             delay(1000L)
             isRefreshing = false
         }
-        else {
+        else if (isRefreshing && pagerState.currentPage==2) {
             delay(1000L)
             eventsViewModel.getDefaultDropProfiles("")
             delay(500L)

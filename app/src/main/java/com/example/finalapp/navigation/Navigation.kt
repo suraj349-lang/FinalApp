@@ -32,11 +32,11 @@ import com.example.finalapp.screens._4profile.GalleryPicker
 import com.example.finalapp.screens._1home.HomeScreenUI
 import com.example.finalapp.screens._8notification.NotificationsScreenUI
 import com.example.finalapp.screens._2pings.PingsScreenUI
-import com.example.finalapp.screens._3createEvent.privateCreateEvent.CreateEventNew
+import com.example.finalapp.screens._3createEvent.createEvent.CreateEventMainScreen
 import com.example.finalapp.screens._5settings.SettingsScreenUI
 import com.example.finalapp.testing.TabView
 import com.example.finalapp.screens._3createEvent.PastRaisedOffer
-import com.example.finalapp.screens._3createEvent.PremiumCreateEvent
+import com.example.finalapp.screens._3createEvent.CreateEvent
 import com.example.finalapp.screens._3createEvent.publicCreateEvent.publicEventDetails.PublicEventDetailsScreenWrapper
 import com.example.finalapp.screens._4profile.ProfileScreenNew
 import com.example.finalapp.screens._4profile.UserPublicProfile
@@ -62,7 +62,6 @@ import com.example.finalapp.screens._5settings.TermsOfService
 import com.example.finalapp.screens.common.CameraXScreen
 import com.example.finalapp.screens.common.ImagePreviewScreen
 import com.example.finalapp.screens.onboarding.screen.WelcomeScreen
-import com.example.finalapp.testingDataAndScreen.Tiktok
 import com.example.finalapp.viewmodels.ImageUploadViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import kotlinx.serialization.decodeFromString
@@ -146,18 +145,18 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
         }
         composable(SCREENS.CREATE_PING.route) {
           //  CreateEvent(eventsViewModel, navController)
-            CreateEventNew(navController,eventsViewModel)
+            CreateEvent(authViewModel, eventsViewModel, navController)
         }
-        composable(SCREENS.CREATE_EVENT_PUBLIC.route) {
-            PremiumCreateEvent(authViewModel, eventsViewModel, navController)
+        composable(SCREENS.CREATE_EVENT.route) {
+            CreateEventMainScreen(navController,eventsViewModel)
         }
         composable(SCREENS.PUBLIC_EVENT_DETAILS_SCREEN_WRAPPER.route){
             PublicEventDetailsScreenWrapper()
         }
-        composable(SCREENS.TIKTOK.route){
-            val list= listOf<String>("1","2","3","4","5","6")
-            Tiktok(videos = list)
-        }
+//        composable(SCREENS.TIKTOK.route){
+//            val list= listOf<String>("1","2","3","4","5","6")
+//            Tiktok(videos = list)
+//        }
         // when the dropped profile is clicked then it is shown
         composable(route=SCREENS.DROP_PROFILE_USER_PROFILE.route, arguments = listOf(navArgument("dropProfileResponse"){ type= NavType.StringType })){navBackStackEntry ->
             val json=navBackStackEntry.arguments?.getString("dropProfileResponse")

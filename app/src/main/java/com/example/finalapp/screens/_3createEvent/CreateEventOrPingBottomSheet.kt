@@ -43,7 +43,10 @@ fun CreateEventOrPingBottomSheet(showSheet: Boolean, onDismiss: () -> Unit, navH
                 Spacer(Modifier.height(12.dp))
                 Row() {
                     Button(
-                        onClick = { navHostController.navigate(SCREENS.CREATE_EVENT_PUBLIC.route) },
+                        onClick = {
+                            navHostController.navigate(SCREENS.CREATE_EVENT.route)
+                            onDismiss()
+                                  },
                         modifier = Modifier.wrapContentWidth(),
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray)

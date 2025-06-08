@@ -33,7 +33,7 @@ sealed class SCREENS(val route:String){
 
     object DROP_PROFILE:SCREENS("drop_profile")
     object CREATE_PING:SCREENS("create_ping")
-    object CREATE_EVENT_PUBLIC:SCREENS("create_event_public")
+    object CREATE_EVENT:SCREENS("create_event_public")
     object PUBLIC_EVENT_DETAILS_SCREEN_WRAPPER:SCREENS("publicEventDetailsScreenWrapper")
     object PAST_OFFERS:SCREENS("past_offers")
     object TABVIEW:SCREENS("tab_view")

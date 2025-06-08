@@ -1,4 +1,4 @@
-package com.example.finalapp.screens._3createEvent.privateCreateEvent
+package com.example.finalapp.screens._3createEvent.createEvent
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -8,14 +8,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Text
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,12 +26,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.finalapp.screens._4profile.EventTopic
+import com.example.finalapp.ui.theme.floatingActionBtnColor
+import com.example.finalapp.utils.constants.Constants
 
 
 @Composable
-fun CreateEventTypeScreen(
+fun AddEventTypeCreateEvent(
     event: String,
     onEventChange: (String) -> Unit,
     onNextClicked: () -> Unit
@@ -52,12 +58,12 @@ fun CreateEventTypeScreen(
         verticalArrangement = Arrangement.spacedBy(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "Add a Type", style = MaterialTheme.typography.titleLarge)
+        Text(text = "Add a Type", fontFamily = Constants.FONT_MEDIUM, fontWeight = FontWeight.SemiBold, fontSize = 20.sp)
 
         OutlinedTextField(
             value = event,
             onValueChange = { onEventChange(it) },
-            label = { Text("Search or type event type...") },
+            label = { Text("Search event type...") },
             modifier = Modifier
                 .fillMaxWidth()
                 .onFocusChanged { isFocused = it.isFocused }
@@ -96,9 +102,12 @@ fun CreateEventTypeScreen(
 
         Button(
             onClick = onNextClicked,
-            enabled = event.isNotBlank()
+            enabled = event.isNotBlank(),
+            shape = RoundedCornerShape(6.dp),
+            modifier=Modifier.width(150.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = floatingActionBtnColor)
         ) {
-            Text(text = "Next")
+            Text(text = "Next ->", fontFamily = Constants.FONT_MEDIUM)
         }
     }
 }

@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -273,7 +274,7 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                     is RequestState.Loading -> CircularProgressIndicator()
                     is RequestState.Error -> CommonErrorScreen(error = "Error getting events!")
                     is RequestState.Success -> {
-                        MyLiveEvents(response.data){
+                        MyPings(response.data){
                             showSheet=true
                         }
                     }
@@ -292,6 +293,12 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
 
 
                 UserStats()
+                LogoutUser(
+                    onLogoutClicked = {authViewModel.logout {
+                    navController.navigate(SCREENS.LOGIN.route){
+                        popUpTo(0) { inclusive = true } // This clears the entire back stack
+                        launchSingleTop = true
+                } }})
             }
 
         }
@@ -327,7 +334,7 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
 
 
 @Composable
-fun MyLiveEvents(items: List<EventResponse>, onAddEventClicked:()->Unit) {
+fun MyPings(items: List<EventResponse>, onAddEventClicked:()->Unit) {
     val eventsList=remember{ items}
     Column() {
             Row(
@@ -337,11 +344,11 @@ fun MyLiveEvents(items: List<EventResponse>, onAddEventClicked:()->Unit) {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start
             ) {
-                Text(text = "My Live Events", color = Color.Black, fontWeight = FontWeight.Bold)
+                Text(text = "My Pings", color = Color.Black, fontWeight = FontWeight.Bold)
             }
         LazyRow{
             items(eventsList){item->
-                LiveEventItem(item)
+                MyPingItem(item)
 
             }
         }
@@ -372,13 +379,13 @@ fun MyLiveEvents(items: List<EventResponse>, onAddEventClicked:()->Unit) {
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun LiveEventItem(item: EventResponse) {
+fun MyPingItem(item: EventResponse) {
     Log.i("CALLAPI", "LiveEventItem:$item ")
     Box(modifier = Modifier
         .size(180.dp) //120 earlier
         .padding(end = 8.dp, top = 8.dp)
         .clip(shape = RoundedCornerShape(6.dp))) {
-        GlideImage(model=  item.image/*R.drawable.profile_image_1*/ , contentDescription = "", contentScale = ContentScale.Crop) //todo add imagePrefix when upload is happening
+        GlideImage(model=  imagePrefix+item.image/*R.drawable.profile_image_1*/ , contentDescription = "", contentScale = ContentScale.Crop) //todo add imagePrefix when upload is happening
         Row(modifier = Modifier
             .align(Alignment.BottomStart)
             .padding(4.dp)
@@ -497,5 +504,20 @@ fun UserStats() {
             
         }
         
+    }
+}
+
+@Composable
+fun LogoutUser(onLogoutClicked:()->Unit) {
+    Box(modifier = Modifier
+        .fillMaxWidth()
+        .heightIn(40.dp)
+        .background(color = Color(0xFFF5F0F0))) {
+        Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.Start) {
+            Text(text = "Logout", fontWeight = FontWeight.SemiBold, fontSize = 16.sp,fontFamily = Constants.FONT_MEDIUM, modifier = Modifier
+                .padding(horizontal = 16.dp, vertical = 4.dp)
+                .clickable { onLogoutClicked() }
+            )
+        }
     }
 }

@@ -1,4 +1,4 @@
-package com.example.finalapp.screens._3createEvent.privateCreateEvent
+package com.example.finalapp.screens._3createEvent.createEvent
 
 
 import android.net.Uri
@@ -65,11 +65,11 @@ import com.example.finalapp.utils.constants.Constants
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun PrivateCreateEventPreview(uri: Uri?,
-                              caption: String,
-                              eventType: String) {
+fun PreviewCreateEvent(uri: Uri?,
+                       caption: String,
+                       eventType: String) {
     Surface(modifier = Modifier
-        .fillMaxSize().padding(30.dp)) {
+        .fillMaxSize().padding(16.dp)) {
         Column(modifier = Modifier.fillMaxSize()) {
             Box(modifier = Modifier
                 .fillMaxWidth()

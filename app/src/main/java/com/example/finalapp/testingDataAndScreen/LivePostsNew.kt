@@ -34,6 +34,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.bumptech.glide.Glide
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
 import com.example.finalapp.screens._1home.commentBottomSheet.CommentBottomSheet
 import com.example.finalapp.screens._1home.commonUI.shareImageFromUrl
@@ -45,7 +48,7 @@ import com.example.finalapp.utils.constants.Constants.DONGLE_NORMAL
 import kotlinx.coroutines.launch
 
 
-
+/*
 @Preview(showBackground = true)
 @Composable
 fun  PrivateLiveEvent2() {
@@ -103,7 +106,7 @@ fun  PrivateLiveEvent2() {
                     backgroundColor = Color.Transparent,
                     elevation = 0.dp
                 ) {
-                    UserData()
+                    UserData("","")//todo
 
                 }
             }
@@ -276,17 +279,19 @@ fun UserComment() {
     }
     
 }
+
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun UserData() {
+fun UserData(username:String,userImage:String) {
     Row(modifier = Modifier
         .fillMaxWidth(0.85f)
         .wrapContentHeight(), verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.Start) {
         Card(modifier = Modifier.size(40.dp), shape = CircleShape) {
-            Image(painter = painterResource(id = R.drawable.girl), contentDescription = "", contentScale = ContentScale.Crop)
+            GlideImage(model =  userImage, contentDescription = "", contentScale = ContentScale.FillBounds, modifier = Modifier.fillMaxWidth().aspectRatio(1f/1f))
         }
         Spacer(modifier = Modifier.width(8.dp))
         Text(
-            text = "Kriti Shinde",
+            text = username,
             fontFamily = FontFamily(Font(R.font.dongle_bold)),
             color = Color.Black,
             fontWeight = FontWeight.Bold,
@@ -573,7 +578,7 @@ fun  PrivateLiveEventInUse(navController:NavHostController) {
                     backgroundColor = Color.Transparent,
                     elevation = 0.dp
                 ) {
-                    UserData()
+                    UserData("","")//todo
                 }
             }
             OfferRequest()
@@ -717,3 +722,4 @@ fun DateAndTime() {
 
     }
 }
+*/

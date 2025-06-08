@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -138,7 +139,9 @@ fun DroppedProfilesUI(
                     verticalArrangement = Arrangement.Top,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    if(showLoader && droppedProfilesList?.itemCount==0) LinearProgressIndicator(modifier = Modifier.fillMaxWidth().height(8.dp), color = floatingActionBtnColor)
+                    if(showLoader && droppedProfilesList?.itemCount==0) LinearProgressIndicator(modifier = Modifier
+                        .fillMaxWidth()
+                        .height(8.dp), color = floatingActionBtnColor)
                     UserLocation.address?.let { DroppedProfileLocation(location = it) }
                     OutlinedTextField(
                     value = query,
@@ -355,25 +358,16 @@ fun DateRangePicker(newDate:String,onDateChange:(String)->Unit,onDismiss:()->Uni
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun DroppedProfileItem(profile: DropProfileResponse, onProfileClicked:()->Unit) {
-    val configuration = LocalConfiguration.current
-    val widthInDp = configuration.screenWidthDp.dp
-    val heightInDp = configuration.screenHeightDp.dp * 0.5f
-    Card(modifier = Modifier
-        .clickable {
-            onProfileClicked()
-        }
-        .padding(2.dp)
-        .fillMaxWidth()
-        .wrapContentHeight(),
-        shape = RoundedCornerShape(4.dp)
-    )
-
+    Card(
+        modifier = Modifier.clickable { onProfileClicked() }
+            .padding(2.dp)
+            .fillMaxWidth()
+            .wrapContentHeight(),
+        shape = RoundedCornerShape(4.dp))
     {
-        Box(
-            modifier = Modifier.fillMaxSize() // Box to overlay content
-        ) {
+        Column(modifier = Modifier.fillMaxWidth().height(300.dp)) {
             GlideImage(
-                model = imagePrefix+ profile.image, // Replace with your image resource
+                model = imagePrefix + profile.image, // Replace with your image resource
                 contentDescription = "Background Image",
                 contentScale = ContentScale.Crop, // Crop to fill the space
                 modifier = Modifier
@@ -382,50 +376,50 @@ fun DroppedProfileItem(profile: DropProfileResponse, onProfileClicked:()->Unit) 
                         onProfileClicked()
                     }
                     .fillMaxWidth()
-                    .height(heightInDp - 120.dp) // Fill the entire space
+                    .height(250.dp)
             )
 
             // Multiple texts
             Column(
                 modifier = Modifier
-                    .align(Alignment.BottomStart) // Center the entire column
-                    .padding(8.dp), // Add padding for spacing
+                    .padding(8.dp),
                 horizontalAlignment = Alignment.Start,
-                verticalArrangement = Arrangement.Bottom// Center texts horizontally
+                verticalArrangement = Arrangement.Bottom
             ) {
-                Row(modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
-                    profile.createdBy?.let {
-                        Text(
-                            text = it.name,//profile.location,
-                            modifier=Modifier.fillMaxWidth(0.8f),
-                            maxLines=1,
-                            overflow= TextOverflow.Ellipsis,
-                            style = TextStyle(color = Color.White, fontSize = 18.sp)
-                        )
-                    }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
                     Text(
-                        text = profile.expirationTime +" hrs.",
-                        modifier=Modifier.fillMaxWidth(1f),
-                        maxLines=1,
-                        overflow=TextOverflow.Ellipsis,
-                        style = TextStyle(color = Color.White, fontSize = 10.sp)
+                        text =profile.createdBy.name,//profile.location,
+                        modifier = Modifier.fillMaxWidth(0.8f),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        style = TextStyle(color = Color.Black, fontSize = 18.sp)
                     )
+//                    Text(
+//                        text = profile.expirationTime + " hrs.",
+//                        modifier = Modifier.fillMaxWidth(1f),
+//                        maxLines = 1,
+//                        overflow = TextOverflow.Ellipsis,
+//                        style = TextStyle(color = Color.Black, fontSize = 10.sp)
+//                    )
 
                 }
 
                 profile.message?.let {
                     Text(
                         text = it,
-                        style = TextStyle(color = Color.White, fontSize = 10.sp)
+                        style = TextStyle(color = Color.Black, fontSize = 10.sp)
                     )
                 }
             }
         }
 
     }
-
 }
 
 

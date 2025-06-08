@@ -1,4 +1,4 @@
-package com.example.finalapp.screens._3createEvent.privateCreateEvent
+package com.example.finalapp.screens._3createEvent.createEvent
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.size

@@ -6,10 +6,10 @@ import androidx.compose.ui.text.font.FontFamily
 import com.example.finalapp.R
 
 object Constants {
-    const val IP_ADD = "192.168.1.14"//""//"192.168.29.95"
-    const val SOCKET_CHAT_BASE_URL = "http://${IP_ADD}:80/chat/"
-    const val TEMP_SOCKET_URL = "http://${IP_ADD}:5001/";
-    const val BASE_URL = "http://${IP_ADD}:5000/"
+    const val IP_ADD = "3.108.55.84"//""//"192.168.29.95" //  3.108.55.84
+    const val SOCKET_CHAT_BASE_URL = "http://${IP_ADD}/chat/"
+    const val TEMP_SOCKET_URL = "http://${IP_ADD}/";
+    const val BASE_URL = "http://${IP_ADD}/"
     const val APP_NAME="Spint"
     val APP_ICON = R.drawable.app_icon_dynamic
     const val TAG = APP_NAME

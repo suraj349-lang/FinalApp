@@ -81,9 +81,8 @@ import java.io.File
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun PremiumCreateEvent(authViewModel: AuthViewModel, eventsViewModel: EventsViewModel, navController: NavHostController= NavHostController(LocalContext.current)) {
+fun CreateEvent(authViewModel: AuthViewModel, eventsViewModel: EventsViewModel, navController: NavHostController= NavHostController(LocalContext.current)) {
     val buttonsVisible = remember { mutableStateOf(true) }
-    val scope = rememberCoroutineScope()
     val context= LocalContext.current
     val address by authViewModel.address.collectAsState()
     var offerText by remember { mutableStateOf("") }
@@ -378,7 +377,10 @@ fun PremiumCreateEvent(authViewModel: AuthViewModel, eventsViewModel: EventsView
                                             image = uri.toString(),
                                             category = category,
                                             location = address,
-                                            offer = offerText
+                                            offer = offerText,
+                                            user = "",
+                                            userName = "",
+                                            expirationTime = ""
                                         )
                                     )
 
@@ -462,9 +464,7 @@ fun CreateOffer() {
         ) {
             Text(
                 text = "Offer Photo",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 8.dp, top = 8.dp),
+                modifier = Modifier.fillMaxWidth().padding(start = 8.dp, top = 8.dp),
                 textAlign = TextAlign.Start,
                 fontSize = 18.sp,
                 color = Color(0xFF111001)
@@ -480,11 +480,8 @@ fun CreateOffer() {
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.padding(2.dp)
                 )
-
             }
         }
-
-
     }
     OutlinedTextField(
         value = offerText,
@@ -502,12 +499,8 @@ fun CreateOffer() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateEventTopBar(title: String, actionIcon: Int,onActionClicked:()->Unit){
-
-
     TopAppBar(
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = statusBarColor  //  0xF8E2A61A
-        ),
+        colors = TopAppBarDefaults.topAppBarColors(containerColor = statusBarColor),
         title = {
             Text(
                 title,
@@ -520,18 +513,6 @@ fun CreateEventTopBar(title: String, actionIcon: Int,onActionClicked:()->Unit){
             )
         },
         navigationIcon = {
-//            if(navIcon.isNotEmpty()) {
-//                Image(
-//                    painter = painterResource(
-//                        id = navIcon[0]
-//                    ),
-//                    contentDescription = "",
-//                    modifier = Modifier
-//                        .clickable { onActionClicked() }
-//                        .padding(top = 6.dp)
-//                        .size(40.dp)
-//                )
-//            }
             Image(
                 painter = painterResource(
                     id = R.drawable.app_icon
@@ -543,19 +524,16 @@ fun CreateEventTopBar(title: String, actionIcon: Int,onActionClicked:()->Unit){
                     .size(28.dp)
             )
         }, actions = {
-            actionIcon.let {
-                Image(painter = painterResource(id = actionIcon),
-                    contentDescription = "",
-                    colorFilter = ColorFilter.tint(color= Color(0xFF000000)),
-                    modifier = Modifier
-                        .padding(end = 16.dp)
-                        .size(32.dp)
-                        .clickable {
-                            onActionClicked()
-                        })
-
-            }
-
+            Image(painter = painterResource(id = actionIcon),
+                contentDescription = "",
+                colorFilter = ColorFilter.tint(color= Color(0xFF000000)),
+                modifier = Modifier
+                    .padding(end = 16.dp)
+                    .size(32.dp)
+                    .clickable {
+                        onActionClicked()
+                    }
+            )
         }
     )
 }

@@ -25,7 +25,6 @@ import com.example.finalapp.utils.LoginState
 import com.example.finalapp.utils.ProfileObject
 import com.example.finalapp.utils.RequestState
 import com.example.finalapp.utils.TokenObject
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.messaging.ktx.messaging
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -151,6 +150,9 @@ class AuthViewModel @Inject constructor(
                 }
             }
     }
+       fun resetLoginState(){
+           _loginState.value=LoginState.Idle
+       }
        // Function to handle validation errors
        fun setValidationError(message: String) {
            _loginState.value = LoginState.Error(message)
@@ -172,9 +174,15 @@ class AuthViewModel @Inject constructor(
 
             }
     }
-    fun LogoutUser(){
-        val auth:FirebaseAuth=FirebaseAuth.getInstance();
-        auth.signOut()
+    fun logout(onSuccess:()->Unit){
+//        val auth:FirebaseAuth=FirebaseAuth.getInstance();
+//        auth.signOut()
+        viewModelScope.launch {
+            storeLoginState.saveLoginState(false)
+            storeLoginState.saveUserToken("")
+            resetLoginState()
+            onSuccess()
+        }
 
     }
 

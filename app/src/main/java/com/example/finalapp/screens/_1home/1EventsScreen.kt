@@ -81,18 +81,13 @@ fun EventsScreen(
                         modifier = modifier.weight(1f)
                     ) { page ->
                         val event = eventList[page]
-                        if (event.isPrivate) {
-
-                            PrivateEvent(event,navController) // or PrivateLiveEventInUse(navController)
-                        } else {
-                            PublicEvent(
-                                event,
-                                navController,
-                                index = index,
-                                height = height,
-                                imageUrls = imageUrls
-                            ) // pass necessary info
-                        }
+                        PublicEvent(
+                            event,
+                            navController,
+                            index = index,
+                            height = height,
+                            imageUrls = imageUrls
+                        )
                     }
                 }
             }else{
