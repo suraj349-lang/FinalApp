@@ -78,7 +78,7 @@ fun CreateEventMainScreen(navController: NavController, eventsViewModel: EventsV
                                 image = imageKey,
                                 category = type,
                                 location = location,
-                                offer =caption,
+                                description =caption,
                                 expirationTime = "12")
                         )
                     }

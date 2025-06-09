@@ -36,8 +36,8 @@ import com.example.finalapp.screens._3createEvent.createEvent.CreateEventMainScr
 import com.example.finalapp.screens._5settings.SettingsScreenUI
 import com.example.finalapp.testing.TabView
 import com.example.finalapp.screens._3createEvent.PastRaisedOffer
-import com.example.finalapp.screens._3createEvent.CreateEvent
-import com.example.finalapp.screens._3createEvent.publicCreateEvent.publicEventDetails.PublicEventDetailsScreenWrapper
+import com.example.finalapp.screens._3createEvent.createPing.CreatePing
+import com.example.finalapp.screens._3createEvent.createEvent.eventWarScreen.PublicEventDetailsScreenWrapper
 import com.example.finalapp.screens._4profile.ProfileScreenNew
 import com.example.finalapp.screens._4profile.UserPublicProfile
 import com.example.finalapp.screens._4profile.dropProfileUserProfile.DropProfileUserProfile
@@ -145,7 +145,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
         }
         composable(SCREENS.CREATE_PING.route) {
           //  CreateEvent(eventsViewModel, navController)
-            CreateEvent(authViewModel, eventsViewModel, navController)
+            CreatePing(authViewModel, eventsViewModel, navController)
         }
         composable(SCREENS.CREATE_EVENT.route) {
             CreateEventMainScreen(navController,eventsViewModel)

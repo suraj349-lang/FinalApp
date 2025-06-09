@@ -1,4 +1,4 @@
-package com.example.finalapp.screens._3createEvent
+package com.example.finalapp.screens._3createEvent.createPing
 
 import BottomBar
 import android.net.Uri
@@ -48,7 +48,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -81,7 +80,7 @@ import java.io.File
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun CreateEvent(authViewModel: AuthViewModel, eventsViewModel: EventsViewModel, navController: NavHostController= NavHostController(LocalContext.current)) {
+fun CreatePing(authViewModel: AuthViewModel, eventsViewModel: EventsViewModel, navController: NavHostController= NavHostController(LocalContext.current)) {
     val buttonsVisible = remember { mutableStateOf(true) }
     val context= LocalContext.current
     val address by authViewModel.address.collectAsState()
@@ -255,7 +254,7 @@ fun CreateEvent(authViewModel: AuthViewModel, eventsViewModel: EventsViewModel, 
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .wrapContentHeight(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceEvenly){
-                            items(offerList) {offer->
+                            items(offerList) { offer->
                                 Column(
                                     modifier = Modifier.wrapContentSize().padding(start = 20.dp),
                                     verticalArrangement = Arrangement.Center,
