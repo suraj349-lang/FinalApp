@@ -183,15 +183,6 @@ fun PublicEventNewUI(
 
             }
 
-
-//            Box(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .height(80.dp)
-//                    .background(Color.White)
-//            ) {
-//                event.topPostsList?.let { UserReactions(it) {selectedPost-> image = selectedPost} }
-//            }
             PeopleCommentWarAndJoinButtonNewUI(
                   event,
                 onJoinClicked = {
