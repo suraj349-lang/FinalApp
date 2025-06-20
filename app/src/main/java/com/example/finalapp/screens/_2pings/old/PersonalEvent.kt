@@ -83,9 +83,9 @@ fun PersonalEvent() {
 
             TypeLocationDate()
 
-            com.example.finalapp.screens._2pings.CaptionHeader()
+            com.example.finalapp.screens._2pings.CaptionHeader("")
 
-            com.example.finalapp.screens._2pings.Caption()
+            com.example.finalapp.screens._2pings.Caption("")
 
             EventImage() //optional
 

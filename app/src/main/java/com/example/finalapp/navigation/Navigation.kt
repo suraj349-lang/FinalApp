@@ -32,12 +32,12 @@ import com.example.finalapp.screens._4profile.GalleryPicker
 import com.example.finalapp.screens._1home.HomeScreenUI
 import com.example.finalapp.screens._8notification.NotificationsScreenUI
 import com.example.finalapp.screens._2pings.PingsScreenUI
-import com.example.finalapp.screens._3createEvent.createEvent.CreateEventMainScreen
+import com.example.finalapp.screens._3createEventOrPing.createEvent.CreateEventMainScreen
 import com.example.finalapp.screens._5settings.SettingsScreenUI
 import com.example.finalapp.testing.TabView
-import com.example.finalapp.screens._3createEvent.PastRaisedOffer
-import com.example.finalapp.screens._3createEvent.createPing.CreatePing
-import com.example.finalapp.screens._3createEvent.createEvent.eventWarScreen.PublicEventDetailsScreenWrapper
+import com.example.finalapp.screens._3createEventOrPing.PastRaisedOffer
+import com.example.finalapp.screens._3createEventOrPing.createEvent.eventWarScreen.PublicEventDetailsScreenWrapper
+import com.example.finalapp.screens._3createEventOrPing.createPing.CreatePingMainScreen
 import com.example.finalapp.screens._4profile.ProfileScreenNew
 import com.example.finalapp.screens._4profile.UserPublicProfile
 import com.example.finalapp.screens._4profile.dropProfileUserProfile.DropProfileUserProfile
@@ -133,7 +133,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
             //AllProfiles(profileViewModel)
         }
         composable(SCREENS.PINGS.route){
-            PingsScreenUI(navController)
+            PingsScreenUI(navController,eventsViewModel)
         }
 
         composable(SCREENS.PAST_OFFERS.route){
@@ -145,7 +145,8 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
         }
         composable(SCREENS.CREATE_PING.route) {
           //  CreateEvent(eventsViewModel, navController)
-            CreatePing(authViewModel, eventsViewModel, navController)
+            //CreatePing(authViewModel, eventsViewModel, navController)
+            CreatePingMainScreen(navController,eventsViewModel)
         }
         composable(SCREENS.CREATE_EVENT.route) {
             CreateEventMainScreen(navController,eventsViewModel)

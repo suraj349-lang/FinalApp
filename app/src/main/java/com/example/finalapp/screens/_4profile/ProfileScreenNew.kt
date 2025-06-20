@@ -61,7 +61,7 @@ import com.example.finalapp.R
 import com.example.finalapp.model.DropProfileResponse
 import com.example.finalapp.model.EventResponse
 import com.example.finalapp.navigation.SCREENS
-import com.example.finalapp.screens._3createEvent.CreateEventOrPingBottomSheet
+import com.example.finalapp.screens._3createEventOrPing.CreateEventOrPingBottomSheet
 import com.example.finalapp.screens.common.CommonErrorScreen
 import com.example.finalapp.screens.dialogBox.DropProfileDialog
 import com.example.finalapp.screens.dialogBox.uriToFile

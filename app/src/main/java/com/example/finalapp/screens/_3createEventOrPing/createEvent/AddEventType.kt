@@ -1,4 +1,4 @@
-package com.example.finalapp.screens._3createEvent.createEvent
+package com.example.finalapp.screens._3createEventOrPing.createEvent
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border

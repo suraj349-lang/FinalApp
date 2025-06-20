@@ -1,6 +1,7 @@
 package com.example.finalapp.screens._2pings
 
 import BottomBar
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,9 +21,12 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,15 +37,21 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.finalapp.screens._3createEvent.CreateEventOrPingBottomSheet
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
+import com.example.finalapp.model.DropProfileResponse
+import com.example.finalapp.screens._3createEventOrPing.CreateEventOrPingBottomSheet
+import com.example.finalapp.screens.common.CommonErrorScreen
+import com.example.finalapp.ui.theme.floatingActionBtnColor
+import com.example.finalapp.utils.UserLocation
 import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
+import com.example.finalapp.viewmodels.EventsViewModel
 
 @Composable
-fun PingsScreenUI(navController:NavHostController) {
+fun PingsScreenUI(navController:NavHostController,eventsViewModel: EventsViewModel) {
     val buttonsVisible = remember { mutableStateOf(true) }
-    var searchBox by remember {
-        mutableStateOf(false)
-    }
+    var searchBox by remember { mutableStateOf(false) }
+    var showLoader by remember { mutableStateOf(false) }
     val listState = rememberLazyListState()
     var isScrollingUp by remember { mutableStateOf(true) }
     var previousIndex by remember { mutableStateOf(0) }
@@ -49,8 +59,13 @@ fun PingsScreenUI(navController:NavHostController) {
     var showSheet by remember {
         mutableStateOf(false)
     }
+    val allPings by eventsViewModel.allPingsFlow.collectAsState()
+    val allPingsState = allPings?.collectAsLazyPagingItems()
 
-    LaunchedEffect(listState.firstVisibleItemIndex, listState.firstVisibleItemScrollOffset) {
+    LaunchedEffect(key1 = Unit){
+        eventsViewModel.getAllPings(UserLocation.address.toString())
+    }
+    LaunchedEffect(remember { derivedStateOf { listState.firstVisibleItemIndex } }, remember { derivedStateOf { listState.firstVisibleItemScrollOffset } }) {
         val currentIndex = listState.firstVisibleItemIndex
         val currentOffset = listState.firstVisibleItemScrollOffset
 
@@ -79,24 +94,73 @@ fun PingsScreenUI(navController:NavHostController) {
                 showSheet=true
             }
         }
-    ) {
+    ) { it ->
         Surface(modifier = Modifier
             .padding(it)
             .fillMaxSize()) {
             Column(modifier = Modifier.fillMaxSize()) {
                 AnimatedVisibility(visible = isScrollingUp) {
                     Column {
+                        if(showLoader && allPingsState?.itemCount==0) LinearProgressIndicator(modifier = Modifier
+                            .fillMaxWidth()
+                            .height(8.dp), color = floatingActionBtnColor
+                        )
                         SearchBar()
                         PingCategories(categories)
+                        LazyColumn(
+                            state = listState
+                        ) {
+                            allPingsState?.itemCount?.let {
+                                Log.i("POSTCOUNT", "PingsScreenUI: $it")
+                                items(it) { index ->
+                                    val item = allPingsState[index]
+                                    if (item != null) {
+                                        PingsItemUI(
+                                            item,
+                                            onShareClicked = {},
+                                            onRespondClicked = {}
+                                        )
+                                    }
+                                }
+                            }
+                            allPingsState?.apply {
+                                when {
+                                    loadState.refresh is LoadState.Loading -> {
+                                        item {
+                                            showLoader=true
+                                        }
+                                    }
+
+                                    loadState.append is LoadState.Loading -> {
+                                        item {
+                                            showLoader=true
+                                        }
+                                    }
+
+                                    loadState.refresh is LoadState.Error -> {
+                                        showLoader=false
+                                        val error = (loadState.refresh as LoadState.Error).error
+                                        item {
+                                            Log.e("Error in getting pings", "PingsScreenUI: $error " )
+                                            CommonErrorScreen(error = "Error getting pings.",true){
+                                               // eventsViewModel.getAllPings("")
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
 
-                PingsScreen(listState)
+
+            }
+
             }
         }
         CreateEventOrPingBottomSheet(showSheet = showSheet, onDismiss = { showSheet=!showSheet }, navHostController =navController )
     }
-}
+
 @Composable
 fun PingCategories(categories: List<Category>) {
     var selectedCategory by remember { mutableStateOf<Category?>(categories[0]) }
@@ -144,17 +208,7 @@ fun PingCategories(categories: List<Category>) {
 }
 
 @Composable
-fun PingsScreen(listState: LazyListState) {
-    LazyColumn(state = listState){
-        items(30) {
-            Box(
-                modifier = Modifier
-                    .padding(horizontal = 8.dp, vertical = 8.dp)
-                    .fillMaxSize()
-            ) {
-                PingsItemUI()
-            }
-        }
-    }
+fun PingsScreen(listState: LazyListState, item: DropProfileResponse) {
+
 }
 

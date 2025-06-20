@@ -1,4 +1,4 @@
-package com.example.finalapp.screens._3createEvent
+package com.example.finalapp.screens._3createEventOrPing
 
 import BottomBar
 import androidx.compose.foundation.background

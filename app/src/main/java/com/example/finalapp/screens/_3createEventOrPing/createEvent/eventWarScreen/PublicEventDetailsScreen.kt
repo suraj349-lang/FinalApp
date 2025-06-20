@@ -1,4 +1,4 @@
-package com.example.finalapp.screens._3createEvent.createEvent.eventWarScreen
+package com.example.finalapp.screens._3createEventOrPing.createEvent.eventWarScreen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable

@@ -19,9 +19,14 @@ import com.example.finalapp.model.ImageUploadResponse
 import com.example.finalapp.model.LoginAPIResponse
 import com.example.finalapp.model.AllEventsResponseDTO
 import com.example.finalapp.model.ChatList
+import com.example.finalapp.model.CreatePingResponse
 import com.example.finalapp.model.FCMTokenResponse
 import com.example.finalapp.model.Message
 import com.example.finalapp.model.PremiumEventResponseDTO
+import com.example.finalapp.model.pings.PingRequestDto
+import com.example.finalapp.model.pings.PingResponse
+import com.example.finalapp.repository.Resource
+import com.example.finalapp.utils.AllPingsResponse
 import com.example.finalapp.utils.ApiResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -64,6 +69,14 @@ interface ApiService {
     @GET("/api/v1/dropProfile/dropProfileByUser")
     suspend fun getUserDropProfiles(@Query("id") id:String): GetDropProfileResponseModel
     //---------------------------------------------------------------------//
+    @POST("/api/v1/ping")
+    suspend fun createPing(@Body event:PingRequestDto):CreatePingResponse
+    //---------------------------------------------------------------------//
+
+    @GET("/api/v1/ping")
+    suspend fun getAllPings(@Query("page") page:Int): AllPingsResponse<List<PingResponse>>
+
+    //-----------------------------------------------------------------//
     @GET("api/getPreSignedUrl")
     suspend fun getPreSignedUrl(@Query("id") id:String): PreSignedUrlResponse
 //    @PUT

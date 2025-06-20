@@ -1,11 +1,10 @@
 package com.example.finalapp.screens._2pings
 
 
-import androidx.compose.animation.animateColor
-import androidx.compose.animation.core.*
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,22 +21,26 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import coil.compose.AsyncImage
 import com.example.finalapp.R
-import com.example.finalapp.screens._2pings.old.EventImage
+import com.example.finalapp.model.pings.PingResponse
+import com.example.finalapp.ui.imagePrefix
 import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.utils.constants.Constants
 import kotlinx.coroutines.delay
 
 
-@Preview
+
+
 @Composable
-fun PingsItemUI() {
+fun PingsItemUI(item: PingResponse,onShareClicked: () -> Unit,onRespondClicked: () -> Unit) {
 
     Card(
         modifier = Modifier
@@ -48,7 +51,10 @@ fun PingsItemUI() {
         border = BorderStroke(width = 1.dp, color = floatingActionBtnColor.copy(alpha = 0.5f))
     ) {
         Column {
-            UserImageNameTime2()
+
+            if(item.user !=null && item.user.username.isNotEmpty() && item.user.profileImage.isNotEmpty()){
+                UserImageNameTime2(item.user.username,item.user.profileImage,item.expirationTime)
+            }
             Column(
                 modifier = Modifier
                     .wrapContentSize()
@@ -58,19 +64,19 @@ fun PingsItemUI() {
             ) {
                 TypeLocationDate2()
               //  StatusBadge(status = "Active", urgency = "Expiring soon")
-                EventImage()
-                CaptionHeader()
-                Caption()
-                CountdownTimer(eventTimeMillis = System.currentTimeMillis() + 3600000L) // 1 hour from now
+                EventImage2(item.image)
+                item.title?.let { CaptionHeader(it) }
+                Caption(item.category)
+              //  CountdownTimer(eventTimeMillis = System.currentTimeMillis() + 3600000L) // 1 hour from now
                 Divider(Modifier.fillMaxWidth(), thickness = 1.dp, color = Color.LightGray)
-                ShareLikeRespond(onRespondClicked = { /* handle response */ })
+                ShareLikeRespond(item.totalUpVotes,{onShareClicked()},onRespondClicked = {onRespondClicked()})
             }
         }
     }
 }
 
 @Composable
-fun UserImageNameTime2() {
+fun UserImageNameTime2(username:String,image:String,time:String) {
     Row(
         modifier = Modifier
             .background(color = floatingActionBtnColor)
@@ -82,17 +88,17 @@ fun UserImageNameTime2() {
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Card(modifier = Modifier.size(40.dp), shape = CircleShape) {
-                Image(
-                    painter = painterResource(id = R.drawable.profile_image_3),
+                AsyncImage(
+                    model=image,
                     contentDescription = null,
                     modifier=Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
                 )
             }
             Spacer(modifier = Modifier.width(10.dp))
-            Text("suraj__3494", fontFamily = Constants.FONT_MEDIUM, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+            Text(username, fontFamily = Constants.FONT_MEDIUM, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
         }
-        Text("8 hrs ago", fontFamily = Constants.FONT_MEDIUM, fontSize = 14.sp, color = Color.White)
+        Text(time, fontFamily = Constants.FONT_MEDIUM, fontSize = 14.sp, color = Color.White)
     }
 }
 
@@ -178,14 +184,14 @@ fun StatusBadge(status: String?, urgency: String) {
 }
 
 @Composable
-fun CaptionHeader() {
+fun CaptionHeader(title:String) {
     Card(
         Modifier
             .fillMaxWidth()
             .wrapContentHeight(), colors = CardDefaults.cardColors(containerColor = Color.LightGray), shape = RoundedCornerShape(6.dp)
     ) {
         Text(
-            "Pick Your Vibe Partner",
+            title.capitalize(),
             modifier = Modifier.padding(start = 8.dp),
             fontSize = 20.sp,
             fontWeight = FontWeight.SemiBold,
@@ -199,15 +205,16 @@ fun CaptionHeader() {
 }
 
 @Composable
-fun Caption() {
-    Text(
-        "Post your interest. Wait for others to respond. Choose who you want to go out with!",
-        fontSize = 14.sp,
-        color = Color.DarkGray,
-        fontFamily = Constants.FONT_EXTRA_LIGHT,
-        maxLines = 4,
-        overflow = TextOverflow.Ellipsis
-    )
+fun Caption(caption:String?) {
+    if (caption != null) {
+        Text(caption,
+            fontSize = 14.sp,
+            color = Color.DarkGray,
+            fontFamily = Constants.FONT_EXTRA_LIGHT,
+            maxLines = 4,
+            overflow = TextOverflow.Ellipsis
+        )
+    }
 }
 
 @Composable
@@ -259,7 +266,7 @@ fun ResponderAvatars(responderImageIds: List<Int>) {
 
 
 @Composable
-fun ShareLikeRespond(onRespondClicked: () -> Unit) {
+fun ShareLikeRespond(totalViews:Int?,onShareClicked:()->Unit,onRespondClicked: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -275,18 +282,23 @@ fun ShareLikeRespond(onRespondClicked: () -> Unit) {
 //            )
 //        )
         Row(horizontalArrangement = Arrangement.spacedBy(16.dp), modifier = Modifier.padding(top=8.dp), verticalAlignment = Alignment.CenterVertically) {
-            IconWithLabel(R.drawable.people, "20")
-            IconWithLabel(R.drawable.share, "Share")
+
+            IconWithLabel(iconRes = R.drawable.people, label = totalViews.toString(),isShareButton = false)
+            IconWithLabel(R.drawable.share, "Share",isShareButton = true,onShareClicked={onShareClicked()})
         }
-        RespondButton {}
+        RespondButton {onRespondClicked()}
        // AnimatedRespondButton(onClick = onRespondClicked)
     }
 }
 
 
 @Composable
-fun IconWithLabel(iconRes: Int, label: String) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+fun IconWithLabel(iconRes: Int, label: String,isShareButton:Boolean,onShareClicked: () -> Unit={}) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.clickable {
+        if(isShareButton){
+            onShareClicked()
+        }
+    }) {
         Image(
             painter = painterResource(id = iconRes),
             contentDescription = "",
@@ -314,6 +326,17 @@ fun RespondButton(onClick: () -> Unit) {
             fontFamily = Constants.FONT_MEDIUM,
             fontSize = 14.sp,
             color = Color.White
+        )
+    }
+}
+@Composable
+fun EventImage2(image: String) {
+    Card(modifier = Modifier
+        .fillMaxWidth()
+        .height(200.dp), colors = CardDefaults.cardColors(containerColor = Color.Black)) {
+        AsyncImage(model = imagePrefix + image, contentDescription ="", modifier = Modifier
+            .fillMaxWidth()
+            .aspectRatio(16f / 9f), contentScale = ContentScale.Fit
         )
     }
 }

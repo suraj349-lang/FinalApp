@@ -1,7 +1,7 @@
-package com.example.finalapp.screens._1home.privateEvent
+package com.example.finalapp.screens._3createEventOrPing.createEvent
 
-import android.app.Activity
-import android.util.Log
+
+import android.net.Uri
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -10,7 +10,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -38,7 +37,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -46,141 +44,117 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.view.WindowInsetsControllerCompat
-import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
-import com.example.finalapp.model.EventResponse
-import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens._1home._1_1ExperimentScreenEvents.ActiveButton
 import com.example.finalapp.screens._1home._1_1ExperimentScreenEvents.DONGLE
 import com.example.finalapp.screens._1home._1_1ExperimentScreenEvents.SANS
 import com.example.finalapp.screens._1home._1_1ExperimentScreenEvents.images
-import com.example.finalapp.ui.imagePrefix
+import com.example.finalapp.utils.ProfileObject
 import com.example.finalapp.utils.constants.Constants
-import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun PrivateEvent(event: EventResponse,navController: NavHostController) {
-
-//    SideEffect {
-//        window.statusBarColor = Color.White.toArgb()
-//        WindowInsetsControllerCompat(window, view).isAppearanceLightStatusBars = true
-//    }
-        Surface(modifier = Modifier
-            .fillMaxSize()) {
-            Column(modifier = Modifier.fillMaxSize()) {
-                Box(modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight()){
-                    // IMAGE
-                    GlideImage(model = imagePrefix+event.image.ifEmpty { R.drawable.girl }, contentDescription = "",
-                        Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight(0.64f), contentScale = ContentScale.Crop)
-                    //--------------------active button and expiration time----------------------
-                    Box(modifier = Modifier.align(Alignment.TopStart)){
-                        ActiveButtonAndExpirationTime()
-                    }
-                    //---------------------------------------------------------------------------
-                    Column(modifier = Modifier
+fun PreviewCreateEvent(uri: Uri?,
+                       caption: String,
+                       eventType: String) {
+    Surface(modifier = Modifier
+        .fillMaxSize().padding(16.dp)) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            Box(modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight()){
+                // IMAGE
+                GlideImage(model = uri, contentDescription = "",
+                    Modifier
                         .fillMaxWidth()
-                        .wrapContentHeight()
-                        .align(Alignment.BottomCenter)) {
-                        //------------------ username and user image----------------------------------------------------
-                        UsernameAndUserProfileImage(event.user?.username)
+                        .fillMaxHeight(0.7f), contentScale = ContentScale.FillBounds)
+                //--------------------active button and expiration time----------------------
+                Box(modifier = Modifier.align(Alignment.TopStart)){
+                    ActiveButtonAndExpirationTime()
+                }
+                //---------------------------------------------------------------------------
+                Column(modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .align(Alignment.BottomCenter)) {
+                    //------------------ username and user image----------------------------------------------------
+                    UsernameAndUserProfileImage(ProfileObject.profile?.username!!)
 
-                        Divider(modifier = Modifier.fillMaxWidth(), thickness = 1.dp, color = Color.LightGray)
+                    Divider(modifier = Modifier.fillMaxWidth(), thickness = 1.dp, color = Color.LightGray)
 
-                        //----------------- Event comments and join button bar------------------------------------------
-                        Row(modifier= Modifier
+                    //----------------- Event comments and join button bar------------------------------------------
+                    Row(modifier= Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()) {
+                        Card(modifier = Modifier
                             .fillMaxWidth()
-                            .wrapContentHeight()) {
-                            Card(modifier = Modifier
-                                .fillMaxWidth()
-                                .height(50.dp),
-                                shape= RoundedCornerShape(0.dp)
-                                , colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.7f))) {
-                                EventCommentsAndJoinButtonBar(onJoinButtonClicked = {navController.navigate("")})
-                            }
+                            .height(50.dp),
+                            shape= RoundedCornerShape(0.dp)
+                            , colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.7f))) {
+                            EventCommentsAndJoinButtonBar()
                         }
-                        //--------------event category and offer -----------------------------------------------------------
+                    }
+                    //--------------event category and offer -----------------------------------------------------------
 
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .wrapContentHeight(), shape = RoundedCornerShape(0.dp)
-                        ) {
-                            Column {
-                                Row(
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentHeight(), shape = RoundedCornerShape(0.dp)
+                    ) {
+                        Column {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .wrapContentHeight(),
+                                horizontalArrangement = Arrangement.spacedBy(2.dp)
+                            ) {
+                                Card(
                                     modifier = Modifier
-                                        .fillMaxWidth()
-                                        .wrapContentHeight(),
-                                    horizontalArrangement = Arrangement.spacedBy(2.dp)
+                                        .height(60.dp)
+                                        .width(60.dp)
                                 ) {
-                                    Card(
-                                        modifier = Modifier
-                                            .height(60.dp)
-                                            .width(60.dp)
-                                    ) {
-                                        EventCategory(event.category)
-                                    }
-                                    Card(
-                                        modifier = Modifier
-                                            .width(350.dp)
-                                            .height(80.dp), shape = RoundedCornerShape(0.dp)
-                                    ) {
-                                        Column(modifier = Modifier.wrapContentSize(), verticalArrangement = Arrangement.Top) {
-                                            event.offer?.let { EventOffer(it) }
-                                        }
-                                    }
-
+                                    EventCategory(eventType)
                                 }
                                 Card(
                                     modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(24.dp), shape = RoundedCornerShape(0.dp)
+                                        .width(350.dp)
+                                        .height(80.dp), shape = RoundedCornerShape(0.dp)
                                 ) {
-                                    RunningText4(event.location)
+                                    Column(modifier = Modifier.wrapContentSize(), verticalArrangement = Arrangement.Top) {
+                                        EventOffer(caption)
+                                    }
                                 }
+
+                            }
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(24.dp), shape = RoundedCornerShape(0.dp)
+                            ) {
+                                RunningText4(ProfileObject.profile?.address!!)
                             }
                         }
-                        //------hot this weekend-----------------------------------------------------------------
-
-                        Row(modifier= Modifier
-                            .fillMaxWidth()
-                            .wrapContentHeight()) {
-                            Card(modifier = Modifier
-                                .fillMaxWidth()
-                                .height(80.dp), shape = RoundedCornerShape(0.dp), colors = CardDefaults.cardColors(containerColor = Color(
-                                0xFFF3EA97
-                            )
-                            )) {
-                                HotThisWeekendBanner4()
-                            }
-                        }
-                        //----------------------------------------------------------------------------------------------
-                        Divider(modifier= Modifier
-                            .fillMaxWidth()
-                            .padding(top = 4.dp), thickness = 0.5.dp, color = Color.LightGray)
-
                     }
+                    //----------------------------------------------------------------------------------------------
+                    Divider(modifier= Modifier
+                        .fillMaxWidth()
+                        .padding(top = 4.dp), thickness = 0.5.dp, color = Color.LightGray)
+
                 }
             }
         }
+    }
 }
 
 @Composable
@@ -297,7 +271,6 @@ fun ApproveOrJoin4(modifier: Modifier = Modifier) {
     }
 }
 
-
 @Composable
 fun UsernameAndUserProfileImage(username:String?) {
     Row(
@@ -353,15 +326,12 @@ fun EventOffer(offer:String) {
         .background(color = Color(0xFFFFFFFF).copy(alpha = 0.6f))
         .padding(top = 6.dp)) {
         Text(offer,  fontFamily = SANS,maxLines = 4, fontSize = 12.sp, lineHeight = 16.sp, overflow = TextOverflow.Ellipsis, color = Color(0xFF2196F3),fontWeight = FontWeight.SemiBold,modifier = Modifier.padding(start = 4.dp,end=4.dp))
-//        Text("see more...", fontFamily = DONGLE,modifier = Modifier
-//            .padding(end = 4.dp)
-//            .align(Alignment.BottomEnd), color = Color(0xFF2196F3))
     }
 
 }
 
 @Composable
-fun EventCommentsAndJoinButtonBar(onJoinButtonClicked:()->Unit) {
+fun EventCommentsAndJoinButtonBar() {
     Row(modifier = Modifier.fillMaxSize(), horizontalArrangement = Arrangement.SpaceBetween) {
         Row(
             modifier = Modifier
@@ -428,7 +398,7 @@ fun EventCommentsAndJoinButtonBar(onJoinButtonClicked:()->Unit) {
                 Text("Share", fontSize = 8.sp, fontWeight = FontWeight.SemiBold)
             }
         }
-        Card(modifier = Modifier.wrapContentSize().clickable { onJoinButtonClicked() }) {
+        Card(modifier = Modifier.wrapContentSize()) {
             Row(
                 modifier = Modifier
                     .fillMaxHeight()

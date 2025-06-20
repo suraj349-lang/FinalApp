@@ -1,4 +1,4 @@
-package com.example.finalapp.screens._3createEvent.createPing
+package com.example.finalapp.screens._3createEventOrPing.createPing.unused
 
 import BottomBar
 import android.net.Uri

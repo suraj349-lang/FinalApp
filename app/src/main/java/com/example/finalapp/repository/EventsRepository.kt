@@ -10,9 +10,13 @@ import com.example.finalapp.model.EventRequestDTO
 import com.example.finalapp.model.EventResponseDTO
 import com.example.finalapp.model.ImageUploadResponse
 import com.example.finalapp.model.AllEventsResponseDTO
+import com.example.finalapp.model.CreatePingResponse
 import com.example.finalapp.model.PremiumEventResponseDTO
+import com.example.finalapp.model.pings.PingRequestDto
+import com.example.finalapp.model.pings.PingResponse
 import com.example.finalapp.network.ApiService
 import com.example.finalapp.screens._4profile.uriToMultipart
+import com.example.finalapp.utils.AllPingsResponse
 import com.example.finalapp.utils.ApiResponse
 import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.Dispatchers
@@ -72,6 +76,16 @@ class EventsRepository @Inject constructor(private val api: ApiService) {
             val filePart = uriToMultipart(imageUri, context)
             api.uploadImage(filePart) })
     }.flowOn(Dispatchers.IO)
+
+    suspend fun createPing(data:PingRequestDto):Flow<CreatePingResponse> = flow {
+        emit(api.createPing(data))
+    }.flowOn(Dispatchers.IO)
+
+    suspend fun getAllPings(page:Int): AllPingsResponse<List<PingResponse>> {
+        return api.getAllPings(page)
+    }
+
+
 }
 
 //data class DataOrException<T,Boolean,E:Exception>(

@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Divider
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -61,8 +60,8 @@ import com.example.finalapp.login.PhoneLogin
 import com.example.finalapp.model.User
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens.onboarding.util.OnBoardingPage
-import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.utils.LoginState
+import com.example.finalapp.utils.UserLocation
 import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.utils.constants.Constants.APP_NAME_FONT
 import com.google.accompanist.pager.ExperimentalPagerApi

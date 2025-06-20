@@ -50,7 +50,7 @@ import com.example.finalapp.R
 import com.example.finalapp.viewmodels.AuthViewModel
 import com.example.finalapp.screens._1home.commonUI.HomeFloatingActionButton
 import com.example.finalapp.screens._1home.commonUI.HomeTopBar
-import com.example.finalapp.screens._3createEvent.CreateEventOrPingBottomSheet
+import com.example.finalapp.screens._3createEventOrPing.CreateEventOrPingBottomSheet
 import com.example.finalapp.viewmodels.EventsViewModel
 import com.example.finalapp.screens.dialogBox.ShowQRDialog
 import com.example.finalapp.screens.dialogBox.showDialog

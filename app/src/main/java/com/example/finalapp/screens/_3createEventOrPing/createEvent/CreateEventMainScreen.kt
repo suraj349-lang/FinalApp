@@ -1,4 +1,4 @@
-package com.example.finalapp.screens._3createEvent.createEvent
+package com.example.finalapp.screens._3createEventOrPing.createEvent
 
 import android.net.Uri
 import androidx.compose.foundation.layout.fillMaxSize

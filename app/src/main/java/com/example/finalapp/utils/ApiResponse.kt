@@ -6,3 +6,10 @@ data class ApiResponse<T>(
     val data:T,
     val error:String
 )
+
+
+data class AllPingsResponse<T>(
+    val success:Boolean,
+    val code:Int,
+    val data:T,
+)

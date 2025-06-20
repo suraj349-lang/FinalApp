@@ -21,12 +21,15 @@ import com.example.finalapp.model.EventResponseDTO
 import com.example.finalapp.model.GetDropProfileResponseModel
 import com.example.finalapp.model.PremiumEventResponseDTO
 import com.example.finalapp.model.User
+import com.example.finalapp.model.pings.PingRequestDto
+import com.example.finalapp.model.pings.PingResponse
 import com.example.finalapp.paging.DirectChatUsersPagingSource
 import com.example.finalapp.paging.DropProfilePagingSource
 import com.example.finalapp.repository.ChatDatabaseRepository
 import com.example.finalapp.repository.EventsRepository
 import com.example.finalapp.repository.ProfileRepository
 import com.example.finalapp.repository.Resource
+import com.example.finalapp.screens._2pings.PingsPagingSource
 import com.example.finalapp.utils.RequestState
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.AutocompletePrediction
@@ -360,6 +363,53 @@ class EventsViewModel @Inject constructor(
                 Log.d(TAG,premiumCreateEventResponse.value.toString())
             }
     }
+   //----------------------------------------------------------------------------------------------------------------------------------//
+
+    private var _createPingResponse:MutableStateFlow<RequestState<String>> = MutableStateFlow(RequestState.Idle)
+    var createPingResponse :StateFlow<RequestState<String>> = _createPingResponse
+
+    fun createPing(ping:PingRequestDto)=viewModelScope.launch(Dispatchers.IO) {
+        val tag="CREATE_PING_RESPONSE"
+
+        eventsRepository.createPing(ping)
+            .onStart {
+                _createPingResponse.value=RequestState.Loading;
+
+                Log.d(tag,_createPingResponse.value.toString())
+            }
+            .catch {
+
+                Log.e(tag,it.printStackTrace().toString())
+                _createPingResponse.value=RequestState.Error(it)
+                Log.e(tag,it.message.toString())
+            }
+            .collect {
+                if(it.success.uppercase() =="TRUE") {
+                    Log.i(tag, "createPing: success")
+                    createEventIsSuccess.value=true
+                    _createPingResponse.value = RequestState.Success(it.data);
+                }else{
+                    Log.e(tag, it.message)
+                   // _createPingResponse.value = RequestState.Error(it);
+                }
+
+            }
+    }
+
+//--------------------------------------------------------------------------------------------------------------------//
+
+    private val _allPingsFlow = MutableStateFlow<Flow<PagingData<PingResponse>>?>(null)
+    val allPingsFlow: StateFlow<Flow<PagingData<PingResponse>>?> = _allPingsFlow.asStateFlow()
+//    private val _shouldLoadDroppedProfiles= MutableStateFlow(false)
+//    val shouldLoadDroppedProfiles:StateFlow<Boolean>  = _shouldLoadDroppedProfiles
+
+    fun getAllPings(location:String) {
+        _allPingsFlow.value = Pager(
+            config = PagingConfig(pageSize = 10, prefetchDistance = 5),
+            pagingSourceFactory = { PingsPagingSource(eventsRepository) }
+        ).flow.cachedIn(viewModelScope)
+    }
+
 
 
     private val _saveUserToChatListResponseState= MutableStateFlow<RequestState<ChatList>>(RequestState.Idle)

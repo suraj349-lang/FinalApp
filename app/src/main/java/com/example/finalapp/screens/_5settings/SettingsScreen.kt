@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.finalapp.navigation.SCREENS
-import com.example.finalapp.screens._3createEvent.CreateEventOrPingBottomSheet
+import com.example.finalapp.screens._3createEventOrPing.CreateEventOrPingBottomSheet
 import com.example.finalapp.screens.common.BackImage
 import com.example.finalapp.ui.theme.LIGHT_GREEN
 import com.example.finalapp.ui.theme.LIGHT_GREY_BG_COLOR
