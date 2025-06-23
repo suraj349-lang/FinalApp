@@ -17,14 +17,14 @@ import com.example.finalapp.enums.ImageUploadScreens
 import com.example.finalapp.model.DropProfileResponse
 import com.example.finalapp.viewmodels.ChatViewModel
 import com.example.finalapp.viewmodels.AuthViewModel
-import com.example.finalapp.loginActivity.auth.util.EnterOTPScreenUI
+import com.example.finalapp.screens.auth.util.EnterOTPScreenUI
 
-import com.example.finalapp.loginActivity.auth.LoginScreenUI
-import com.example.finalapp.loginActivity.auth.SignupScreenUI
-import com.example.finalapp.loginActivity.auth.SplashScreenUI
-import com.example.finalapp.loginActivity.auth.util.OtpBox
+import com.example.finalapp.screens.auth.LoginScreenUI
+import com.example.finalapp.screens.auth.SignupScreenUI
+import com.example.finalapp.screens.auth.SplashScreenUI
+import com.example.finalapp.screens.auth.util.OtpBox
 import com.example.finalapp.screens._6chat.SingleChatScreenUI
-import com.example.finalapp.loginActivity.auth.FinalUserCreation
+import com.example.finalapp.screens.auth.FinalUserCreation
 import com.example.finalapp.qrScanning.QRScannerScreen
 import com.example.finalapp.viewmodels.EventsViewModel
 import com.example.finalapp.screens._6chat.ChatListScreen

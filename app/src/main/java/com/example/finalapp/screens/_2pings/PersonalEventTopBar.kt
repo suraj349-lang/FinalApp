@@ -9,29 +9,32 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.finalapp.R
-import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.utils.constants.Constants
 
 @Composable
-fun PingsTopBar(showIcon: Boolean, onSearchIconClicked: () -> Unit) {
+fun PingsTopBar(backgroundColor: Color, showIcon: Boolean, onSearchIconClicked: () -> Unit) {
     TopAppBar(
-        title = { Text(text = "Pings", fontFamily = Constants.FONT_MEDIUM, fontSize = 24.sp, color = floatingActionBtnColor ) },
+        title = { Text(text = "Pings", fontSize = 24.sp, color = Color.White , fontFamily = Constants.FONT_EXTRA_LIGHT) },
         navigationIcon = {
-                         Image(painter = painterResource(id = R.drawable.back), contentDescription ="", modifier = Modifier.size(28.dp).padding(end=4.dp) )
+                         Image(painter = painterResource(id = R.drawable.baseline_arrow_back_24), contentDescription ="", colorFilter = ColorFilter.tint(
+                             Color.White), modifier = Modifier.size(28.dp).padding(end=4.dp) )
         },
         actions = {
             if(!showIcon) {
                 Image(
-                    painter = painterResource(id = R.drawable.search_new),
+                    painter = painterResource(id = R.drawable.search_new_filled),
                     contentDescription = "",
+                    colorFilter = ColorFilter.tint(
+                        Color.White),
                     modifier = Modifier.padding(end = 16.dp).size(28.dp).clickable { onSearchIconClicked() })
             }
         },
-        backgroundColor = Color.White
+        backgroundColor = backgroundColor
     )
 
 }

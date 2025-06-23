@@ -18,6 +18,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.finalapp.R
@@ -32,8 +33,7 @@ fun SearchBar() {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .wrapContentHeight(),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFFFFE))
+            .wrapContentHeight(), colors = CardDefaults.cardColors(containerColor = Color.DarkGray),
     ) {
         OutlinedTextField(
             value = searchText,
@@ -42,14 +42,21 @@ fun SearchBar() {
             maxLines=1,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 12.dp, end = 12.dp, top = 12.dp, bottom = 4.dp),
+                .padding(4.dp),
             colors = TextFieldDefaults.outlinedTextFieldColors(
                 focusedBorderColor = Color.DarkGray,
                 unfocusedBorderColor = Color.DarkGray,
-                cursorColor = Color.Red
+                cursorColor = Color.Red,
+                backgroundColor = Color.Black
             ),
-            placeholder = { Text(text = "Search", fontFamily = Constants.FONT_MEDIUM) },
-            trailingIcon = { Image(painter = painterResource(id = R.drawable.search_new), contentDescription = "", modifier = Modifier.size(20.dp))}
+            placeholder = { Text(text = "Search", fontFamily = Constants.FONT_MEDIUM, color = Color.White) },
+            trailingIcon = {
+                Image(
+                    painter = painterResource(id = R.drawable.search_new),
+                    colorFilter = ColorFilter.tint(Color.White),
+                    contentDescription = "", modifier = Modifier.size(20.dp)
+                )
+            }
         )
     }
 }

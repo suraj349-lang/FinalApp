@@ -10,7 +10,7 @@ import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.finalapp.repository.AuthRepository
-import com.example.finalapp.loginActivity.auth.RESPONSE
+import com.example.finalapp.screens.auth.RESPONSE
 import com.example.finalapp.database.Profile
 import com.example.finalapp.datastore.StoreLoginState
 import com.example.finalapp.fcm.stateObject.SendFcmTokenDto

@@ -56,14 +56,14 @@ data class Category(
     var isSelected: Boolean = false
 )
 val categories = listOf(
-    Category("All", color = floatingActionBtnColor),
-    Category("Sports", color = Color(0xFF07498A)),
-    Category("Cinema", color = Color(0xFFCE9506)),
-    Category("Politics", color = Color(0xFF06880C)),
-    Category("Entertainment",color= Color(0xFFD32F2F)),
-    Category("News",color= Color(0xFFC2185B)),
-    Category("Comedy",color= Color(0xFF512DA8)),
-    Category("Crime",color= Color(0xFF1D9BA8)),
-    Category("Elections",color= Color(0xFF15AD9C)),
-    Category("Protest",color= Color(0xFFAFB42B)),
+    Category("All", color = floatingActionBtnColor), // Keep as is
+    Category("Sports", color = Color(0xFFE53935)),       // Energetic Red for action and passion
+    Category("Cinema", color = Color(0xFF5E35B1)),       // Deep Purple for creativity and drama
+    Category("Politics", color = Color(0xFF1E88E5)),     // Calm, strong Blue for trust and structure
+    Category("Entertainment", color = Color(0xFFFF7043)),// Vibrant Orange for excitement and engagement
+    Category("News", color = Color(0xFF43A047)),         // Green for balance and freshness
+    Category("Comedy", color = Color(0xFFFFC107)),       // Bright Yellow for cheerfulness and humor
+    Category("Crime", color = Color(0xFF37474F)),        // Dark Slate for mystery and tension
+    Category("Elections", color = Color(0xFF1976D2)),    // Rich Blue for authority and clarity
+    Category("Protest", color = Color(0xFFD32F2F)),      // Bold Red for urgency and impact
 )

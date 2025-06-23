@@ -4,6 +4,7 @@ import BottomBar
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,7 +25,9 @@ import androidx.compose.material.Text
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -40,12 +43,15 @@ import androidx.navigation.NavHostController
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.finalapp.model.DropProfileResponse
+import com.example.finalapp.screens._2pings.pingsItem.PingItemCard
+import com.example.finalapp.screens._2pings.pingsItem.PingsItemUI
 import com.example.finalapp.screens._3createEventOrPing.CreateEventOrPingBottomSheet
 import com.example.finalapp.screens.common.CommonErrorScreen
 import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.utils.UserLocation
 import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
 import com.example.finalapp.viewmodels.EventsViewModel
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Composable
 fun PingsScreenUI(navController:NavHostController,eventsViewModel: EventsViewModel) {
@@ -80,16 +86,45 @@ fun PingsScreenUI(navController:NavHostController,eventsViewModel: EventsViewMod
         previousIndex = currentIndex
         previousScrollOffset = currentOffset
     }
+    val systemUiController = rememberSystemUiController()
+    val navBarColor = Color(0xFF121212)
+    val backgroundColor= Color(0xFF121212)
+
+    SideEffect {
+        systemUiController.setNavigationBarColor(
+            color = navBarColor,
+            darkIcons = false
+        )
+        systemUiController.setStatusBarColor(
+            color = navBarColor,     // Your desired color
+            darkIcons = false        // true = dark icons (for light backgrounds)
+        )
+    }
+    DisposableEffect(Unit) {
+        onDispose {
+            systemUiController.setStatusBarColor(
+                color = floatingActionBtnColor,
+                darkIcons = true
+            )
+            systemUiController.setNavigationBarColor(
+                color = Color.Transparent,
+                darkIcons = true
+            )
+        }
+    }
+
 
     Scaffold(
         topBar = {
-           PingsTopBar(showIcon = searchBox) { searchBox = !searchBox }
+           PingsTopBar(navBarColor,showIcon = searchBox) { searchBox = !searchBox }
         },
         bottomBar = {
             BottomBar(
                 navController = navController,
                 state = buttonsVisible,
-                modifier = Modifier.height(45.dp)
+                modifier = Modifier.height(45.dp),
+                containerColor = navBarColor,
+                highlightedTextColor = Color.White
             ){
                 showSheet=true
             }
@@ -97,7 +132,7 @@ fun PingsScreenUI(navController:NavHostController,eventsViewModel: EventsViewMod
     ) { it ->
         Surface(modifier = Modifier
             .padding(it)
-            .fillMaxSize()) {
+            .fillMaxSize(), color = backgroundColor) {
             Column(modifier = Modifier.fillMaxSize()) {
                 AnimatedVisibility(visible = isScrollingUp) {
                     Column {
@@ -105,7 +140,7 @@ fun PingsScreenUI(navController:NavHostController,eventsViewModel: EventsViewMod
                             .fillMaxWidth()
                             .height(8.dp), color = floatingActionBtnColor
                         )
-                        SearchBar()
+                        if(searchBox) SearchBar()
                         PingCategories(categories)
                         LazyColumn(
                             state = listState
@@ -115,7 +150,7 @@ fun PingsScreenUI(navController:NavHostController,eventsViewModel: EventsViewMod
                                 items(it) { index ->
                                     val item = allPingsState[index]
                                     if (item != null) {
-                                        PingsItemUI(
+                                        PingItemCard(
                                             item,
                                             onShareClicked = {},
                                             onRespondClicked = {}
@@ -178,7 +213,7 @@ fun PingCategories(categories: List<Category>) {
         state=lazyListState,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(start = 10.dp),
+            .padding(start = 4.dp, top = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp) // Add space between items
     ) {
         items(categories) { category ->
@@ -188,11 +223,16 @@ fun PingCategories(categories: List<Category>) {
                     //.padding(vertical = 4.dp) // Add vertical padding for better spacing
                     .clip(RoundedCornerShape(12.dp))
                     .background(
-                        color = if (category == selectedCategory) Color(0xFF074C91) else Color.LightGray
+                        color = if (category == selectedCategory) Color(0xFFEEAB06) else category.color
                     )
                     .clickable {
                         selectedCategory = if (category == selectedCategory) null else category
                     }
+                    .border(
+                        width = 3.dp,
+                        color = if (category == selectedCategory) Color.White else category.color,
+                        shape = RoundedCornerShape(12.dp)
+                    )
             ) {
                 Text(
                     text = category.name,
@@ -200,7 +240,7 @@ fun PingCategories(categories: List<Category>) {
                     modifier = Modifier
                         .padding(horizontal = 16.dp, vertical = 8.dp), // Add padding inside the Box
                     color = Color.White,
-                    fontSize = 18.sp
+                    fontSize =18.sp
                 )
             }
         }

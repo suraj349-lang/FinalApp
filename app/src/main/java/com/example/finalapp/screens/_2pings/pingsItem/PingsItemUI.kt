@@ -1,7 +1,6 @@
-package com.example.finalapp.screens._2pings
+package com.example.finalapp.screens._2pings.pingsItem
 
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,10 +20,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -37,18 +34,18 @@ import com.example.finalapp.utils.constants.Constants
 import kotlinx.coroutines.delay
 
 
-
-
 @Composable
 fun PingsItemUI(item: PingResponse,onShareClicked: () -> Unit,onRespondClicked: () -> Unit) {
 
     Card(
         modifier = Modifier
+            .padding(4.dp)
             .wrapContentHeight()
             .fillMaxWidth(),
+        elevation=CardDefaults.cardElevation(60.dp),
         shape = RoundedCornerShape(12.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        border = BorderStroke(width = 1.dp, color = floatingActionBtnColor.copy(alpha = 0.5f))
+        colors = CardDefaults.cardColors(containerColor = Color(0xFF161515)),
+//        border = BorderStroke(width = 1.dp, color = Color.DarkGray)
     ) {
         Column {
 
@@ -57,19 +54,17 @@ fun PingsItemUI(item: PingResponse,onShareClicked: () -> Unit,onRespondClicked: 
             }
             Column(
                 modifier = Modifier
-                    .wrapContentSize()
-                    .padding(16.dp),
+                    .wrapContentSize(),
                 horizontalAlignment = Alignment.Start,
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                TypeLocationDate2()
+                item.title?.let { TypeLocationDate2(it) }
               //  StatusBadge(status = "Active", urgency = "Expiring soon")
                 EventImage2(item.image)
-                item.title?.let { CaptionHeader(it) }
-                Caption(item.category)
+                item.category?.let { CaptionHeader(it) }
               //  CountdownTimer(eventTimeMillis = System.currentTimeMillis() + 3600000L) // 1 hour from now
-                Divider(Modifier.fillMaxWidth(), thickness = 1.dp, color = Color.LightGray)
                 ShareLikeRespond(item.totalUpVotes,{onShareClicked()},onRespondClicked = {onRespondClicked()})
+                Divider(Modifier.fillMaxWidth(), thickness = 1.dp, color = Color.LightGray)
             }
         }
     }
@@ -79,9 +74,8 @@ fun PingsItemUI(item: PingResponse,onShareClicked: () -> Unit,onRespondClicked: 
 fun UserImageNameTime2(username:String,image:String,time:String) {
     Row(
         modifier = Modifier
-            .background(color = floatingActionBtnColor)
+            //  .background(color = floatingActionBtnColor)
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 2.dp)
             .height(60.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
@@ -89,14 +83,14 @@ fun UserImageNameTime2(username:String,image:String,time:String) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Card(modifier = Modifier.size(40.dp), shape = CircleShape) {
                 AsyncImage(
-                    model=image,
+                    model= imagePrefix+image,
                     contentDescription = null,
                     modifier=Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
                 )
             }
             Spacer(modifier = Modifier.width(10.dp))
-            Text(username, fontFamily = Constants.FONT_MEDIUM, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = Color.White)
+            Text(username, fontFamily = Constants.FONT_MEDIUM, fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.White)
         }
         Text(time, fontFamily = Constants.FONT_MEDIUM, fontSize = 14.sp, color = Color.White)
     }
@@ -105,7 +99,7 @@ fun UserImageNameTime2(username:String,image:String,time:String) {
 
 
 @Composable
-fun TypeLocationDate2(eventTimeMillis: Long = System.currentTimeMillis() + 3600000L) {
+fun TypeLocationDate2(title:String,eventTimeMillis: Long = System.currentTimeMillis() + 3600000L) {
     val timeRemaining = remember(eventTimeMillis) {
         eventTimeMillis - System.currentTimeMillis()
     }
@@ -118,23 +112,39 @@ fun TypeLocationDate2(eventTimeMillis: Long = System.currentTimeMillis() + 36000
             .padding(vertical = 4.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        InfoChip(text = "Dating", backgroundColor = floatingActionBtnColor)
-        InfoChip(iconRes = R.drawable.location_new, text = "Delhi", backgroundColor = Color(0xFF3949AB))
+        InfoChipForType(text = title)
+        InfoChip(iconRes = R.drawable.location_new, text = "Delhi" )
         InfoChip(
             iconRes = R.drawable.clock_filled,
             text = "In ${hours}h ${minutes}m",
-            backgroundColor = Color(0xFFFB8C00)
         )
     }
 }
 
 @Composable
-fun InfoChip(iconRes: Int? = null, text: String, backgroundColor: Color) {
+fun InfoChipForType(text: String) {
     Row(
         modifier = Modifier
-            .background(backgroundColor, shape = RoundedCornerShape(6.dp))
-            .padding(horizontal = 10.dp, vertical = 6.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .background(Color(0xFF061CA8), shape = RoundedCornerShape(6.dp)),
+            verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = text,
+            fontSize = 14.sp,
+            color = Color.White,
+            fontWeight=FontWeight.Bold,
+            modifier=Modifier.padding(4.dp),
+            fontFamily = Constants.FONT_MEDIUM
+        )
+    }
+}
+@Composable
+fun InfoChip(iconRes: Int? = null, text: String) {
+    Row(
+        modifier = Modifier
+//            .background(Color.Gray, shape = RoundedCornerShape(6.dp))
+//            .padding(horizontal = 10.dp, vertical = 6.dp),
+       , verticalAlignment = Alignment.CenterVertically
     ) {
         if(iconRes !=null) {
             Image(
@@ -184,38 +194,47 @@ fun StatusBadge(status: String?, urgency: String) {
 }
 
 @Composable
-fun CaptionHeader(title:String) {
+fun CaptionHeader( caption: String?) {
+    var active by remember { mutableStateOf(false) }
     Card(
         Modifier
             .fillMaxWidth()
-            .wrapContentHeight(), colors = CardDefaults.cardColors(containerColor = Color.LightGray), shape = RoundedCornerShape(6.dp)
+            .wrapContentHeight(),
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent),
+        shape = RoundedCornerShape(topStart = 6.dp, topEnd = 6.dp)
     ) {
-        Text(
-            title.capitalize(),
-            modifier = Modifier.padding(start = 8.dp),
-            fontSize = 20.sp,
-            fontWeight = FontWeight.SemiBold,
-            fontFamily = Constants.FONT_EXTRA_LIGHT,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-            color = Color.Black
-        )
+        Row(verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+            Column(
+                modifier = Modifier
+                    .padding(start = 8.dp)
+                    .wrapContentSize()
+            ) {
+
+                caption?.let {
+                    Text(
+                        text = it,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        fontFamily = Constants.FONT_EXTRA_LIGHT,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        color = Color.White
+                    )
+                }
+            }
+            Image(
+                painter = painterResource(id = if(active)R.drawable.baseline_expand_less_24 else R.drawable.baseline_expand_more_24 ),
+                contentDescription ="",
+                modifier = Modifier
+                    .size(24.dp)
+                    .clickable { active = !active },
+                colorFilter = ColorFilter.tint(Color.White)
+            )
+        }
     }
 
 }
 
-@Composable
-fun Caption(caption:String?) {
-    if (caption != null) {
-        Text(caption,
-            fontSize = 14.sp,
-            color = Color.DarkGray,
-            fontFamily = Constants.FONT_EXTRA_LIGHT,
-            maxLines = 4,
-            overflow = TextOverflow.Ellipsis
-        )
-    }
-}
 
 @Composable
 fun CountdownTimer(eventTimeMillis: Long) {
@@ -270,7 +289,7 @@ fun ShareLikeRespond(totalViews:Int?,onShareClicked:()->Unit,onRespondClicked: (
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 8.dp),
+            .padding(horizontal = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -303,9 +322,9 @@ fun IconWithLabel(iconRes: Int, label: String,isShareButton:Boolean,onShareClick
             painter = painterResource(id = iconRes),
             contentDescription = "",
             modifier = Modifier.size(24.dp),
-            colorFilter = ColorFilter.tint(Color.Black)
+            colorFilter = ColorFilter.tint(Color.LightGray)
         )
-        Text(text = label, fontSize = 12.sp, fontFamily = Constants.DONGLE_NORMAL, color = Color.Black)
+        Text(text = label, fontSize = 12.sp, fontFamily = Constants.DONGLE_NORMAL, color = Color.LightGray)
     }
 }
 
@@ -333,10 +352,9 @@ fun RespondButton(onClick: () -> Unit) {
 fun EventImage2(image: String) {
     Card(modifier = Modifier
         .fillMaxWidth()
-        .height(200.dp), colors = CardDefaults.cardColors(containerColor = Color.Black)) {
+        .height(400.dp), shape = RoundedCornerShape(0.dp),colors = CardDefaults.cardColors(containerColor = Color.Black)) {
         AsyncImage(model = imagePrefix + image, contentDescription ="", modifier = Modifier
-            .fillMaxWidth()
-            .aspectRatio(16f / 9f), contentScale = ContentScale.Fit
+            .fillMaxSize(), contentScale = ContentScale.Crop
         )
     }
 }

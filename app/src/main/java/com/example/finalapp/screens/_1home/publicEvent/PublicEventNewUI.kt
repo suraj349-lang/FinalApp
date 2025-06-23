@@ -47,6 +47,7 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
 import com.example.finalapp.model.EventResponse
+import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens._1home.commentBottomSheet.CommentBottomSheet
 import com.example.finalapp.ui.imagePrefix
 import com.example.finalapp.utils.constants.Constants
@@ -57,26 +58,13 @@ import com.example.finalapp.utils.constants.Constants
 fun PublicEventNewUI(
     event: EventResponse,
     navController: NavHostController,
-    index: Int,
-    height: Boolean,
-    imageUrls: List<String>
 ) {
-    var height by remember {
-        mutableStateOf(true)
-    }
-    val context= LocalContext.current
-//    var image by remember {
-//        mutableStateOf(imageUrls.get(0))
-//    }
-//    var index by remember {
-//        mutableStateOf(index)
-//    }
     var showBottomSheet by remember {
         mutableStateOf(false)
     }
 
     Box(modifier = Modifier
-        .fillMaxSize()) {
+        .fillMaxSize().background(color = Color.LightGray)) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -109,7 +97,7 @@ fun PublicEventNewUI(
                         horizontalAlignment = Alignment.Start
                     ) {
                         ActiveButton()
-                       // ReactionBar()
+
                     }
                 }
             }
@@ -194,7 +182,7 @@ fun PublicEventNewUI(
             )
             Box(modifier = Modifier.fillMaxWidth().wrapContentHeight()) {
                 Button(
-                    onClick = {},
+                    onClick = {navController.navigate(SCREENS.PUBLIC_EVENT_DETAILS_SCREEN_WRAPPER.route)},
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
                         .fillMaxWidth(0.8f)
@@ -210,7 +198,6 @@ fun PublicEventNewUI(
                     )
                 }
             }
-           // if(!event.topComments.isNullOrEmpty()) EventComments(event.topComments)
 
         }
     }

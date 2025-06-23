@@ -82,10 +82,7 @@ fun EventsScreen(
                         val event = eventList[page]
                         PublicEventNewUI(
                             event,
-                            navController,
-                            index = index,
-                            height = height,
-                            imageUrls = imageUrls
+                            navController
                         )
                     }
                 }

@@ -1,4 +1,4 @@
-package com.example.finalapp.loginActivity.auth
+package com.example.finalapp.screens.auth
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -48,7 +48,7 @@ import androidx.navigation.NavController
 import com.example.finalapp.R
 import com.example.finalapp.viewmodels.AuthViewModel
 import com.example.finalapp.repository.FirebaseRepository
-import com.example.finalapp.loginActivity.auth.util.OtpBox
+import com.example.finalapp.screens.auth.util.OtpBox
 import com.example.finalapp.ui.theme.statusAndTopAppBarColor
 import com.example.finalapp.ui.theme.topAppBarTextColor
 import com.example.finalapp.utils.constants.Constants

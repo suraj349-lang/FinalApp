@@ -1,8 +1,15 @@
 package com.example.finalapp.screens._4profile
 
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
 import android.net.Uri
+import android.os.Build
+import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -20,6 +27,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -31,9 +39,11 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -52,11 +62,15 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.FileProvider
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavHostController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.canhub.cropper.CropImageContract
+import com.canhub.cropper.CropImageContractOptions
+import com.canhub.cropper.CropImageOptions
 import com.example.finalapp.R
 import com.example.finalapp.model.DropProfileResponse
 import com.example.finalapp.model.EventResponse
@@ -67,12 +81,14 @@ import com.example.finalapp.screens.dialogBox.DropProfileDialog
 import com.example.finalapp.screens.dialogBox.uriToFile
 import com.example.finalapp.ui.imagePrefix
 import com.example.finalapp.ui.theme.PURPLE
+import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.utils.ProfileObject
 import com.example.finalapp.utils.RequestState
 import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.viewmodels.AuthViewModel
 import com.example.finalapp.viewmodels.EventsViewModel
 import com.example.finalapp.viewmodels.ImageUploadViewModel
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import java.io.File
 
 @OptIn(ExperimentalGlideComposeApi::class)
@@ -83,16 +99,24 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
     var showSheetForImageUpdate by remember { mutableStateOf(false) }
     var showSheet by remember { mutableStateOf(false) }
     val temporaryImage by remember { mutableStateOf(ProfileObject.profile?.profileImage) }
-    val cameraDialog by remember { mutableStateOf(false) }
-    val galleryDialog by remember { mutableStateOf(false) }
     var imageUri by remember { mutableStateOf(Uri.EMPTY) }
-    val showImageCropper by remember { mutableStateOf(false) }
     val startProfileImageUpload=imageUploadViewModel.startProfileImageUpload.collectAsState()
     val userEventsList by eventsViewModel.userEventsListResponse.collectAsState()
     val userDropProfilesList by eventsViewModel.userDropProfilesListResponse.collectAsState()
 
+    val pickMedia = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        if (uri != null) {
+            imageUri=uri
+        } else {
+            Log.d("PhotoPicker", "No media selected")
+        }
+    }
+
+
     val imageUploadStatus by imageUploadViewModel.userProfileImageUpdateStatus.collectAsState()
     val lifecycleOwner= LocalLifecycleOwner.current
+
+
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_START) {
@@ -121,35 +145,51 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
             lifecycleOwner.lifecycle.removeObserver(observer)
         }
     }
+    val systemUiController = rememberSystemUiController()
+    val backgroundColor = Color.Gray
+    val navColor=Color.DarkGray
+
+    SideEffect {
+        systemUiController.setNavigationBarColor(
+            color = navColor,
+            darkIcons = false
+        )
+        systemUiController.setStatusBarColor(
+            color = navColor,     // Your desired color
+            darkIcons = false        // true = dark icons (for light backgrounds)
+        )
+    }
+    DisposableEffect(Unit) {
+        onDispose {
+            systemUiController.setStatusBarColor(
+                color = floatingActionBtnColor,
+                darkIcons = true
+            )
+            systemUiController.setNavigationBarColor(
+                color = Color.Transparent,
+                darkIcons = true
+            )
+        }
+    }
 
 
     if (showCustomDialog) {
         DropProfileDialog(authViewModel ,eventsViewModel , imageUploadViewModel ,navController ) { showCustomDialog = !showCustomDialog }
     }
-//    if(showImageCropper){
-//        ImageCropperAndChooser(showChooser = showImageCropper) {
-//            newUri=it
-//        }
-//    }
     LaunchedEffect(key1 = ProfileObject.profile?.userId!!){
         if(eventsViewModel.canFetchEvents.value && eventsViewModel.canFetchDroppedProfiles.value) {
             eventsViewModel.getUserEvents(ProfileObject.profile?.userId!!)
             eventsViewModel.getUserDropProfiles(ProfileObject.profile?.userId!!)
         }
     }
-    Surface(modifier = Modifier.fillMaxSize()) {
+    Surface(modifier = Modifier.fillMaxSize(), color = backgroundColor) {
         Column(modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())) {
-            Box(
-                modifier = Modifier
+                Box(modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)
-                    .background(color = PURPLE) //Color(0xFFE4EE05)
-            ) {
-                Box(modifier = Modifier
-                    .fillMaxSize()
-                    .background(color = Color(0xFF25086B))){ // 0xFF1B1A1A
+                    .background(color = Color.DarkGray)){ // 0xFF1B1A1A
                     Image(
                         painterResource(id = R.drawable.back),
                         contentDescription = "",
@@ -160,6 +200,25 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                             .align(Alignment.TopStart),
                         contentScale = ContentScale.Crop, colorFilter = ColorFilter.tint(Color.White)
                     )
+                    Row(modifier = Modifier
+                        .wrapContentWidth()
+                        .align(Alignment.TopEnd)
+                        .clickable {
+                            pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                        }, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
+                        Text(text = "Add Background image", fontSize = 8.sp, fontFamily = Constants.FONT_MEDIUM, color = Color.White)
+                        Image(
+                            painterResource(id = R.drawable.edit_new),
+                            contentDescription = "",
+                            modifier = Modifier
+                                .padding(16.dp)
+                                .size(30.dp),
+                            contentScale = ContentScale.Crop, colorFilter = ColorFilter.tint(Color.White)
+                        )
+
+                    }
+
+
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
@@ -268,11 +327,13 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                     }
 
             }
-            }
             Column(modifier = Modifier.padding(start = 16.dp,end=16.dp,top=10.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                //--------------------------------------------------------------------------------
+
+
                 when(val response=userEventsList){
                     is RequestState.Loading -> CircularProgressIndicator()
-                    is RequestState.Error -> CommonErrorScreen(error = "Error getting events!")
+                    is RequestState.Error -> CommonErrorScreen(error = "Error getting pings!")
                     is RequestState.Success -> {
                         MyPings(response.data){
                             showSheet=true
@@ -280,6 +341,10 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                     }
                     else ->{}
                 }
+
+                //--------------------------------------------------------------------------------------
+
+
                 when(val response=userDropProfilesList){
                     is RequestState.Loading -> CircularProgressIndicator()
                     is RequestState.Error -> CommonErrorScreen(error = "Error getting events!")
@@ -290,6 +355,8 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                     }
                     else ->{}
                 }
+
+                //----------------------------------------------------------------------------------------
 
 
                 UserStats()
@@ -344,7 +411,7 @@ fun MyPings(items: List<EventResponse>, onAddEventClicked:()->Unit) {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start
             ) {
-                Text(text = "My Pings", color = Color.Black, fontWeight = FontWeight.Bold)
+                Text(text = "My Pings", color = Color.White, fontWeight = FontWeight.Bold, fontFamily = Constants.FONT_MEDIUM)
             }
         LazyRow{
             items(eventsList){item->
@@ -356,19 +423,31 @@ fun MyPings(items: List<EventResponse>, onAddEventClicked:()->Unit) {
             .clickable { onAddEventClicked() }
             .padding(top = 8.dp)
             .fillMaxWidth()
-            .height(40.dp), border = BorderStroke(width = 1.dp, brush = Brush.linearGradient(colors = listOf(
-            Color(0xFFF7B206), Color(0xFF540575)
-        )))
-        ) {
-            Row(modifier = Modifier
-                .fillMaxSize()
-                .padding(8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
-                Image(painterResource(id = R.drawable.add), contentDescription = "", colorFilter = ColorFilter.tint(Color(
-                    0xFF033669
+            .height(40.dp),
+            backgroundColor = Color.Gray,
+            border = BorderStroke(width = 1.dp, brush = Brush.linearGradient(colors = listOf(Color(0xFFF7B206), Color(0xFF540575)))))
+        {
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start
+            ) {
+                Image(
+                    painterResource(id = R.drawable.add),
+                    contentDescription = "",
+                    colorFilter = ColorFilter.tint(Color(0xFF033666)),
+                    modifier = Modifier.size(30.dp)
                 )
-                ),modifier = Modifier.size(30.dp))
-                Text(text = "Create new Event", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
-                
+                Text(
+                    text = "Create new Event",
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    fontFamily = Constants.FONT_MEDIUM,
+                    color = Color.White
+                )
+
             }
             
         }
@@ -386,17 +465,17 @@ fun MyPingItem(item: EventResponse) {
         .padding(end = 8.dp, top = 8.dp)
         .clip(shape = RoundedCornerShape(6.dp))) {
         GlideImage(model=  imagePrefix+item.image/*R.drawable.profile_image_1*/ , contentDescription = "", contentScale = ContentScale.Crop) //todo add imagePrefix when upload is happening
-        Row(modifier = Modifier
-            .align(Alignment.BottomStart)
-            .padding(4.dp)
-            .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            item.title?.let { Text(text = it, color = Color.White, fontWeight = FontWeight.SemiBold) }
-            Card(shape = CircleShape,backgroundColor = Color.Black.copy(alpha = 0.4f)) {
-                Text(text=item.expirationTime, color = Color.White, modifier = Modifier.padding(2.dp))
-            }
-
-            
-        }
+//        Row(modifier = Modifier
+//            .align(Alignment.BottomStart)
+//            .padding(4.dp)
+//            .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+//            item.title?.let { Text(text = it, color = Color.White, fontWeight = FontWeight.SemiBold) }
+//            Card(shape = CircleShape,backgroundColor = Color.Black.copy(alpha = 0.4f)) {
+//                Text(text=item.expirationTime, color = Color.White, modifier = Modifier.padding(2.dp))
+//            }
+//
+//
+//        }
 
 
         
@@ -419,12 +498,13 @@ fun RecentDrops(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Column {
-                    Text(text = "Recent Profile Drops", color = Color.Black, fontWeight = FontWeight.Bold)
-                    Text(text = "upto 1 week", color = Color.DarkGray, fontWeight = FontWeight.SemiBold, fontSize = 8.sp)
+                    Text(text = "Recent Profile Drops", color = Color.White, fontWeight = FontWeight.Bold, fontFamily = Constants.FONT_MEDIUM)
+                    Text(text = "upto 1 week", color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 8.sp,fontFamily = Constants.FONT_MEDIUM)
 
                 }
-                Image(painter = painterResource(id = R.drawable.showall), contentDescription ="", colorFilter = ColorFilter.tint(
-                    Color(0xFF05407A)
+                Image(painter = painterResource(id = R.drawable.showall), contentDescription ="", colorFilter = ColorFilter.tint(Color(
+                    0xFFABB5F5
+                )
                 ) , modifier = Modifier.size(20.dp))
             }
         Divider(modifier = Modifier
@@ -433,33 +513,31 @@ fun RecentDrops(
         LazyRow(modifier = Modifier.padding(top =8.dp)){
             items(droppedProfilesList){item->
                 RecentProfileDropItem(item)
-
             }
         }
         Card(modifier = Modifier
             .clickable { onDropProfileClicked() }
             .padding(top = 8.dp)
             .fillMaxWidth()
-            .height(40.dp), border = BorderStroke(width = 1.dp, brush = Brush.linearGradient(colors = listOf(
+            .height(40.dp),
+            backgroundColor = Color.Gray,
+            border = BorderStroke(width = 1.dp, brush = Brush.linearGradient(colors = listOf(
             Color(0xFFF7B206), Color(0xFF540575)
         )))
         ) {
             Row(modifier = Modifier
                 .fillMaxSize()
                 .padding(8.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
-                Image(painterResource(id = R.drawable.drop_profile_filled_rounded), contentDescription = "", colorFilter = ColorFilter.tint(Color(
-                    0xFF033669
-                )
-                ),modifier = Modifier.size(30.dp))
-                Text(text = "Drop your profile", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
-
+                Image(painterResource(id = R.drawable.drop_profile_filled_rounded),
+                    contentDescription = "",
+                    colorFilter = ColorFilter.tint(Color(0xFF0481FD)),
+                    modifier = Modifier
+                        .size(30.dp)
+                        .padding(16.dp))
+                Text(text = "Drop your profile", fontSize = 12.sp, fontWeight = FontWeight.SemiBold, fontFamily = Constants.FONT_MEDIUM, color = Color.White)
             }
-
         }
-
-
     }
-
 }
 
 @OptIn(ExperimentalGlideComposeApi::class)
@@ -476,13 +554,13 @@ fun RecentProfileDropItem(item: DropProfileResponse) {
             ),
                 Color(0xFF9E0642)
             )))) {
-                Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(0.dp),backgroundColor = Color(
-                    0xFFF1EDE3
-                )
-                ) {
-                    Text(text = item.location, fontWeight = FontWeight.SemiBold,color = Color(0xFF072747),
-                        modifier = Modifier.padding(start=4.dp,top=2.dp), fontSize = 8.sp)
-                }
+//                Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(0.dp),backgroundColor = Color(
+//                    0xFFF1EDE3
+//                )
+//                ) {
+//                    Text(text = item.location.take(10), fontWeight = FontWeight.SemiBold,color = Color(0xFF072747),
+//                        modifier = Modifier.padding(start=4.dp,top=2.dp), fontSize = 8.sp)
+//                }
                 GlideImage(
                     model= imagePrefix+item.image,
                     contentDescription = "",
@@ -512,11 +590,11 @@ fun LogoutUser(onLogoutClicked:()->Unit) {
     Box(modifier = Modifier
         .fillMaxWidth()
         .heightIn(40.dp)
-        .background(color = Color(0xFFF5F0F0))) {
+        .background(color = Color.Gray)) {
         Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.Start) {
             Text(text = "Logout", fontWeight = FontWeight.SemiBold, fontSize = 16.sp,fontFamily = Constants.FONT_MEDIUM, modifier = Modifier
                 .padding(horizontal = 16.dp, vertical = 4.dp)
-                .clickable { onLogoutClicked() }
+                .clickable { onLogoutClicked() }, color = Color.White
             )
         }
     }
