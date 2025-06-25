@@ -1,4 +1,4 @@
-package com.example.finalapp.screens._3createEventOrPing.createEvent.eventWarScreen
+package com.example.finalapp.screens._1home.eventWarScreen
 
 
 import androidx.compose.foundation.Image
@@ -44,7 +44,7 @@ import com.example.finalapp.R
 
 @Preview(showBackground = true)
 @Composable
-fun WarScreen() {
+fun CommentsScreen() {
     // Use mutable state list for top-level comments
     val commentsState = remember { mutableStateListOf<Comment>().apply { addAll(comments) } }
 

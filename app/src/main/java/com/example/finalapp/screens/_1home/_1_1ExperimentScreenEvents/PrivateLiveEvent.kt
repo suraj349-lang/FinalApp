@@ -61,6 +61,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.finalapp.R
 import com.example.finalapp.screens._1home.commentBottomSheet.CommentBottomSheet
+import com.example.finalapp.utils.constants.Constants
 
 @Composable
 fun PrivateLiveEvent() {
@@ -256,7 +257,7 @@ fun RunningTextV2(modifier: Modifier = Modifier) {
     }
 }
 val DONGLE=FontFamily(Font( R.font.dongle_bold))
-val SANS= FontFamily(Font(R.font.work_sans_regular))
+val SANS= Constants.FONT_MEDIUM
 
 @Composable
 fun ActiveButtonUI() {

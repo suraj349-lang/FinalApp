@@ -21,6 +21,7 @@ object Constants {
     val DONGLE_LIGHT=FontFamily(Font(R.font.dongle_light));
     val LOGIN_BACKGROUND= Color.DarkGray
     val LOGIN_SURFACE=Color(0xFFFFFFFF)
+    val USER_NAME_FONT= FontFamily(Font(R.font.inter))
 
     val APP_NAME_FONT= FontFamily(Font(R.font.alfaslabone))
 }

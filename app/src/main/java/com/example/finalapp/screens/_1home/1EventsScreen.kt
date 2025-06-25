@@ -23,6 +23,7 @@ import androidx.navigation.NavHostController
 import com.example.finalapp.R
 import com.example.finalapp.model.EventRequestDTO
 import com.example.finalapp.model.EventResponse
+import com.example.finalapp.screens._1home.publicEvent.PublicEvent
 import com.example.finalapp.screens._1home.publicEvent.PublicEventNewUI
 import com.example.finalapp.screens.common.NoDataFound
 import com.example.finalapp.screens.dialogBox.DialogLoading
@@ -80,9 +81,14 @@ fun EventsScreen(
                         modifier = modifier.weight(1f)
                     ) { page ->
                         val event = eventList[page]
-                        PublicEventNewUI(
+
+                        PublicEvent(
                             event,
-                            navController
+                            navController,
+                            height = false,
+                            index = 2,
+                            imageUrls = imageUrls
+
                         )
                     }
                 }

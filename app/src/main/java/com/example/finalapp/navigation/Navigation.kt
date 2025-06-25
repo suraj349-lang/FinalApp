@@ -36,7 +36,7 @@ import com.example.finalapp.screens._3createEventOrPing.createEvent.CreateEventM
 import com.example.finalapp.screens._5settings.SettingsScreenUI
 import com.example.finalapp.testing.TabView
 import com.example.finalapp.screens._3createEventOrPing.PastRaisedOffer
-import com.example.finalapp.screens._3createEventOrPing.createEvent.eventWarScreen.PublicEventDetailsScreenWrapper
+import com.example.finalapp.screens._1home.eventWarScreen.PublicEventDetailsScreenWrapper
 import com.example.finalapp.screens._3createEventOrPing.createPing.CreatePingMainScreen
 import com.example.finalapp.screens._4profile.ProfileScreenNew
 import com.example.finalapp.screens._4profile.UserPublicProfile

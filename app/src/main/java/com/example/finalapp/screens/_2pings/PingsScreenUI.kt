@@ -3,12 +3,19 @@ package com.example.finalapp.screens._2pings
 import BottomBar
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,6 +27,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Divider
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material3.LinearProgressIndicator
@@ -34,6 +42,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -71,21 +80,23 @@ fun PingsScreenUI(navController:NavHostController,eventsViewModel: EventsViewMod
     LaunchedEffect(key1 = Unit){
         eventsViewModel.getAllPings(UserLocation.address.toString())
     }
-    LaunchedEffect(remember { derivedStateOf { listState.firstVisibleItemIndex } }, remember { derivedStateOf { listState.firstVisibleItemScrollOffset } }) {
-        val currentIndex = listState.firstVisibleItemIndex
-        val currentOffset = listState.firstVisibleItemScrollOffset
 
-        isScrollingUp = when {
-            currentIndex < previousIndex -> true
-            currentIndex > previousIndex -> false
-            currentOffset < previousScrollOffset -> true
-            currentOffset > previousScrollOffset -> false
-            else -> isScrollingUp
-        }
+    LaunchedEffect(listState) {
+        snapshotFlow { listState.firstVisibleItemScrollOffset to listState.firstVisibleItemIndex }
+            .collect { (offset, index) ->
+                isScrollingUp = when {
+                    index < previousIndex -> true
+                    index > previousIndex -> false
+                    offset < previousScrollOffset -> true
+                    offset > previousScrollOffset -> false
+                    else -> isScrollingUp
+                }
 
-        previousIndex = currentIndex
-        previousScrollOffset = currentOffset
+                previousIndex = index
+                previousScrollOffset = offset
+            }
     }
+
     val systemUiController = rememberSystemUiController()
     val navBarColor = Color(0xFF121212)
     val backgroundColor= Color(0xFF121212)
@@ -116,17 +127,29 @@ fun PingsScreenUI(navController:NavHostController,eventsViewModel: EventsViewMod
 
     Scaffold(
         topBar = {
-           PingsTopBar(navBarColor,showIcon = searchBox) { searchBox = !searchBox }
+            AnimatedVisibility(
+                visible = isScrollingUp,
+                enter = slideInVertically(initialOffsetY = { -it }) + fadeIn(),
+                exit = slideOutVertically(targetOffsetY = { -it }) + fadeOut()
+            ) {
+                PingsTopBar(navBarColor, showIcon = searchBox) { searchBox = !searchBox }
+            }
         },
         bottomBar = {
-            BottomBar(
-                navController = navController,
-                state = buttonsVisible,
-                modifier = Modifier.height(45.dp),
-                containerColor = navBarColor,
-                highlightedTextColor = Color.White
-            ){
-                showSheet=true
+            AnimatedVisibility(
+                visible = isScrollingUp,
+                enter = slideInVertically(initialOffsetY = { -it }) + fadeIn(),
+                exit = slideOutVertically(targetOffsetY = { -it }) + fadeOut()
+            ) {
+                BottomBar(
+                    navController = navController,
+                    state = buttonsVisible,
+                    modifier = Modifier.height(45.dp),
+                    containerColor = navBarColor,
+                    highlightedTextColor = Color.White
+                ) {
+                    showSheet = true
+                }
             }
         }
     ) { it ->
@@ -134,52 +157,70 @@ fun PingsScreenUI(navController:NavHostController,eventsViewModel: EventsViewMod
             .padding(it)
             .fillMaxSize(), color = backgroundColor) {
             Column(modifier = Modifier.fillMaxSize()) {
-                AnimatedVisibility(visible = isScrollingUp) {
+                AnimatedVisibility(
+                    visible = isScrollingUp,
+                    enter = fadeIn() + expandVertically(),
+                    exit = fadeOut() + shrinkVertically()
+                ) {
                     Column {
-                        if(showLoader && allPingsState?.itemCount==0) LinearProgressIndicator(modifier = Modifier
-                            .fillMaxWidth()
-                            .height(8.dp), color = floatingActionBtnColor
-                        )
-                        if(searchBox) SearchBar()
+                        if (showLoader && allPingsState?.itemCount == 0) {
+                            LinearProgressIndicator(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(8.dp),
+                                color = floatingActionBtnColor
+                            )
+                        }
+                        if (searchBox) SearchBar()
                         PingCategories(categories)
-                        LazyColumn(
-                            state = listState
-                        ) {
-                            allPingsState?.itemCount?.let {
-                                Log.i("POSTCOUNT", "PingsScreenUI: $it")
-                                items(it) { index ->
-                                    val item = allPingsState[index]
-                                    if (item != null) {
-                                        PingItemCard(
-                                            item,
-                                            onShareClicked = {},
-                                            onRespondClicked = {}
-                                        )
-                                    }
+                    }
+                }
+
+
+
+                LazyColumn(
+                    state = listState,
+                    contentPadding = PaddingValues(top = 0.dp, bottom = 16.dp))
+                {
+                        allPingsState?.itemCount?.let {
+                            Log.i("POSTCOUNT", "PingsScreenUI: $it")
+                            items(it) { index ->
+                                val item = allPingsState[index]
+                                if (item != null) {
+                                    PingItemCard(
+                                        item,
+                                        onShareClicked = {},
+                                        onRespondClicked = {}
+                                    )
+                                    Divider(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        thickness = 0.5.dp,
+                                        color = Color.LightGray
+                                    )
                                 }
                             }
-                            allPingsState?.apply {
-                                when {
-                                    loadState.refresh is LoadState.Loading -> {
-                                        item {
-                                            showLoader=true
-                                        }
+                        }
+                        allPingsState?.apply {
+                            when {
+                                loadState.refresh is LoadState.Loading -> {
+                                    item {
+                                        showLoader = true
                                     }
+                                }
 
-                                    loadState.append is LoadState.Loading -> {
-                                        item {
-                                            showLoader=true
-                                        }
+                                loadState.append is LoadState.Loading -> {
+                                    item {
+                                        showLoader = true
                                     }
+                                }
 
-                                    loadState.refresh is LoadState.Error -> {
-                                        showLoader=false
-                                        val error = (loadState.refresh as LoadState.Error).error
-                                        item {
-                                            Log.e("Error in getting pings", "PingsScreenUI: $error " )
-                                            CommonErrorScreen(error = "Error getting pings.",true){
-                                               // eventsViewModel.getAllPings("")
-                                            }
+                                loadState.refresh is LoadState.Error -> {
+                                    showLoader = false
+                                    val error = (loadState.refresh as LoadState.Error).error
+                                    item {
+                                        Log.e("Error in getting pings", "PingsScreenUI: $error ")
+                                        CommonErrorScreen(error = "Error getting pings.", true) {
+                                            // eventsViewModel.getAllPings("")
                                         }
                                     }
                                 }
@@ -188,8 +229,6 @@ fun PingsScreenUI(navController:NavHostController,eventsViewModel: EventsViewMod
                     }
                 }
 
-
-            }
 
             }
         }
@@ -223,16 +262,16 @@ fun PingCategories(categories: List<Category>) {
                     //.padding(vertical = 4.dp) // Add vertical padding for better spacing
                     .clip(RoundedCornerShape(12.dp))
                     .background(
-                        color = if (category == selectedCategory) Color(0xFFEEAB06) else category.color
+                        color = if (category == selectedCategory) floatingActionBtnColor else Color.LightGray //category.color
                     )
                     .clickable {
                         selectedCategory = if (category == selectedCategory) null else category
                     }
-                    .border(
-                        width = 3.dp,
-                        color = if (category == selectedCategory) Color.White else category.color,
-                        shape = RoundedCornerShape(12.dp)
-                    )
+//                    .border(
+//                        width = 3.dp,
+//                        color = if (category == selectedCategory) Color.White else Color.LightGray,
+//                        shape = RoundedCornerShape(12.dp)
+//                    )
             ) {
                 Text(
                     text = category.name,

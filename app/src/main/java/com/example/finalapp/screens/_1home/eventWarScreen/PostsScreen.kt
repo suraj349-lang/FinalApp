@@ -1,4 +1,4 @@
-package com.example.finalapp.screens._3createEventOrPing.createEvent.eventWarScreen
+package com.example.finalapp.screens._1home.eventWarScreen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxSize

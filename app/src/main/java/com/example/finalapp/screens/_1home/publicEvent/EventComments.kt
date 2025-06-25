@@ -30,6 +30,33 @@ import com.example.finalapp.model.CommentData
 import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.utils.constants.Constants
 import kotlinx.coroutines.delay
+val sampleComments = listOf(
+    CommentData(
+        userName = "Aarav Sharma",
+        profileImage = "https://example.com/profiles/aarav.jpg",
+        commentText = "This is amazing! Totally love the vibe. 🔥"
+    ),
+    CommentData(
+        userName = "Meera Patel",
+        profileImage = "https://example.com/profiles/meera.jpg",
+        commentText = "So cool! Where exactly is this place?"
+    ),
+    CommentData(
+        userName = "Rohan Das",
+        profileImage = "https://example.com/profiles/rohan.jpg",
+        commentText = "I wish I was there! Looks like a great time."
+    ),
+    CommentData(
+        userName = "Sanya Kapoor",
+        profileImage = "https://example.com/profiles/sanya.jpg",
+        commentText = "Love the energy in this post 😍"
+    ),
+    CommentData(
+        userName = "Aditya Verma",
+        profileImage = "https://example.com/profiles/aditya.jpg",
+        commentText = "This needs to go viral — great content!"
+    )
+)
 
 
 @Composable

@@ -9,31 +9,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.example.finalapp.R
 
-// good for body small
-val Dongle= FontFamily(
-    Font(R.font.dongle_regular),
-    Font(R.font.dongle_bold),
-    Font(R.font.dongle_light)
-)
-val Estonia= FontFamily(
-    Font(R.font.estonia_regular)
-)
-val Gluten= FontFamily(
-    Font(R.font.gluten_regular)
-)
-val Joti_One= FontFamily(
-    Font(R.font.jotioneregular)
-)
-val Marhem= FontFamily(
-    Font(R.font.marhey_regular)
-)
-val Oregano= FontFamily(
-    Font(R.font.oreganoregular),
-    Font(R.font.oreganoitalic)
-)
-val OfferFont= FontFamily(
-    Font(R.font.audiowide_regular)
-)
+
 
 
 // Set of Material typography styles to start with

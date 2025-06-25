@@ -30,6 +30,7 @@ import com.example.finalapp.model.EventResponse
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens._1home.commentBottomSheet.CommentBottomSheet
 import com.example.finalapp.screens._1home.commonUI.shareDeepLink
+import com.example.finalapp.screens._1home.eventWarScreen.comments
 import com.example.finalapp.ui.imagePrefix
 import com.example.finalapp.ui.theme.PURPLE
 import com.example.finalapp.ui.theme.floatingActionBtnColor
@@ -182,14 +183,17 @@ fun PublicEvent(  //currently in use
                EventDescription(event.description)
             }
 
+
            Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(80.dp)
                     .background(Color.White)
             ) {
-               event.topPostsList?.let { UserReactions(it) {selectedPost-> image = selectedPost} }
+                UserReactions(imageUrls) {selectedPost-> image = selectedPost}
             }
+
+
             PeopleCommentWarAndJoinButton(
                 event,
                 onJoinClicked = {
@@ -199,7 +203,9 @@ fun PublicEvent(  //currently in use
                     showBottomSheet=!showBottomSheet
                 }
             )
-            if(!event.topComments.isNullOrEmpty()) EventComments(event.topComments)
+
+//            if(!event.topComments.isNullOrEmpty())
+            EventComments(sampleComments)
 
         }
     }

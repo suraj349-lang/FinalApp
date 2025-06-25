@@ -2,19 +2,20 @@ package com.example.finalapp.screens._2pings.pingsItem
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
@@ -24,17 +25,21 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -146,21 +151,19 @@ fun PingCard() {
 
 @Composable
 fun PingItemCard(item: PingResponse, onShareClicked: () -> Unit, onRespondClicked: () -> Unit) {
-    val color= Color(0xFF111E4E)// getRandomEnergeticColor()
     Card(
         modifier = Modifier
-            .padding(16.dp)
+            .padding(vertical = 4.dp)
             .fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.DarkGray), // Dark background //0xFF1A1A1A
-        elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
+        colors = CardDefaults.cardColors(containerColor = Color.Black), // Dark background //0xFF1A1A1A
+        elevation = CardDefaults.cardElevation(defaultElevation = 200.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
 
-            // User Info
             Row(verticalAlignment = Alignment.CenterVertically) {
                 AsyncImage(
-                    model = imagePrefix+item.user?.profileImage,
+                    model = imagePrefix + item.user?.profileImage,
                     contentDescription = "Profile Picture",
                     modifier = Modifier
                         .size(44.dp)
@@ -170,54 +173,78 @@ fun PingItemCard(item: PingResponse, onShareClicked: () -> Unit, onRespondClicke
                 Column {
                     item.user.let {
                         Text(
-                            if(it?.username.isNullOrEmpty()) "...." else it?.username!!,
+                            if (it?.username.isNullOrEmpty()) "...." else it?.username!!.lowercase(),
                             fontWeight = FontWeight.Bold,
-                            fontFamily = Constants.FONT_MEDIUM,
+                            fontSize=14.sp,
+                            fontFamily = Constants.USER_NAME_FONT,
                             color = Color.White
                         )
                     }
 
                     Text(
-                        "${item.expirationTime} hrs ago",
-                        fontSize = 12.sp,
-                        color = Color.LightGray,
+                        item.location,
+                        fontSize = 10.sp,
+                        color = Color(0xFF067DF1), //0xFF047CF3
+                        fontWeight=FontWeight.Bold,
                         fontFamily = Constants.FONT_EXTRA_LIGHT
                     )
                 }
             }
-
-            Spacer(Modifier.height(16.dp))
-
-            // Ping Box (Coupon-like)
-            Box(
+            Card(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .background(
-                        brush = Brush.horizontalGradient(
-                            colors = listOf(
-                                color, //0xFFFF5F6D  //0xFFEE327C
-                               color //0xFFFFAD05  //0xFFB505FF
-                            ) // Gradient coupon look
-                        ),
-                        shape = RoundedCornerShape(12.dp)
-                    )
-                    .padding(16.dp)
-                    .shadow(8.dp, RoundedCornerShape(12.dp))
+                    .wrapContentSize(),
+                colors = CardDefaults.cardColors(containerColor = Color.Black),
+                shape = RoundedCornerShape(4.dp)
             ) {
-                Text(
-                    text = "🔥 ${item.title}",
-                    fontFamily = Constants.FONT_MEDIUM,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White,
-                    fontSize = 18.sp
-                )
+
+                item.title?.let {
+                    Text(
+                        text = it,
+                        maxLines = 3,
+                        modifier=Modifier.padding(start = 4.dp),
+                        overflow = TextOverflow.Ellipsis,
+                        fontFamily = Constants.USER_NAME_FONT,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White,
+                        fontSize = 18.sp
+                    )
+                }
             }
+            if (!item.description.isNullOrEmpty()) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight(),
+                    colors = CardDefaults.cardColors(containerColor = Color.DarkGray)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                            .wrapContentHeight()
+                    ) {
 
-            Spacer(Modifier.height(12.dp))
+                        Text(
+                            text = "Description:",
+                            fontFamily = Constants.FONT_LIGHT,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                            fontSize = 14.sp
+                        )
 
+                        Text(
+                            text = item.description,
+                            fontFamily = Constants.FONT_LIGHT,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                            fontSize = 12.sp
+                        )
+                    }
+                }
+            }
             // Optional Image
             AsyncImage(
-                model= imagePrefix+item.image,
+                model = imagePrefix + item.image,
                 contentDescription = "Ping Image",
                 modifier = Modifier
                     .fillMaxWidth()
@@ -225,36 +252,65 @@ fun PingItemCard(item: PingResponse, onShareClicked: () -> Unit, onRespondClicke
                     .clip(RoundedCornerShape(14.dp)),
                 contentScale = ContentScale.Crop
             )
-
-            Spacer(Modifier.height(12.dp))
-
             // Stats Row
             Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.spacedBy(16.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
+                Card(modifier = Modifier.wrapContentSize(), colors = CardDefaults.cardColors(containerColor = Color.Black)) {
+                    Row(modifier = Modifier.wrapContentSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+
+                    Row(
+                        modifier = Modifier
+                            .wrapContentSize()
+                            .padding(4.dp),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.people),
+                            contentDescription = "",
+                            modifier = Modifier.size(16.dp),
+                            colorFilter = ColorFilter.tint(
+                                color = Color.LightGray
+                            )
+                        )
+                        Text(
+                            item.totalUpVotes.toString(),
+                            color = Color.White,
+                            fontFamily = Constants.FONT_LIGHT
+                        )
+                    }
+
                 Row(
-                    modifier = Modifier.wrapContentSize(),
+                    modifier = Modifier
+                        .wrapContentSize()
+                        .padding(4.dp),
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.people),
+                        painter = painterResource(id = R.drawable.comment),
                         contentDescription = "",
                         modifier = Modifier.size(16.dp),
-                        colorFilter = ColorFilter.tint(
-                            color = Color(
-                                0xFF4BA1F7
-                            )
-                        )
+                        colorFilter = ColorFilter.tint(color = Color.LightGray)
                     )
-                    Text(item.totalUpVotes.toString(), color = Color.White, fontFamily = Constants.FONT_LIGHT)
+                    Text(
+                        "${if (item.topComments.isNullOrEmpty()) "0" else item.totalComments}",
+                        color = Color.White,
+                        fontFamily = Constants.FONT_LIGHT
+                    )
                 }
-                Card(modifier = Modifier.wrapContentSize(), colors = CardDefaults.cardColors(containerColor = Color(
-                    0xFFF35220
+            }
+                }
+
+                Card(modifier = Modifier.wrapContentSize(),
+                    colors = CardDefaults.cardColors(containerColor = Color.DarkGray),
+                    border = BorderStroke(width = 1.dp, color =Color(0xFFF35220) )
                 )
-                )) {
+                {
                     Row(
-                        modifier = Modifier.wrapContentSize().padding(4.dp),
+                        modifier = Modifier
+                            .wrapContentSize()
+                            .padding(4.dp),
                         horizontalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
                         Image(
@@ -262,74 +318,62 @@ fun PingItemCard(item: PingResponse, onShareClicked: () -> Unit, onRespondClicke
                             contentDescription = "",
                             modifier = Modifier.size(16.dp),
                             colorFilter = ColorFilter.tint(
-                                color = Color(
-                                    0xFF4BA1F7
-                                )
+                                color = Color(0xFFFFFFFF)
                             )
                         )
-                        Text(item.expirationTime + " hrs left", color = Color.White, fontFamily = Constants.FONT_LIGHT)
+                        Text(
+                            item.expirationTime + " hrs left",
+                            color = Color.White,
+                            fontFamily = Constants.FONT_LIGHT
+                        )
                     }
                 }
-                Row(
-                    modifier = Modifier.wrapContentSize(),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.comment),
-                        contentDescription = "",
-                        modifier = Modifier.size(16.dp),
-                        colorFilter = ColorFilter.tint(color = Color(0xFF4BA1F7))
-                    )
-                    Text("${if(item.topComments.isNullOrEmpty()) "0" else item.totalComments}", color = Color.White, fontFamily = Constants.FONT_LIGHT)
-                }
-
             }
-            Spacer(Modifier.height(16.dp))
 
             // Response Buttons
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF1E1E1E))
             ) {
-                Button(
-                    onClick = { },
-                    shape = RoundedCornerShape(50),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00D26A)) // Mint green
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 12.dp, vertical = 10.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        "I'm in",
-                        color = Color.White,
-                        fontFamily = Constants.FONT_MEDIUM,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-                OutlinedButton(
-                    onClick = { },
-                    border = BorderStroke(1.dp, Color.White),
-                    shape = RoundedCornerShape(50)
-                ) {
-                    Text("Chat", color = Color.White, fontFamily = Constants.FONT_MEDIUM)
+                    OutlinedButton(
+                        onClick = onShareClicked,
+                        border = BorderStroke(2.dp, Color(0xFF00D26A)),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Row(modifier = Modifier.wrapContentSize(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                            Image(painter = painterResource(id = R.drawable.join_blue), contentDescription ="", modifier = Modifier.size(18.dp) )
+                            Text(
+                                "Join",
+                                color = Color.White,
+                                fontFamily = Constants.FONT_MEDIUM,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
+
+                    OutlinedButton(
+                        onClick = onShareClicked,
+                        border = BorderStroke(2.dp, Color.White),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Row(modifier = Modifier.wrapContentSize(), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                            Image(painter = painterResource(id = R.drawable.chat_new), contentDescription ="", modifier = Modifier.size(18.dp), colorFilter = ColorFilter.tint(
+                                Color.White) )
+                            Text("Chat", color = Color.White, fontFamily = Constants.FONT_MEDIUM)
+                        }
+
+                    }
                 }
             }
         }
     }
-}
-
-fun getRandomEnergeticColor(): Color {
-    val energeticColors = listOf(
-        Color(0xFFFF3CAC), // Electric Pink
-        Color(0xFFFF6B6B), // Soft Coral Red
-        Color(0xFFFFA41B), // Vibrant Orange
-        Color(0xFF40C4FF), // Neon Blue
-        Color(0xFF7C4DFF), // Vivid Purple
-        Color(0xFF64DD17), // Acid Green
-        Color(0xFF00E5FF), // Bright Cyan
-        Color(0xFFFF4081), // Pink Punch
-        Color(0xFFFF9100), // Orange Pop
-        Color(0xFFFF5252), // Energetic Red
-        Color(0xFFEEFF41), // Neon Lime
-        Color(0xFF00C853), // Vibrant Green
-        Color(0xFFEA80FC), // Bubblegum Purple
-    )
-    return energeticColors.random()
 }
