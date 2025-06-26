@@ -32,6 +32,7 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
 import com.example.finalapp.ui.imagePrefix
+import com.example.finalapp.utils.constants.Constants
 
 
 @OptIn(ExperimentalGlideComposeApi::class)
@@ -39,7 +40,7 @@ import com.example.finalapp.ui.imagePrefix
 fun UserData(username:String,userImage:String) {
     Row(modifier = Modifier
         .fillMaxWidth(0.85f)
-        .wrapContentHeight(), verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.Start) {
+        .wrapContentHeight(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
         Card(modifier = Modifier.size(40.dp), shape = CircleShape) {
             GlideImage(model =  imagePrefix+userImage, contentDescription = "", contentScale = ContentScale.FillBounds, modifier = Modifier
                 .fillMaxWidth()
@@ -48,13 +49,13 @@ fun UserData(username:String,userImage:String) {
         Spacer(modifier = Modifier.width(8.dp))
         Text(
             text = username,
-            fontFamily = FontFamily(Font(R.font.dongle_bold)),
-            color = Color.Black,
+            fontFamily = Constants.USER_NAME_FONT,
+            color = Color.White,
             fontWeight = FontWeight.Bold,
-            fontSize = 25.sp,
+            fontSize = 16.sp,
             style = TextStyle(
                 shadow = Shadow(
-                    color = Color.White.copy(alpha = 0.8f), // Light glow effect
+                    color = Color.Black.copy(alpha = 0.8f), // Light glow effect
                     offset = Offset(0f, 0f),
                     blurRadius = 8f
                 )

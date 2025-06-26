@@ -101,6 +101,7 @@ fun HomeError(eventsViewModel: EventsViewModel){
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeTopBar(
+    backgroundColor:Color = Color.DarkGray,
     scrollBehavior: TopAppBarScrollBehavior,
     title: String,
     navController: NavHostController,
@@ -109,7 +110,7 @@ fun HomeTopBar(
     icon: Int? = null,
     onQRClicked: () -> Unit = {}
 ){
-    val baseColor= floatingActionBtnColor//statusBarColor
+    val baseColor= Color.DarkGray//statusBarColor
     val iconAndTextColor= statusBarColor //homeTopBarIconsColor
 
 

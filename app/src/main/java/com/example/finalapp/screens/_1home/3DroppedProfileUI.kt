@@ -38,6 +38,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -81,6 +82,7 @@ import com.example.finalapp.screens.common.CommonErrorScreen
 import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.utils.ProfileObject
 import com.example.finalapp.utils.UserLocation
+import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
 import com.example.finalapp.utils.testdata.Item
 import kotlinx.coroutines.launch
@@ -127,7 +129,7 @@ fun DroppedProfilesUI(
 
     Surface(modifier = Modifier
         .fillMaxSize()
-        .padding()) {
+        .padding(), color = Color.Black) {
         Column(
             modifier=Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Top,
@@ -152,17 +154,17 @@ fun DroppedProfilesUI(
                     label = {
                         Text(
                             text = "Enter location...",
-                            fontSize=20.sp,
+                            fontSize=14.sp,
                             color=Color.LightGray,
-                            fontFamily = FontFamily(Font(R.font.dongle_bold))
+                            fontFamily = Constants.FONT_MEDIUM
                         )
                     },
                     trailingIcon = {
                                    Text(
                                        text = "Search",
-                                       fontSize = 24.sp,
-                                       fontFamily = DONGLE_BOLD,
-                                       color=Color.DarkGray,
+                                       fontSize = 16.sp,
+                                       fontFamily = Constants.FONT_MEDIUM,
+                                       color=Color.LightGray,
                                        modifier = Modifier
                                            .padding(end = 8.dp)
                                            .clickable {
@@ -171,14 +173,15 @@ fun DroppedProfilesUI(
                                                }
                                            })
                     },
-                    placeholder = { Text(text = labelText) },
+                    placeholder = { Text(text = labelText, color = Color.LightGray) },
                     modifier = Modifier
                         .clickable {
                             labelText = "Search location"
                         }
                         .fillMaxWidth()
                         .padding(4.dp),
-                    shape = RoundedCornerShape(20.dp)
+                    shape = RoundedCornerShape(20.dp),
+                    colors = OutlinedTextFieldDefaults.colors(focusedContainerColor = Color.DarkGray.copy(alpha = 0.8f))
                 )
                 if (showPredictionBoxForSearch) {
                     Box(
@@ -359,13 +362,16 @@ fun DateRangePicker(newDate:String,onDateChange:(String)->Unit,onDismiss:()->Uni
 @Composable
 fun DroppedProfileItem(profile: DropProfileResponse, onProfileClicked:()->Unit) {
     Card(
-        modifier = Modifier.clickable { onProfileClicked() }
+        modifier = Modifier
+            .clickable { onProfileClicked() }
             .padding(2.dp)
             .fillMaxWidth()
             .wrapContentHeight(),
         shape = RoundedCornerShape(4.dp))
     {
-        Column(modifier = Modifier.fillMaxWidth().height(300.dp)) {
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .height(300.dp)) {
             GlideImage(
                 model = imagePrefix + profile.image, // Replace with your image resource
                 contentDescription = "Background Image",
@@ -434,7 +440,7 @@ fun DroppedProfileLocation(location: String, trim: Boolean=false) {
             .fillMaxWidth()
             .height(24.dp)
             .clip(if (trim) RoundedCornerShape(12.dp) else RectangleShape)
-            .background(Color(0xFF077CDA))
+            .background(Color(0xFF077CDA).copy(alpha = 0.6f))
             .onGloballyPositioned { coordinates ->
                 containerWidth.value = coordinates.size.width.toFloat()
             },

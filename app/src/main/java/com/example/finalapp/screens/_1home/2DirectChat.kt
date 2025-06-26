@@ -1,7 +1,9 @@
 package com.example.finalapp.screens._1home
 
+import android.media.midi.MidiOutputPort
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -40,6 +43,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -59,6 +63,7 @@ import com.example.finalapp.screens.common.CommonErrorScreen
 import com.example.finalapp.utils.ProfileObject
 import com.example.finalapp.utils.RequestState
 import com.example.finalapp.utils.UserLocation
+import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
 import com.example.finalapp.viewmodels.AuthViewModel
 import com.example.finalapp.viewmodels.EventsViewModel
@@ -268,10 +273,10 @@ fun SwitchWithIcon(checked: Boolean,onClick:(value:Boolean)->Unit) {
             onClick(it)
         },
         colors = SwitchDefaults.colors(
-            checkedThumbColor = Color.White,// MaterialTheme.colorScheme.primary,
-            checkedTrackColor = Color(0xFF053E77),
-            uncheckedThumbColor = Color.DarkGray,
-            uncheckedTrackColor = Color.LightGray,
+            checkedThumbColor = Color(0xFF047E0A),// MaterialTheme.colorScheme.primary,
+            checkedTrackColor = Color.LightGray,
+            uncheckedThumbColor = Color(0xFFE9AB10),
+            uncheckedTrackColor = Color(0xFFFFFFFF),
         ),
         modifier = Modifier.padding(0.dp)
     )
@@ -281,6 +286,7 @@ fun SwitchWithIcon(checked: Boolean,onClick:(value:Boolean)->Unit) {
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
+
 fun ShareProfileForDirectChat(onShareProfileClicked:()->Unit) {
     Box(modifier = Modifier
         .fillMaxWidth()

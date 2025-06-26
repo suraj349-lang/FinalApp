@@ -1,6 +1,7 @@
 package com.example.finalapp.screens._1home.publicEvent
 
 
+import android.provider.SyncStateContract.Constants
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
@@ -36,6 +37,7 @@ import com.example.finalapp.ui.theme.PURPLE
 import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
 import com.example.finalapp.utils.constants.Constants.DONGLE_NORMAL
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 
 @OptIn(ExperimentalGlideComposeApi::class)
@@ -60,11 +62,36 @@ fun PublicEvent(  //currently in use
     var showBottomSheet by remember {
         mutableStateOf(false)
     }
+    val systemUiController = rememberSystemUiController()
+    val navBarColor = Color.DarkGray
+    val backgroundColor= Color(0xFF121212)
+
+    SideEffect {
+        systemUiController.setNavigationBarColor(
+            color = navBarColor,
+            darkIcons = false
+        )
+        systemUiController.setStatusBarColor(
+            color = navBarColor,     // Your desired color
+            darkIcons = false        // true = dark icons (for light backgrounds)
+        )
+    }
+    DisposableEffect(Unit) {
+        onDispose {
+            systemUiController.setStatusBarColor(
+                color = navBarColor,
+                darkIcons = true
+            )
+            systemUiController.setNavigationBarColor(
+                color = navBarColor,
+                darkIcons = true
+            )
+        }
+    }
 
     Box(modifier = Modifier
         .fillMaxSize()
-        .padding(4.dp)
-        .border(width = 1.dp, color = Color.LightGray)) {
+        .background(color = Color.Black)) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -76,7 +103,7 @@ fun PublicEvent(  //currently in use
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxHeight(0.5f)
-                    .border(width = 1.dp, color = Color.LightGray)
+                   // .border(width = 1.dp, color = Color.LightGray)
             ) {
                 GlideImage(
                     model = imagePrefix+event.image,
@@ -131,7 +158,7 @@ fun PublicEvent(  //currently in use
                     .fillMaxWidth()
                     .fillMaxHeight(0.18f)
                     .background(
-                        color = Color(0xFFF5F5F5)
+                        color = Color.Black
                     )
             ) {
                 Row(
@@ -142,21 +169,21 @@ fun PublicEvent(  //currently in use
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Column(modifier = Modifier.fillMaxHeight(), verticalArrangement = Arrangement.spacedBy(0.dp), horizontalAlignment = Alignment.Start) {
-                        Row(modifier = Modifier.fillMaxHeight(0.4f), verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Row(modifier = Modifier.fillMaxHeight(0.4f).padding(top = 4.dp), verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                             Image(painter = painterResource(id = R.drawable.location_new), contentDescription ="" )
-                            Text(text =event.location, fontSize = 18.sp, fontFamily = DONGLE_BOLD)
+                            Text(text =event.location, fontSize = 12.sp, fontFamily = com.example.finalapp.utils.constants.Constants.FONT_MEDIUM, color = Color.White)
                         }
                         event.title?.let {
                             Text(
                                 text = it,
                                 Modifier.fillMaxHeight(1f),
-                                fontFamily = FontFamily(Font(R.font.dongle_bold)),
-                                color =PURPLE,
-                                fontSize = 30.sp
+                                fontFamily = com.example.finalapp.utils.constants.Constants.FONT_MEDIUM,
+                                color = Color.White,
+                                fontSize = 12.sp
                             )
                         }
                     }
-                    Image(painter = painterResource(id = R.drawable.arrow_down),
+                    Image(painter = painterResource(id = if(height) R.drawable.up_arrow else R.drawable.arrow_down),
                         contentDescription = "",
                         colorFilter = ColorFilter.tint(
                             //Color.White
@@ -168,12 +195,13 @@ fun PublicEvent(  //currently in use
                     Button(
                         onClick = { image= imageUrls.get(++index)},
                         modifier = Modifier,
-                        colors = ButtonDefaults.buttonColors(backgroundColor = Color.White),
-                        border = BorderStroke(width = 0.5.dp, color = floatingActionBtnColor.copy(alpha = 0.6f))
+                        shape=RoundedCornerShape(16.dp),
+                        colors = ButtonDefaults.buttonColors(backgroundColor = Color.LightGray),
+                       // border = BorderStroke(width = 0.5.dp, color = floatingActionBtnColor.copy(alpha = 0.6f))
                     ) {
                         Text(
                             text = "Next",
-                            fontFamily = FontFamily(Font(R.font.dongle_bold)), fontSize = 22.sp
+                            fontFamily = com.example.finalapp.utils.constants.Constants.FONT_MEDIUM, fontSize = 14.sp
                         )
 
                     }
@@ -188,7 +216,7 @@ fun PublicEvent(  //currently in use
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(80.dp)
-                    .background(Color.White)
+                    .background(Color.Black)
             ) {
                 UserReactions(imageUrls) {selectedPost-> image = selectedPost}
             }
@@ -222,7 +250,7 @@ fun PeopleCommentWarAndJoinButton(event: EventResponse,onJoinClicked:()->Unit,on
         .padding(top = 8.dp)
         .fillMaxWidth()
         .height(50.dp)
-        .background(Color.White))
+        .background(Color.Black))
     {
         Row(
             modifier = Modifier
@@ -231,19 +259,20 @@ fun PeopleCommentWarAndJoinButton(event: EventResponse,onJoinClicked:()->Unit,on
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             Column( horizontalAlignment = Alignment.CenterHorizontally) {
-                Image(painter = painterResource(id = R.drawable.people), contentDescription ="", modifier = Modifier.size(30.dp), colorFilter = ColorFilter.tint(Color.DarkGray) )
-                Text(text =event.peopleJoined.toString()  , fontSize = 12.sp, fontFamily = DONGLE_NORMAL, color = Color.DarkGray)
+                Image(painter = painterResource(id = R.drawable.people), contentDescription ="", modifier = Modifier.size(30.dp), colorFilter = ColorFilter.tint(Color.White) )
+                Text(text =event.peopleJoined.toString()  , fontSize = 12.sp, fontFamily = DONGLE_NORMAL, color = Color.White)
             }
             Column( horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.clickable { onCommentClicked() }) {
-                Image(painter = painterResource(id = R.drawable.comment_filled), contentDescription ="", modifier = Modifier.size(30.dp), colorFilter = ColorFilter.tint(Color.DarkGray) )
-                Text(text = event.totalComments.toString() , fontSize = 12.sp, fontFamily = DONGLE_NORMAL, color = Color.DarkGray)
+                Image(painter = painterResource(id = R.drawable.comment_filled), contentDescription ="", modifier = Modifier.size(30.dp), colorFilter = ColorFilter.tint(Color.White) )
+                Text(text = event.totalComments.toString() , fontSize = 12.sp, fontFamily = DONGLE_NORMAL, color = Color.White)
             }
             Column( horizontalAlignment = Alignment.CenterHorizontally) {
-                Image(painter = painterResource(id = R.drawable.war_room), contentDescription ="", modifier = Modifier.size(30.dp),colorFilter = ColorFilter.tint(Color.DarkGray) )
-                Text(text= event.totalChildPosts.toString() , fontSize = 12.sp, fontFamily = DONGLE_NORMAL, color = Color.DarkGray)
+                Image(painter = painterResource(id = R.drawable.war_room), contentDescription ="", modifier = Modifier.size(30.dp),colorFilter = ColorFilter.tint(Color.White) )
+                Text(text= event.totalChildPosts.toString() , fontSize = 12.sp, fontFamily = DONGLE_NORMAL, color = Color.White
+                )
             }
-            Button(onClick = {onJoinClicked() }, modifier = Modifier.height(40.dp),shape= RoundedCornerShape(8.dp),colors = ButtonDefaults.buttonColors(backgroundColor = Color.DarkGray)) {
-                Text(text = "+JOIN", fontFamily = DONGLE_BOLD, fontSize = 20.sp,color=Color.White)
+            Button(onClick = {onJoinClicked() }, modifier = Modifier.height(40.dp),shape= RoundedCornerShape(8.dp),colors = ButtonDefaults.buttonColors(backgroundColor = Color.White)) {
+                Text(text = "+JOIN", fontFamily = DONGLE_BOLD, fontSize = 20.sp,color=Color.Black)
             }
         }
     }

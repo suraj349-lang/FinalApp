@@ -39,7 +39,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -56,20 +58,51 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.example.finalapp.testing.TabItem
 import com.example.finalapp.ui.theme.floatingActionBtnColor
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Preview(showBackground = true)
 @Composable
-fun PublicEventDetailsScreenWrapper() {
+fun PublicEventDetailsScreenWrapper(navController: NavHostController= NavHostController(LocalContext.current)) {
 
+    val systemUiController = rememberSystemUiController()
+    val navBarColor = topColor
+    val backgroundColor= Color(0xFF121212)
+
+    SideEffect {
+//        systemUiController.setNavigationBarColor(
+//            color = navBarColor,
+//            darkIcons = false
+//        )
+        systemUiController.setStatusBarColor(
+            color = navBarColor,     // Your desired color
+            darkIcons = false        // true = dark icons (for light backgrounds)
+        )
+    }
+    DisposableEffect(Unit) {
+        onDispose {
+            systemUiController.setStatusBarColor(
+                color = floatingActionBtnColor,
+                darkIcons = true
+            )
+            systemUiController.setNavigationBarColor(
+                color = Color.Transparent,
+                darkIcons = true
+            )
+        }
+    }
     Scaffold(
-        topBar = { PublicEventDetailsTopBar("Farmer's Protest,India") },
+        topBar = { PublicEventDetailsTopBar("Farmer's Protest,India"){
+            navController.navigateUp()
+        } },
         content = {
             Surface(modifier = Modifier
                 .fillMaxSize()
@@ -88,11 +121,11 @@ fun PublicEventDetailsScreen() {
         // .verticalScroll(rememberScrollState())
         .fillMaxSize(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
         //background image
-        Box(modifier = Modifier.fillMaxWidth().height(200.dp)) {
+        Box(modifier = Modifier.fillMaxWidth().height(280.dp)) {
             Image(painter = painterResource(id = R.drawable.profile_image_1), contentDescription = "", modifier = Modifier.fillMaxSize(), contentScale = ContentScale.FillWidth)
         }
         PeopleCommentWar(onCommentClicked={/*navigate to CommentsScreen()*/})
-        EventDescriptionWar(eventDescription = "Farmers protest is one of the biggest protest in the world")
+        EventDescriptionWar(eventDescription = "Farmers protest is one of the biggest protest in the world.")
         ThreeOptions()
 
     }
@@ -111,7 +144,7 @@ fun PeopleCommentWar(
     Box(modifier = Modifier
         .padding(top = 4.dp, start = 8.dp)
         .fillMaxWidth()
-        .height(35.dp)
+        .height(40.dp)
         .background(Color.Black))
     {
         Row(
@@ -133,22 +166,19 @@ fun PeopleCommentWar(
                 Text(text= "100" , fontSize = 10.sp, fontFamily = Constants.FONT_LIGHT, color = Color.White)
             }
 
-            Column( horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.clickable { onLiveClicked() }) {
-                Button(onClick = { /*TODO*/ }, colors = ButtonDefaults.buttonColors(backgroundColor = Color(
-                    0xFF2738A2
-                )
-                )) {
-                  //  Image(painter = painterResource(id = R.drawable.share), contentDescription ="", modifier = Modifier.size(20.dp),colorFilter = ColorFilter.tint(Color.White) )
-                    Text(text= "+Live" , fontSize = 18.sp, color = Color.White)
-                }
-//                Image(painter = painterResource(id = R.drawable.share), contentDescription ="", modifier = Modifier.size(20.dp),colorFilter = ColorFilter.tint(Color.White) )
-//
-            }
-            Button(onClick = { onContributeClicked() }, colors = ButtonDefaults.buttonColors(backgroundColor = Color(
-                0xFF5D8F32
-            )
-            )) {
-                Text(text= "+Contribute" , fontSize = 18.sp, color = Color.White)
+//            Column( horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.clickable { onLiveClicked() }) {
+//                Button(onClick = { /*TODO*/ }, colors = ButtonDefaults.buttonColors(backgroundColor = Color(
+//                    0xFF2738A2
+//                )
+//                )) {
+//                  //  Image(painter = painterResource(id = R.drawable.share), contentDescription ="", modifier = Modifier.size(20.dp),colorFilter = ColorFilter.tint(Color.White) )
+//                    Text(text= "+Live" , fontSize = 18.sp, color = Color.White)
+//                }
+////                Image(painter = painterResource(id = R.drawable.share), contentDescription ="", modifier = Modifier.size(20.dp),colorFilter = ColorFilter.tint(Color.White) )
+////
+//            }
+            Button(onClick = { onContributeClicked() }) {
+                Text(text= "+Contribute" , fontSize = 18.sp, color = Color.White, fontFamily = Constants.USER_NAME_FONT)
             }
 //            Column( horizontalAlignment = Alignment.CenterHorizontally) {
 //
@@ -170,7 +200,7 @@ fun EventDescriptionWar(eventDescription:String?) {
             .fillMaxWidth()
             .wrapContentHeight()
             .verticalScroll(rememberScrollState())) {
-            Text(text = "Description", color = Color.White, fontSize = 16.sp,fontFamily = Constants.USER_NAME_FONT)
+           // Text(text = "Description", color = Color.White, fontSize = 16.sp,fontFamily = Constants.USER_NAME_FONT)
             if (eventDescription != null) {
                 Text(
                     text = eventDescription,
@@ -230,7 +260,7 @@ fun ThreeOptions() {
                     height = 3.dp
                 )
             },
-            backgroundColor = floatingActionBtnColor.copy(alpha = 0.9f),//Color(0xFFFFFFFF), //0xFFD5623E orange , 0xFFBCE697 green
+            backgroundColor = Color.Black,//Color(0xFFFFFFFF), //0xFFD5623E orange , 0xFFBCE697 green
             modifier = Modifier
                 //   .border(width = 0.dp, color = Color.White)
                 .padding(bottom = 0.dp)

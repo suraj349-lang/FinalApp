@@ -69,7 +69,7 @@ sealed class Destinations(
 
 @Composable
 fun BottomBar(
-    navController: NavHostController, state: MutableState<Boolean>, modifier: Modifier = Modifier, containerColor:Color= Color.White,highlightedTextColor:Color=Color.Black, onCreateEventClick: () -> Unit={}) {
+    navController: NavHostController, state: MutableState<Boolean>, modifier: Modifier = Modifier, containerColor:Color= Color.DarkGray,highlightedTextColor:Color=Color.White, onCreateEventClick: () -> Unit={}) {
     val screens = listOf(
         Destinations.HomeScreen, Destinations.Pings,Destinations.CreateEvent,Destinations.ProfileScreen,Destinations.Settings
     )
@@ -87,8 +87,8 @@ fun BottomBar(
                             Image(painter = painterResource(id = screen.activeIcon), contentDescription ="",modifier=Modifier.size(20.dp) )
                             Text(text = screen.name, fontSize = 11.sp, style = MaterialTheme.typography.labelSmall, color =  highlightedTextColor, fontWeight = FontWeight.Bold  )
                         }else{
-                            Image(painter = painterResource(id = screen.inactiveIcon), contentDescription ="",modifier=Modifier.size(20.dp), colorFilter = ColorFilter.tint( color =  Color.Gray) )
-                            Text(text = screen.name, fontSize = 11.sp, style = MaterialTheme.typography.labelSmall, color =  Color.Gray)
+                            Image(painter = painterResource(id = screen.inactiveIcon), contentDescription ="",modifier=Modifier.size(20.dp), colorFilter = ColorFilter.tint( color =  Color.White) )
+                            Text(text = screen.name, fontSize = 11.sp, style = MaterialTheme.typography.labelSmall, color =  Color.LightGray)
                         }
                     }
 

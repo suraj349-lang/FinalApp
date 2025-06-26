@@ -116,6 +116,7 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
     Scaffold(
         topBar = {
             HomeTopBar(
+                backgroundColor = Color.DarkGray,
                 scrollBehavior,
                 Constants.APP_NAME,
                 navController,
@@ -160,7 +161,7 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
                                 height = 3.dp
                             )
                         },
-                        backgroundColor = floatingActionBtnColor.copy(alpha = 0.9f),//Color(0xFFFFFFFF), //0xFFD5623E orange , 0xFFBCE697 green
+                        backgroundColor = Color.DarkGray,//Color(0xFFFFFFFF), //0xFFD5623E orange , 0xFFBCE697 green
                         modifier = Modifier
                          //   .border(width = 0.dp, color = Color.White)
                             .padding(bottom = 0.dp)
@@ -174,7 +175,7 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
                                 text = {
                                     Text(
                                         text = item.title,
-                                        color = if (pagerState.currentPage == index) Color(0xFFFFFFFF) /*Color(0xFFDF400E)*/ else Color.LightGray,
+                                        color = if (pagerState.currentPage == index) Color(0xFFFFFFFF) /*Color(0xFFDF400E)*/ else Color.White.copy(alpha = 0.7f),
                                         fontFamily = Constants.FONT_MEDIUM,//FontFamily(Font(R.font.dongle_light)),
                                         fontSize = 12.sp,//20.sp,
                                         fontWeight = if (pagerState.currentPage == index) FontWeight.Bold else FontWeight.Normal
