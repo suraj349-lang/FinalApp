@@ -46,7 +46,7 @@ fun UserReactions(imageUrls:List<String>,onImageClicked:(String)->Unit) {
             Box(modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(1f)
-                .clip(RoundedCornerShape(20.dp))
+                .clip(RoundedCornerShape(8.dp))
                 .background(color = Color(0xFFFBC02D))) {
                 Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
                     Image(painter = painterResource(id = R.drawable.add), contentDescription ="", colorFilter = ColorFilter.tint(
@@ -64,7 +64,7 @@ fun UserReactions(imageUrls:List<String>,onImageClicked:(String)->Unit) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(1f)
-                    .clip(RoundedCornerShape(20.dp))
+                    .clip(RoundedCornerShape(8.dp))
             ) {
                 GlideImage(
                     model = imageUrl,

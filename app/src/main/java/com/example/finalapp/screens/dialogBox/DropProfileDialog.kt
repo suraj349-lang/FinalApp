@@ -70,6 +70,7 @@ import com.example.finalapp.ui.imagePickerText
 import com.example.finalapp.utils.ProfileObject
 import com.example.finalapp.utils.RequestState
 import com.example.finalapp.utils.UserLocation
+import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
 import com.example.finalapp.viewmodels.AuthViewModel
 import com.example.finalapp.viewmodels.EventsViewModel
@@ -147,10 +148,10 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                             text = "Drop Profile",
                             modifier = Modifier.fillMaxWidth(),
                             color = Color.White,
-                            fontSize = 28.sp,
+                            fontSize = 20.sp,
                             textAlign = TextAlign.Start,
-                            fontFamily = DONGLE_BOLD,
-                            lineHeight = 26.sp // Adjust line height if needed
+                            fontFamily = Constants.USER_NAME_FONT,
+                            //lineHeight = 26.sp // Adjust line height if needed
                         )
                     }
                 }

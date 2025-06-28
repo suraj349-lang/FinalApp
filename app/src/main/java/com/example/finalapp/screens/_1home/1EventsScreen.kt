@@ -23,6 +23,7 @@ import androidx.navigation.NavHostController
 import com.example.finalapp.R
 import com.example.finalapp.model.EventRequestDTO
 import com.example.finalapp.model.EventResponse
+import com.example.finalapp.screens.EventAndPingDesigns.events.EventScreenWrapper1
 import com.example.finalapp.screens._1home.publicEvent.PublicEvent
 import com.example.finalapp.screens._1home.publicEvent.PublicEventNewUI
 import com.example.finalapp.screens.common.NoDataFound
@@ -82,14 +83,15 @@ fun EventsScreen(
                     ) { page ->
                         val event = eventList[page]
 
-                        PublicEvent(
-                            event,
-                            navController,
-                            height = false,
-                            index = 2,
-                            imageUrls = imageUrls
-
-                        )
+//                        PublicEvent(
+//                            event,
+//                            navController,
+//                            height = false,
+//                            index = 2,
+//                            imageUrls = imageUrls
+//
+//                        )
+                        EventScreenWrapper1()
                     }
                 }
             }else{

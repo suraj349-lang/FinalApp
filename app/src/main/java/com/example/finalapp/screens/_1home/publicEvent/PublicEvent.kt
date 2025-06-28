@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
@@ -23,6 +24,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
@@ -102,7 +104,7 @@ fun PublicEvent(  //currently in use
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .fillMaxHeight(0.5f)
+                    .fillMaxHeight(0.65f)
                    // .border(width = 1.dp, color = Color.LightGray)
             ) {
                 GlideImage(
@@ -154,9 +156,9 @@ fun PublicEvent(  //currently in use
                 }
             }
             Box(
-                modifier = Modifier
+                modifier = Modifier.zIndex(4f).shadow(elevation = 60.dp, ambientColor = Color.White)
                     .fillMaxWidth()
-                    .fillMaxHeight(0.18f)
+                    .height(60.dp).padding(end = 8.dp)
                     .background(
                         color = Color.Black
                     )
@@ -164,46 +166,30 @@ fun PublicEvent(  //currently in use
                 Row(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(start = 16.dp, end = 16.dp),
+                        .padding(start =  8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Column(modifier = Modifier.fillMaxHeight(), verticalArrangement = Arrangement.spacedBy(0.dp), horizontalAlignment = Alignment.Start) {
-                        Row(modifier = Modifier.fillMaxHeight(0.4f).padding(top = 4.dp), verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                            Image(painter = painterResource(id = R.drawable.location_new), contentDescription ="" )
-                            Text(text =event.location, fontSize = 12.sp, fontFamily = com.example.finalapp.utils.constants.Constants.FONT_MEDIUM, color = Color.White)
-                        }
                         event.title?.let {
                             Text(
                                 text = it,
-                                Modifier.fillMaxHeight(1f),
+//                                Modifier.fillMaxHeight(1f),
                                 fontFamily = com.example.finalapp.utils.constants.Constants.FONT_MEDIUM,
                                 color = Color.White,
-                                fontSize = 12.sp
+                                fontSize = 20.sp
+                            )
+                        }
+                        Row(modifier = Modifier, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
+                           //  Image(painter = painterResource(id = R.drawable.location_new), contentDescription ="", modifier = Modifier.size(14.dp) )
+                            Text(text =event.location, fontSize = 12.sp, fontFamily = com.example.finalapp.utils.constants.Constants.FONT_MEDIUM, color = Color(
+                                0xFF4C9FF0
+                            )
                             )
                         }
                     }
-                    Image(painter = painterResource(id = if(height) R.drawable.up_arrow else R.drawable.arrow_down),
-                        contentDescription = "",
-                        colorFilter = ColorFilter.tint(
-                            //Color.White
-                        Color(0xFF095985)),
-                        modifier = Modifier
-                            .size(30.dp)
-                            .clickable { height = !height })
-
-                    Button(
-                        onClick = { image= imageUrls.get(++index)},
-                        modifier = Modifier,
-                        shape=RoundedCornerShape(16.dp),
-                        colors = ButtonDefaults.buttonColors(backgroundColor = Color.LightGray),
-                       // border = BorderStroke(width = 0.5.dp, color = floatingActionBtnColor.copy(alpha = 0.6f))
-                    ) {
-                        Text(
-                            text = "Next",
-                            fontFamily = com.example.finalapp.utils.constants.Constants.FONT_MEDIUM, fontSize = 14.sp
-                        )
-
+                    Button(onClick = { navController.navigate(SCREENS.PUBLIC_EVENT_DETAILS_SCREEN_WRAPPER.route) }, modifier = Modifier.height(40.dp),shape= RoundedCornerShape(2.dp),colors = ButtonDefaults.buttonColors(backgroundColor = Color.White)) {
+                        Text(text = "+JOIN", fontFamily = com.example.finalapp.utils.constants.Constants.FONT_MEDIUM, fontSize = 16.sp,color=Color.Black)
                     }
                 }
             }
@@ -215,7 +201,7 @@ fun PublicEvent(  //currently in use
            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(80.dp)
+                    .height(70.dp)
                     .background(Color.Black)
             ) {
                 UserReactions(imageUrls) {selectedPost-> image = selectedPost}
@@ -224,16 +210,13 @@ fun PublicEvent(  //currently in use
 
             PeopleCommentWarAndJoinButton(
                 event,
-                onJoinClicked = {
-                    navController.navigate(SCREENS.PUBLIC_EVENT_DETAILS_SCREEN_WRAPPER.route)
-                },
                 onCommentClicked = {
                     showBottomSheet=!showBottomSheet
                 }
             )
 
 //            if(!event.topComments.isNullOrEmpty())
-            EventComments(sampleComments)
+         //   EventComments(sampleComments)
 
         }
     }
@@ -244,10 +227,10 @@ fun PublicEvent(  //currently in use
 }
 
 @Composable
-fun PeopleCommentWarAndJoinButton(event: EventResponse,onJoinClicked:()->Unit,onCommentClicked: () -> Unit) {
+fun PeopleCommentWarAndJoinButton(event: EventResponse,onCommentClicked: () -> Unit) {
 
     Box(modifier = Modifier
-        .padding(top = 8.dp)
+        .padding( 8.dp)
         .fillMaxWidth()
         .height(50.dp)
         .background(Color.Black))
@@ -256,23 +239,20 @@ fun PeopleCommentWarAndJoinButton(event: EventResponse,onJoinClicked:()->Unit,on
             modifier = Modifier
                 .fillMaxSize(),
             verticalAlignment = Alignment.Top,
-            horizontalArrangement = Arrangement.SpaceEvenly
+            horizontalArrangement = Arrangement.spacedBy(30.dp)
         ) {
             Column( horizontalAlignment = Alignment.CenterHorizontally) {
-                Image(painter = painterResource(id = R.drawable.people), contentDescription ="", modifier = Modifier.size(30.dp), colorFilter = ColorFilter.tint(Color.White) )
+                Image(painter = painterResource(id = R.drawable.people), contentDescription ="", modifier = Modifier.size(24.dp), colorFilter = ColorFilter.tint(Color.White.copy(alpha = 0.8f)) )
                 Text(text =event.peopleJoined.toString()  , fontSize = 12.sp, fontFamily = DONGLE_NORMAL, color = Color.White)
             }
             Column( horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.clickable { onCommentClicked() }) {
-                Image(painter = painterResource(id = R.drawable.comment_filled), contentDescription ="", modifier = Modifier.size(30.dp), colorFilter = ColorFilter.tint(Color.White) )
+                Image(painter = painterResource(id = R.drawable.comment_filled), contentDescription ="", modifier = Modifier.size(24.dp), colorFilter = ColorFilter.tint(Color.White.copy(alpha = 0.8f)) )
                 Text(text = event.totalComments.toString() , fontSize = 12.sp, fontFamily = DONGLE_NORMAL, color = Color.White)
             }
             Column( horizontalAlignment = Alignment.CenterHorizontally) {
-                Image(painter = painterResource(id = R.drawable.war_room), contentDescription ="", modifier = Modifier.size(30.dp),colorFilter = ColorFilter.tint(Color.White) )
+                Image(painter = painterResource(id = R.drawable.war_room), contentDescription ="", modifier = Modifier.size(24.dp),colorFilter = ColorFilter.tint(Color.White.copy(alpha=0.8f)) )
                 Text(text= event.totalChildPosts.toString() , fontSize = 12.sp, fontFamily = DONGLE_NORMAL, color = Color.White
                 )
-            }
-            Button(onClick = {onJoinClicked() }, modifier = Modifier.height(40.dp),shape= RoundedCornerShape(8.dp),colors = ButtonDefaults.buttonColors(backgroundColor = Color.White)) {
-                Text(text = "+JOIN", fontFamily = DONGLE_BOLD, fontSize = 20.sp,color=Color.Black)
             }
         }
     }

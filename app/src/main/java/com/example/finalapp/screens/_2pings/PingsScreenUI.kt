@@ -10,7 +10,6 @@ import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,7 +36,6 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -52,8 +50,8 @@ import androidx.navigation.NavHostController
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.finalapp.model.DropProfileResponse
-import com.example.finalapp.screens._2pings.pingsItem.PingItemCard
-import com.example.finalapp.screens._2pings.pingsItem.PingsItemUI
+import com.example.finalapp.screens.EventAndPingDesigns.pings.PingItem1
+import com.example.finalapp.screens.EventAndPingDesigns.pings.PingItem2
 import com.example.finalapp.screens._3createEventOrPing.CreateEventOrPingBottomSheet
 import com.example.finalapp.screens.common.CommonErrorScreen
 import com.example.finalapp.ui.theme.floatingActionBtnColor
@@ -182,16 +180,25 @@ fun PingsScreenUI(navController:NavHostController,eventsViewModel: EventsViewMod
                     state = listState,
                     contentPadding = PaddingValues(top = 0.dp, bottom = 16.dp))
                 {
+                   // val number=Random.nextInt()
                         allPingsState?.itemCount?.let {
                             Log.i("POSTCOUNT", "PingsScreenUI: $it")
                             items(it) { index ->
                                 val item = allPingsState[index]
                                 if (item != null) {
-                                    PingItemCard(
-                                        item,
-                                        onShareClicked = {},
-                                        onRespondClicked = {}
-                                    )
+//                                    PingItemCard(
+//                                        item,
+//                                        onShareClicked = {},
+//                                        onRespondClicked = {}
+//                                    )
+                                 //   PingItem1(item)
+                                    PingItem2(item = item)
+                                    
+//                                    if(number/2==0) {
+//                                        PingItem2(item)
+//                                    }else{
+//                                        PingItem1()
+//                                    }
                                     Divider(
                                         modifier = Modifier.fillMaxWidth(),
                                         thickness = 0.5.dp,
