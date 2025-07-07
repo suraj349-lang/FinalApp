@@ -40,6 +40,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -50,6 +51,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.items
+import coil.compose.AsyncImage
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
@@ -101,40 +103,40 @@ fun DirectChatScreen(
                     .fillMaxSize()
                     .padding(paddingValues)
             ) {
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .padding(end = 16.dp, top = 8.dp)
-                    ) {
-                        SwitchWithIcon(checked) {
-                            eventsViewModel.shareProfileClicked.value = !eventsViewModel.shareProfileClicked.value
-                        }
-                    }
+                Image(painter = painterResource(id = R.drawable.whatsapp), contentDescription ="", contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize() )
+                Text(
+                    text = if(checked)"Users near you" else "Share profile nearby" ,
+                    fontFamily = DONGLE_BOLD,
+                    fontSize = 24.sp,
+                    modifier = Modifier.align(Alignment.TopStart).padding(top = 10.dp, start = 10.dp)
+                )
+                Switch(
+                    checked = checked,
+                    onCheckedChange = {
+                        eventsViewModel.shareProfileClicked.value = !eventsViewModel.shareProfileClicked.value
+                    },
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = Color(0xFF047E0A),// MaterialTheme.colorScheme.primary,
+                        checkedTrackColor = Color.LightGray,
+                        uncheckedThumbColor = Color(0xFFE9AB10),
+                        uncheckedTrackColor = Color(0xFFFFFFFF),
+                    ),
+                    modifier = Modifier.align(Alignment.TopEnd).padding(end = 16.dp)
+                )
+
+
                 Column(modifier = Modifier.fillMaxSize()) {
-                    Row(
-                        modifier = Modifier
-                            .padding(start = 16.dp)
-                            .fillMaxWidth()
-                            .height(60.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Start
-                    ) {
-                        Text(
-                            text = if(checked)"Users near you" else "Share profile nearby" ,
-                            fontFamily = DONGLE_BOLD,
-                            fontSize = 24.sp
-                        )
-                    }
                     DirectChatUI(
                         scrollBehavior,
                         eventsViewModel,
                         navController,
-                        checked
-                    ) { eventsViewModel.shareProfileClicked.value = true }
+                        checked,
+                        onShareProfileClicked = {
+                            eventsViewModel.shareProfileClicked.value = true
+                        }
+                    )
                 }
-
-
-                }
+            }
         }
     )
 }
@@ -266,20 +268,8 @@ fun DirectChatItem(
 
 
 @Composable
-fun SwitchWithIcon(checked: Boolean,onClick:(value:Boolean)->Unit) {
-    Switch(
-        checked = checked,
-        onCheckedChange = {
-            onClick(it)
-        },
-        colors = SwitchDefaults.colors(
-            checkedThumbColor = Color(0xFF047E0A),// MaterialTheme.colorScheme.primary,
-            checkedTrackColor = Color.LightGray,
-            uncheckedThumbColor = Color(0xFFE9AB10),
-            uncheckedTrackColor = Color(0xFFFFFFFF),
-        ),
-        modifier = Modifier.padding(0.dp)
-    )
+fun SwitchWithIcon(checked: Boolean,alignment: Alignment,onClick:(value:Boolean)->Unit) {
+
 
 
 }
@@ -291,7 +281,6 @@ fun ShareProfileForDirectChat(onShareProfileClicked:()->Unit) {
     Box(modifier = Modifier
         .fillMaxWidth()
         .fillMaxHeight(1f)) {
-        Image(painter = painterResource(id = R.drawable.whatsapp), contentDescription ="", contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize() )
         Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
             Card(
                 modifier = Modifier
@@ -306,10 +295,11 @@ fun ShareProfileForDirectChat(onShareProfileClicked:()->Unit) {
                       modifier = Modifier.size(150.dp),
                       shape = CircleShape,
                       border = BorderStroke(width = 1.dp, color = Color.LightGray)) {
-                    GlideImage(
+                    AsyncImage(
                         model = imagePrefix+ProfileObject.profile?.profileImage,
                         contentDescription = "",
-                        contentScale = ContentScale.Crop
+                        contentScale = ContentScale.Crop,
+                        filterQuality = FilterQuality.High
                     )
                 }
                 ProfileObject.profile?.let { Text(text = it.username, overflow = TextOverflow.Ellipsis, fontFamily = DONGLE_BOLD, fontSize =24.sp) }

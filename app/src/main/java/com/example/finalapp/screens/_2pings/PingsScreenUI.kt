@@ -50,8 +50,7 @@ import androidx.navigation.NavHostController
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.finalapp.model.DropProfileResponse
-import com.example.finalapp.screens.EventAndPingDesigns.pings.PingItem1
-import com.example.finalapp.screens.EventAndPingDesigns.pings.PingItem2
+import com.example.finalapp.screens.EventAndPingDesigns.pings.PingItem3
 import com.example.finalapp.screens._3createEventOrPing.CreateEventOrPingBottomSheet
 import com.example.finalapp.screens.common.CommonErrorScreen
 import com.example.finalapp.ui.theme.floatingActionBtnColor
@@ -192,7 +191,8 @@ fun PingsScreenUI(navController:NavHostController,eventsViewModel: EventsViewMod
 //                                        onRespondClicked = {}
 //                                    )
                                  //   PingItem1(item)
-                                    PingItem2(item = item)
+                                   // PingItem2(item = item)
+                                    PingItem3(item)
                                     
 //                                    if(number/2==0) {
 //                                        PingItem2(item)
@@ -202,7 +202,7 @@ fun PingsScreenUI(navController:NavHostController,eventsViewModel: EventsViewMod
                                     Divider(
                                         modifier = Modifier.fillMaxWidth(),
                                         thickness = 0.5.dp,
-                                        color = Color.LightGray
+                                        color = Color.LightGray.copy(alpha = 0.2f)
                                     )
                                 }
                             }

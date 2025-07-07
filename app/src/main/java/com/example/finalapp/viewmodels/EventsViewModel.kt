@@ -164,7 +164,7 @@ class EventsViewModel @Inject constructor(
                 config = PagingConfig(pageSize = 10, prefetchDistance = 5),
                 pagingSourceFactory = { DirectChatUsersPagingSource(eventsRepository, lat, long) }
             ).flow
-                .cachedIn(viewModelScope)
+              //  .cachedIn(viewModelScope)
                 .onStart {
                     _directChatRequestState.emit(RequestState.Loading) // Show loading UI
                 }
@@ -261,6 +261,28 @@ class EventsViewModel @Inject constructor(
                 _userEventsListResponse.value = RequestState.Success(it.data)
                 canFetchEvents.value=false
                 Log.d(TAG, "user events data ${_userEventsListResponse.value}")
+
+            }
+    }
+    //----------------------------Get user events for Profile----------------------------------------------------------------------------------------//
+    private val _userPingsListResponse = MutableStateFlow<RequestState<List<PingResponse>>>(RequestState.Idle)
+    val userPingsListResponse: StateFlow<RequestState<List<PingResponse>>> = _userPingsListResponse.asStateFlow()
+    val canFetchPings = mutableStateOf(true)
+
+    fun getUserPings(id:String)=viewModelScope.launch(Dispatchers.IO) {
+        val TAG="GET_Pings_RESPONSE";
+        eventsRepository.getUserPings(id)
+            .onStart {
+                _userPingsListResponse.value = RequestState.Loading
+
+            }.catch {
+                _userPingsListResponse.value = RequestState.Error(it)
+                Log.d(TAG, "user events error ${_userPingsListResponse.value}")
+
+            }.collect {
+                _userPingsListResponse.value = RequestState.Success(it.data)
+                canFetchPings.value=false
+                Log.d(TAG, "user events data ${_userPingsListResponse.value}")
 
             }
     }

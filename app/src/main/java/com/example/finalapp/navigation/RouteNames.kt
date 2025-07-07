@@ -35,6 +35,7 @@ sealed class SCREENS(val route:String){
     object CREATE_PING:SCREENS("create_ping")
     object CREATE_EVENT:SCREENS("create_event_public")
     object PUBLIC_EVENT_DETAILS_SCREEN_WRAPPER:SCREENS("publicEventDetailsScreenWrapper")
+    object PRIVATE_PROFILE:SCREENS("private_profile")
     object PAST_OFFERS:SCREENS("past_offers")
     object TABVIEW:SCREENS("tab_view")
     object TIKTOK:SCREENS("tiktok")

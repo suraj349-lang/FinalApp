@@ -24,11 +24,8 @@ import com.example.finalapp.R
 import com.example.finalapp.model.EventRequestDTO
 import com.example.finalapp.model.EventResponse
 import com.example.finalapp.screens.EventAndPingDesigns.events.EventScreenWrapper1
-import com.example.finalapp.screens._1home.publicEvent.PublicEvent
-import com.example.finalapp.screens._1home.publicEvent.PublicEventNewUI
 import com.example.finalapp.screens.common.NoDataFound
 import com.example.finalapp.screens.dialogBox.DialogLoading
-import com.example.finalapp.testingDataAndScreen.imageUrls
 import com.example.finalapp.screens.common.CommonErrorScreen
 import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.utils.RequestState
@@ -91,7 +88,7 @@ fun EventsScreen(
 //                            imageUrls = imageUrls
 //
 //                        )
-                        EventScreenWrapper1()
+                        EventScreenWrapper1(event,navController)
                     }
                 }
             }else{

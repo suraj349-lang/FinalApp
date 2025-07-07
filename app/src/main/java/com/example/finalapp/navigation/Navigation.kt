@@ -37,10 +37,13 @@ import com.example.finalapp.screens._5settings.SettingsScreenUI
 import com.example.finalapp.testing.TabView
 import com.example.finalapp.screens._3createEventOrPing.PastRaisedOffer
 import com.example.finalapp.screens._1home.eventWarScreen.PublicEventDetailsScreenWrapper
+import com.example.finalapp.screens._2pings.PingScreenFinal
 import com.example.finalapp.screens._3createEventOrPing.createPing.CreatePingMainScreen
+import com.example.finalapp.screens._3createEventOrPing.createPing.CreatePingWrapper
 import com.example.finalapp.screens._4profile.ProfileScreenNew
 import com.example.finalapp.screens._4profile.UserPublicProfile
 import com.example.finalapp.screens._4profile.dropProfileUserProfile.DropProfileUserProfile
+import com.example.finalapp.screens._4profile.privateUsername.PrivateUserNameScreenWrapper
 import com.example.finalapp.screens._5settings.BlockedUsers
 import com.example.finalapp.screens._5settings.BugsAndSuggestion
 import com.example.finalapp.screens._5settings.ClearSearchHistory
@@ -133,7 +136,8 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
             //AllProfiles(profileViewModel)
         }
         composable(SCREENS.PINGS.route){
-            PingsScreenUI(navController,eventsViewModel)
+            //PingsScreenUI(navController,eventsViewModel)
+            PingScreenFinal(navController,eventsViewModel)
         }
 
         composable(SCREENS.PAST_OFFERS.route){
@@ -146,13 +150,17 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
         composable(SCREENS.CREATE_PING.route) {
           //  CreateEvent(eventsViewModel, navController)
             //CreatePing(authViewModel, eventsViewModel, navController)
-            CreatePingMainScreen(navController,eventsViewModel)
+           // CreatePingMainScreen(navController,eventsViewModel)
+            CreatePingWrapper()
         }
         composable(SCREENS.CREATE_EVENT.route) {
             CreateEventMainScreen(navController,eventsViewModel)
         }
         composable(SCREENS.PUBLIC_EVENT_DETAILS_SCREEN_WRAPPER.route){
             PublicEventDetailsScreenWrapper()
+        }
+        composable(SCREENS.PRIVATE_PROFILE.route){
+            PrivateUserNameScreenWrapper(navController = navController)
         }
 //        composable(SCREENS.TIKTOK.route){
 //            val list= listOf<String>("1","2","3","4","5","6")
@@ -275,13 +283,6 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
         composable(SCREENS.LOG_OUT.route){
             Logout(navController = navController)
         }
-//        composable(SCREENS.IMAGE_CROPPER.route){
-//            AutoImageCropper()
-//        }
-
 
     }
-
-
-
 }

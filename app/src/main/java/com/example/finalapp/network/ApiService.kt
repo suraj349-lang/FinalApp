@@ -18,6 +18,7 @@ import com.example.finalapp.model.EventResponseDTO
 import com.example.finalapp.model.ImageUploadResponse
 import com.example.finalapp.model.LoginAPIResponse
 import com.example.finalapp.model.AllEventsResponseDTO
+import com.example.finalapp.model.AllPingsResponseDTO
 import com.example.finalapp.model.ChatList
 import com.example.finalapp.model.CreatePingResponse
 import com.example.finalapp.model.FCMTokenResponse
@@ -62,6 +63,8 @@ interface ApiService {
     suspend fun createEvent(@Body event:EventRequestDTO): EventResponseDTO
     @GET("/api/v1/event")
     suspend fun getAllEvents(): AllEventsResponseDTO
+    @GET("/api/v1/ping/getUserPings/{id}")
+    suspend fun getUserPings(@Path("id") id:String): AllPingsResponseDTO
 
     @GET("/api/v1/event/getUserEvents/{id}")
     suspend fun getUserEvents(@Path("id") id:String): AllEventsResponseDTO
@@ -75,6 +78,10 @@ interface ApiService {
 
     @GET("/api/v1/ping")
     suspend fun getAllPings(@Query("page") page:Int): AllPingsResponse<List<PingResponse>>
+    //---------------------------------------------------------------------//
+
+    @GET("/api/v1/ping/getUserPings")
+    suspend fun getUserPings(@Query("page") page:Int): AllPingsResponse<List<PingResponse>>
 
     //-----------------------------------------------------------------//
     @GET("api/getPreSignedUrl")

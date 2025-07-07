@@ -27,8 +27,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -39,25 +37,27 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
-import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.example.finalapp.R
-import com.example.finalapp.screens._1home.publicEvent.UserReactions
+import com.example.finalapp.model.EventResponse
+import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.testingDataAndScreen.imageUrls
+import com.example.finalapp.ui.imagePrefix
 import com.example.finalapp.utils.constants.Constants
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.google.common.math.Stats
 
-@Preview(showBackground = true)
+
 @Composable
-fun EventScreenWrapper1() {
+fun EventScreenWrapper1(event: EventResponse, navController: NavHostController) {
     val systemUiController = rememberSystemUiController()
     val navBarColor = Color.DarkGray
     val backgroundColor= Color(0xFF121212)
@@ -84,72 +84,72 @@ fun EventScreenWrapper1() {
             )
         }
     }
-    Scaffold(
-        topBar = {},
-        content = {
-            Surface(modifier = Modifier
-                .padding(it)
-                .fillMaxSize(), color = Color.Black) {
-                EventScreen1()
+    Surface(modifier = Modifier
+        .fillMaxSize(), color = Color.Black) {
+        EventScreen1(event,onJoinEventClicked={ navController.navigate(SCREENS.PUBLIC_EVENT_DETAILS_SCREEN_WRAPPER.route)})
 
 
-            }
+    }
 
-        }
-    )
+
+
+
+
 }
 
 @Composable
-fun EventScreen1() {
+fun EventScreen1(event: EventResponse,onJoinEventClicked:()->Unit) {
     Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-        Image(painter = painterResource(id = R.drawable.profile_image_1), contentDescription ="", modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(0.3f) )
 
-        CreatorData()
-        EventDescription1()
-        JoinEventButton()
-        Stats()
-        UserReactionUI()
-        MicroPosts()
+        AsyncImage(model = imagePrefix+event.image, contentDescription ="", modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight(0.3f), filterQuality = FilterQuality.High
+        )
+
+        CreatorData(event.user.profileImage,event.user.username, event.title)
+        EventDescription1(event.description)
+        JoinEventButton(onJoinEventClicked)
+        Stats(event.totalViews,event.totalChildPosts)
+        UserReactionUI(event.totalComments,event.totalViews)
+        MicroPosts(event.topPostsList ?: listOf())
     }
 }
 
 @Composable
-fun CreatorData() {
+fun CreatorData(userImage:String,username:String,eventTitle:String) {
     Row(modifier = Modifier
         .fillMaxWidth()
         .wrapContentHeight()
         .padding(start = 8.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-        Image(painter = painterResource(id = R.drawable.profile_image_1), contentDescription = "", modifier = Modifier
+        AsyncImage(model = imagePrefix+userImage, contentDescription = "", modifier = Modifier
             .size(40.dp)
-            .clip(shape = CircleShape), contentScale = ContentScale.Crop)
+            .clip(shape = CircleShape), contentScale = ContentScale.Crop, filterQuality = FilterQuality.High)
         Column(modifier = Modifier.wrapContentSize()) {
-            Text(text = "suraj_3494", fontFamily = Constants.USER_NAME_FONT, fontSize = 12.sp, color = Color.White)
-            Text(text = "Breaking conflict, IRAN vs ISREAL", fontFamily = Constants.FONT_MEDIUM, fontSize = 18.sp, fontWeight = FontWeight.SemiBold, color = Color.White)
+            Text(text = username, fontFamily = Constants.USER_NAME_FONT, fontSize = 12.sp, color = Color.White)
+            Text(text = eventTitle, fontFamily = Constants.FONT_MEDIUM, fontSize = 18.sp, fontWeight = FontWeight.SemiBold, color = Color.White)
         }
     }
 }
 
 @Composable
-fun EventDescription1() {
+fun EventDescription1(description: String?) {
     Row(modifier = Modifier
         .fillMaxWidth()
         .wrapContentHeight()
         .padding(start = 8.dp)) {
-        Text(text = "Event odds pal, the mad thinking of the conflict has arosen and leading to the trouble in the area", fontFamily = Constants.FONT_EXTRA_LIGHT, fontSize = 14.sp, color = Color.White.copy(alpha = 0.7f), lineHeight = 16.sp)
+        Text(text = description ?: " ", fontFamily = Constants.FONT_EXTRA_LIGHT, fontSize = 14.sp, color = Color.White.copy(alpha = 0.7f), lineHeight = 16.sp)
     }
 }
 
 @Composable
-fun JoinEventButton() {
-    Button(onClick = { /*TODO*/ }, modifier = Modifier.padding(start = 8.dp,top=8.dp), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF7A0505))) {
+fun JoinEventButton(onJoinEventClicked:()->Unit) {
+    Button(onClick = { onJoinEventClicked()}, modifier = Modifier.padding(start = 8.dp,top=8.dp), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF7A0505))) {
         Text(text = "JOIN EVENT")
     }
 }
 
 @Composable
-fun Stats() {
+fun Stats(totalViews: Int, totalChildPosts: Int) {
     Row(modifier = Modifier
         .padding(8.dp)
         .fillMaxWidth()
@@ -159,10 +159,10 @@ fun Stats() {
             .height(80.dp), colors = CardDefaults.cardColors(containerColor = Color.DarkGray)) {
             Column(modifier = Modifier
                 .fillMaxSize()
-                .padding(start = 8.dp,top=2.dp), verticalArrangement = Arrangement.spacedBy(1.dp)) {
-                Text(text = "User reactions", color = Color.White, fontFamily = Constants.FONT_LIGHT, fontSize = 12.sp)
-                Text(text = "179 %",color = Color.White, fontFamily = Constants.USER_NAME_FONT, fontSize = 24.sp, fontWeight = FontWeight.Bold)
-                Text(text = "10/26m",color = Color.White, fontFamily = Constants.FONT_LIGHT)
+                .padding(start = 8.dp, top = 2.dp), verticalArrangement = Arrangement.spacedBy(1.dp)) {
+                Text(text = "Total views", color = Color.White, fontFamily = Constants.FONT_LIGHT, fontSize = 12.sp)
+                Text(text = totalViews.toString(),color = Color.White, fontFamily = Constants.USER_NAME_FONT, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                Text(text = "Last 3 hours",color = Color.White, fontFamily = Constants.FONT_LIGHT)
                 
             }
 
@@ -174,8 +174,8 @@ fun Stats() {
             Column(modifier = Modifier
                 .fillMaxSize()
                 .padding(start = 8.dp, top = 2.dp), verticalArrangement = Arrangement.spacedBy(1.dp)) {
-                Text(text = "User reactions", color = Color.Black, fontFamily = Constants.FONT_LIGHT)
-                Text(text = "179 %",color = Color.Black, fontFamily = Constants.USER_NAME_FONT, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                Text(text = "Child Posts", color = Color.Black, fontFamily = Constants.FONT_LIGHT, fontSize = 12.sp)
+                Text(text = totalChildPosts.toString(),color = Color.Black, fontFamily = Constants.USER_NAME_FONT, fontSize = 24.sp, fontWeight = FontWeight.Bold)
                 Text(text = "10/26m", color = Color.Black, fontFamily = Constants.FONT_LIGHT)
 
             }
@@ -186,7 +186,7 @@ fun Stats() {
 }
 
 @Composable
-fun UserReactionUI() {
+fun UserReactionUI(totalComments: Int, totalViews: Int) {
     Card(modifier = Modifier
         .wrapContentWidth()
         .height(56.dp)
@@ -195,25 +195,28 @@ fun UserReactionUI() {
         .padding(8.dp)
         .fillMaxWidth()
         .wrapContentHeight(), horizontalArrangement = Arrangement.spacedBy(30.dp)) {
-        Column(modifier = Modifier.wrapContentSize(), verticalArrangement = Arrangement.Top) {
+        Column(modifier = Modifier.wrapContentSize(), verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally) {
             Image(painter = painterResource(id = R.drawable.people), contentDescription = "", modifier = Modifier.size(20.dp), colorFilter = ColorFilter.tint(
                 Color.Black))
-            Text(text = "100", fontWeight = FontWeight.SemiBold, fontFamily = Constants.FONT_MEDIUM, fontSize = 10.sp)
+            Text(text = totalViews.toString(), fontWeight = FontWeight.SemiBold, fontFamily = Constants.FONT_MEDIUM, fontSize = 10.sp)
 
         }
-        Column(modifier = Modifier.wrapContentSize(), verticalArrangement = Arrangement.Top) {
+        Column(modifier = Modifier.wrapContentSize(), verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally) {
             Image(painter = painterResource(id = R.drawable.comment_filled), contentDescription = "", modifier = Modifier.size(20.dp), colorFilter = ColorFilter.tint(
                 Color.Black))
-            Text(text = "145", fontWeight = FontWeight.SemiBold, fontFamily = Constants.FONT_MEDIUM, fontSize = 10.sp)
+            Text(text = totalComments.toString(), fontWeight = FontWeight.SemiBold, fontFamily = Constants.FONT_MEDIUM, fontSize = 10.sp)
 
         }
-        Column(modifier = Modifier.wrapContentSize(), verticalArrangement = Arrangement.Top) {
-            Image(painter = painterResource(id = R.drawable.share), contentDescription = "", modifier = Modifier.size(20.dp), colorFilter = ColorFilter.tint(Color.Black))
-            Text(text = "456", fontWeight = FontWeight.SemiBold, fontFamily = Constants.FONT_MEDIUM, fontSize = 10.sp)
+        Column(modifier = Modifier.wrapContentSize(), verticalArrangement = Arrangement.Center) {
+            Image(painter = painterResource(id = R.drawable.share_event), contentDescription = "", modifier = Modifier.size(20.dp), colorFilter = ColorFilter.tint(Color.Black))
+           // Text(text = "456", fontWeight = FontWeight.SemiBold, fontFamily = Constants.FONT_MEDIUM, fontSize = 10.sp)
 
         }
-        Button(onClick = {  }) {
-            Text(text = "+ Contribute")
+        Button(onClick = {  }, colors = ButtonDefaults.buttonColors(containerColor = Color(
+            0xFF08087C
+        )
+        )) {
+            Text(text = "+ Contribute", fontFamily =Constants.FONT_MEDIUM, color = Color.White)
             
         }
         }
@@ -222,8 +225,8 @@ fun UserReactionUI() {
 }
 
 @Composable
-fun MicroPosts() {
-    UserReactions1(imageUrls = imageUrls, onImageClicked = {})
+fun MicroPosts(topPostsList: List<String>) {
+    UserReactions1(imageUrls = topPostsList, onImageClicked = {})
 }
 
 
@@ -237,21 +240,50 @@ fun UserReactions1(imageUrls:List<String>,onImageClicked:(String)->Unit) {
         verticalArrangement = Arrangement.spacedBy(4.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
-        items(imageUrls) {imageUrl->
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .aspectRatio(1f)
-                    .clip(RoundedCornerShape(8.dp))
-            ) {
-                GlideImage(
-                    model = imageUrl,
-                    contentDescription = "",
-                    contentScale = ContentScale.Crop,
+        if (imageUrls.isEmpty()) {
+            item {
+                Box(
                     modifier = Modifier
-                        .clickable { onImageClicked(imageUrl) }
-                        .fillMaxSize(), alpha = 0.8f
-                )
+                        .clip(shape = RoundedCornerShape(12.dp))
+                        .background(color = Color.Gray)
+                        .fillMaxWidth()
+                        .aspectRatio(1f)
+                        .clip(RoundedCornerShape(8.dp))
+                ) {
+                    Column(modifier = Modifier
+                        .wrapContentSize()
+                        .align(Alignment.Center), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                        Image(
+                            painter = painterResource(id = R.drawable.add),
+                            contentDescription = "",
+                            contentScale = ContentScale.Crop,
+                            colorFilter=ColorFilter.tint(Color.White),
+                            modifier = Modifier
+                                .clickable { }
+                                .size(40.dp)
+                        )
+                        Text(text ="Add child post", fontFamily = Constants.FONT_MEDIUM, fontSize = 12.sp )
+                    }
+                }
+
+            }
+        } else {
+            items(imageUrls) { imageUrl ->
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .aspectRatio(1f)
+                        .clip(RoundedCornerShape(8.dp))
+                ) {
+                    GlideImage(
+                        model = imageUrl,
+                        contentDescription = "",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .clickable { onImageClicked(imageUrl) }
+                            .fillMaxSize(), alpha = 0.8f
+                    )
+                }
             }
         }
     }

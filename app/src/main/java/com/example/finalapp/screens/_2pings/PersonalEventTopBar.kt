@@ -17,12 +17,12 @@ import com.example.finalapp.R
 import com.example.finalapp.utils.constants.Constants
 
 @Composable
-fun PingsTopBar(backgroundColor: Color, showIcon: Boolean, onSearchIconClicked: () -> Unit) {
+fun PingsTopBar(backgroundColor: Color, showIcon: Boolean, onBackClicked:()->Unit={},onSearchIconClicked: () -> Unit) {
     TopAppBar(
         title = { Text(text = "Pings", fontSize = 24.sp, color = Color.White , fontFamily = Constants.FONT_EXTRA_LIGHT) },
         navigationIcon = {
                          Image(painter = painterResource(id = R.drawable.baseline_arrow_back_24), contentDescription ="", colorFilter = ColorFilter.tint(
-                             Color.White), modifier = Modifier.size(28.dp).padding(end=4.dp) )
+                             Color.White), modifier = Modifier.clickable { onBackClicked() }.size(28.dp).padding(end=4.dp) )
         },
         actions = {
             if(!showIcon) {

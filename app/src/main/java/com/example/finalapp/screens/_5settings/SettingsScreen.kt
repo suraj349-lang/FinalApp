@@ -63,7 +63,7 @@ fun SettingsScreenUI(navController: NavHostController,authViewModel: AuthViewMod
     val listSupportAndFeedback= listOf(SupportAndFeedBack("Bugs and Suggestions",SCREENS.BUGS_AND_SUGGESTION.route),SupportAndFeedBack("Safety and Privacy",SCREENS.SAFETY_AND_PRIVACY.route), SupportAndFeedBack("Help Centre",SCREENS.HELP_CENTRE.route))
 
     val moreInformation= listOf(MoreInformation("Privacy Policy",SCREENS.PRIVACY_POLICY.route),MoreInformation("Safety Centre",SCREENS.SAFETY_CENTRE.route),MoreInformation("Terms of Service",SCREENS.TERMS_OF_SERVICE.route),MoreInformation("Other legal",SCREENS.OTHER_LEGAL.route))
-    val accountActions= listOf(AccountAction("Clear Search History",SCREENS.CLEAR_SEARCH_HISTORY.route),AccountAction("Permissions",SCREENS.PERMISSIONS.route),AccountAction("Blocked Users",SCREENS.BLOCKED_USERS.route),AccountAction("Saved Login Info",SCREENS.SAVED_LOGIN_INFO.route),AccountAction("My Data",SCREENS.MY_DATA.route),AccountAction("Log Out",SCREENS.LOG_OUT.route))
+    val accountActions= listOf(AccountAction("Clear Search History",SCREENS.CLEAR_SEARCH_HISTORY.route),AccountAction("Permissions",SCREENS.PERMISSIONS.route),AccountAction("Blocked Users",SCREENS.BLOCKED_USERS.route),AccountAction("Saved Login Info",SCREENS.SAVED_LOGIN_INFO.route),AccountAction("My Data",SCREENS.MY_DATA.route)/*,AccountAction("Log Out",SCREENS.LOG_OUT.route)*/)
 
     Scaffold(
         topBar = { SettingsTopBar { navController.navigate(SCREENS.HOME.route) } },

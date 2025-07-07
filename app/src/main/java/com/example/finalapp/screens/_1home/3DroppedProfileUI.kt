@@ -34,6 +34,8 @@ import androidx.compose.material.Surface
 import androidx.compose.ui.Alignment
 import androidx.compose.material.Text
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -54,6 +56,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
@@ -72,8 +75,10 @@ import androidx.compose.ui.zIndex
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import coil.compose.AsyncImage
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
+import com.bumptech.glide.integration.compose.Placeholder
 import com.example.finalapp.R
 import com.example.finalapp.model.DropProfileResponse
 import com.example.finalapp.navigation.SCREENS
@@ -135,7 +140,6 @@ fun DroppedProfilesUI(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            AnimatedVisibility(visible = scrollBehavior.state.overlappedFraction == 0f) {
                 Column(
                     modifier=Modifier,
                     verticalArrangement = Arrangement.Top,
@@ -144,7 +148,8 @@ fun DroppedProfilesUI(
                     if(showLoader && droppedProfilesList?.itemCount==0) LinearProgressIndicator(modifier = Modifier
                         .fillMaxWidth()
                         .height(8.dp), color = floatingActionBtnColor)
-                    UserLocation.address?.let { DroppedProfileLocation(location = it) }
+                    UserLocation.address?.let {
+                        DroppedProfileLocation(location = it) }
                     OutlinedTextField(
                     value = query,
                     onValueChange = {
@@ -211,7 +216,7 @@ fun DroppedProfilesUI(
                     }
                 }
             }
-        }
+
             if(droppedProfiles==null && !triggerFetch){
                 LazyRow(modifier = Modifier.padding(start = 4.dp)){
                     items(com.example.finalapp.utils.testdata.items){item->
@@ -315,67 +320,25 @@ fun LazyRowItem(item: Item) {
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun DropProfileSearchedList(
-    scrollBehavior: TopAppBarScrollBehavior,
-    droppedProfiles: LazyPagingItems<DropProfileResponse>,
-) {
-    val droppedProfilesList = remember { droppedProfiles }
-    Column(
-        modifier = Modifier
-            .zIndex(0f)
-            .fillMaxSize()
-    ) {
-        LazyVerticalStaggeredGrid(
-            modifier = Modifier
-                .zIndex(0f)
-                .nestedScroll(scrollBehavior.nestedScrollConnection),
-            columns = StaggeredGridCells.Fixed(2), // Ensure column count is defined
-            contentPadding = PaddingValues(2.dp),
-        ) {
-            items(droppedProfilesList.itemCount) { index ->
-                val item = droppedProfiles[index] // Access item safely
-                if (item != null) {
-                    DroppedProfileItem(item){
-
-                    }
-                }
-            }
-        }
-
-    }
-}
-@Composable
-fun DateRangePicker(newDate:String,onDateChange:(String)->Unit,onDismiss:()->Unit) {
-    Dialog(
-        onDismissRequest = { onDismiss() },
-        properties = DialogProperties(dismissOnBackPress = true,dismissOnClickOutside = false)
-    ) {
-
-    }
-    
-}
-
-
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun DroppedProfileItem(profile: DropProfileResponse, onProfileClicked:()->Unit) {
-    Card(
+    Box(
         modifier = Modifier
             .clickable { onProfileClicked() }
             .padding(2.dp)
             .fillMaxWidth()
-            .wrapContentHeight(),
-        shape = RoundedCornerShape(4.dp))
+            .wrapContentHeight()
+            .background(color = Color.DarkGray.copy(alpha = 0.5f)))
     {
         Column(modifier = Modifier
             .fillMaxWidth()
             .height(300.dp)) {
-            GlideImage(
+            AsyncImage(
                 model = imagePrefix + profile.image, // Replace with your image resource
                 contentDescription = "Background Image",
                 contentScale = ContentScale.Crop, // Crop to fill the space
+                filterQuality= FilterQuality.High,
                 modifier = Modifier
                     .clickable {
                         Log.d("DropProfileTesting", "DroppedProfile: onProfileClicked() called")
@@ -404,23 +367,30 @@ fun DroppedProfileItem(profile: DropProfileResponse, onProfileClicked:()->Unit) 
                         modifier = Modifier.fillMaxWidth(0.8f),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        style = TextStyle(color = Color.Black, fontSize = 18.sp)
+                        fontFamily=Constants.FONT_MEDIUM,
+                        style = TextStyle(color = Color.White, fontSize = 18.sp)
                     )
-//                    Text(
-//                        text = profile.expirationTime + " hrs.",
-//                        modifier = Modifier.fillMaxWidth(1f),
-//                        maxLines = 1,
-//                        overflow = TextOverflow.Ellipsis,
-//                        style = TextStyle(color = Color.Black, fontSize = 10.sp)
-//                    )
+                    Text(
+                        text = profile.expirationTime + " hrs.",
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        fontFamily = Constants.FONT_LIGHT,
+                        fontSize = 10.sp,
+                        color = Color.White
+                    )
 
                 }
-
-                profile.message?.let {
+                Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                    Image(painter = painterResource(id = R.drawable.location_new), contentDescription ="", modifier = Modifier.size(16.dp) )
                     Text(
-                        text = it,
-                        style = TextStyle(color = Color.Black, fontSize = 10.sp)
+                        text = profile.location,
+                        fontFamily = Constants.FONT_MEDIUM,
+                        fontSize = 8.sp,
+                        maxLines = 1,
+                        color= Color.White,
+                        overflow = TextOverflow.Ellipsis
                     )
+
                 }
             }
         }
@@ -433,14 +403,12 @@ fun DroppedProfileItem(profile: DropProfileResponse, onProfileClicked:()->Unit) 
 fun DroppedProfileLocation(location: String, trim: Boolean=false) {
     val textWidth = remember { mutableStateOf(0f) }
     val containerWidth = remember { mutableStateOf(0f) }
-
-    val offsetX = remember { Animatable(0f) }
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .height(24.dp)
             .clip(if (trim) RoundedCornerShape(12.dp) else RectangleShape)
-            .background(Color(0xFF077CDA).copy(alpha = 0.6f))
+            .background(Color(0xFF077CDA).copy(alpha = 0.9f))
             .onGloballyPositioned { coordinates ->
                 containerWidth.value = coordinates.size.width.toFloat()
             },
@@ -459,8 +427,8 @@ fun DroppedProfileLocation(location: String, trim: Boolean=false) {
                 overflow =TextOverflow.Ellipsis,
                 color = Color.White,
                 modifier = Modifier,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 12.sp,
+                fontFamily=Constants.FONT_EXTRA_LIGHT,
+                fontSize = 16.sp,
             )
         }
     }

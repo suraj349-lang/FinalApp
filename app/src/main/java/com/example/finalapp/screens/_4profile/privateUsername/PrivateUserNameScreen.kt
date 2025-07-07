@@ -7,6 +7,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -22,7 +23,7 @@ fun PrivateUserNameScreenWrapper(navController: NavHostController) {
         topBar = {
             HomeTopBar(
                 scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior(),
-                title = "Your private profile",
+                title = "___s____3494",
                 navController = navController,
                 navIcon = true,
                 actionIcon = false
@@ -32,6 +33,7 @@ fun PrivateUserNameScreenWrapper(navController: NavHostController) {
         Surface(modifier = Modifier
             .fillMaxSize()
             .padding(it)) {
+            PrivateUserNameScreen()
 
         }
     }
@@ -41,6 +43,6 @@ fun PrivateUserNameScreenWrapper(navController: NavHostController) {
 @Composable
 fun PrivateUserNameScreen() {
     Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
-
+        Text("Private username")
     }
 }

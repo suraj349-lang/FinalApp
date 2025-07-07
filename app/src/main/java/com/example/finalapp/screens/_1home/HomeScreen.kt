@@ -56,6 +56,8 @@ import com.example.finalapp.screens.dialogBox.ShowQRDialog
 import com.example.finalapp.screens.dialogBox.showDialog
 import com.example.finalapp.ui.TAB_ITEMS
 import com.example.finalapp.ui.theme.floatingActionBtnColor
+import com.example.finalapp.utils.ProfileObject
+import com.example.finalapp.utils.UserLocation
 import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.viewmodels.ImageUploadViewModel
 import kotlinx.coroutines.delay
@@ -95,8 +97,8 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
         }
         else if (isRefreshing && pagerState.currentPage==1) {
             delay(1000L)
-            eventsViewModel.loadDirectChatUsers(0.0,0.0)
-            delay(1000L)
+            eventsViewModel.loadDirectChatUsers(UserLocation.latitude ?: 0.0,UserLocation.longitude ?: 0.0)
+            delay(500L)
             isRefreshing = false
         }
         else if (isRefreshing && pagerState.currentPage==2) {

@@ -34,13 +34,12 @@ data class EventRequestDTO(
 
 data class EventResponse(
   val _id:String,
-  val user: User? = null,
-  val title: String? = null,
+  val user: User = User(),
+  val title: String="",
   val description: String? = null,
   val image: String = "",
   val category: String = "",
   val location: String = "",
-  val offer: String = "",
   val topPostsList:List<String>? = emptyList(),
   val expirationTime: String = "",
   val peopleJoined:Int=0,

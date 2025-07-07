@@ -10,6 +10,7 @@ import com.example.finalapp.model.EventRequestDTO
 import com.example.finalapp.model.EventResponseDTO
 import com.example.finalapp.model.ImageUploadResponse
 import com.example.finalapp.model.AllEventsResponseDTO
+import com.example.finalapp.model.AllPingsResponseDTO
 import com.example.finalapp.model.CreatePingResponse
 import com.example.finalapp.model.PremiumEventResponseDTO
 import com.example.finalapp.model.pings.PingRequestDto
@@ -65,6 +66,10 @@ class EventsRepository @Inject constructor(private val api: ApiService) {
 
     fun getUserEvents(id:String): Flow<AllEventsResponseDTO> = flow {
         emit(api.getUserEvents(id))
+    }.flowOn(Dispatchers.IO)
+
+    fun getUserPings(id:String): Flow<AllPingsResponseDTO> = flow {
+        emit(api.getUserPings(id))
     }.flowOn(Dispatchers.IO)
     fun getUserDropProfiles(id:String): Flow<GetDropProfileResponseModel> = flow {
         emit(api.getUserDropProfiles(id))

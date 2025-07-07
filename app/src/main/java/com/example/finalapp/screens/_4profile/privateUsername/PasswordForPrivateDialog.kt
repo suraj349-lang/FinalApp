@@ -70,7 +70,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 
 @Preview(showBackground = true)
 @Composable
-fun PasswordForPrivateUsername(onDismiss:()->Unit={}) {
+fun PasswordForPrivateUsername(onEnterClicked:(String)->Unit={},onDismiss:()->Unit={}) {
     var password by remember {
         mutableStateOf("")
     }
@@ -106,7 +106,11 @@ fun PasswordForPrivateUsername(onDismiss:()->Unit={}) {
                 )
                 OutlinedTextField(
                     value = password,
-                    onValueChange = { password=it },
+                    onValueChange = {
+                        if (password.length <= 5) {
+                            password = it
+                        }
+                    },
                     placeholder = {
                         Text(
                             text = "******",
@@ -136,7 +140,7 @@ fun PasswordForPrivateUsername(onDismiss:()->Unit={}) {
                 )
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                     Button(
-                        onClick = { /*TODO*/ },
+                        onClick = { onEnterClicked(password) },
                         modifier=Modifier.clip(RoundedCornerShape(6.dp)),
                         enabled= password.length==6,
                         colors = ButtonDefaults.buttonColors(containerColor = floatingActionBtnColor,
