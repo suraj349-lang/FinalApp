@@ -2,6 +2,8 @@ package com.example.finalapp.screens._1home
 
 
 import BottomBar
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -41,7 +43,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -55,8 +56,6 @@ import com.example.finalapp.viewmodels.EventsViewModel
 import com.example.finalapp.screens.dialogBox.ShowQRDialog
 import com.example.finalapp.screens.dialogBox.showDialog
 import com.example.finalapp.ui.TAB_ITEMS
-import com.example.finalapp.ui.theme.floatingActionBtnColor
-import com.example.finalapp.utils.ProfileObject
 import com.example.finalapp.utils.UserLocation
 import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.viewmodels.ImageUploadViewModel
@@ -66,6 +65,7 @@ import kotlinx.coroutines.launch
 
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewModel, imageUploadViewModel: ImageUploadViewModel, authViewModel: AuthViewModel) {
@@ -77,7 +77,6 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
 
     if (showQR == showDialog.OPEN) {
         ShowQRDialog(
-            image = R.drawable.bigqr,
             navController = navController,
             onDismiss = { showQR = showDialog.CLOSE }
         )
@@ -118,13 +117,15 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
     Scaffold(
         topBar = {
             HomeTopBar(
-                backgroundColor = Color.DarkGray,
-                scrollBehavior,
-                Constants.APP_NAME,
-                navController,
-                true,
-                true,
-                R.drawable.chat_new
+                backgroundColor = Constants.HOME_TOP_BAR_COLOR,
+                iconAndTextColor= Constants.HOME_TOP_BAR_ICON_COLOR,
+                scrollBehavior = scrollBehavior,
+                title = Constants.APP_NAME,
+                titleColor=Constants.HOME_TOP_BAR_TITLE_COLOR,
+                navController = navController,
+                navIcon = true,
+                actionIcon = true,
+                icon = R.drawable.chat_new
             ) { showQR = showDialog.OPEN }
         },
         modifier = Modifier.windowInsetsPadding(WindowInsets.systemBars),
@@ -136,6 +137,10 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
             ) {
                 BottomBar(
                     navController = navController,
+                    containerColor=Constants.HOME_BOTTOM_BAR_COLOR,
+                    highlightedTextColor=Constants.BOTTOM_BAR_ACTIVE_TEXT_COLOR,
+                    inactiveIconColor = Constants.BOTTOM_BAR_INACTIVE_ICON_COLOR,
+                    inactiveTextColor = Constants.BOTTOM_BAR_INACTIVE_TEXT_COLOR,
                     state = buttonsVisible,
                     modifier = Modifier
                         .height(30.dp)
@@ -144,6 +149,7 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
                         }
             }
         },
+
         floatingActionButton = {
             HomeFloatingActionButton(authViewModel, eventsViewModel, imageUploadViewModel , navController)
         }
@@ -159,11 +165,11 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
                         indicator = { tabPositions ->
                             TabRowDefaults.Indicator(
                                 Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage]),
-                                color = Color(0xFFDF400E) ,//0xFFEB1809
-                                height = 3.dp
+                                color = Constants.TAB_ROW_INDICATOR_COLOR,
+                                height = 2.dp
                             )
                         },
-                        backgroundColor = Color.DarkGray,//Color(0xFFFFFFFF), //0xFFD5623E orange , 0xFFBCE697 green
+                        backgroundColor = Constants.HOME_TOP_BAR_COLOR,
                         modifier = Modifier
                          //   .border(width = 0.dp, color = Color.White)
                             .padding(bottom = 0.dp)
@@ -177,7 +183,7 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
                                 text = {
                                     Text(
                                         text = item.title,
-                                        color = if (pagerState.currentPage == index) Color(0xFFFFFFFF) /*Color(0xFFDF400E)*/ else Color.White.copy(alpha = 0.7f),
+                                        color = if (pagerState.currentPage == index) Constants.TAB_ROW_ACTIVE_TEXT_COLOR /*Color(0xFFDF400E)*/ else Constants.TAB_ROW_INACTIVE_COLOR,
                                         fontFamily = Constants.FONT_MEDIUM,//FontFamily(Font(R.font.dongle_light)),
                                         fontSize = 12.sp,//20.sp,
                                         fontWeight = if (pagerState.currentPage == index) FontWeight.Bold else FontWeight.Normal
@@ -194,7 +200,7 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
                                 .imePadding()
                         ) { page ->
                             when (page) {
-                                0 -> EventsScreen(eventsViewModel = eventsViewModel, navController = navController, onRetryCalled = {eventsViewModel.getAllEvents()})
+                                0 -> EventScreenWrapper(eventsViewModel = eventsViewModel, navController = navController, onRetryCalled = {eventsViewModel.getAllEvents()})
                                 1 -> DirectChatScreen(scrollBehavior, authViewModel, eventsViewModel, navController)
                                 2 -> DroppedProfilesUI(pagerState,scrollBehavior, navController, eventsViewModel)
                             }

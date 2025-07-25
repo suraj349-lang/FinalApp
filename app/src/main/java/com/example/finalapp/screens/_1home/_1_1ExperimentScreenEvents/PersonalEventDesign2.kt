@@ -42,14 +42,14 @@ import androidx.compose.ui.unit.sp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
-import com.example.finalapp.model.EventRequestDTO
+import com.example.finalapp.model.Event
 import com.example.finalapp.ui.theme.statusBarColor
 import com.example.finalapp.utils.constants.Constants
 
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun PersonalEventDesign3(offer: EventRequestDTO) {
+fun PersonalEventDesign3(offer: Event) {
     Surface(modifier = Modifier.fillMaxSize()) {
         Box(
             modifier = Modifier

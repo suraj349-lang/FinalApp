@@ -175,7 +175,7 @@ fun CameraXScreen(navController: NavHostController, screen: String) {
                     .background(Color.White.copy(alpha = 0.8f), shape = CircleShape)
             ) {
                 Image(
-                    painter = painterResource(R.drawable.rotate),
+                    painter = painterResource(R.drawable.flip_camera_android_24),
                     contentDescription = "Switch Camera",
                     modifier = Modifier.size(30.dp)
                 )

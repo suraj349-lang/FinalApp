@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -57,6 +58,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import com.example.finalapp.R
 import com.example.finalapp.enums.ImageUploadScreens
@@ -102,24 +104,25 @@ fun HomeError(eventsViewModel: EventsViewModel){
 @Composable
 fun HomeTopBar(
     backgroundColor:Color = Color.DarkGray,
+    iconAndTextColor :Color=statusBarColor,
     scrollBehavior: TopAppBarScrollBehavior,
     title: String,
+    titleColor:Color = statusBarColor,
     navController: NavHostController,
     navIcon: Boolean,
     actionIcon: Boolean,
     icon: Int? = null,
     onQRClicked: () -> Unit = {}
 ){
-    val baseColor= Color.DarkGray//statusBarColor
-    val iconAndTextColor= statusBarColor //homeTopBarIconsColor
-
-
     TopAppBar(
-        modifier= Modifier.shadow(elevation = 40.dp)
+        modifier=
+        Modifier
+            .shadow(elevation = 4.dp)
+            .zIndex(6f)
             .fillMaxWidth()
             .height(40.dp),
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = baseColor
+            containerColor = backgroundColor
         ),
         scrollBehavior = scrollBehavior,
         title = {
@@ -128,7 +131,7 @@ fun HomeTopBar(
                 title,
                 fontSize = 20.sp,
             //    fontWeight=FontWeight.SemiBold,
-                modifier = Modifier, color = iconAndTextColor, fontFamily = APP_NAME_FONT //Constants.FONT_MEDIUM,
+                modifier = Modifier, color = titleColor, fontFamily = APP_NAME_FONT //Constants.FONT_MEDIUM,
             )
             }
         },
@@ -140,7 +143,7 @@ fun HomeTopBar(
                         colorFilter = ColorFilter.tint(color = iconAndTextColor),
                         modifier = Modifier
                             .padding(end = 20.dp)
-                            .size(24.dp)
+                            .size(20.dp)
                             .clickable {
                                 onQRClicked()
                             })
@@ -151,7 +154,7 @@ fun HomeTopBar(
                         modifier = Modifier
                             .clickable { navController.navigate(SCREENS.NOTIFICATIONS.route) }
                             .padding(end = 20.dp)
-                            .size(24.dp)
+                            .size(20.dp)
                     )
                     icon?.let { painterResource(id = it) }?.let {
                         Image(painter = it,
@@ -159,7 +162,7 @@ fun HomeTopBar(
                             colorFilter = ColorFilter.tint(color = iconAndTextColor),
                             modifier = Modifier
                                 .padding(end = 8.dp)
-                                .size(24.dp)
+                                .size(20.dp)
                                 .clickable {
                                     navController.navigate(SCREENS.CHAT_LIST.route)
                                 })
@@ -269,7 +272,7 @@ fun HomeFloatingActionButton(authViewModel: AuthViewModel, eventsViewModel: Even
             .wrapContentSize()
             .padding(2.dp),
         contentColor = Color.White,
-        containerColor = floatingActionBtnColor
+        containerColor =floatingActionBtnColor
     ) {
         Column(modifier = Modifier.wrapContentSize(), horizontalAlignment = Alignment.CenterHorizontally) {
             Image(
@@ -280,7 +283,7 @@ fun HomeFloatingActionButton(authViewModel: AuthViewModel, eventsViewModel: Even
                     .padding(top = 4.dp)
                     .size(40.dp)
             )
-            Text(text = "Drop Profile", fontSize = 8.sp,modifier = Modifier.padding(top=0.dp), fontFamily = FontFamily(Font(R.font.dongle_bold)), color = Color.White)
+            Text(text = "Drop", fontSize = 12.sp,modifier = Modifier.padding( top = 0.dp), fontFamily = Constants.FONT_MEDIUM, color = Color.White)
         }
     }
     if (showCustomDialog) {

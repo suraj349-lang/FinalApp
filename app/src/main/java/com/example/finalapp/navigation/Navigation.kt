@@ -26,19 +26,19 @@ import com.example.finalapp.screens.auth.util.OtpBox
 import com.example.finalapp.screens._6chat.SingleChatScreenUI
 import com.example.finalapp.screens.auth.FinalUserCreation
 import com.example.finalapp.qrScanning.QRScannerScreen
+import com.example.finalapp.screens.pings.CameraPingScreen
 import com.example.finalapp.viewmodels.EventsViewModel
 import com.example.finalapp.screens._6chat.ChatListScreen
 import com.example.finalapp.screens._4profile.GalleryPicker
 import com.example.finalapp.screens._1home.HomeScreenUI
-import com.example.finalapp.screens._8notification.NotificationsScreenUI
-import com.example.finalapp.screens._2pings.PingsScreenUI
+import com.example.finalapp.screens._1home.eventWarScreen.CommentsScreen
+import com.example.finalapp.screens._8notification.TimeLineScreenUI
 import com.example.finalapp.screens._3createEventOrPing.createEvent.CreateEventMainScreen
 import com.example.finalapp.screens._5settings.SettingsScreenUI
 import com.example.finalapp.testing.TabView
 import com.example.finalapp.screens._3createEventOrPing.PastRaisedOffer
 import com.example.finalapp.screens._1home.eventWarScreen.PublicEventDetailsScreenWrapper
 import com.example.finalapp.screens._2pings.PingScreenFinal
-import com.example.finalapp.screens._3createEventOrPing.createPing.CreatePingMainScreen
 import com.example.finalapp.screens._3createEventOrPing.createPing.CreatePingWrapper
 import com.example.finalapp.screens._4profile.ProfileScreenNew
 import com.example.finalapp.screens._4profile.UserPublicProfile
@@ -55,16 +55,15 @@ import com.example.finalapp.screens._5settings.EditUserName
 import com.example.finalapp.screens._5settings.HelpCentre
 import com.example.finalapp.screens._5settings.Logout
 import com.example.finalapp.screens._5settings.MyData
-import com.example.finalapp.screens._5settings.OtherLegal
 import com.example.finalapp.screens._5settings.PermissionsUI
-import com.example.finalapp.screens._5settings.PrivacyPolicyScreen
 import com.example.finalapp.screens._5settings.SafetyAndPrivacy
-import com.example.finalapp.screens._5settings.SafetyCentre
 import com.example.finalapp.screens._5settings.SavedLoginInfo
-import com.example.finalapp.screens._5settings.TermsOfService
 import com.example.finalapp.screens.common.CameraXScreen
 import com.example.finalapp.screens.common.ImagePreviewScreen
 import com.example.finalapp.screens.onboarding.screen.WelcomeScreen
+import com.example.finalapp.screens.pings.EditScreen
+import com.example.finalapp.screens.pings.templates.PingTemplateSelector
+import com.example.finalapp.screens.pings.templates.visualPingTemplates
 import com.example.finalapp.viewmodels.ImageUploadViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import kotlinx.serialization.decodeFromString
@@ -82,6 +81,15 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
     val chatViewModel= hiltViewModel<ChatViewModel>()
 
     NavHost(navController = navController, startDestination =SCREENS.SPLASH.route){
+        composable("ping"){
+            CameraPingScreen(navController)
+        }
+        composable("edit"){
+            EditScreen(navController)
+        }
+        composable("template"){
+            PingTemplateSelector(templates = visualPingTemplates, onTemplateSelected ={} )
+        }
         composable(SCREENS.SPLASH.route){
             SplashScreenUI(navController,screen)
         }
@@ -108,7 +116,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
             SettingsScreenUI(navController,authViewModel)
         }
         composable(SCREENS.NOTIFICATIONS.route){
-            NotificationsScreenUI(navController)
+            TimeLineScreenUI(navController)
         }
         composable(SCREENS.CHAT_LIST.route){
             ChatListScreen(navController, chatViewModel)
@@ -151,13 +159,23 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
           //  CreateEvent(eventsViewModel, navController)
             //CreatePing(authViewModel, eventsViewModel, navController)
            // CreatePingMainScreen(navController,eventsViewModel)
-            CreatePingWrapper()
+            CreatePingWrapper(navController,eventsViewModel)
         }
-        composable(SCREENS.CREATE_EVENT.route) {
-            CreateEventMainScreen(navController,eventsViewModel)
+        composable(SCREENS.CREATE_EVENT.route, arguments = listOf(navArgument("parentEventId"){
+            type= NavType.StringType
+            nullable=true
+            defaultValue=null
+        })) {
+            val parentEventId=it.arguments?.getString("parentEventId")
+            CreateEventMainScreen(parentEventId,navController,eventsViewModel)
         }
-        composable(SCREENS.PUBLIC_EVENT_DETAILS_SCREEN_WRAPPER.route){
-            PublicEventDetailsScreenWrapper()
+        composable(route = SCREENS.PUBLIC_EVENT_DETAILS_SCREEN_WRAPPER.route, arguments = listOf(
+            navArgument(name = "id"){
+                type= NavType.StringType
+            }
+        )){navBackStackEntry->
+            val id=navBackStackEntry.arguments?.getString("id") ?: ""
+            PublicEventDetailsScreenWrapper(id, navController,eventsViewModel)
         }
         composable(SCREENS.PRIVATE_PROFILE.route){
             PrivateUserNameScreenWrapper(navController = navController)
@@ -225,6 +243,11 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
         }
 
 
+        composable(SCREENS.COMMENT.route){
+            CommentsScreen()
+        }
+
+
         // SETTINGS---------------------------------------------------------------------------------------------------------------------------------------------------
         composable(SCREENS.EDIT_NAME.route){
             EditName(navController = navController)
@@ -249,20 +272,6 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
         }
         composable(SCREENS.HELP_CENTRE.route){
             HelpCentre(navController = navController)
-        }
-
-        //---------------------------------------------------------------------------------//
-        composable(SCREENS.PRIVACY_POLICY.route){
-            PrivacyPolicyScreen(navController = navController)
-        }
-        composable(SCREENS.SAFETY_CENTRE.route){
-            SafetyCentre(navController = navController)
-        }
-        composable(SCREENS.TERMS_OF_SERVICE.route){
-            TermsOfService(navController = navController)
-        }
-        composable(SCREENS.OTHER_LEGAL.route){
-            OtherLegal(navController = navController)
         }
         //---------------------------------------------------------------------------------//
         composable(SCREENS.CLEAR_SEARCH_HISTORY.route){

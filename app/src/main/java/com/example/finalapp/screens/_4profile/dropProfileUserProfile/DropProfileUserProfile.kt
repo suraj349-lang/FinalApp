@@ -120,7 +120,7 @@ fun DropProfileUserProfileUI(paddingValues: PaddingValues, dropProfileResponse: 
                     verticalAlignment = Alignment.CenterVertically) {
                     Row(modifier = Modifier.wrapContentHeight().fillMaxWidth(0.6f)) {
                         Card(modifier = Modifier.wrapContentSize(), shape = CircleShape) {
-                            GlideImage(model = dropProfileResponse.createdBy.profileImage, contentDescription ="", modifier = Modifier.size(40.dp), contentScale = ContentScale.Crop )
+                            GlideImage(model = imagePrefix+dropProfileResponse.createdBy.profileImage, contentDescription ="", modifier = Modifier.size(40.dp), contentScale = ContentScale.Crop )
                         }
                         Text(
                             text = dropProfileResponse.createdBy.username.lowercase(),

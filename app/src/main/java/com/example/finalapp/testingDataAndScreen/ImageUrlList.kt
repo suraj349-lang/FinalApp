@@ -52,7 +52,7 @@ val imageUrls3 = listOf(
     "https://images.pexels.com/photos/4669151/pexels-photo-4669151.jpeg"
 )
 
-val imageUrls = listOf(
+val imageUrlsStatic = listOf(
     "https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg",
     "https://images.pexels.com/photos/415829/pexels-photo-415829.jpeg",
     "https://images.pexels.com/photos/712521/pexels-photo-712521.jpeg",

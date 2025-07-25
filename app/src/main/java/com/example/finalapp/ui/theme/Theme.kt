@@ -19,6 +19,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import com.example.finalapp.utils.constants.Constants
 
 private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
@@ -71,11 +72,11 @@ fun FinalAppTheme(
             val window = (view.context as Activity).window
            // window.statusBarColor = colorScheme.primary.toArgb()
 //            window.statusBarColor = statusAndTopAppBarColor.toArgb()
-            window.statusBarColor= floatingActionBtnColor.toArgb()
+            window.statusBarColor= Color.White.toArgb()
 
            // WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
             WindowCompat.getInsetsController(window, view)?.run {
-                isAppearanceLightStatusBars = darkTheme // Set based on your theme
+                isAppearanceLightStatusBars = true // Set based on your theme
                 systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
             }
 

@@ -61,6 +61,11 @@ class ProfileRepository @Inject constructor(private val api: ApiService,private 
         emit(api.getUserData(userId))
     }.flowOn(Dispatchers.IO)
 
+    //--------------------------------------Get user data ---------------------------------//
+    fun updateUserData(id: String, backgroundImage: Map<String, String>): Flow<OkResponse> = flow {
+        emit(api.updateUserData(id,backgroundImage))
+    }.flowOn(Dispatchers.IO)
+
     fun sendDropProfileData(data: DropProfileModel): Flow<DropProfileResponseModel> = flow  {
         emit(api.dropProfile(data))
     }.flowOn(Dispatchers.IO)

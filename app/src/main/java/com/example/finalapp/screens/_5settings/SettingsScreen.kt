@@ -78,7 +78,6 @@ fun SettingsScreenUI(navController: NavHostController,authViewModel: AuthViewMod
                 .verticalScroll(rememberScrollState())) {
                 MyAccount(list as List<MyAccount>,navController)
                 SupportAndFeedback(list = listSupportAndFeedback,navController)
-                MoreInformation(list = moreInformation,navController)
                 AccountActions(list = accountActions,navController)
             }
 

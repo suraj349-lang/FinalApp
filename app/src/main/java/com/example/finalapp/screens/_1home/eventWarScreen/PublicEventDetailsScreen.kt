@@ -1,6 +1,6 @@
 package com.example.finalapp.screens._1home.eventWarScreen
 
-import androidx.camera.camera2.internal.compat.workaround.ForceCloseCaptureSession.OnConfigured
+import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -9,14 +9,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -24,8 +22,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
@@ -34,7 +30,6 @@ import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
-import androidx.compose.material3.Card
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -42,6 +37,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -58,24 +54,35 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
+import com.example.finalapp.model.EventResponse
+import com.example.finalapp.navigation.SCREENS
+import com.example.finalapp.screens.dialogBox.DialogError
+import com.example.finalapp.screens.dialogBox.DialogLoading
 import com.example.finalapp.testing.TabItem
+import com.example.finalapp.ui.imagePrefix
 import com.example.finalapp.ui.theme.floatingActionBtnColor
+import com.example.finalapp.utils.RequestState
+import com.example.finalapp.viewmodels.EventsViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-@Preview(showBackground = true)
+
 @Composable
-fun PublicEventDetailsScreenWrapper(navController: NavHostController= NavHostController(LocalContext.current)) {
+fun PublicEventDetailsScreenWrapper(id:String,navController: NavHostController,eventsViewModel: EventsViewModel) {
 
     val systemUiController = rememberSystemUiController()
     val navBarColor = topColor
     val backgroundColor= Color(0xFF121212)
+    val eventDetailsResponse by eventsViewModel.eventDetailsResponse.collectAsState()
+    Log.i("EventDetailsResponse", "PublicEventDetailsScreenWrapper: $eventDetailsResponse")
+    LaunchedEffect(id ){
+        eventsViewModel.getEventDetails(id)
+    }
+
 
     SideEffect {
 //        systemUiController.setNavigationBarColor(
@@ -104,11 +111,40 @@ fun PublicEventDetailsScreenWrapper(navController: NavHostController= NavHostCon
             navController.navigateUp()
         } },
         content = {
-            Surface(modifier = Modifier
-                .fillMaxSize()
-                .padding(it), color = Color.Black) {
-                PublicEventDetailsScreen()
+            when(val response=eventDetailsResponse){
+                is RequestState.Success ->{
+                    Surface(modifier = Modifier
+                        .fillMaxSize()
+                        .padding(it), color = Color.Black) {
+                        PublicEventDetailsScreen(response.data){
+                            navController.navigate(SCREENS.COMMENT.route)
+                        }
+                    }
+
+                }
+                is RequestState.Error ->{
+                    Surface(modifier = Modifier
+                        .fillMaxSize()
+                        .padding(it), color = Color.Black) {
+                        DialogError {
+                            navController.navigateUp()
+                        }
+                    }
+                }
+                is RequestState.Loading ->{
+                    Surface(modifier = Modifier
+                        .fillMaxSize()
+                        .padding(it), color = Color.Black) {
+                        DialogLoading() {
+                            navController.navigateUp()
+                        }
+                    }
+                }
+                else ->{
+
+                }
             }
+
         }
     )
 }
@@ -116,17 +152,20 @@ fun PublicEventDetailsScreenWrapper(navController: NavHostController= NavHostCon
 
 
 @Composable
-fun PublicEventDetailsScreen() {
+fun PublicEventDetailsScreen(response: EventResponse,onCommentClicked: () -> Unit) {
     Column(modifier = Modifier
         // .verticalScroll(rememberScrollState())
         .fillMaxSize(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
         //background image
-        Box(modifier = Modifier.fillMaxWidth().height(280.dp)) {
-            Image(painter = painterResource(id = R.drawable.profile_image_1), contentDescription = "", modifier = Modifier.fillMaxSize(), contentScale = ContentScale.FillWidth)
+        Box(modifier = Modifier
+            .fillMaxWidth()
+            .height(280.dp)) {
+            AsyncImage(model = imagePrefix+response.image, contentDescription = "", modifier = Modifier.fillMaxSize(), contentScale = ContentScale.FillWidth)
         }
-        PeopleCommentWar(onCommentClicked={/*navigate to CommentsScreen()*/})
-        EventDescriptionWar(eventDescription = "Farmers protest is one of the biggest protest in the world.")
+        PeopleCommentWar(onCommentClicked={onCommentClicked()})
+        EventDescriptionWar(eventDescription = response.description)
         ThreeOptions()
+
 
     }
 }

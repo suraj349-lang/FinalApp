@@ -14,8 +14,20 @@ data class Profile(
     val username:String="",
     val number:String="",
     val address:String="",
-    val profileImage:String=""
-)
+    val profileImage: String = "",
+    val backgroundImage: String = ""
+) {
+    constructor() : this(
+        id = 0,
+        userId = "",
+        name = "",
+        username = "",
+        number = "",
+        address = "",
+        profileImage = "",
+        backgroundImage = ""
+    )
+}
 
 @Serializable
 @Entity(tableName = "chat_table")

@@ -17,7 +17,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
-import com.example.finalapp.model.EventRequestDTO
+import com.example.finalapp.model.Event
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens.dialogBox.uriToFile
 import com.example.finalapp.viewmodels.EventsViewModel
@@ -30,7 +30,7 @@ enum class CREATE_EVENT {
     IMAGE,TYPE,CAPTION,LOCATION,PREVIEW
 }
 @Composable
-fun CreateEventMainScreen(navController: NavController, eventsViewModel: EventsViewModel) {
+fun CreateEventMainScreenOld(parentEventId:String ?= null,navController: NavController, eventsViewModel: EventsViewModel) {
     var page by remember {
         mutableStateOf(CREATE_EVENT.IMAGE)
     }
@@ -64,21 +64,25 @@ fun CreateEventMainScreen(navController: NavController, eventsViewModel: EventsV
 
     Scaffold(
         topBar = {
-            CreateEventTopBar2(showButton){
+            CreateEventTopBar2(
+                isActive = showButton,
+                onBackClicked = {navController.navigateUp()}
+            ){
                 val uri = imageUri
                 var imageFile by mutableStateOf<File?>(null)
                 if(uri != Uri.EMPTY) imageFile = uriToFile(uri!!, context )
                 imageFile?.let {
-                    eventsViewModel.uploadImageAndThenCreateEvent(ProfileObject.profile?.userId!!, it){imageKey->
+                    eventsViewModel.uploadImageAndThenCreateEvent(ProfileObject.profile.userId, it){imageKey->
                         eventsViewModel.createEvent(
-                            EventRequestDTO(
-                                user = ProfileObject.profile?.userId!!,
-                                userName = ProfileObject.profile?.username!!,
+                            Event(
+                                user = ProfileObject.profile.userId,
+                                userName = ProfileObject.profile.username,
                                 title=type,
                                 image = imageKey,
-                                category = type,
                                 location = location,
                                 description =caption,
+                                parentPostId = if (!parentEventId.isNullOrEmpty()) parentEventId else null,
+                                isChildPost = !parentEventId.isNullOrEmpty(),
                                 expirationTime = "12")
                         )
                     }

@@ -33,8 +33,20 @@ sealed class SCREENS(val route:String){
 
     object DROP_PROFILE:SCREENS("drop_profile")
     object CREATE_PING:SCREENS("create_ping")
-    object CREATE_EVENT:SCREENS("create_event_public")
-    object PUBLIC_EVENT_DETAILS_SCREEN_WRAPPER:SCREENS("publicEventDetailsScreenWrapper")
+    object CREATE_EVENT:SCREENS("create_event_public?parentEventId={parentEventId}"){
+        fun createRoute(parentEventId:String?):String {
+            return if(parentEventId.isNullOrEmpty()){
+                "create_event_public"
+            }else{
+                "create_event_public?parentEventId=$parentEventId"
+            }
+        }
+    }
+    object PUBLIC_EVENT_DETAILS_SCREEN_WRAPPER:SCREENS("publicEventDetailsScreenWrapper/{id}"){
+        fun createRoute(id: String):String{
+            return "publicEventDetailsScreenWrapper/$id"
+        }
+    }
     object PRIVATE_PROFILE:SCREENS("private_profile")
     object PAST_OFFERS:SCREENS("past_offers")
     object TABVIEW:SCREENS("tab_view")
@@ -51,6 +63,8 @@ sealed class SCREENS(val route:String){
             return "user_public_profile/$userId"
         }
     }
+
+    object COMMENT:SCREENS("comment")
     object IMAGE_CROPPER:SCREENS("auto_image_cropper")
 
     object CAMERAX_SCREEN:SCREENS("camerax_screen")

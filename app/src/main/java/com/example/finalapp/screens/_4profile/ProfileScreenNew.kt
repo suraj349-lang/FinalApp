@@ -15,11 +15,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -32,8 +30,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
@@ -89,7 +85,6 @@ import com.example.finalapp.viewmodels.EventsViewModel
 import com.example.finalapp.viewmodels.ImageUploadViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import java.io.File
-import java.lang.Exception
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
@@ -114,11 +109,12 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
     ) { uri ->
         if (uri != null) {
             imageUri = uri
-            try{
-              //  navController.navigate(SCREENS.CAMERAX_SCREEN.route)
-            }catch (e:Exception){
-
-
+            var imageFile by mutableStateOf<File?>(null)
+            if(imageUri != Uri.EMPTY) imageFile = uriToFile(uri, context )
+            imageFile?.let {
+                eventsViewModel.uploadImageAndThenCreateEvent(ProfileObject.profile.userId, it){ urlKey->
+                    eventsViewModel.updateUserDetails(ProfileObject.profile.userId, urlKey)
+                }
             }
         } else {
             Log.d("PhotoPicker", "No media selected")
@@ -140,9 +136,9 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                         var imageFile by mutableStateOf<File?>(null)
                         if(uri != Uri.EMPTY) imageFile = uriToFile(uri, context )
                         Log.i("profileImage", "ProfileScreenNew: called with $imageFile")
-                        imageUploadViewModel.uploadImageAndThen(userId = ProfileObject.profile?.userId!!, file = imageFile!!){url->
+                        imageUploadViewModel.uploadImageAndThen(userId = ProfileObject.profile.userId, file = imageFile!!){url->
                             Log.i("profileImage", "updateUserProfileImage: called with $url")
-                            imageUploadViewModel.updateUserProfileImage(ProfileObject.profile?.userId!!,url)
+                            imageUploadViewModel.updateUserProfileImage(ProfileObject.profile.userId,url)
                         }
 
                         imageUploadViewModel.startProfileImageUpload.value=false
@@ -192,11 +188,12 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
     if(showPasswordDialog){
         PasswordForPrivateUsername(onDismiss = {showPasswordDialog=false}, onEnterClicked = {navController.navigate(SCREENS.PRIVATE_PROFILE.route)})
     }
-    LaunchedEffect(key1 = ProfileObject.profile?.userId!!){
+    val userId=ProfileObject.profile.userId
+    LaunchedEffect(key1 = userId){
         if(eventsViewModel.canFetchEvents.value && eventsViewModel.canFetchDroppedProfiles.value) {
-            eventsViewModel.getUserPings(ProfileObject.profile?.userId!!)
-            eventsViewModel.getUserEvents(ProfileObject.profile?.userId!!)
-            eventsViewModel.getUserDropProfiles(ProfileObject.profile?.userId!!)
+            eventsViewModel.getUserPings(userId)
+            eventsViewModel.getUserEvents(userId)
+            eventsViewModel.getUserDropProfiles(userId)
         }
     }
     Surface(modifier = Modifier.fillMaxSize(), color = backgroundColor) {
@@ -207,11 +204,11 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                     .fillMaxWidth()
                     .height(200.dp)
                     .background(color = upperCardColor)){ // 0xFF1B1A1A
+                    Log.i("IMAGEnkvfj", "ProfileScreenNew: ${ProfileObject.profile.backgroundImage}")
                     AsyncImage(
-                        model = if(imageUri!=null) imageUri else "",
+                        model = if(ProfileObject.profile.backgroundImage.isNotEmpty() ) imagePrefix+ProfileObject.profile.backgroundImage else   "",
                         contentDescription = "",
                         modifier = Modifier
-                            //  .padding(16.dp)
                             .fillMaxSize()
                             .align(Alignment.Center),
                         contentScale = ContentScale.Crop
@@ -390,11 +387,16 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                         eventsViewModel.getUserDropProfiles(ProfileObject.profile?.userId!!)
                     }
                     is RequestState.Success -> {
-                        RecentDrops(response.data.data){
-                            showCustomDialog=!showCustomDialog
-                        }
+                        RecentDrops(
+                            response.data.data,
+                            onDropProfileClicked = { showCustomDialog = !showCustomDialog },
+                            onItemClicked = {
+                                val route=  SCREENS.DROP_PROFILE_USER_PROFILE.passProfile(it)
+                                navController.navigate(route)}
+                        )
                     }
-                    else ->{}
+
+                    else -> {}
                 }
 
                 //----------------------------------------------------------------------------------------
@@ -529,7 +531,8 @@ fun MyEventItem(item: EventResponse) {
 @Composable
 fun RecentDrops(
     userDropProfilesList: List<DropProfileResponse>,
-    onDropProfileClicked: () -> Unit
+    onDropProfileClicked: () -> Unit,
+    onItemClicked: (DropProfileResponse) -> Unit
 ) {
     val droppedProfilesList=remember{userDropProfilesList}
         Column() {
@@ -565,11 +568,13 @@ fun RecentDrops(
                 Column(modifier = Modifier.padding(bottom = 16.dp)) {
                     LazyRow(modifier = Modifier.padding(vertical = 8.dp)) {
                         items(droppedProfilesList) { item ->
-                            RecentProfileDropItem(item)
+                            RecentProfileDropItem(item) { onItemClicked(item) }
+
                         }
                     }
                         Row(
                             modifier = Modifier
+                                .clickable { onDropProfileClicked() }
                                 .fillMaxSize()
                                 .padding(8.dp),
                             verticalAlignment = Alignment.CenterVertically,
@@ -598,9 +603,10 @@ fun RecentDrops(
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun RecentProfileDropItem(item: DropProfileResponse) {
+fun RecentProfileDropItem(item: DropProfileResponse,onItemClicked:(DropProfileResponse)->Unit) {
         Box(
             modifier = Modifier
+                .clickable { onItemClicked(item) }
                 .width(100.dp)
                 .height(140.dp)
                 .padding(end = 8.dp)

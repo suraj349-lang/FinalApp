@@ -21,8 +21,8 @@ import com.example.finalapp.R
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun DialogLoading() {
-    Dialog(onDismissRequest = {  }) {
+fun DialogLoading(onBackClicked: () -> Unit={}) {
+    Dialog(onDismissRequest = { onBackClicked() }) {
         Card(
             modifier = Modifier
                 .wrapContentSize()

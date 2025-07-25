@@ -46,46 +46,31 @@ import kotlinx.coroutines.delay
 @Composable
 fun SplashScreenUI(navController: NavController, screen: String){
     val auth=FirebaseAuth.getInstance().currentUser;
+    val color=Constants.SPLASH_SCREEN_COLOR
 
-    val scale= remember { Animatable(0f) }
     LaunchedEffect(key1 = true, block ={
-//        scale.animateTo(targetValue = 0.9f, animationSpec = tween(durationMillis = 800, easing = {
-//            OvershootInterpolator(8f).getInterpolation(it)
-//        }))
-        delay(2000L)
+       // delay(1000L)
         if(auth!=null) navController.navigate(SCREENS.HOME.route){popUpTo(0) };
         else navController.navigate(screen){ popUpTo(0); }
 
     } )
     val systemUiController = rememberSystemUiController()
-    val navBarColor = Color.Gray
+    val navBarColor =color
 
-    SideEffect {
-        systemUiController.setNavigationBarColor(
-            color = navBarColor,
-            darkIcons = false
-        )
-        systemUiController.setStatusBarColor(
-            color = navBarColor,     // Your desired color
-            darkIcons = false        // true = dark icons (for light backgrounds)
-        )
-    }
-    DisposableEffect(Unit) {
-        onDispose {
-            systemUiController.setStatusBarColor(
-                color = floatingActionBtnColor,
-                darkIcons = true
-            )
-            systemUiController.setNavigationBarColor(
-                color = Color.Transparent,
-                darkIcons = true
-            )
-        }
-    }
+//    SideEffect {
+//        systemUiController.setNavigationBarColor(
+//            color = navBarColor,
+//            darkIcons = false
+//        )
+//        systemUiController.setStatusBarColor(
+//            color = navBarColor,     // Your desired color
+//            darkIcons = false        // true = dark icons (for light backgrounds)
+//        )
+//    }
     Surface(
         modifier = Modifier
             .fillMaxSize(),
-        color = Color.Gray
+        color = color //0xFFDB3B08
     )
     {
         Column(
@@ -93,14 +78,8 @@ fun SplashScreenUI(navController: NavController, screen: String){
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Card(modifier = Modifier.wrapContentSize(), colors = CardDefaults.cardColors(containerColor = Color.White), shape = RoundedCornerShape(20.dp)) {
-                Image(
-                    painterResource(id = R.drawable.app_iconn ),
-                    contentDescription ="App Icon",
-                    contentScale= ContentScale.Fit,
-                    modifier = Modifier
-                        .size(95.dp).clip(shape = RoundedCornerShape(20.dp))
-                )
+            Card(modifier = Modifier.wrapContentSize(), colors = CardDefaults.cardColors(containerColor = Color.Transparent), shape = RoundedCornerShape(20.dp)) {
+                Text(text = Constants.APP_NAME, fontSize = 30.sp, fontFamily = APP_NAME_FONT, color = Color.White, fontWeight = FontWeight.Bold)
             }
         }
 

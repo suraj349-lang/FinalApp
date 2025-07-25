@@ -2,16 +2,18 @@ package com.example.finalapp.repository
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import com.example.finalapp.model.DirectChat
 import com.example.finalapp.model.DirectChatApiResponse
 import com.example.finalapp.model.DirectChatRequest
 import com.example.finalapp.model.GetDropProfileResponseModel
-import com.example.finalapp.model.EventRequestDTO
+import com.example.finalapp.model.Event
 import com.example.finalapp.model.EventResponseDTO
 import com.example.finalapp.model.ImageUploadResponse
 import com.example.finalapp.model.AllEventsResponseDTO
 import com.example.finalapp.model.AllPingsResponseDTO
 import com.example.finalapp.model.CreatePingResponse
+import com.example.finalapp.model.EventDetailsResponse
 import com.example.finalapp.model.PremiumEventResponseDTO
 import com.example.finalapp.model.pings.PingRequestDto
 import com.example.finalapp.model.pings.PingResponse
@@ -38,7 +40,7 @@ class EventsRepository @Inject constructor(private val api: ApiService) {
         return api.getDirectChatUsers(lat,long,page)
     }
 
-    fun sendPremiumCreateEventData(event: EventRequestDTO): Flow<PremiumEventResponseDTO> = flow  {
+    fun sendPremiumCreateEventData(event: Event): Flow<PremiumEventResponseDTO> = flow  {
         emit(api.premiumCreateEvent(event))
     }.flowOn(Dispatchers.IO)
 
@@ -46,7 +48,8 @@ class EventsRepository @Inject constructor(private val api: ApiService) {
         return api.getAllDropProfiles(page)
     }
 
-   suspend fun createEvent(data:EventRequestDTO):Resource<EventResponseDTO>{
+   suspend fun createEvent(data:Event):Resource<EventResponseDTO>{
+       Log.i("eventsData", "createEvent: $data")
         return try {
           Resource.Loading(data=true)
            val createEventsResponse =api.createEvent(data)
@@ -66,6 +69,14 @@ class EventsRepository @Inject constructor(private val api: ApiService) {
 
     fun getUserEvents(id:String): Flow<AllEventsResponseDTO> = flow {
         emit(api.getUserEvents(id))
+    }.flowOn(Dispatchers.IO)
+
+    fun getEventDetails(id: String): Flow<EventDetailsResponse> = flow {
+        emit(api.getEventDetails(id))
+    }.flowOn(Dispatchers.IO)
+
+    fun upvoteEvent(id: String): Flow<String> = flow {
+        emit(api.upvoteEvent(id))
     }.flowOn(Dispatchers.IO)
 
     fun getUserPings(id:String): Flow<AllPingsResponseDTO> = flow {

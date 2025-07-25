@@ -14,16 +14,14 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
 import com.example.finalapp.R
-import com.example.finalapp.model.EventRequestDTO
+import com.example.finalapp.model.Event
 import com.example.finalapp.model.EventResponse
-import com.example.finalapp.screens.EventAndPingDesigns.events.EventScreenWrapper1
+import com.example.finalapp.screens._1home.EventAndPingDesigns.events.EventScreen
 import com.example.finalapp.screens.common.NoDataFound
 import com.example.finalapp.screens.dialogBox.DialogLoading
 import com.example.finalapp.screens.common.CommonErrorScreen
@@ -35,7 +33,7 @@ import com.example.finalapp.viewmodels.EventsViewModel
 @OptIn(ExperimentalFoundationApi::class)
 @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 @Composable
-fun EventsScreen(
+fun EventScreenWrapper(
     eventsViewModel: EventsViewModel,
     modifier: Modifier = Modifier,
     initialPage: Int? = 0,
@@ -44,19 +42,13 @@ fun EventsScreen(
 ) {
     val pagerState = rememberPagerState(
         initialPage = initialPage ?: 0,
-        pageCount = { (eventsViewModel.eventsListResponse.value as? RequestState.Success<List<EventRequestDTO>>)?.data?.size ?: 0 }
+        pageCount = { (eventsViewModel.eventsListResponse.value as? RequestState.Success<List<Event>>)?.data?.size ?: 0 }
     )
-//    val fling = PagerDefaults.flingBehavior(
-//        state = pagerState,
-//        lowVelocityAnimationSpec = tween(easing = LinearEasing, durationMillis = 300)
-//    )
-    val index by remember { mutableStateOf(0) }
-    val height by remember { mutableStateOf(false) }
     val eventsState by eventsViewModel.eventsListResponse.collectAsState()
 
     when (eventsState) {
         is RequestState.Loading -> {
-            DialogLoading()
+            DialogLoading(){navController.navigateUp()}
         }
         is RequestState.Error -> {
             Column(modifier=Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
@@ -88,11 +80,15 @@ fun EventsScreen(
 //                            imageUrls = imageUrls
 //
 //                        )
-                        EventScreenWrapper1(event,navController)
+                        EventScreen(
+                            event=event,
+                            navController=navController,
+                            onUpVotesClicked ={eventsViewModel.upvoteEvent(it)}
+                        )
                     }
                 }
             }else{
-                Column() {
+                Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
                     NoDataFound("No Events Found!", R.drawable.search, content ={ RetryButton(onRetryCalled=onRetryCalled)})
                 }
             }

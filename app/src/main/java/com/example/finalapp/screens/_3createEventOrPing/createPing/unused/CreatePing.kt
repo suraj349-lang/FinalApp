@@ -67,7 +67,7 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
 import com.example.finalapp.viewmodels.AuthViewModel
-import com.example.finalapp.model.EventRequestDTO
+import com.example.finalapp.model.Event
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.viewmodels.EventsViewModel
 import com.example.finalapp.screens.dialogBox.GalleryPickerForDropProfile
@@ -369,14 +369,13 @@ fun CreatePing(authViewModel: AuthViewModel, eventsViewModel: EventsViewModel, n
                                     ).show()
                                 } else {
                                     eventsViewModel.premiumCreateEvent(
-                                        event = EventRequestDTO(
+                                        event = Event(
                                           //  userId = "",
                                             //title = "",
                                             //description = null,
                                             image = uri.toString(),
-                                            category = category,
                                             location = address,
-                                            offer = offerText,
+                                            title = offerText,
                                             user = "",
                                             userName = "",
                                             expirationTime = ""

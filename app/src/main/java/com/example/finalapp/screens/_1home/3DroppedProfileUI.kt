@@ -1,9 +1,13 @@
 package com.example.finalapp.screens._1home
 
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -14,7 +18,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -55,7 +59,10 @@ import com.example.finalapp.viewmodels.EventsViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -67,6 +74,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -89,10 +97,12 @@ import com.example.finalapp.utils.ProfileObject
 import com.example.finalapp.utils.UserLocation
 import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
+import com.example.finalapp.utils.formatDateTime
 import com.example.finalapp.utils.testdata.Item
 import kotlinx.coroutines.launch
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun DroppedProfilesUI(
@@ -118,23 +128,28 @@ fun DroppedProfilesUI(
         mutableStateOf(false)
     }
     val scope= rememberCoroutineScope()
-    var labelText by remember {
-        mutableStateOf("Enter location")
-    }
 
     val predictions by eventsViewModel.getAutocompletePredictions(query).collectAsState(emptyList())
     val shouldLoadDroppedProfiles by eventsViewModel.shouldLoadDroppedProfiles.collectAsState()
     LaunchedEffect(pagerState.currentPage) {
         // if page is not checked then on scrolling it will make the api call i.e. in the direct screen itself
         if (pagerState.currentPage == 2 && !shouldLoadDroppedProfiles) {
-            eventsViewModel.getDefaultDropProfiles(ProfileObject.profile?.address!!)
+            eventsViewModel.getDefaultDropProfiles(ProfileObject.profile.address)
             eventsViewModel.resetShouldLoadDroppedProfiles()
         }
+    }
+    val animatedAlpha by animateFloatAsState(
+        targetValue = 1f,
+        animationSpec = tween(durationMillis = 500)
+    )
+    var changeLocation by remember {
+        mutableStateOf(false)
     }
 
     Surface(modifier = Modifier
         .fillMaxSize()
-        .padding(), color = Color.Black) {
+        .padding(), color = Color(0xFF3D3F41)//0xFF021930
+    ) {
         Column(
             modifier=Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Top,
@@ -145,76 +160,119 @@ fun DroppedProfilesUI(
                     verticalArrangement = Arrangement.Top,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    if(showLoader && droppedProfilesList?.itemCount==0) LinearProgressIndicator(modifier = Modifier
-                        .fillMaxWidth()
-                        .height(8.dp), color = floatingActionBtnColor)
-                    UserLocation.address?.let {
-                        DroppedProfileLocation(location = it) }
-                    OutlinedTextField(
-                    value = query,
-                    onValueChange = {
-                        query = it
-                        showPredictionBoxForSearch = it.isNotEmpty()
-                    },
-                    label = {
-                        Text(
-                            text = "Enter location...",
-                            fontSize=14.sp,
-                            color=Color.LightGray,
-                            fontFamily = Constants.FONT_MEDIUM
-                        )
-                    },
-                    trailingIcon = {
-                                   Text(
-                                       text = "Search",
-                                       fontSize = 16.sp,
-                                       fontFamily = Constants.FONT_MEDIUM,
-                                       color=Color.LightGray,
-                                       modifier = Modifier
-                                           .padding(end = 8.dp)
-                                           .clickable {
-                                               scope.launch {
-                                                   eventsViewModel.getDefaultDropProfiles("")
-                                               }
-                                           })
-                    },
-                    placeholder = { Text(text = labelText, color = Color.LightGray) },
-                    modifier = Modifier
-                        .clickable {
-                            labelText = "Search location"
-                        }
-                        .fillMaxWidth()
-                        .padding(4.dp),
-                    shape = RoundedCornerShape(20.dp),
-                    colors = OutlinedTextFieldDefaults.colors(focusedContainerColor = Color.DarkGray.copy(alpha = 0.8f))
-                )
-                if (showPredictionBoxForSearch) {
+                    if(showLoader && droppedProfilesList?.itemCount==0) {
+                        LinearProgressIndicator(modifier = Modifier
+                            .fillMaxWidth()
+                            .height(8.dp), color = floatingActionBtnColor)
+                    }
+
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(200.dp)
-                            .padding(start = 20.dp, end = 20.dp)
-                            .border(1.dp, color = Color.LightGray)
-
+                            .background(Color(0xFF0064C9))//0xFF1970C7
                     ) {
-                        LazyColumn(modifier = Modifier) {
-                            items(predictions) { prediction ->
+                        Column(modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)) {
+
+                            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
                                 Text(
-                                    text = prediction.getPrimaryText(null).toString(),
-                                    modifier = Modifier
-                                        .padding(16.dp)
-                                        .clickable {
-                                            // Handle click on prediction
-                                            query = prediction
-                                                .getPrimaryText(null)
-                                                .toString()
-                                            showPredictionBoxForSearch = false
-                                        }
+                                    text = "Dropped profiles here at :",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 18.sp,
+                                    color = Color.White,
+                                    fontFamily=Constants.FONT_MEDIUM,
+                                    modifier = Modifier.alpha(animatedAlpha)
                                 )
+                                Row(modifier = Modifier.clickable { changeLocation = !changeLocation }, horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
+                                    Image(painter = painterResource(id = R.drawable.search_new_filled), contentDescription ="", modifier = Modifier
+                                        .size(12.dp), colorFilter = ColorFilter.tint(Color.White) )
+                                    Text(
+                                        text = "Change location",
+                                        fontWeight = FontWeight.Medium,
+                                        fontSize = 14.sp,
+                                        color = Color.White,
+                                        modifier = Modifier.alpha(animatedAlpha),
+                                        style = TextStyle(textDecoration = TextDecoration.Underline)
+                                    )
+                                }
+
+                            }
+
+                            Spacer(modifier = Modifier.height(10.dp))
+                            UserLocation.address?.let {
+                                DroppedProfileLocation(trim = true, location = it)
                             }
                         }
                     }
-                }
+                    if(changeLocation) {
+
+                        OutlinedTextField(
+                            value = query,
+                            onValueChange = {
+                                query = it
+                                showPredictionBoxForSearch = it.isNotEmpty()
+                            },
+                            label = {
+                                Text(
+                                    text = "Enter location",
+                                    fontSize = 14.sp,
+                                    color = Color.LightGray,
+                                    fontFamily = Constants.FONT_MEDIUM
+                                )
+                            },
+                            trailingIcon = {
+                                Text(
+                                    text = "Search",
+                                    fontSize = 16.sp,
+                                    fontFamily = Constants.FONT_MEDIUM,
+                                    color = Color.LightGray,
+                                    modifier = Modifier
+                                        .padding(end = 8.dp)
+                                        .clickable {
+                                            scope.launch {
+                                                eventsViewModel.getDefaultDropProfiles("")
+                                            }
+                                        })
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(4.dp),
+                            shape = RoundedCornerShape(20.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedContainerColor = Color.DarkGray.copy(
+                                    alpha = 0.8f
+                                )
+                            )
+                        )
+                        if (showPredictionBoxForSearch) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(200.dp)
+                                    .padding(start = 20.dp, end = 20.dp)
+                                    .border(1.dp, color = Color.LightGray)
+
+                            ) {
+                                LazyColumn(modifier = Modifier) {
+                                    items(predictions) { prediction ->
+                                        Text(
+                                            text = prediction.getPrimaryText(null).toString(),
+                                            modifier = Modifier
+                                                .padding(16.dp)
+                                                .clickable {
+                                                    // Handle click on prediction
+                                                    query = prediction
+                                                        .getPrimaryText(null)
+                                                        .toString()
+                                                    showPredictionBoxForSearch = false
+                                                }
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
             }
 
             if(droppedProfiles==null && !triggerFetch){
@@ -232,8 +290,8 @@ fun DroppedProfilesUI(
                     LazyVerticalStaggeredGrid(
                         modifier = Modifier
                             .zIndex(0f)
-                            .nestedScroll(scrollBehavior.nestedScrollConnection),
-                        columns = StaggeredGridCells.Fixed(2),
+                           // .nestedScroll(scrollBehavior.nestedScrollConnection),
+                       , columns = StaggeredGridCells.Fixed(2),
                         contentPadding = PaddingValues(2.dp),
                     ) {
                         droppedProfilesList?.itemCount?.let {
@@ -274,8 +332,13 @@ fun DroppedProfilesUI(
                                     val error = (loadState.refresh as LoadState.Error).error
                                     item {
                                         Log.e("Error in dropped profiles", "DroppedProfilesUI: $error ", )
-                                        CommonErrorScreen(error = "Error getting profiles.",true){
-                                            eventsViewModel.getDefaultDropProfiles("")
+                                        Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                                            CommonErrorScreen(
+                                                error = "Error getting profiles.",
+                                                true
+                                            ) {
+                                                eventsViewModel.getDefaultDropProfiles("")
+                                            }
                                         }
                                     }
                                 }
@@ -319,21 +382,20 @@ fun LazyRowItem(item: Item) {
     }
 }
 
-
-@OptIn(ExperimentalGlideComposeApi::class)
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DroppedProfileItem(profile: DropProfileResponse, onProfileClicked:()->Unit) {
     Box(
         modifier = Modifier
+            .shadow(elevation = 60.dp)
+            .zIndex(4f)
             .clickable { onProfileClicked() }
             .padding(2.dp)
             .fillMaxWidth()
-            .wrapContentHeight()
-            .background(color = Color.DarkGray.copy(alpha = 0.5f)))
+            .height(300.dp)
+            .clip(shape = RoundedCornerShape(10.dp))
+            .background(color = Color.White))
     {
-        Column(modifier = Modifier
-            .fillMaxWidth()
-            .height(300.dp)) {
             AsyncImage(
                 model = imagePrefix + profile.image, // Replace with your image resource
                 contentDescription = "Background Image",
@@ -341,61 +403,81 @@ fun DroppedProfileItem(profile: DropProfileResponse, onProfileClicked:()->Unit) 
                 filterQuality= FilterQuality.High,
                 modifier = Modifier
                     .clickable {
-                        Log.d("DropProfileTesting", "DroppedProfile: onProfileClicked() called")
                         onProfileClicked()
                     }
-                    .fillMaxWidth()
-                    .height(250.dp)
+                    .fillMaxSize()
             )
 
             // Multiple texts
-            Column(
-                modifier = Modifier
-                    .padding(8.dp),
-                horizontalAlignment = Alignment.Start,
-                verticalArrangement = Arrangement.Bottom
-            ) {
-                Row(
+            Box(modifier = Modifier
+                .wrapContentSize()
+                .align(Alignment.BottomCenter)
+                .background(color = Color(0xFF9C9C9C).copy(alpha = 1f)) //0xFF2C2A2A  0xFFAFB42B  0xFF290438
+                .clip(shape = RoundedCornerShape(10.dp))) {
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .wrapContentHeight(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween
+                        .padding(horizontal = 8.dp)
+                        .padding(bottom = 4.dp),
+                    horizontalAlignment = Alignment.Start,
+                    verticalArrangement = Arrangement.Bottom
                 ) {
-                    Text(
-                        text =profile.createdBy.name,//profile.location,
-                        modifier = Modifier.fillMaxWidth(0.8f),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        fontFamily=Constants.FONT_MEDIUM,
-                        style = TextStyle(color = Color.White, fontSize = 18.sp)
-                    )
-                    Text(
-                        text = profile.expirationTime + " hrs.",
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        fontFamily = Constants.FONT_LIGHT,
-                        fontSize = 10.sp,
-                        color = Color.White
-                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentHeight(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = profile.createdBy.name,
+                            modifier = Modifier.fillMaxWidth(0.6f),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            fontFamily = Constants.FONT_MEDIUM,
+                            style = TextStyle(color = Color.White, fontSize = 18.sp)
+                        )
+                        Card(modifier = Modifier.shadow(elevation = 60.dp).zIndex(2f), colors = CardDefaults.cardColors(containerColor = Color(0xFF9C9C9C)), shape = RoundedCornerShape(2.dp)) {
+                            Text(
+                                text = formatDateTime(profile.createdAt ?: "" ),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                fontFamily = Constants.FONT_LIGHT,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 10.sp,
+                                color = Color.White
+                            )
+                        }
 
-                }
-                Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    Image(painter = painterResource(id = R.drawable.location_new), contentDescription ="", modifier = Modifier.size(16.dp) )
-                    Text(
-                        text = profile.location,
-                        fontFamily = Constants.FONT_MEDIUM,
-                        fontSize = 8.sp,
-                        maxLines = 1,
-                        color= Color.White,
-                        overflow = TextOverflow.Ellipsis
-                    )
+                    }
+                    Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = Color(0xFF9C9C9C))) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        ) {
+//                        Image(
+//                            painter = painterResource(id = R.drawable.location_new),
+//                            contentDescription = "",
+//                            modifier = Modifier.size(16.dp),
+//                            colorFilter = ColorFilter.lighting(
+//                                multiply = Color.White,
+//                                add = Color.Black
+//                            )
+//                        )
+                            Text(
+                                text = profile.location,
+                                fontFamily = Constants.FONT_MEDIUM,
+                                fontSize =10.sp,
+                                maxLines = 1,
+                                color = Color.Black,
+                                overflow = TextOverflow.Ellipsis
+                            )
 
+                        }
+                    }
                 }
             }
         }
-
-    }
 }
 
 
@@ -428,7 +510,7 @@ fun DroppedProfileLocation(location: String, trim: Boolean=false) {
                 color = Color.White,
                 modifier = Modifier,
                 fontFamily=Constants.FONT_EXTRA_LIGHT,
-                fontSize = 16.sp,
+                fontSize = 13.sp,
             )
         }
     }

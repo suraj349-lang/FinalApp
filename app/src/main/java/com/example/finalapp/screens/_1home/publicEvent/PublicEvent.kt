@@ -243,7 +243,7 @@ fun PeopleCommentWarAndJoinButton(event: EventResponse,onCommentClicked: () -> U
         ) {
             Column( horizontalAlignment = Alignment.CenterHorizontally) {
                 Image(painter = painterResource(id = R.drawable.people), contentDescription ="", modifier = Modifier.size(24.dp), colorFilter = ColorFilter.tint(Color.White.copy(alpha = 0.8f)) )
-                Text(text =event.peopleJoined.toString()  , fontSize = 12.sp, fontFamily = DONGLE_NORMAL, color = Color.White)
+                Text(text =event.totalJoined.toString()  , fontSize = 12.sp, fontFamily = DONGLE_NORMAL, color = Color.White)
             }
             Column( horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.clickable { onCommentClicked() }) {
                 Image(painter = painterResource(id = R.drawable.comment_filled), contentDescription ="", modifier = Modifier.size(24.dp), colorFilter = ColorFilter.tint(Color.White.copy(alpha = 0.8f)) )

@@ -1,30 +1,29 @@
 package com.example.finalapp.model
 
-data class EventRequestDTO(
+data class Event(
   val user: String,
   val userName:String,
   val title: String = "",
   val description: String="",
   val image: String,
-  val category: String = "",
   val location: String = "",
-  val offer: String = "",
-  val isChildPost :String="",
+  val isChildPost :Boolean=false,
   val parentPostId:String?=null,
+  val childPosts:List<Event> = listOf(),
   val expirationTime: String,
 ){
   companion object{
-    fun empty():EventRequestDTO{
-      return EventRequestDTO(
+    fun empty():Event{
+      return Event(
         user="",
         userName = "",
         title = "",
         description = "",
         image = "",
-        category = "",
         location = "",
-        offer = "",
+        isChildPost = false,
         parentPostId = "",
+        childPosts = listOf(),
         expirationTime = ""
       )
     }
@@ -38,11 +37,10 @@ data class EventResponse(
   val title: String="",
   val description: String? = null,
   val image: String = "",
-  val category: String = "",
   val location: String = "",
-  val topPostsList:List<String>? = emptyList(),
+  val childPosts:List<EventResponse>? = emptyList(),
   val expirationTime: String = "",
-  val peopleJoined:Int=0,
+  val totalJoined:Int=0,
   val totalComments:Int=0,
   val topComments:List<CommentData> ? =null,
   val totalChildPosts:Int =0,

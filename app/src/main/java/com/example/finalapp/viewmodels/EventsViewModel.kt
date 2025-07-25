@@ -15,7 +15,7 @@ import com.example.finalapp.model.ChatList
 import com.example.finalapp.model.DirectChat
 import com.example.finalapp.model.DirectChatRequest
 import com.example.finalapp.model.DropProfileResponse
-import com.example.finalapp.model.EventRequestDTO
+import com.example.finalapp.model.Event
 import com.example.finalapp.model.EventResponse
 import com.example.finalapp.model.EventResponseDTO
 import com.example.finalapp.model.GetDropProfileResponseModel
@@ -30,6 +30,7 @@ import com.example.finalapp.repository.EventsRepository
 import com.example.finalapp.repository.ProfileRepository
 import com.example.finalapp.repository.Resource
 import com.example.finalapp.screens._2pings.PingsPagingSource
+import com.example.finalapp.utils.ProfileObject
 import com.example.finalapp.utils.RequestState
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.AutocompletePrediction
@@ -57,6 +58,8 @@ class EventsViewModel @Inject constructor(
     private val profileRepository: ProfileRepository,
     private val s3Uploader: S3Uploader,
     @ApplicationContext context: Context): ViewModel(){
+
+    val TAG="GET_EVENTS_RESPONSE";
 
     private val placesClient by lazy { Places.createClient(context) }
     var checked= mutableStateOf(false)
@@ -164,7 +167,7 @@ class EventsViewModel @Inject constructor(
                 config = PagingConfig(pageSize = 10, prefetchDistance = 5),
                 pagingSourceFactory = { DirectChatUsersPagingSource(eventsRepository, lat, long) }
             ).flow
-              //  .cachedIn(viewModelScope)
+                .cachedIn(viewModelScope)
                 .onStart {
                     _directChatRequestState.emit(RequestState.Loading) // Show loading UI
                 }
@@ -190,6 +193,7 @@ class EventsViewModel @Inject constructor(
 
         placesClient.findAutocompletePredictions(request)
             .addOnSuccessListener { response ->
+                Log.i("PlacesViewModel", "Autocomplete prediction request success $response")
                 results.value = response.autocompletePredictions
             }
             .addOnFailureListener { exception ->
@@ -265,6 +269,25 @@ class EventsViewModel @Inject constructor(
             }
     }
     //----------------------------Get user events for Profile----------------------------------------------------------------------------------------//
+    private val _eventDetailsResponse = MutableStateFlow<RequestState<EventResponse>>(RequestState.Idle)
+    val eventDetailsResponse: StateFlow<RequestState<EventResponse>> = _eventDetailsResponse.asStateFlow()
+
+    fun getEventDetails(id:String)=viewModelScope.launch(Dispatchers.IO) {
+        eventsRepository.getEventDetails(id)
+            .onStart {
+                _eventDetailsResponse.value = RequestState.Loading
+
+            }.catch {
+                _eventDetailsResponse.value = RequestState.Error(it)
+                Log.d(TAG, "user events error ${_eventDetailsResponse.value}")
+
+            }.collect {
+                _eventDetailsResponse.value = RequestState.Success(it.data)
+                Log.d(TAG, "user events data ${_eventDetailsResponse.value}")
+
+            }
+    }
+    //----------------------------Get user events for Profile----------------------------------------------------------------------------------------//
     private val _userPingsListResponse = MutableStateFlow<RequestState<List<PingResponse>>>(RequestState.Idle)
     val userPingsListResponse: StateFlow<RequestState<List<PingResponse>>> = _userPingsListResponse.asStateFlow()
     val canFetchPings = mutableStateOf(true)
@@ -283,6 +306,25 @@ class EventsViewModel @Inject constructor(
                 _userPingsListResponse.value = RequestState.Success(it.data)
                 canFetchPings.value=false
                 Log.d(TAG, "user events data ${_userPingsListResponse.value}")
+
+            }
+    }
+    //----------------------------Get user events for Profile----------------------------------------------------------------------------------------//
+    private val _upvoteEvent = MutableStateFlow<RequestState<String>>(RequestState.Idle)
+    val upvoteEvent: StateFlow<RequestState<String>> = _upvoteEvent.asStateFlow()
+    fun upvoteEvent(id:String)=viewModelScope.launch(Dispatchers.IO) {
+        val TAG="";
+        eventsRepository.upvoteEvent(id)
+            .onStart {
+                _upvoteEvent.value = RequestState.Loading
+
+            }.catch {
+                _upvoteEvent.value = RequestState.Error(it)
+                Log.d(TAG, "user events error ${_upvoteEvent.value}")
+
+            }.collect {
+                _upvoteEvent.value = RequestState.Success(it)
+                Log.d(TAG, "user events data ${_upvoteEvent.value}")
 
             }
     }
@@ -331,27 +373,33 @@ class EventsViewModel @Inject constructor(
         }
     }
 
-    var createEventResponse = MutableStateFlow(EventResponseDTO())
+    var createEventResponse = MutableStateFlow<RequestState<EventResponseDTO>>(RequestState.Idle)
     var createEventIsLoading = MutableStateFlow(false)
     var createEventIsSuccess= MutableStateFlow(false)
-    fun createEvent(data:EventRequestDTO){
+    fun createEvent(data:Event){
         createEventIsLoading.value=true
         viewModelScope.launch(Dispatchers.IO) {
 //            if(data.location=="") return@launch
             try {
                 when(val response=eventsRepository.createEvent(data)){
                     is Resource.Success->{
-                        createEventResponse.value= response.data!!
+
+                        createEventIsLoading.value=false
+                        createEventResponse.value= RequestState.Success(response.data!!)
                         createEventIsSuccess.value=true
 
                     }
                     is Resource.Error->{
+                        createEventIsLoading.value=false
+                        createEventIsSuccess.value=false
                         Log.d("TAG","create event ${response.message.toString()}")
                     }
                     else->{
                      }
                 }
             }catch (e:Exception){
+                createEventIsLoading.value=false
+                createEventIsSuccess.value=false
                 Log.d("TAG","create event ${e.message.toString()}")
             }
             finally {
@@ -368,7 +416,7 @@ class EventsViewModel @Inject constructor(
 
     val premiumCreateEventResponse:MutableState<RequestState<PremiumEventResponseDTO>> = mutableStateOf(RequestState.Idle)
     var premiumCreateEventKey :MutableState<Int> = mutableStateOf(0);
-    fun premiumCreateEvent(event:EventRequestDTO)=viewModelScope.launch(Dispatchers.IO) {
+    fun premiumCreateEvent(event:Event)=viewModelScope.launch(Dispatchers.IO) {
         val TAG="PREMIUM_CREATE_EVENT_RESPONSE"
         eventsRepository.sendPremiumCreateEventData(event)
             .onStart {
@@ -472,5 +520,26 @@ class EventsViewModel @Inject constructor(
                 _userProfileResponse.value=RequestState.Success(it.data)
             }
     }
+    //-------------------------------------------------------------------------------------------------------//
+
+    private val _userDetailsUpdateResponse = MutableStateFlow<RequestState<User>>(RequestState.Idle)
+    val userDetailsUpdateResponse: StateFlow<RequestState<User>> = _userDetailsUpdateResponse
+
+    fun updateUserDetails(id: String, backgroundImage: String) = viewModelScope.launch {
+        val updateData = mapOf("backgroundImage" to backgroundImage)
+
+        profileRepository.updateUserData(id, updateData)
+            .onStart {
+                _userDetailsUpdateResponse.value = RequestState.Loading
+            }
+            .catch {
+                _userDetailsUpdateResponse.value = RequestState.Error(it)
+            }
+            .collect { result ->
+                ProfileObject.profile = ProfileObject.profile.copy(backgroundImage = result.data.backgroundImage)
+                _userDetailsUpdateResponse.value = RequestState.Success(result.data)
+            }
+    }
+
 
 }

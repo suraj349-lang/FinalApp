@@ -142,7 +142,7 @@ fun PreviewCreateEvent(uri: Uri?,
                                     .fillMaxWidth()
                                     .height(24.dp), shape = RoundedCornerShape(0.dp)
                             ) {
-                                RunningText4(ProfileObject.profile?.address!!)
+                                RunningText4(ProfileObject.profile.address)
                             }
                         }
                     }

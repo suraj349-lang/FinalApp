@@ -1,4 +1,4 @@
-package com.example.finalapp.screens.EventAndPingDesigns.pings
+package com.example.finalapp.screens._1home.EventAndPingDesigns.pings
 
 
 import androidx.compose.foundation.BorderStroke

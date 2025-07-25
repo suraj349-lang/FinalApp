@@ -1,6 +1,6 @@
 package com.example.finalapp.screens._1home
 
-import android.media.midi.MidiOutputPort
+
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -39,6 +39,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -87,7 +88,7 @@ fun DirectChatScreen(
     LaunchedEffect(key1 =shareProfileClickedON){
         if(shareProfileClickedON ){
             eventsViewModel.checked.value=!checked
-            eventsViewModel.sendDirectChatData(DirectChatRequest( ProfileObject.profile?.userId!!,authViewModel.latitude.value,authViewModel.longitude.value))
+            eventsViewModel.sendDirectChatData(DirectChatRequest( ProfileObject.profile.userId,authViewModel.latitude.value,authViewModel.longitude.value))
         }
         else {
            // eventsViewModel.emptyNearByUsersList()
@@ -100,32 +101,37 @@ fun DirectChatScreen(
         content = { paddingValues ->
             Box(
                 modifier = Modifier
+                    .background(Constants.HOME_TOP_BAR_COLOR)
                     .fillMaxSize()
                     .padding(paddingValues)
             ) {
-                Image(painter = painterResource(id = R.drawable.whatsapp), contentDescription ="", contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize() )
-                Text(
-                    text = if(checked)"Users near you" else "Share profile nearby" ,
-                    fontFamily = DONGLE_BOLD,
-                    fontSize = 24.sp,
-                    modifier = Modifier.align(Alignment.TopStart).padding(top = 10.dp, start = 10.dp)
-                )
-                Switch(
-                    checked = checked,
-                    onCheckedChange = {
-                        eventsViewModel.shareProfileClicked.value = !eventsViewModel.shareProfileClicked.value
-                    },
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = Color(0xFF047E0A),// MaterialTheme.colorScheme.primary,
-                        checkedTrackColor = Color.LightGray,
-                        uncheckedThumbColor = Color(0xFFE9AB10),
-                        uncheckedTrackColor = Color(0xFFFFFFFF),
-                    ),
-                    modifier = Modifier.align(Alignment.TopEnd).padding(end = 16.dp)
-                )
-
-
+               // Image(painter = painterResource(id = R.drawable.whatsapp), contentDescription ="", contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize() )
                 Column(modifier = Modifier.fillMaxSize()) {
+                    Box(modifier = Modifier.fillMaxWidth().height(60.dp).shadow(elevation = 60.dp)){
+                        Text(
+                            text = if(checked)"Users near you" else "Share profile nearby" ,
+                            fontFamily = DONGLE_BOLD,
+                            fontSize = 24.sp,
+                            modifier = Modifier
+                                .align(Alignment.TopStart)
+                                .padding(top = 10.dp, start = 10.dp)
+                        )
+                        Switch(
+                            checked = checked,
+                            onCheckedChange = {
+                                eventsViewModel.shareProfileClicked.value = !eventsViewModel.shareProfileClicked.value
+                            },
+                            colors = SwitchDefaults.colors(
+                                checkedThumbColor = Color(0xFF047E0A),// MaterialTheme.colorScheme.primary,
+                                checkedTrackColor = Color.LightGray,
+                                uncheckedThumbColor = Color(0xFFE9AB10),
+                                uncheckedTrackColor = Color(0xFFFFFFFF),
+                            ),
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .padding(end = 16.dp)
+                        )
+                    }
                     DirectChatUI(
                         scrollBehavior,
                         eventsViewModel,
@@ -196,7 +202,7 @@ fun DirectChatProfiles(
                         DirectChatItem(
                             user=it,
                             onProfileClicked = { navController.navigate(SCREENS.USER_PUBLIC_PROFILE.createPath(it.userId._id)) },
-                            onSendMessageClicked = { eventsViewModel.saveUserToChatList(ProfileObject.profile?.userId!!, it.userId._id) }
+                            onSendMessageClicked = { eventsViewModel.saveUserToChatList(ProfileObject.profile.userId, it.userId._id) }
                         )
                     }
                 }
@@ -274,45 +280,65 @@ fun SwitchWithIcon(checked: Boolean,alignment: Alignment,onClick:(value:Boolean)
 
 }
 
-@OptIn(ExperimentalGlideComposeApi::class)
-@Composable
 
-fun ShareProfileForDirectChat(onShareProfileClicked:()->Unit) {
-    Box(modifier = Modifier
-        .fillMaxWidth()
-        .fillMaxHeight(1f)) {
-        Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+@Composable
+fun ShareProfileForDirectChat(onShareProfileClicked: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight(1f)
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             Card(
                 modifier = Modifier
                     .fillMaxWidth(0.8f)
                     .wrapContentHeight(),
                 shape = RoundedCornerShape(12.dp),
                 colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F7FA)),
-                elevation = CardDefaults.cardElevation(100.dp)) {
-                Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(4.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                    UserLocation.address?.let { DroppedProfileLocation(location = it,true) }
+                elevation = CardDefaults.cardElevation(100.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    UserLocation.address?.let { DroppedProfileLocation(location = it, true) }
                     Card(
-                      modifier = Modifier.size(150.dp),
-                      shape = CircleShape,
-                      border = BorderStroke(width = 1.dp, color = Color.LightGray)) {
-                    AsyncImage(
-                        model = imagePrefix+ProfileObject.profile?.profileImage,
-                        contentDescription = "",
-                        contentScale = ContentScale.Crop,
-                        filterQuality = FilterQuality.High
+                        modifier = Modifier.size(150.dp),
+                        shape = CircleShape,
+                        border = BorderStroke(width = 1.dp, color = Color.LightGray)
+                    ) {
+                        AsyncImage(
+                            model = imagePrefix + ProfileObject.profile.profileImage,
+                            contentDescription = "",
+                            contentScale = ContentScale.Crop,
+                            filterQuality = FilterQuality.High
+                        )
+                    }
+                    Text(
+                        text = ProfileObject.profile.username,
+                        overflow = TextOverflow.Ellipsis,
+                        fontFamily = DONGLE_BOLD,
+                        fontSize = 24.sp
                     )
-                }
-                ProfileObject.profile?.let { Text(text = it.username, overflow = TextOverflow.Ellipsis, fontFamily = DONGLE_BOLD, fontSize =24.sp) }
-                Button(
-                    onClick = { onShareProfileClicked() },
-                    shape = RoundedCornerShape(6.dp),
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = PURPLE, contentColor = Color.White)) {
-                    Text(text = "Share Profile", fontFamily = DONGLE_BOLD, fontSize = 20.sp)
+                    Button(
+                        onClick = { onShareProfileClicked() },
+                        shape = RoundedCornerShape(6.dp),
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = PURPLE,
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Text(text = "Share Profile", fontFamily = DONGLE_BOLD, fontSize = 20.sp)
+                    }
                 }
             }
-        }
         }
 
     }

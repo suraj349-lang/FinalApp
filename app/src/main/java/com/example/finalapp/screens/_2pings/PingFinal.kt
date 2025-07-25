@@ -42,7 +42,7 @@ import androidx.navigation.NavHostController
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.finalapp.R
-import com.example.finalapp.screens.EventAndPingDesigns.pings.PingItem3
+import com.example.finalapp.screens._1home.EventAndPingDesigns.pings.PingItem3
 import com.example.finalapp.screens._3createEventOrPing.CreateEventOrPingBottomSheet
 import com.example.finalapp.screens.common.CommonErrorScreen
 import com.example.finalapp.ui.theme.floatingActionBtnColor

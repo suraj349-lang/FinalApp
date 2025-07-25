@@ -10,10 +10,9 @@ import com.example.finalapp.model.DropProfileModel
 import com.example.finalapp.model.DropProfileResponseModel
 import com.example.finalapp.model.GetDropProfileResponseModel
 import com.example.finalapp.model.LoginModel
-import com.example.finalapp.model.EventRequestDTO
+import com.example.finalapp.model.Event
 import com.example.finalapp.model.RegisterUserModel
 import com.example.finalapp.model.OkResponse
-import com.example.finalapp.model.User
 import com.example.finalapp.model.EventResponseDTO
 import com.example.finalapp.model.ImageUploadResponse
 import com.example.finalapp.model.LoginAPIResponse
@@ -21,12 +20,12 @@ import com.example.finalapp.model.AllEventsResponseDTO
 import com.example.finalapp.model.AllPingsResponseDTO
 import com.example.finalapp.model.ChatList
 import com.example.finalapp.model.CreatePingResponse
+import com.example.finalapp.model.EventDetailsResponse
 import com.example.finalapp.model.FCMTokenResponse
 import com.example.finalapp.model.Message
 import com.example.finalapp.model.PremiumEventResponseDTO
 import com.example.finalapp.model.pings.PingRequestDto
 import com.example.finalapp.model.pings.PingResponse
-import com.example.finalapp.repository.Resource
 import com.example.finalapp.utils.AllPingsResponse
 import com.example.finalapp.utils.ApiResponse
 import okhttp3.MultipartBody
@@ -58,11 +57,15 @@ interface ApiService {
 
     //---------------------------------------------------------------------//
     @POST("/api/v1/event")
-    suspend fun premiumCreateEvent(@Body event:EventRequestDTO): PremiumEventResponseDTO
+    suspend fun premiumCreateEvent(@Body event:Event): PremiumEventResponseDTO
     @POST("/api/v1/event")
-    suspend fun createEvent(@Body event:EventRequestDTO): EventResponseDTO
+    suspend fun createEvent(@Body event:Event): EventResponseDTO
     @GET("/api/v1/event")
     suspend fun getAllEvents(): AllEventsResponseDTO
+    @PUT("api/v1/event/updateEvent/{id}/upvote")
+    suspend fun upvoteEvent(@Path("id") id: String) : String
+    @GET("/api/v1/event/getEventDetails/{id}")
+    suspend fun getEventDetails(@Path("id") id: String): EventDetailsResponse
     @GET("/api/v1/ping/getUserPings/{id}")
     suspend fun getUserPings(@Path("id") id:String): AllPingsResponseDTO
 
@@ -94,8 +97,8 @@ interface ApiService {
     suspend fun getUserData(@Query("userId") userId: String):OkResponse
 
     //---------------------------------------------------------------------//
-    @PUT("/api/v1/user/update")
-    suspend fun updateUserData(@Body updateUser: User ):OkResponse
+    @PATCH("/api/v1/user/update")
+    suspend fun updateUserData(@Query("id") id:String,@Body backgroundImage: Map<String,String> ):OkResponse
 
     //---------------------------------------------------------------------//
     @GET("/api/v1/auth/updateUserImage")

@@ -188,7 +188,7 @@ class AuthViewModel @Inject constructor(
 
     //-----------------------------------------------------------------------------------------------------------//
     fun saveProfileData(user: User){
-        val profile=Profile(0,user._id,user.name,user.username,user.number,user.address,user.profileImage ?: "")
+        val profile=Profile(0,user._id,user.name,user.username,user.number,user.address,user.profileImage ,user.backgroundImage)
         viewModelScope.launch {
             profileDatabaseRepository.saveProfileDataInDb(profile = profile)
         }
