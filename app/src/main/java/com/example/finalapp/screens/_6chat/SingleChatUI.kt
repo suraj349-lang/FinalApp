@@ -59,6 +59,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.graphicsLayer
@@ -703,7 +704,8 @@ fun SingleChatTopBar(title: String,profileImage:String, navController: NavHostCo
 //                )
 //            }
 
-        }
+        },
+        modifier = Modifier.shadow(elevation = 10.dp, spotColor = Color.White)
     )
 }
 

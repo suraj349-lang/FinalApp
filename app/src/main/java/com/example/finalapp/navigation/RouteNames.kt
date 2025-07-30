@@ -53,7 +53,7 @@ sealed class SCREENS(val route:String){
     object TIKTOK:SCREENS("tiktok")
     object PREMIUM_CREATE_EVENT:SCREENS("premium")
     object DROP_PROFILE_USER_PROFILE:SCREENS("drop_profile_user_profile/{dropProfileResponse}"){
-        fun passProfile(dropProfileResponse: DropProfileResponse):String{
+        fun createRoute(dropProfileResponse: DropProfileResponse):String{
             val profileJson= Uri.encode(Json.encodeToString(dropProfileResponse))
             return "drop_profile_user_profile/$profileJson"
         }

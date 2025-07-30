@@ -17,3 +17,4 @@ data class DirectChatApiResponse(
     val success: Boolean,
     val data: List<DirectChat>
 )
+

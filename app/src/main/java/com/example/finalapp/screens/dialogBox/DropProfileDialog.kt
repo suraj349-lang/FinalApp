@@ -67,6 +67,7 @@ import com.example.finalapp.model.DropProfileModel
 import com.example.finalapp.screens._1home.commonUI.OfferResponseDataAndAction
 import com.example.finalapp.screens._4profile.createImageFile
 import com.example.finalapp.ui.imagePickerText
+import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.utils.ProfileObject
 import com.example.finalapp.utils.RequestState
 import com.example.finalapp.utils.UserLocation
@@ -86,7 +87,6 @@ import java.io.File
 fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewModel, imageUploadViewModel: ImageUploadViewModel, navController: NavHostController, onDismiss: () -> Unit) {
     var caption by remember{ mutableStateOf("") }
     val context= LocalContext.current
-    val enabled=true;
     var uri = eventsViewModel.dropProfileUploadUri.value
     var imageFile by mutableStateOf<File?>(null)
     if(uri != Uri.EMPTY) imageFile = uriToFile(uri, context )
@@ -134,26 +134,43 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                 Box(modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp)
-                    .background(
-                        brush = Brush.linearGradient(
-                            colors = listOf(Color(0xFF620F85), Color(0xFF560679))
-                        )
-                    ))
+                    .background(color = Color.Black))
                 {
-                    Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
-                        Image(painter = painterResource(id = R.drawable.app_icon), contentDescription ="app icon", modifier = Modifier
-                            .size(40.dp)
-                            .padding(start = 8.dp, end = 8.dp) , colorFilter = ColorFilter.tint(Color.White))
-                        Text(
-                            text = "Drop Profile",
-                            modifier = Modifier.fillMaxWidth(),
-                            color = Color.White,
-                            fontSize = 20.sp,
-                            textAlign = TextAlign.Start,
-                            fontFamily = Constants.USER_NAME_FONT,
-                            //lineHeight = 26.sp // Adjust line height if needed
-                        )
-                    }
+                        Row(
+                            modifier = Modifier
+                                .fillMaxSize(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.drop_profile_filled_rounded),
+                                contentDescription = "app icon",
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .padding(start = 8.dp, end = 8.dp),
+                                colorFilter = ColorFilter.tint(Color.White)
+                            )
+                            Column(modifier = Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.Start) {
+                                Text(
+                                    text = "Drop Profile",
+                                    modifier = Modifier.fillMaxWidth(),
+                                    color = Color.White,
+                                    fontSize = 18.sp,
+                                    textAlign = TextAlign.Start,
+                                    fontFamily = Constants.FONT_MEDIUM,
+                                    lineHeight = 14.sp // Adjust line height if needed
+                                )
+                                Text(
+                                    text =  ProfileObject.profile.address,
+                                    modifier = Modifier.fillMaxWidth(),
+                                    color = Color(0xFFF7ECD3),
+                                    fontSize = 10.sp,
+                                    textAlign = TextAlign.Start,
+                                    fontFamily = Constants.FONT_LIGHT,
+                                    lineHeight = 14.sp
+                                )
+                            }
+                        }
                 }
 
                 Card(
@@ -324,29 +341,27 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                         onClick = {
                             Log.i("DropProfile", "DropProfileDialog:button clicked ")
                             eventsViewModel.premiumCreateEventKey.value = 1
-                            //todo later on turn enalbed to true
+                            //todo later on turn enabled to true
                           //  enabled = false;
                             imageFile?.let {
                                 imageUploadViewModel.dropProfileModel.value=
-                                    ProfileObject.profile?.let { profile ->
-                                        DropProfileModel(
-                                            image = "",
-                                            location = authViewModel.address.value,
-                                            message = caption,
-                                            expirationTime = expirationTime,
-                                            createdBy = profile.userId
-                                        )
-                                    }
-                                imageUploadViewModel.s3ImageUploadFunction(ProfileObject.profile?.userId!!,it)
+                                    DropProfileModel(
+                                        image = "",
+                                        location = authViewModel.address.value,
+                                        message = caption,
+                                        expirationTime = expirationTime,
+                                        createdBy = ProfileObject.profile.userId
+                                    )
+                                imageUploadViewModel.s3ImageUploadFunction(ProfileObject.profile.userId,it)
                                 }
                         },
                         shape= RoundedCornerShape(6.dp),
                         modifier= Modifier
                             .fillMaxWidth(1f)
                             .padding(15.dp),
-                        enabled=enabled,
+                        enabled= uri !=Uri.EMPTY,
                         colors = ButtonDefaults.buttonColors(
-                            containerColor =Color.DarkGray, //statusAndTopAppBarColor,
+                            containerColor = floatingActionBtnColor, //statusAndTopAppBarColor,
                             contentColor = Color.White,//topAppBarTextColor,
                             disabledContainerColor= Color.LightGray,
                             disabledContentColor= Color.DarkGray

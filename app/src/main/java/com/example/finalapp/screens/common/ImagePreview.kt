@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -27,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,6 +44,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.finalapp.enums.ImageUploadScreens
+import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.viewmodels.EventsViewModel
 import com.example.finalapp.viewmodels.ImageUploadViewModel
@@ -173,9 +176,10 @@ fun ImagePreviewTopBar(onDoneClicked:()->Unit) {
   TopAppBar(
       title = { },
       actions = {
-          Button(onClick = { onDoneClicked() }) {
-              Text(text = "DONE", fontFamily = Constants.FONT_MEDIUM, fontSize = 20.sp)
+          Button(onClick = { onDoneClicked() }, colors = ButtonDefaults.buttonColors(containerColor = floatingActionBtnColor)) {
+              Text(text = "Done", fontFamily = Constants.FONT_LIGHT, fontSize = 20.sp)
           }
-      }
+      },
+      colors =TopAppBarDefaults.mediumTopAppBarColors(containerColor = Color.Black)
   )
 }

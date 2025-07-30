@@ -32,6 +32,7 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.PATCH
@@ -54,6 +55,9 @@ interface ApiService {
     suspend fun getDirectChatUsers(@Query("lat") lat:Double,@Query("long") long:Double,@Query("page") page:Int): Response<DirectChatApiResponse>
     @POST("/api/v1/directChat/")
     suspend fun setLocationForDirectChat(@Body data:DirectChatRequest):ApiResponse<DirectChat>
+
+    @DELETE("/api/v1/directChat/{id}")
+    suspend fun removeUserFromDirectChat(@Path("id") id:String):ApiResponse<String>
 
     //---------------------------------------------------------------------//
     @POST("/api/v1/event")
@@ -81,10 +85,6 @@ interface ApiService {
 
     @GET("/api/v1/ping")
     suspend fun getAllPings(@Query("page") page:Int): AllPingsResponse<List<PingResponse>>
-    //---------------------------------------------------------------------//
-
-    @GET("/api/v1/ping/getUserPings")
-    suspend fun getUserPings(@Query("page") page:Int): AllPingsResponse<List<PingResponse>>
 
     //-----------------------------------------------------------------//
     @GET("api/getPreSignedUrl")

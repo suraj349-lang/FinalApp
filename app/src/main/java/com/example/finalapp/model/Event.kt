@@ -38,14 +38,18 @@ data class EventResponse(
   val description: String? = null,
   val image: String = "",
   val location: String = "",
+  val isChildPost: Boolean=false,
   val childPosts:List<EventResponse>? = emptyList(),
   val expirationTime: String = "",
+  val upvoted:Boolean=false,
+  val downvoted:Boolean=false,
+  val totalUpVotes:Int=0,
+  val totalDownVotes:Int=0,
   val totalJoined:Int=0,
   val totalComments:Int=0,
   val topComments:List<CommentData> ? =null,
   val totalChildPosts:Int =0,
-  val totalViews:Int=0,
-  val totalUpVotes:Int=0
+  val totalViews:Int=0
 )
 
 data class CommentData(

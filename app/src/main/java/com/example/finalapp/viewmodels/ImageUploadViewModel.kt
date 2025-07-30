@@ -92,7 +92,6 @@ class ImageUploadViewModel @Inject constructor(
             .collect{
                 if(it.success) {
                     try {
-
                         ProfileObject.profile = ProfileObject.profile.copy(profileImage = it.data.profileImage)
                         _userProfileImageUpdateStatus.value = RequestState.Success(it.data)
                     } catch (e: Exception) {
@@ -167,6 +166,7 @@ class ImageUploadViewModel @Inject constructor(
                 s3DataState.value = RequestState.Success(Unit) // No data, just success
                 s3Response.value = true // Upload successful
                 dropProfileModel.value?.image=preSignedUrlData.value.key
+                //make call to drop the profile
                 dropProfileModel.value?.let { dropProfile(it) }
                 Log.d("S3 Upload", "s3upload success")
             } else {
@@ -233,7 +233,7 @@ class ImageUploadViewModel @Inject constructor(
                 dropProfileResponse.value=RequestState.Error(it)
             }
             .collect {
-              //  dropProfileResponse.value = RequestState.Success(it)
+                dropProfileResponse.value = RequestState.Success(it)
                 updateDropProfileStateToSuccess()
             }
     }

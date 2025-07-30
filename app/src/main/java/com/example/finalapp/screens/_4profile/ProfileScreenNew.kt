@@ -76,7 +76,6 @@ import com.example.finalapp.screens.common.CommonErrorScreen
 import com.example.finalapp.screens.dialogBox.DropProfileDialog
 import com.example.finalapp.screens.dialogBox.uriToFile
 import com.example.finalapp.ui.imagePrefix
-import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.utils.ProfileObject
 import com.example.finalapp.utils.RequestState
 import com.example.finalapp.utils.constants.Constants
@@ -96,7 +95,7 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
     var showCustomDialog by remember { mutableStateOf(false) }
     var showSheetForImageUpdate by remember { mutableStateOf(false) }
     var showSheet by remember { mutableStateOf(false) }
-    val temporaryImage by remember { mutableStateOf(ProfileObject.profile?.profileImage) }
+    val profileImage by remember { mutableStateOf(ProfileObject.profile?.profileImage) }
     val startProfileImageUpload=imageUploadViewModel.startProfileImageUpload.collectAsState()
     val userPingsList by eventsViewModel.userPingsListResponse.collectAsState()
     val userEventsList by eventsViewModel.userEventsListResponse.collectAsState()
@@ -167,18 +166,6 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
             color = navColor,     // Your desired color
             darkIcons = false        // true = dark icons (for light backgrounds)
         )
-    }
-    DisposableEffect(Unit) {
-        onDispose {
-            systemUiController.setStatusBarColor(
-                color = floatingActionBtnColor,
-                darkIcons = true
-            )
-            systemUiController.setNavigationBarColor(
-                color = Color.Transparent,
-                darkIcons = true
-            )
-        }
     }
 
 
@@ -287,7 +274,7 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                                         }
                                         else ->{
                                             GlideImage(
-                                                model=  imagePrefix+temporaryImage,
+                                                model=  imagePrefix+profileImage,
                                                 contentDescription = "",
                                                 modifier=Modifier.fillMaxSize(),
                                                 contentScale = ContentScale.Crop
@@ -299,23 +286,19 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                                     verticalArrangement = Arrangement.spacedBy(8.dp),
                                     modifier = Modifier.padding(start = 8.dp)
                                 ) {
-                                    ProfileObject.profile?.let {
-                                        Text(
-                                            text = it.name,
-                                            fontWeight = FontWeight.Bold,
-                                            fontFamily=Constants.FONT_MEDIUM,
-                                            color = Color.White,
-                                            fontSize = 18.sp
-                                        )
-                                    }
-                                    ProfileObject.profile?.let {
-                                        Text(
-                                            text = it.username,
-                                            fontWeight = FontWeight.SemiBold,
-                                            color = Color.White,
-                                            fontSize = 10.sp
-                                        )
-                                    }
+                                    Text(
+                                        text = ProfileObject.profile.name,
+                                        fontWeight = FontWeight.Bold,
+                                        fontFamily=Constants.FONT_MEDIUM,
+                                        color = Color.White,
+                                        fontSize = 18.sp
+                                    )
+                                    Text(
+                                        text = ProfileObject.profile.username,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = Color.White,
+                                        fontSize = 10.sp
+                                    )
                                 }
                             }
                             Spacer(modifier = Modifier.height(10.dp))
@@ -391,7 +374,7 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                             response.data.data,
                             onDropProfileClicked = { showCustomDialog = !showCustomDialog },
                             onItemClicked = {
-                                val route=  SCREENS.DROP_PROFILE_USER_PROFILE.passProfile(it)
+                                val route=  SCREENS.DROP_PROFILE_USER_PROFILE.createRoute(it)
                                 navController.navigate(route)}
                         )
                     }
@@ -422,7 +405,7 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
     ImageUpdateBottomSheet(
         showSheet = showSheetForImageUpdate,
         onDismiss = {showSheetForImageUpdate=false },
-        currentProfileImage=temporaryImage,
+        currentProfileImage=profileImage,
         navHostController = navController,
         onChangeImageClicked={ navController.navigate("camerax/profile");/*showImageCropper=true*/}
     )

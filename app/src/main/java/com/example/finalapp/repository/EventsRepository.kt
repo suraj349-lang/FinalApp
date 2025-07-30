@@ -40,6 +40,10 @@ class EventsRepository @Inject constructor(private val api: ApiService) {
         return api.getDirectChatUsers(lat,long,page)
     }
 
+    fun removeUserFromDirectChat(id: String):Flow<ApiResponse<String>> = flow {
+        emit(api.removeUserFromDirectChat(id))
+    }.flowOn(Dispatchers.IO)
+
     fun sendPremiumCreateEventData(event: Event): Flow<PremiumEventResponseDTO> = flow  {
         emit(api.premiumCreateEvent(event))
     }.flowOn(Dispatchers.IO)

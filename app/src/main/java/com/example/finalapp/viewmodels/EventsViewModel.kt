@@ -61,9 +61,11 @@ class EventsViewModel @Inject constructor(
 
     val TAG="GET_EVENTS_RESPONSE";
 
+    val profileObject= MutableStateFlow(ProfileObject)
+
     private val placesClient by lazy { Places.createClient(context) }
     var checked= mutableStateOf(false)
-    var shareProfileClicked= mutableStateOf(false)
+    var shareProfileClicked= MutableStateFlow(false)
     init {
         viewModelScope.launch(Dispatchers.Main) {
             val job = viewModelScope.launch {
@@ -181,6 +183,24 @@ class EventsViewModel @Inject constructor(
         }
     }
 
+    // Nearby user paging response
+    private val _removeUserResponse = MutableStateFlow<RequestState<String>>(RequestState.Idle)
+    val removeUserResponse: StateFlow<RequestState<String>> = _removeUserResponse.asStateFlow()
+
+    fun removeUserFromDirectChat(id:String) = viewModelScope.launch(Dispatchers.IO) {
+        eventsRepository.removeUserFromDirectChat(id)
+            .onStart {
+                _removeUserResponse.value = RequestState.Loading
+            }
+            .catch { exception ->
+                Log.e("Data received remove", "Error found: ${exception.message}",exception)
+                _removeUserResponse.value = RequestState.Error(exception)
+            }
+            .collect { response ->
+                _removeUserResponse.value = RequestState.Success(response.data)
+            }
+    }
+
 //-----------------------------------------------------------------------------------------------------------------------------------------------//
 
 
@@ -277,9 +297,9 @@ class EventsViewModel @Inject constructor(
             .onStart {
                 _eventDetailsResponse.value = RequestState.Loading
 
-            }.catch {
-                _eventDetailsResponse.value = RequestState.Error(it)
-                Log.d(TAG, "user events error ${_eventDetailsResponse.value}")
+            }.catch { e->
+                _eventDetailsResponse.value = RequestState.Error(e)
+                Log.e(TAG, "user events error ${_eventDetailsResponse.value}, ${e.message}",e)
 
             }.collect {
                 _eventDetailsResponse.value = RequestState.Success(it.data)

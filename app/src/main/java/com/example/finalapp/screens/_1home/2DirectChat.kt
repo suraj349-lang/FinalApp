@@ -1,6 +1,12 @@
 package com.example.finalapp.screens._1home
 
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -26,7 +32,6 @@ import androidx.compose.material.Divider
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
@@ -37,15 +42,26 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -61,13 +77,12 @@ import com.example.finalapp.model.DirectChatRequest
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens.dialogBox.DialogLoading
 import com.example.finalapp.ui.imagePrefix
-import com.example.finalapp.ui.theme.PURPLE
 import com.example.finalapp.screens.common.CommonErrorScreen
+import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.utils.ProfileObject
 import com.example.finalapp.utils.RequestState
 import com.example.finalapp.utils.UserLocation
 import com.example.finalapp.utils.constants.Constants
-import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
 import com.example.finalapp.viewmodels.AuthViewModel
 import com.example.finalapp.viewmodels.EventsViewModel
 
@@ -82,16 +97,21 @@ fun DirectChatScreen(
 ) {
 
     val checked by eventsViewModel.checked
-    val shareProfileClickedON by eventsViewModel.shareProfileClicked
-    val directChatResponseState by eventsViewModel.directChatResponse.collectAsState()
-    val nearByUsersList by eventsViewModel.nearByUsersList.collectAsState()
+    val shareProfileClickedON by eventsViewModel.shareProfileClicked.collectAsState()
+    var remove by remember{
+        mutableStateOf(false)
+    }
+    val profileObject by eventsViewModel.profileObject.collectAsState()
     LaunchedEffect(key1 =shareProfileClickedON){
         if(shareProfileClickedON ){
             eventsViewModel.checked.value=!checked
             eventsViewModel.sendDirectChatData(DirectChatRequest( ProfileObject.profile.userId,authViewModel.latitude.value,authViewModel.longitude.value))
-        }
-        else {
-           // eventsViewModel.emptyNearByUsersList()
+        } else {
+            if(remove){
+                eventsViewModel.removeUserFromDirectChat(ProfileObject.profile.userId)
+                remove=false
+            }
+            // eventsViewModel.emptyNearByUsersList()
         }
         eventsViewModel.shareProfileClicked.value = false
 
@@ -107,40 +127,70 @@ fun DirectChatScreen(
             ) {
                // Image(painter = painterResource(id = R.drawable.whatsapp), contentDescription ="", contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize() )
                 Column(modifier = Modifier.fillMaxSize()) {
-                    Box(modifier = Modifier.fillMaxWidth().height(60.dp).shadow(elevation = 60.dp)){
-                        Text(
-                            text = if(checked)"Users near you" else "Share profile nearby" ,
-                            fontFamily = DONGLE_BOLD,
-                            fontSize = 24.sp,
-                            modifier = Modifier
-                                .align(Alignment.TopStart)
-                                .padding(top = 10.dp, start = 10.dp)
-                        )
-                        Switch(
-                            checked = checked,
-                            onCheckedChange = {
-                                eventsViewModel.shareProfileClicked.value = !eventsViewModel.shareProfileClicked.value
-                            },
-                            colors = SwitchDefaults.colors(
-                                checkedThumbColor = Color(0xFF047E0A),// MaterialTheme.colorScheme.primary,
-                                checkedTrackColor = Color.LightGray,
-                                uncheckedThumbColor = Color(0xFFE9AB10),
-                                uncheckedTrackColor = Color(0xFFFFFFFF),
-                            ),
-                            modifier = Modifier
+                    Box(modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()){
+                        if(checked) {
+                            Text(
+                                text = "Users near you",
+                                fontFamily = Constants.FONT_MEDIUM,
+                                color = floatingActionBtnColor,
+                                fontWeight = FontWeight.ExtraBold,
+                                fontSize = 20.sp,
+                                modifier = Modifier
+                                    .align(Alignment.TopStart)
+                                    .padding(top = 10.dp, start = 10.dp)
+                            )
+                            Switch(
+                                checked = checked,
+                                onCheckedChange = {
+                                    eventsViewModel.shareProfileClicked.value = !eventsViewModel.shareProfileClicked.value
+                                    remove=!remove
+                                },
+                                colors = SwitchDefaults.colors(
+                                    checkedThumbColor = floatingActionBtnColor,// MaterialTheme.colorScheme.primary,
+                                    checkedTrackColor = Color(0xFFF0E3C5),
+                                    uncheckedThumbColor = Color(0xFFE9AB10),
+                                    uncheckedTrackColor = Color(0xFFF0E3C5),
+                                ),
+                                modifier = Modifier
+                                    .align(Alignment.TopEnd)
+                                    .padding(end = 16.dp)
+                            )
+                        }else{
+                            Column(modifier = Modifier
                                 .align(Alignment.TopEnd)
-                                .padding(end = 16.dp)
-                        )
+                                .padding(end = 16.dp, top = 16.dp), verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(text = "Range : 500 m",fontFamily = Constants.FONT_LIGHT, color = Color(0xFF280636), fontSize = 12.sp, style = TextStyle(textDecoration = TextDecoration.Underline))
+                                Row(modifier = Modifier, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                                    Image(painter = painterResource(id = R.drawable.edit_new), contentDescription ="", modifier = Modifier.size(12.dp) )
+                                    Text(text = "Edit",fontFamily = Constants.FONT_LIGHT, color = Color(0xFF280636), fontSize = 9.sp)
+                                }
+                            }
+                            Column(modifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentHeight()
+                                .align(Alignment.TopCenter), verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.direct_chat),
+                                    contentDescription = "",
+                                    modifier = Modifier
+                                        .size(100.dp)
+                                )
+                                Text(text = "Connect to nearby people.", fontFamily = Constants.FONT_MEDIUM, color = Color(0xFF520772), fontWeight = FontWeight.ExtraBold, fontSize = 24.sp)
+                                Text(text = "Click connect to share your profile!", style = TextStyle(textDecoration = TextDecoration.Underline),fontFamily = Constants.FONT_MEDIUM, color = Color(0xFF280636), fontSize = 14.sp) //0xFF520772 0xFF256828 0xFF045708
+                            }
+                        }
                     }
                     DirectChatUI(
+                        profileObject,
                         scrollBehavior,
                         eventsViewModel,
                         navController,
-                        checked,
-                        onShareProfileClicked = {
-                            eventsViewModel.shareProfileClicked.value = true
-                        }
-                    )
+                        checked
+                    ) {
+                        eventsViewModel.shareProfileClicked.value = true
+                    }
                 }
             }
         }
@@ -150,6 +200,7 @@ fun DirectChatScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DirectChatUI(
+    profileObject: ProfileObject,
     scrollBehavior: TopAppBarScrollBehavior,
     eventsViewModel: EventsViewModel,
     navController: NavHostController,
@@ -157,7 +208,7 @@ fun DirectChatUI(
     onShareProfileClicked: () -> Unit
 ) {
     if (!checked ) {
-        ShareProfileForDirectChat{ onShareProfileClicked() }
+        ShareProfileForDirectChat(profileObject,onShareProfileClicked)
     } else {
         DirectChatProfiles(scrollBehavior,navController, eventsViewModel )
     }
@@ -229,9 +280,10 @@ fun DirectChatItem(
                 .clickable {
                     onProfileClicked()
                 }
-                .size(150.dp)
-                .padding(top = 4.dp),
-            shape = RoundedCornerShape(20.dp),
+                .padding(horizontal = 16.dp)
+                .wrapContentWidth()
+                .height(300.dp),
+            shape = RoundedCornerShape(8.dp),
             border = BorderStroke(width = 1.dp, color = Color.LightGray)
         ) {
             GlideImage(
@@ -246,9 +298,9 @@ fun DirectChatItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = if(user?.userId?.name?.isNotEmpty() == true) user!!.userId.name.capitalize() else "...",
-                fontSize = 25.sp,
-                fontFamily = DONGLE_BOLD
+                text = if(user?.userId?.name?.isNotEmpty() == true) user.userId.name.capitalize() else "...",
+                fontSize = 20.sp,
+                fontFamily = Constants.USER_NAME_FONT, fontWeight = FontWeight.Bold
             )
         }
 
@@ -259,87 +311,122 @@ fun DirectChatItem(
                 .fillMaxWidth(0.5f) //.wrapContentHeight().fillMaxWidth(0.8f)
                 .align(Alignment.CenterHorizontally),
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color.LightGray,
-                contentColor = Color.White
+                containerColor = Color.Black,
             )
         ) {
-            Text(text = "Send Message", color = Color.Black,fontFamily = DONGLE_BOLD)
+            Text(text = "Send Message", color = Color.White,fontFamily = Constants.FONT_LIGHT)
         }
-        Divider(color = Color.LightGray, thickness = 0.5.dp)
+        Divider(color = floatingActionBtnColor, thickness = 0.5.dp)
 
     }
 }
 
 
 
-
 @Composable
-fun SwitchWithIcon(checked: Boolean,alignment: Alignment,onClick:(value:Boolean)->Unit) {
+fun ShareProfileForDirectChat(profileObject: ProfileObject, onShareProfileClicked: () -> Unit) {
+    val shimmerColors = listOf(
+        Color.White.copy(alpha = 0.1f),
+        Color.White.copy(alpha = 0.4f),
+        Color.White.copy(alpha = 0.1f)
+    )
 
+    val transition = rememberInfiniteTransition(label = "shimmer")
+    val translateAnim by transition.animateFloat(
+        initialValue = -200f,
+        targetValue = 1000f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = 1800, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart
+        ),
+        label = "translateAnim"
+    )
 
-
-}
-
-
-@Composable
-fun ShareProfileForDirectChat(onShareProfileClicked: () -> Unit) {
     Box(
         modifier = Modifier
+            .padding(top = 50.dp)
             .fillMaxWidth()
             .fillMaxHeight(1f)
     ) {
+
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.align(Alignment.TopCenter),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth(0.8f)
-                    .wrapContentHeight(),
-                shape = RoundedCornerShape(12.dp),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F7FA)),
-                elevation = CardDefaults.cardElevation(100.dp)
-            ) {
+            Card(modifier = Modifier
+                .size(200.dp), shape = CircleShape) {
+                AsyncImage(
+                    model = imagePrefix + profileObject.profile.profileImage,
+                    contentDescription = "",
+                    filterQuality = FilterQuality.High,
+                    modifier = Modifier
+                        .padding(1.dp)
+                        .clip(shape = CircleShape)
+                        .fillMaxSize(),
+                    contentScale = ContentScale.Crop,
+                )
+            }
                 Column(
-                    modifier = Modifier.padding(16.dp),
+                    modifier = Modifier
+                        .padding(top = 4.dp)
+                        .padding(horizontal = 16.dp)
+                        .fillMaxWidth(0.8f)
+                        .wrapContentHeight(),
                     verticalArrangement = Arrangement.spacedBy(4.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    UserLocation.address?.let { DroppedProfileLocation(location = it, true) }
-                    Card(
-                        modifier = Modifier.size(150.dp),
-                        shape = CircleShape,
-                        border = BorderStroke(width = 1.dp, color = Color.LightGray)
-                    ) {
-                        AsyncImage(
-                            model = imagePrefix + ProfileObject.profile.profileImage,
-                            contentDescription = "",
-                            contentScale = ContentScale.Crop,
-                            filterQuality = FilterQuality.High
-                        )
-                    }
                     Text(
-                        text = ProfileObject.profile.username,
+                        text = profileObject.profile.username,
                         overflow = TextOverflow.Ellipsis,
-                        fontFamily = DONGLE_BOLD,
-                        fontSize = 24.sp
+                        fontFamily = Constants.FONT_LIGHT,
+                        fontSize = 18.sp,
+                        color= Color(0xFF520772),
+                        fontWeight = FontWeight.ExtraBold
                     )
-                    Button(
-                        onClick = { onShareProfileClicked() },
-                        shape = RoundedCornerShape(6.dp),
+                    //0xFF2CA832  0xFF045708 0xFF77209C
+
+                    UserLocation.address?.let { DroppedProfileLocation(location = it, backgroundColor = Color(0xFF558B26), trim = true) }
+
+                    Box(
                         modifier = Modifier
-                            .fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = PURPLE,
-                            contentColor = Color.White
-                        )
+                            .fillMaxWidth()
+                            .height(40.dp)
+                            .graphicsLayer { clip = true }
+                            .drawWithCache {
+                                val shimmerBrush = Brush.linearGradient(
+                                    colors = shimmerColors,
+                                    start = Offset(translateAnim - 200f, 0f),
+                                    end = Offset(translateAnim, size.height)
+                                )
+                                onDrawWithContent {
+                                    // Draw original background
+                                    drawRoundRect(
+                                        color = Color(0xFF045708), //0xFF520772
+                                        cornerRadius = CornerRadius(12.dp.toPx())
+                                    )
+
+                                    drawContent() // Draw the text
+
+                                    // Draw shimmer glance
+                                    drawRect(
+                                        brush = shimmerBrush,
+                                        blendMode = BlendMode.SrcOver // prevents color washing
+                                    )
+                                }
+                            }
+                            .clickable { onShareProfileClicked() },
+                        contentAlignment = Alignment.Center
                     ) {
-                        Text(text = "Share Profile", fontFamily = DONGLE_BOLD, fontSize = 20.sp)
+                        Text(
+                            text = "+ CONNECT",
+                            fontSize = 16.sp,
+                            fontFamily = Constants.FONT_LIGHT,
+                            color = Color.White
+                        )
                     }
                 }
             }
-        }
 
     }
 

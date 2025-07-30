@@ -48,7 +48,7 @@ fun ReactionBar() {
             .padding(bottom = 8.dp), color = Color.LightGray.copy(alpha = 0.2f))
         Column {
             Image(
-                painter = painterResource(id = R.drawable.up),
+                painter = painterResource(id = R.drawable.upvote),
                 contentDescription = "",
                 modifier = Modifier.size(28.dp),
                 colorFilter = ColorFilter.tint(vectorScreenIcons)

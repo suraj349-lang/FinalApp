@@ -26,7 +26,6 @@ import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -34,10 +33,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -47,21 +42,13 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.core.view.WindowCompat
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
@@ -71,6 +58,7 @@ import com.example.finalapp.model.EventResponse
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens._1home.commonUI.shareDeepLink
 import com.example.finalapp.ui.imagePrefix
+import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.utils.constants.Constants
 
 
@@ -82,8 +70,13 @@ fun EventScreen(event: EventResponse, navController: NavHostController, onUpVote
     WindowCompat.setDecorFitsSystemWindows(window, false)
     window.statusBarColor = Constants.HOME_STATUS_BAR_COLOR.toArgb()
     window.navigationBarColor = Constants.HOME_NAV_BAR_COLOR.toArgb()
-    Surface(modifier = Modifier
-        .fillMaxSize(), color = Color.Black) {
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = Color(0xFF03092E)
+    ) {
+        if(event.isChildPost){
+            ChildEventScreenUI(event = event)
+        }else{
         EventScreenUI(
             event=event,
             onUpVotesClicked ={onUpVotesClicked(it)},
@@ -92,6 +85,7 @@ fun EventScreen(event: EventResponse, navController: NavHostController, onUpVote
             onAddChildPostClicked = {navController.navigate(SCREENS.CREATE_EVENT.createRoute(event._id))},
             onChildPostClicked = {navController.navigate(SCREENS.PUBLIC_EVENT_DETAILS_SCREEN_WRAPPER.createRoute(it))}
         )
+        }
     }
 }
 
@@ -109,7 +103,13 @@ fun EventScreenUI(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.45f)){
+                .fillMaxHeight(0.45f)
+                .shadow(
+                    elevation = 20.dp,
+                    ambientColor = floatingActionBtnColor,
+                    spotColor = floatingActionBtnColor
+                )
+                .zIndex(5f)){
             AsyncImage(model = imagePrefix+event.image, contentDescription ="", modifier = Modifier
                 .fillMaxSize(), filterQuality = FilterQuality.High, contentScale = ContentScale.Crop
             )
@@ -121,9 +121,16 @@ fun EventScreenUI(
             .fillMaxWidth()
             .wrapContentHeight()
             .padding(start = 8.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-            AsyncImage(model = imagePrefix+ event.user.profileImage, contentDescription = "", modifier = Modifier
-                .size(40.dp)
-                .clip(shape = CircleShape), contentScale = ContentScale.Crop, filterQuality = FilterQuality.High)
+            AsyncImage(model = imagePrefix+ event.user.profileImage,
+                contentDescription = "",
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(shape = CircleShape)
+                    .shadow(elevation = 6.dp, ambientColor = Color.White, spotColor = Color.White)
+                    .zIndex(4f)
+                , contentScale = ContentScale.Crop,
+                filterQuality = FilterQuality.High
+            )
             Column(modifier = Modifier
                 .wrapContentSize()
                 .shadow(60.dp, spotColor = Color.White)) {
@@ -222,14 +229,13 @@ fun UserReactionUI(totalUpVotes:Int,totalComments: Int, totalViews: Int,onUpVote
     Card(modifier = Modifier
         .fillMaxWidth()
         .height(40.dp)
-        .padding(horizontal = 8.dp), colors = CardDefaults.cardColors(containerColor = Color.DarkGray)
-    ) {
+        .padding(horizontal = 8.dp), colors = CardDefaults.cardColors(containerColor = Color.DarkGray)) {
     Row(modifier = Modifier
         .padding(horizontal = 8.dp)
         .fillMaxWidth()
         .wrapContentHeight(), horizontalArrangement = Arrangement.spacedBy(30.dp), verticalAlignment = Alignment.CenterVertically) {
 
-        IconWithText(icon = R.drawable.up, text =totalUpVotes.toString() ){
+        IconWithText(icon = R.drawable.upvote, text =totalUpVotes.toString() ){
             onUpVotesClicked()
         }
         IconWithText(icon = R.drawable.people, text = totalViews.toString())

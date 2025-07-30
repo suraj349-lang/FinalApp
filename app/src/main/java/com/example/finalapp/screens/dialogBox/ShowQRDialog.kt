@@ -62,7 +62,7 @@ fun ShowQRDialog(navController: NavHostController, onDismiss: () -> Unit) {
             modifier = Modifier
                 .wrapContentSize()
                 .padding(8.dp),
-            colors = CardDefaults.cardColors(containerColor = Color.DarkGray) //0xFF1C1B2F
+            colors = CardDefaults.cardColors(containerColor = Color(0xFF000000)) //0xFF1C1B2F
         ) {
             Column(modifier = Modifier
                 .wrapContentSize()
@@ -71,7 +71,7 @@ fun ShowQRDialog(navController: NavHostController, onDismiss: () -> Unit) {
                     text = Constants.APP_NAME,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.fillMaxWidth(),
-                    color = Constants.SPLASH_SCREEN_COLOR,
+                    color = floatingActionBtnColor,
                     fontSize = 20.sp,
                     fontFamily = Constants.APP_NAME_FONT
                 )

@@ -4,14 +4,11 @@ package com.example.finalapp.screens._1home
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,6 +29,7 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Surface
@@ -39,7 +37,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.material.Text
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -49,6 +46,7 @@ import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -65,28 +63,20 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.zIndex
 import androidx.paging.LoadState
-import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
-import com.bumptech.glide.integration.compose.Placeholder
 import com.example.finalapp.R
 import com.example.finalapp.model.DropProfileResponse
 import com.example.finalapp.navigation.SCREENS
@@ -96,7 +86,6 @@ import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.utils.ProfileObject
 import com.example.finalapp.utils.UserLocation
 import com.example.finalapp.utils.constants.Constants
-import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
 import com.example.finalapp.utils.formatDateTime
 import com.example.finalapp.utils.testdata.Item
 import kotlinx.coroutines.launch
@@ -145,10 +134,21 @@ fun DroppedProfilesUI(
     var changeLocation by remember {
         mutableStateOf(false)
     }
+    val gridState = rememberLazyStaggeredGridState()
+    var previousScrollOffset by remember { mutableStateOf(0) }
+    val isScrollingUp = remember {
+        derivedStateOf {
+            val currentOffset = gridState.firstVisibleItemScrollOffset
+            val isUp = currentOffset < previousScrollOffset
+            previousScrollOffset = currentOffset
+            isUp
+        }
+    }
+
 
     Surface(modifier = Modifier
         .fillMaxSize()
-        .padding(), color = Color(0xFF3D3F41)//0xFF021930
+        .padding(), color = Color(0xFF140F01)//0xFF021930
     ) {
         Column(
             modifier=Modifier.fillMaxSize(),
@@ -163,13 +163,13 @@ fun DroppedProfilesUI(
                     if(showLoader && droppedProfilesList?.itemCount==0) {
                         LinearProgressIndicator(modifier = Modifier
                             .fillMaxWidth()
-                            .height(8.dp), color = floatingActionBtnColor)
+                            .height(4.dp), color = floatingActionBtnColor)
                     }
 
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(Color(0xFF0064C9))//0xFF1970C7
+                            .background(Color(0xFF0E0A00))//0xFF0064C9
                     ) {
                         Column(modifier = Modifier
                             .fillMaxWidth()
@@ -185,12 +185,12 @@ fun DroppedProfilesUI(
                                     modifier = Modifier.alpha(animatedAlpha)
                                 )
                                 Row(modifier = Modifier.clickable { changeLocation = !changeLocation }, horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
-                                    Image(painter = painterResource(id = R.drawable.search_new_filled), contentDescription ="", modifier = Modifier
+                                    Image(painter = painterResource(id = R.drawable.edit_new), contentDescription ="", modifier = Modifier
                                         .size(12.dp), colorFilter = ColorFilter.tint(Color.White) )
                                     Text(
                                         text = "Change location",
                                         fontWeight = FontWeight.Medium,
-                                        fontSize = 14.sp,
+                                        fontSize = 10.sp,
                                         color = Color.White,
                                         modifier = Modifier.alpha(animatedAlpha),
                                         style = TextStyle(textDecoration = TextDecoration.Underline)
@@ -201,7 +201,7 @@ fun DroppedProfilesUI(
 
                             Spacer(modifier = Modifier.height(10.dp))
                             UserLocation.address?.let {
-                                DroppedProfileLocation(trim = true, location = it)
+                                DroppedProfileLocation(trim = true, backgroundColor = Color.Transparent,location = it)
                             }
                         }
                     }
@@ -250,9 +250,7 @@ fun DroppedProfilesUI(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(200.dp)
-                                    .padding(start = 20.dp, end = 20.dp)
-                                    .border(1.dp, color = Color.LightGray)
-
+                                    .padding(horizontal = 8.dp)
                             ) {
                                 LazyColumn(modifier = Modifier) {
                                     items(predictions) { prediction ->
@@ -301,7 +299,7 @@ fun DroppedProfilesUI(
                                     DroppedProfileItem(item){
                                         try {
                                             val route= item.let {
-                                                SCREENS.DROP_PROFILE_USER_PROFILE.passProfile(it)
+                                                SCREENS.DROP_PROFILE_USER_PROFILE.createRoute(it)
                                             }
                                             navController.navigate(route)
                                         }catch (e:Exception){
@@ -396,25 +394,35 @@ fun DroppedProfileItem(profile: DropProfileResponse, onProfileClicked:()->Unit) 
             .clip(shape = RoundedCornerShape(10.dp))
             .background(color = Color.White))
     {
-            AsyncImage(
-                model = imagePrefix + profile.image, // Replace with your image resource
-                contentDescription = "Background Image",
-                contentScale = ContentScale.Crop, // Crop to fill the space
-                filterQuality= FilterQuality.High,
-                modifier = Modifier
-                    .clickable {
-                        onProfileClicked()
-                    }
-                    .fillMaxSize()
-            )
+        AsyncImage(model = imagePrefix + profile.image, // Replace with your image resource
+            contentDescription = "Background Image",
+            contentScale = ContentScale.Crop, // Crop to fill the space
+            filterQuality = FilterQuality.High,
+            modifier = Modifier
+                .clickable {
+                    onProfileClicked()
+                }
+                .fillMaxSize())
+        Text(
+            text = profile.expirationTime + " hrs left",
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(end = 4.dp)
+                .shadow(elevation = 20.dp, spotColor = Color.White),
+            fontFamily = Constants.FONT_MEDIUM,
+            style = TextStyle(color = Color.White, fontSize =9.sp)
+        )
 
-            // Multiple texts
-            Box(modifier = Modifier
+
+        // Multiple texts
+        Box(
+            modifier = Modifier
                 .wrapContentSize()
                 .align(Alignment.BottomCenter)
-                .background(color = Color(0xFF9C9C9C).copy(alpha = 1f)) //0xFF2C2A2A  0xFFAFB42B  0xFF290438
-                .clip(shape = RoundedCornerShape(10.dp))) {
-                Column(
+                .background(color = Color.Transparent) //0xFF2C2A2A  0xFFAFB42B  0xFF290438
+                .clip(shape = RoundedCornerShape(10.dp))
+        ) {
+            Column(
                     modifier = Modifier
                         .padding(horizontal = 8.dp)
                         .padding(bottom = 4.dp),
@@ -430,26 +438,31 @@ fun DroppedProfileItem(profile: DropProfileResponse, onProfileClicked:()->Unit) 
                     ) {
                         Text(
                             text = profile.createdBy.name,
-                            modifier = Modifier.fillMaxWidth(0.6f),
+                            modifier = Modifier
+                                .shadow(elevation = 10.dp, spotColor = Color.White)
+                                .fillMaxWidth(0.6f),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             fontFamily = Constants.FONT_MEDIUM,
                             style = TextStyle(color = Color.White, fontSize = 18.sp)
                         )
-                        Card(modifier = Modifier.shadow(elevation = 60.dp).zIndex(2f), colors = CardDefaults.cardColors(containerColor = Color(0xFF9C9C9C)), shape = RoundedCornerShape(2.dp)) {
-                            Text(
-                                text = formatDateTime(profile.createdAt ?: "" ),
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                fontFamily = Constants.FONT_LIGHT,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 10.sp,
-                                color = Color.White
-                            )
-                        }
+                        Text(
+                            text = formatDateTime(profile.createdAt ?: ""),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            fontFamily = Constants.FONT_LIGHT,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 10.sp,
+                            modifier=Modifier.shadow(elevation = 60.dp)
+                                .zIndex(2f),
+                            color = Color.White
+                        )
+
 
                     }
-                    Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = Color(0xFF9C9C9C))) {
+                    Card(modifier = Modifier
+                        .fillMaxWidth()
+                        .shadow(elevation = 10.dp, spotColor = Color.White), colors = CardDefaults.cardColors(containerColor = Color.Transparent)) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically,
@@ -469,7 +482,7 @@ fun DroppedProfileItem(profile: DropProfileResponse, onProfileClicked:()->Unit) 
                                 fontFamily = Constants.FONT_MEDIUM,
                                 fontSize =10.sp,
                                 maxLines = 1,
-                                color = Color.Black,
+                                color = Color.White,
                                 overflow = TextOverflow.Ellipsis
                             )
 
@@ -482,7 +495,7 @@ fun DroppedProfileItem(profile: DropProfileResponse, onProfileClicked:()->Unit) 
 
 
 @Composable
-fun DroppedProfileLocation(location: String, trim: Boolean=false) {
+fun DroppedProfileLocation(location: String, backgroundColor:Color= Color(0xFF077CDA), trim: Boolean=false) {
     val textWidth = remember { mutableStateOf(0f) }
     val containerWidth = remember { mutableStateOf(0f) }
     Box(
@@ -490,7 +503,7 @@ fun DroppedProfileLocation(location: String, trim: Boolean=false) {
             .fillMaxWidth()
             .height(24.dp)
             .clip(if (trim) RoundedCornerShape(12.dp) else RectangleShape)
-            .background(Color(0xFF077CDA).copy(alpha = 0.9f))
+            .background(backgroundColor.copy(alpha = 0.9f))
             .onGloballyPositioned { coordinates ->
                 containerWidth.value = coordinates.size.width.toFloat()
             },
