@@ -236,7 +236,6 @@ fun LoginScreenUI(navController: NavController,authViewModel: AuthViewModel) {
                         scope.launch {
                             if (loginMethod.validate(loginNumberText)) {
                                 authViewModel.loginUser(
-                                    loginMethod,
                                     "$addString$loginNumberText",
                                     loginPasswordText
                                 )

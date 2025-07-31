@@ -13,6 +13,7 @@ import com.example.finalapp.repository.AuthRepository
 import com.example.finalapp.screens.auth.RESPONSE
 import com.example.finalapp.database.Profile
 import com.example.finalapp.datastore.StoreLoginState
+import com.example.finalapp.datastore.StoreUserState
 import com.example.finalapp.fcm.stateObject.SendFcmTokenDto
 import com.example.finalapp.login.LoginMethod
 import com.example.finalapp.model.LatLng
@@ -22,7 +23,7 @@ import com.example.finalapp.model.RegisterUserModel
 import com.example.finalapp.model.SignupAPIResponse
 import com.example.finalapp.model.User
 import com.example.finalapp.utils.LoginState
-import com.example.finalapp.utils.ProfileObject
+import com.example.finalapp.utils.UserObject
 import com.example.finalapp.utils.RequestState
 import com.example.finalapp.utils.TokenObject
 import com.google.firebase.ktx.Firebase
@@ -45,8 +46,10 @@ class AuthViewModel @Inject constructor(
     private val repository: AuthRepository,
     private val profileDatabaseRepository: ProfileDatabaseRepository,
     private val storeLoginState:StoreLoginState,
+    private val storeUserState: StoreUserState,
     @ApplicationContext private val context: Context): ViewModel()
    {
+
        //get user data from room------------------------------------------------------------------------------
        private var _userFromDb:MutableStateFlow<RequestState<Profile>> = MutableStateFlow(RequestState.Idle)
        fun getProfileData() = viewModelScope.launch {
@@ -60,7 +63,6 @@ class AuthViewModel @Inject constructor(
                    if(it !=null) {
                        if (it.name.isNotEmpty()) {
                            _userFromDb.value = RequestState.Success(it)
-                           ProfileObject.profile = it
                        } else {
                            _userFromDb.value = RequestState.Error(Throwable("No user found"))
                        }
@@ -77,6 +79,7 @@ class AuthViewModel @Inject constructor(
            _userFromDb.value = RequestState.Error(Throwable("Error"))
 
        }
+
 
        //--------------------------update user in database-----------------------------------------------------------
        suspend fun updateProfileInDB(profile: Profile) {
@@ -114,7 +117,7 @@ class AuthViewModel @Inject constructor(
        val loginState: StateFlow<LoginState<User>> = _loginState;
        var userData = mutableStateOf(User())
 
-    fun loginUser(loginMethod: LoginMethod, credentials:String,password: String)=viewModelScope.launch(Dispatchers.Main) {
+    fun loginUser(credentials:String,password: String)=viewModelScope.launch(Dispatchers.Main) {
         _loginState.value=LoginState.Loading
         val hashedPassword=hashPassword(password)
         val loginModel=LoginModel(credentials,hashedPassword);
@@ -127,11 +130,14 @@ class AuthViewModel @Inject constructor(
                 Log.d("Login", "Full API response: $response")
 
                 if (response.success) {
-                        saveProfileData(response.data);
+                    Log.i("Userr", "loginUser: ${response.data}")
+                    storeUserState.saveUserInDataStore(response.data)
+
+                   // saveProfileData(response.data);
                     try {
                         val fcmToken= Firebase.messaging.token.await()
                         if (fcmToken!=null) {
-                            repository.updateFcmToken(SendFcmTokenDto(userId = response.data._id, fcmToken = fcmToken))
+                            repository.updateFcmToken(SendFcmTokenDto(userId = response.data.userId, fcmToken = fcmToken))
                                 .catch {
                                     Log.d("FCMTOKENUPDATE", "loginUser error:$it ")
                                 }.collect {
@@ -170,6 +176,7 @@ class AuthViewModel @Inject constructor(
                 mySignupResponse.value= RequestState.Error(it)
 
             }.collect{
+                storeUserState.saveUserInDataStore(it.data)
                 mySignupResponse.value= RequestState.Success(it)
 
             }
@@ -186,15 +193,8 @@ class AuthViewModel @Inject constructor(
 
     }
 
-    //-----------------------------------------------------------------------------------------------------------//
-    fun saveProfileData(user: User){
-        val profile=Profile(0,user._id,user.name,user.username,user.number,user.address,user.profileImage ,user.backgroundImage)
-        viewModelScope.launch {
-            profileDatabaseRepository.saveProfileDataInDb(profile = profile)
-        }
-    }
 
-       //------------------------------------------------------------------------------------------------------------//
+   //----------------------------------------------------------------------------------------------------------------//
 
 
     private fun hashPassword(password: String): String {

@@ -83,7 +83,7 @@ import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.ui.imagePrefix
 import com.example.finalapp.screens.common.CommonErrorScreen
 import com.example.finalapp.ui.theme.floatingActionBtnColor
-import com.example.finalapp.utils.ProfileObject
+import com.example.finalapp.utils.UserObject
 import com.example.finalapp.utils.UserLocation
 import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.utils.formatDateTime
@@ -123,7 +123,7 @@ fun DroppedProfilesUI(
     LaunchedEffect(pagerState.currentPage) {
         // if page is not checked then on scrolling it will make the api call i.e. in the direct screen itself
         if (pagerState.currentPage == 2 && !shouldLoadDroppedProfiles) {
-            eventsViewModel.getDefaultDropProfiles(ProfileObject.profile.address)
+            eventsViewModel.getDefaultDropProfiles(UserObject.user.value.address)
             eventsViewModel.resetShouldLoadDroppedProfiles()
         }
     }

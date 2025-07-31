@@ -16,9 +16,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import com.example.finalapp.utils.ProfileObject
+import com.example.finalapp.utils.UserObject
 import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -29,7 +28,7 @@ import com.example.finalapp.utils.constants.Constants.DONGLE_NORMAL
 @Composable
 fun EditName(navController: NavHostController) {
     var name by remember {
-        mutableStateOf(ProfileObject.profile?.name)
+        mutableStateOf(UserObject.user.value.name)
     }
     Scaffold(topBar = {
         CommonTopBar(title = "Your Display Name") {
@@ -69,7 +68,7 @@ fun EditName(navController: NavHostController) {
 @Composable
 fun EditUserName(navController: NavHostController) {
     var username by remember {
-        mutableStateOf(ProfileObject.profile?.username)
+        mutableStateOf(UserObject.user.value.username)
     }
     Scaffold(topBar = {
         CommonTopBar(title = "Your UserName") {
@@ -109,7 +108,7 @@ fun EditUserName(navController: NavHostController) {
 @Composable
 fun EditPhoneNumber(navController: NavHostController) {
     var phoneNumber by remember {
-        mutableStateOf(ProfileObject.profile?.number)
+        mutableStateOf(UserObject.user.value.number)
     }
     Scaffold(topBar = {
         CommonTopBar(title = "Your Contact Number") {

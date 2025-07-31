@@ -5,29 +5,20 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.modifier.modifierLocalProvider
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -36,16 +27,11 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
-import coil.compose.AsyncImage
-import com.bumptech.glide.load.resource.bitmap.CircleCrop
 import com.example.finalapp.R
-import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens._1home.commonUI.shareDeepLink
-import com.example.finalapp.screens._1home.publicEvent.ShareIcon
 import com.example.finalapp.screens.qrcode.QRCode
-import com.example.finalapp.ui.imagePrefix
 import com.example.finalapp.ui.theme.floatingActionBtnColor
-import com.example.finalapp.utils.ProfileObject
+import com.example.finalapp.utils.UserObject
 import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.utils.testdata.DynamicText
 
@@ -76,9 +62,9 @@ fun ShowQRDialog(navController: NavHostController, onDismiss: () -> Unit) {
                     fontFamily = Constants.APP_NAME_FONT
                 )
 
-                QRCode(userIMAGE = ProfileObject.profile.profileImage,userId = ProfileObject.profile.userId)
+                QRCode(userIMAGE = UserObject.user.value.profileImage,userId = UserObject.user.value.userId)
 
-                DynamicText(text = ProfileObject.profile.username, color = Color.White, fontSize = 16.sp, fontFamily = Constants.FONT_MEDIUM, fontWeight = FontWeight.Bold)
+                DynamicText(text = UserObject.user.value.username, color = Color.White, fontSize = 16.sp, fontFamily = Constants.FONT_MEDIUM, fontWeight = FontWeight.Bold)
 
                 Divider(modifier = Modifier.fillMaxWidth(), thickness = 0.5.dp, color = Color(0xFF745509))
 
@@ -97,7 +83,7 @@ fun ShowQRDialog(navController: NavHostController, onDismiss: () -> Unit) {
                     }
                     Column(modifier = Modifier
                         .clickable {
-                            shareDeepLink(context, ProfileObject.profile.userId)
+                            shareDeepLink(context, UserObject.user.value.userId)
                         }
                         .wrapContentSize(), verticalArrangement = Arrangement.Bottom, horizontalAlignment = Alignment.CenterHorizontally) {
                         Image(painter = painterResource(id = R.drawable.share), contentDescription ="", modifier = Modifier.size(20.dp), colorFilter = ColorFilter.tint(Color.White) )

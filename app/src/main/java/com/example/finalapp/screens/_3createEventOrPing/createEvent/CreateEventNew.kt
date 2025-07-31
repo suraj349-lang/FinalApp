@@ -70,11 +70,11 @@ import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.finalapp.R
 import com.example.finalapp.model.Event
-import com.example.finalapp.model.pings.PingRequestDto
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens.dialogBox.uriToFile
-import com.example.finalapp.utils.ProfileObject
+import com.example.finalapp.utils.UserObject
 import com.example.finalapp.utils.RequestState
+import com.example.finalapp.utils.UserLocation
 import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.viewmodels.EventsViewModel
 import java.io.File
@@ -82,7 +82,6 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -150,14 +149,14 @@ fun CreateEventMainScreen(parentEventId:String ?= null,navController: NavHostCon
                 var imageFile by mutableStateOf<File?>(null)
                 if(uri != Uri.EMPTY) imageFile = uriToFile(uri!!, context )
                 imageFile?.let {
-                    eventsViewModel.uploadImageAndThenCreateEvent(ProfileObject.profile.userId, it){imageKey->
+                    eventsViewModel.uploadImageAndThenCreateEvent(UserObject.user.value.userId , it){ imageKey->
                         eventsViewModel.createEvent(
                             Event(
-                                user = ProfileObject.profile.userId,
-                                userName = ProfileObject.profile.username,
+                                user = UserObject.user.value.userId ,
+                                userName = UserObject.user.value.username,
                                 title=title,
                                 image = imageKey,
-                                location = ProfileObject.profile.address,
+                                location = UserLocation.address.toString(),
                                 description =description,
                                 parentPostId = if (!parentEventId.isNullOrEmpty()) parentEventId else null,
                                 isChildPost = !parentEventId.isNullOrEmpty(),

@@ -82,7 +82,7 @@ import com.example.finalapp.model.Message
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.ui.imagePrefix
 import com.example.finalapp.ui.theme.floatingActionBtnColor
-import com.example.finalapp.utils.ProfileObject
+import com.example.finalapp.utils.UserObject
 import com.example.finalapp.utils.RequestState
 import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
@@ -165,7 +165,7 @@ fun SingleChatScreenUI(
     // Fetch messages on startup or trigger
     LaunchedEffect(chatViewModel.canFetch.value) {
         if (chatViewModel.canFetch.value) {
-            chatViewModel.getAllMessages(ProfileObject.profile?.userId ?: "", chatListUserId)
+            chatViewModel.getAllMessages(UserObject.user.value.userId ?: "", chatListUserId)
             chatViewModel.canFetch.value = false
         }
     }
@@ -214,7 +214,7 @@ fun SingleChatScreenUI(
                                     sent = message.sent,
                                     received = message.received,
                                     timestamp = message.timestamp,
-                                    isSentByLoggedInUser = message.senderId == ProfileObject.profile?.userId ?: ""
+                                    isSentByLoggedInUser = message.senderId == UserObject.user.value.userId
                                 )
                             }
                         }
@@ -315,7 +315,7 @@ fun SingleChatScreenUI(
                                             val newChat = ChatItem(
                                                 id = tempId,
                                                 message = inputText.trim(),
-                                                sentFrom = ProfileObject.profile?.userId ?: "",
+                                                sentFrom = UserObject.user.value.userId ,
                                                 sentTo = chatListUserId,
                                                 sent = 0,
                                                 received = false,

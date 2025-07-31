@@ -3,6 +3,7 @@ package com.example.finalapp.screens._4profile
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -18,8 +19,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
@@ -76,7 +79,7 @@ import com.example.finalapp.screens.common.CommonErrorScreen
 import com.example.finalapp.screens.dialogBox.DropProfileDialog
 import com.example.finalapp.screens.dialogBox.uriToFile
 import com.example.finalapp.ui.imagePrefix
-import com.example.finalapp.utils.ProfileObject
+import com.example.finalapp.utils.UserObject
 import com.example.finalapp.utils.RequestState
 import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.viewmodels.AuthViewModel
@@ -92,10 +95,11 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
     var showPasswordDialog by remember {
         mutableStateOf(false)
     }
+    val user by UserObject.user.collectAsState()
+
     var showCustomDialog by remember { mutableStateOf(false) }
     var showSheetForImageUpdate by remember { mutableStateOf(false) }
     var showSheet by remember { mutableStateOf(false) }
-    val profileImage by remember { mutableStateOf(ProfileObject.profile?.profileImage) }
     val startProfileImageUpload=imageUploadViewModel.startProfileImageUpload.collectAsState()
     val userPingsList by eventsViewModel.userPingsListResponse.collectAsState()
     val userEventsList by eventsViewModel.userEventsListResponse.collectAsState()
@@ -111,8 +115,8 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
             var imageFile by mutableStateOf<File?>(null)
             if(imageUri != Uri.EMPTY) imageFile = uriToFile(uri, context )
             imageFile?.let {
-                eventsViewModel.uploadImageAndThenCreateEvent(ProfileObject.profile.userId, it){ urlKey->
-                    eventsViewModel.updateUserDetails(ProfileObject.profile.userId, urlKey)
+                eventsViewModel.uploadImageAndThenCreateEvent(user.userId, it){ urlKey->
+                    eventsViewModel.updateUserDetails(user.userId, urlKey)
                 }
             }
         } else {
@@ -135,9 +139,9 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                         var imageFile by mutableStateOf<File?>(null)
                         if(uri != Uri.EMPTY) imageFile = uriToFile(uri, context )
                         Log.i("profileImage", "ProfileScreenNew: called with $imageFile")
-                        imageUploadViewModel.uploadImageAndThen(userId = ProfileObject.profile.userId, file = imageFile!!){url->
+                        imageUploadViewModel.uploadImageAndThen(userId =user.userId, file = imageFile!!){ url->
                             Log.i("profileImage", "updateUserProfileImage: called with $url")
-                            imageUploadViewModel.updateUserProfileImage(ProfileObject.profile.userId,url)
+                            imageUploadViewModel.updateUserProfileImage(user.userId,url)
                         }
 
                         imageUploadViewModel.startProfileImageUpload.value=false
@@ -167,6 +171,10 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
             darkIcons = false        // true = dark icons (for light backgrounds)
         )
     }
+    BackHandler(true) {
+        navController.navigate(SCREENS.HOME.route)
+
+    }
 
 
     if (showCustomDialog) {
@@ -175,25 +183,26 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
     if(showPasswordDialog){
         PasswordForPrivateUsername(onDismiss = {showPasswordDialog=false}, onEnterClicked = {navController.navigate(SCREENS.PRIVATE_PROFILE.route)})
     }
-    val userId=ProfileObject.profile.userId
-    LaunchedEffect(key1 = userId){
+    LaunchedEffect(key1 = user.userId){
         if(eventsViewModel.canFetchEvents.value && eventsViewModel.canFetchDroppedProfiles.value) {
-            eventsViewModel.getUserPings(userId)
-            eventsViewModel.getUserEvents(userId)
-            eventsViewModel.getUserDropProfiles(userId)
+            eventsViewModel.getUserPings(user.userId)
+            eventsViewModel.getUserEvents(user.userId)
+            eventsViewModel.getUserDropProfiles(user.userId)
         }
     }
-    Surface(modifier = Modifier.fillMaxSize(), color = backgroundColor) {
+    Surface(modifier = Modifier
+        .fillMaxSize()
+        .statusBarsPadding(), color = backgroundColor) {
         Column(modifier = Modifier
             .fillMaxSize()
+            .navigationBarsPadding()
             .verticalScroll(rememberScrollState())) {
                 Box(modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)
                     .background(color = upperCardColor)){ // 0xFF1B1A1A
-                    Log.i("IMAGEnkvfj", "ProfileScreenNew: ${ProfileObject.profile.backgroundImage}")
                     AsyncImage(
-                        model = if(ProfileObject.profile.backgroundImage.isNotEmpty() ) imagePrefix+ProfileObject.profile.backgroundImage else   "",
+                        model =  imagePrefix+user.backgroundImage ,
                         contentDescription = "",
                         modifier = Modifier
                             .fillMaxSize()
@@ -206,7 +215,7 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                         modifier = Modifier
                             .padding(16.dp)
                             .size(30.dp)
-                            .clickable { navController.navigateUp() }
+                            .clickable { navController.navigate(SCREENS.HOME.route) }
                             .align(Alignment.TopStart),
                         contentScale = ContentScale.Crop, colorFilter = ColorFilter.tint(Color.White)
                     )
@@ -263,7 +272,7 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                                         is RequestState.Error -> Toast.makeText(context,"Error Uploading image",Toast.LENGTH_SHORT).show()
                                         is RequestState.Success->{
                                             GlideImage(
-                                                model=  "${imagePrefix}${response.data.profileImage}",
+                                                model=  imagePrefix+user.profileImage,
                                                 contentDescription = "",
                                                 modifier=Modifier.fillMaxSize(),
                                                 contentScale = ContentScale.Crop
@@ -274,7 +283,7 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                                         }
                                         else ->{
                                             GlideImage(
-                                                model=  imagePrefix+profileImage,
+                                                model=  imagePrefix+user.profileImage,
                                                 contentDescription = "",
                                                 modifier=Modifier.fillMaxSize(),
                                                 contentScale = ContentScale.Crop
@@ -287,14 +296,14 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                                     modifier = Modifier.padding(start = 8.dp)
                                 ) {
                                     Text(
-                                        text = ProfileObject.profile.name,
+                                        text =user.name ,
                                         fontWeight = FontWeight.Bold,
                                         fontFamily=Constants.FONT_MEDIUM,
                                         color = Color.White,
                                         fontSize = 18.sp
                                     )
                                     Text(
-                                        text = ProfileObject.profile.username,
+                                        text = user.username,
                                         fontWeight = FontWeight.SemiBold,
                                         color = Color.White,
                                         fontSize = 10.sp
@@ -338,7 +347,7 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                 when(val response=userEventsList){
                     is RequestState.Loading -> CircularProgressIndicator()
                     is RequestState.Error -> CommonErrorScreen(error = "Error getting events!", onRetryClicked = {
-                        eventsViewModel.getUserEvents(ProfileObject.profile?.userId!!)
+                        eventsViewModel.getUserEvents(user.userId)
                     })
                     is RequestState.Success -> {
                         MyEvents(response.data){
@@ -353,7 +362,7 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                 when(val response=userPingsList){
                     is RequestState.Loading -> CircularProgressIndicator()
                     is RequestState.Error -> CommonErrorScreen(error = "Error getting pings!"){
-                        eventsViewModel.getUserPings(ProfileObject.profile?.userId!!)
+                        eventsViewModel.getUserPings(user.userId)
                     }
                     is RequestState.Success -> {
                         MyPings(response.data){
@@ -367,7 +376,7 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                 when(val response=userDropProfilesList){
                     is RequestState.Loading -> CircularProgressIndicator()
                     is RequestState.Error -> CommonErrorScreen(error = "Error getting events!"){
-                        eventsViewModel.getUserDropProfiles(ProfileObject.profile?.userId!!)
+                        eventsViewModel.getUserDropProfiles(user.userId)
                     }
                     is RequestState.Success -> {
                         RecentDrops(
@@ -405,7 +414,7 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
     ImageUpdateBottomSheet(
         showSheet = showSheetForImageUpdate,
         onDismiss = {showSheetForImageUpdate=false },
-        currentProfileImage=profileImage,
+        currentProfileImage=user.profileImage,
         navHostController = navController,
         onChangeImageClicked={ navController.navigate("camerax/profile");/*showImageCropper=true*/}
     )

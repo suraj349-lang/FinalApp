@@ -36,7 +36,7 @@ import androidx.compose.ui.unit.sp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
-import com.example.finalapp.utils.ProfileObject
+import com.example.finalapp.utils.UserObject
 import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
 import com.example.finalapp.utils.constants.Constants.DONGLE_LIGHT
 
@@ -80,7 +80,7 @@ fun CommentBottomSheet(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        GlideImage(model = ProfileObject.profile?.profileImage, contentDescription ="", modifier = Modifier
+                        GlideImage(model = UserObject.user.value.profileImage, contentDescription ="", modifier = Modifier
                             .clip(shape = CircleShape)
                             .size(40.dp), contentScale = ContentScale.Crop )
                         TextField(

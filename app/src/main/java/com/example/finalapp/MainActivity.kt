@@ -58,6 +58,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
+import com.example.finalapp.datastore.StoreUserState
 import com.example.finalapp.locationHelper.enableLocationSettings
 import com.example.finalapp.locationHelper.getLocation
 import com.example.finalapp.viewmodels.SplashViewModel
@@ -77,6 +78,8 @@ class MainActivity : ComponentActivity() {
     )
     @Inject
     lateinit var splashViewModel: SplashViewModel
+     @Inject
+     lateinit var storeUserState:StoreUserState
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
@@ -190,13 +193,9 @@ fun FinalApp(
     getLocation: () -> Unit
 ) {
     val scope= rememberCoroutineScope()
-    Log.i("LOGIN", "FinalApp:$screen ")
     LaunchedEffect(Unit){
         scope.launch(Dispatchers.IO) {
              getLocation()
-        }
-        scope.launch {
-            authViewModel.getProfileData()
         }
     }
 

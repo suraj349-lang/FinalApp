@@ -62,7 +62,7 @@ import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.ui.imagePrefix
 import com.example.finalapp.screens.common.CommonErrorScreen
 import com.example.finalapp.screens.common.CommonLoadingScreen
-import com.example.finalapp.utils.ProfileObject
+import com.example.finalapp.utils.UserObject
 import com.example.finalapp.utils.RequestState
 import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.utils.constants.Constants.FONT_MEDIUM
@@ -74,6 +74,7 @@ import com.example.finalapp.viewmodels.ChatViewModel
 @Composable
 fun ChatListScreen(navController: NavHostController,chatViewModel: ChatViewModel) {
     val lifecycleOwner= LocalLifecycleOwner.current
+    val user by UserObject.user.collectAsState()
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
             when (event) {
@@ -88,7 +89,7 @@ fun ChatListScreen(navController: NavHostController,chatViewModel: ChatViewModel
         }
     }
     LaunchedEffect(key1 = Unit) {
-        chatViewModel.getUserChatList(ProfileObject.profile?.userId!!)
+        chatViewModel.getUserChatList(user.userId)
     }
 
     val chatListState by chatViewModel.getUserChatList.collectAsState()
@@ -98,6 +99,7 @@ fun ChatListScreen(navController: NavHostController,chatViewModel: ChatViewModel
     Scaffold(topBar = {
         ChatTopBar(
             title = "Chats",
+            user.profileImage,
             navController = navController
         ){
             showSearchBox=true
@@ -161,7 +163,7 @@ fun ChatRowItem(item: String) {
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
 @Composable
-fun ChatTopBar(title: String, navController: NavHostController,onSearchClicked:()->Unit) {
+fun ChatTopBar(title: String,profileImage:String, navController: NavHostController,onSearchClicked:()->Unit) {
         TopAppBar(
             colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = Color.White
@@ -189,7 +191,7 @@ fun ChatTopBar(title: String, navController: NavHostController,onSearchClicked:(
                         shape = CircleShape,
                     ) {
                         GlideImage(
-                            model= imagePrefix+ProfileObject.profile?.profileImage!!,
+                            model= imagePrefix+ profileImage,
                             contentDescription = "",
                             contentScale=ContentScale.Crop,
                             modifier = Modifier
@@ -228,7 +230,12 @@ fun UserItem(navController: NavHostController, user: ChatList,setProfileImage:(S
         .height(60.dp)
         .clickable {
             setProfileImage(user.withUserId.profileImage)
-            navController.navigate(SCREENS.SINGLE_CHAT.createPath(user.withUserId.username,user.withUserId._id))
+            navController.navigate(
+                SCREENS.SINGLE_CHAT.createPath(
+                    user.withUserId.username,
+                    user.withUserId._id
+                )
+            )
         },
         colors = CardDefaults.cardColors(containerColor = Color(0xFFFFFFFE))
     ) {

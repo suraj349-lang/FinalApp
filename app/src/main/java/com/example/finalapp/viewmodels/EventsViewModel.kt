@@ -11,6 +11,7 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import com.example.finalapp.datastore.StoreUserState
 import com.example.finalapp.model.ChatList
 import com.example.finalapp.model.DirectChat
 import com.example.finalapp.model.DirectChatRequest
@@ -30,7 +31,7 @@ import com.example.finalapp.repository.EventsRepository
 import com.example.finalapp.repository.ProfileRepository
 import com.example.finalapp.repository.Resource
 import com.example.finalapp.screens._2pings.PingsPagingSource
-import com.example.finalapp.utils.ProfileObject
+import com.example.finalapp.utils.UserObject
 import com.example.finalapp.utils.RequestState
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.AutocompletePrediction
@@ -43,6 +44,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import java.io.File
@@ -57,23 +59,29 @@ class EventsViewModel @Inject constructor(
     private val chatDatabaseRepository: ChatDatabaseRepository,
     private val profileRepository: ProfileRepository,
     private val s3Uploader: S3Uploader,
+    private val storeUserState: StoreUserState,
     @ApplicationContext context: Context): ViewModel(){
 
     val TAG="GET_EVENTS_RESPONSE";
 
-    val profileObject= MutableStateFlow(ProfileObject)
 
     private val placesClient by lazy { Places.createClient(context) }
     var checked= mutableStateOf(false)
     var shareProfileClicked= MutableStateFlow(false)
     init {
-        viewModelScope.launch(Dispatchers.Main) {
-            val job = viewModelScope.launch {
-                getAllEvents()
+        viewModelScope.launch {
+            val user = storeUserState.getUserFromDataStore.firstOrNull()
+            if (user != null) {
+                UserObject.updateUser(user)
+            } else {
+                Log.w("User", "No user found in DataStore!")
             }
-            job.join()
+        }
+        viewModelScope.launch {
+            getAllEvents()
         }
     }
+
     //-------------------------------------------------------------------------------------------------------//
     val dropProfileUploadUri= mutableStateOf(Uri.EMPTY)
     val showDropDialog= mutableStateOf(false)
@@ -254,15 +262,12 @@ class EventsViewModel @Inject constructor(
             .onStart {
                 _eventsListResponse.value = RequestState.Loading
                 Log.d(TAG, "all profiles start ${_eventsListResponse.value}")
-
             }.catch {
                 _eventsListResponse.value = RequestState.Error(it)
                 Log.d(TAG, "all profiles error ${_eventsListResponse.value}")
-
             }.collect {
                 _eventsListResponse.value = RequestState.Success(it.data)
                 Log.d(TAG, "all profiles data ${_eventsListResponse.value}")
-
             }
     }
 
@@ -556,7 +561,7 @@ class EventsViewModel @Inject constructor(
                 _userDetailsUpdateResponse.value = RequestState.Error(it)
             }
             .collect { result ->
-                ProfileObject.profile = ProfileObject.profile.copy(backgroundImage = result.data.backgroundImage)
+                UserObject.updateBackgroundImage(result.data.backgroundImage)
                 _userDetailsUpdateResponse.value = RequestState.Success(result.data)
             }
     }

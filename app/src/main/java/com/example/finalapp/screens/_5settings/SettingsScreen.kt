@@ -37,7 +37,7 @@ import com.example.finalapp.screens.common.BackImage
 import com.example.finalapp.ui.theme.LIGHT_GREEN
 import com.example.finalapp.ui.theme.LIGHT_GREY_BG_COLOR
 import com.example.finalapp.ui.theme.homeTopBarIconsColor
-import com.example.finalapp.utils.ProfileObject
+import com.example.finalapp.utils.UserObject
 import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
 import com.example.finalapp.viewmodels.AuthViewModel
@@ -54,11 +54,11 @@ fun SettingsScreenUI(navController: NavHostController,authViewModel: AuthViewMod
         mutableStateOf(false)
     }
     val list= listOf(
-        ProfileObject.profile?.let { MyAccount("Name", it.name,SCREENS.EDIT_NAME.route) },
-        ProfileObject.profile?.let { MyAccount("Username", it.username,SCREENS.EDIT_USER_NAME.route) },
-        ProfileObject.profile?.let { MyAccount("Phone Number", it.number,SCREENS.PHONE_NUMBER.route) },
-        MyAccount("Password","",SCREENS.PASSWORD.route) ,
-        MyAccount("Delete Account","",SCREENS.DELETE_ACCOUNT.route)
+         MyAccount("Name", UserObject.user.value.name,SCREENS.EDIT_NAME.route) ,
+         MyAccount("Username", UserObject.user.value.username,SCREENS.EDIT_USER_NAME.route) ,
+         MyAccount("Phone Number", UserObject.user.value.number,SCREENS.PHONE_NUMBER.route) ,
+         MyAccount("Password","",SCREENS.PASSWORD.route) ,
+         MyAccount("Delete Account","",SCREENS.DELETE_ACCOUNT.route)
     )
     val listSupportAndFeedback= listOf(SupportAndFeedBack("Bugs and Suggestions",SCREENS.BUGS_AND_SUGGESTION.route),SupportAndFeedBack("Safety and Privacy",SCREENS.SAFETY_AND_PRIVACY.route), SupportAndFeedBack("Help Centre",SCREENS.HELP_CENTRE.route))
 

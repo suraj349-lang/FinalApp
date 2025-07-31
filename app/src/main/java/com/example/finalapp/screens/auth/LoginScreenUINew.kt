@@ -159,7 +159,7 @@ fun LoginScreenUINew(navController: NavController,authViewModel: AuthViewModel) 
                     onClick = {
                         scope.launch {
                             //if(loginMethod.validate(phoneNumber)){
-                                authViewModel.loginUser(loginMethod,"$addString$phoneNumber", loginPasswordText)
+                                authViewModel.loginUser("$addString$phoneNumber", loginPasswordText)
                            // }else{
                               ////  authViewModel.setValidationError("Invalid phone  number")
                            // }

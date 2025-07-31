@@ -11,7 +11,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
-import com.example.finalapp.utils.ProfileObject
+import com.example.finalapp.utils.UserObject
 import android.widget.Toast
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.collectAsState
@@ -82,11 +82,11 @@ fun CreatePingMainScreen(navController: NavController, eventsViewModel: EventsVi
                 var imageFile by mutableStateOf<File?>(null)
                 if(uri != Uri.EMPTY) imageFile = uriToFile(uri!!, context )
                 imageFile?.let {
-                    eventsViewModel.uploadImageAndThenCreateEvent(ProfileObject.profile?.userId!!, it){imageKey->
+                    eventsViewModel.uploadImageAndThenCreateEvent(UserObject.user.value.userId , it){ imageKey->
                         eventsViewModel.createPing(
                             PingRequestDto(
-                                user = ProfileObject.profile?.userId!!,
-                                userName = ProfileObject.profile?.username!!,
+                                user =UserObject.user.value.userId ,
+                                userName = UserObject.user.value.username,
                                 title=type,
                                 image = imageKey,
                                 category = type,

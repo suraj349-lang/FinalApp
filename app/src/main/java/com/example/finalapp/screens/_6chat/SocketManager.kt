@@ -3,7 +3,7 @@ package com.example.finalapp.screens._6chat
 import android.util.Log
 import com.example.finalapp.database.ChatItem
 import com.example.finalapp.model.Message
-import com.example.finalapp.utils.ProfileObject
+import com.example.finalapp.utils.UserObject
 import com.example.finalapp.utils.constants.Constants
 import io.socket.client.IO
 import io.socket.client.Socket
@@ -52,7 +52,7 @@ class SocketManager {
         messageData.put("senderId", newChatItem.sentFrom)
         messageData.put("receiverId", newChatItem.sentTo)
         messageData.put("message", newChatItem.message)
-        messageData.put("senderUserName",ProfileObject.profile?.username!!)
+        messageData.put("senderUserName",UserObject.user.value.username)
         Log.d("SocketManager", "Emitting sendMessage event with data: $messageData")
         mSocket?.emit("sendMessage", messageData)
         Log.d("SocketManager", "sendMessage event emitted")

@@ -8,12 +8,9 @@ import com.example.finalapp.database.Chat
 import com.example.finalapp.database.ChatItem
 import com.example.finalapp.model.ChatList
 import com.example.finalapp.model.Message
-import com.example.finalapp.model.User
 import com.example.finalapp.repository.ChatDatabaseRepository
-import com.example.finalapp.repository.ProfileDatabaseRepository
-import com.example.finalapp.repository.ProfileRepository
 import com.example.finalapp.screens._6chat.SocketManager
-import com.example.finalapp.utils.ProfileObject
+import com.example.finalapp.utils.UserObject
 import com.example.finalapp.utils.RequestState
 import com.example.finalapp.utils.constants.Constants.TAG
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,7 +18,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -43,7 +39,7 @@ class ChatViewModel @Inject constructor(
 
     private val socketManager by lazy { SocketManager()}
     fun connectSocket() {
-        socketManager.connect(ProfileObject.profile.userId) { receivedMessage ->
+        socketManager.connect(UserObject.user.value.userId) { receivedMessage ->
             Log.d("Messageschat", "connectSocket:${receivedMessage} ")
             _messagesFromServer.update { oldState ->
                 when (oldState) {

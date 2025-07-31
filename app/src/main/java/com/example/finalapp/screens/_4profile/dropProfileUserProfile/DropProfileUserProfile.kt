@@ -1,6 +1,5 @@
 package com.example.finalapp.screens._4profile.dropProfileUserProfile
 
-import BottomBar
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
@@ -9,12 +8,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -26,11 +23,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
-import androidx.compose.material.Divider
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,7 +37,6 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -57,9 +51,6 @@ import com.example.finalapp.screens._1home.commonUI.shareDeepLink
 import com.example.finalapp.ui.imagePrefix
 import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.utils.constants.Constants
-import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
-import com.example.finalapp.utils.constants.Constants.DONGLE_LIGHT
-import com.example.finalapp.utils.constants.Constants.DONGLE_NORMAL
 import com.example.finalapp.utils.formatDateTime
 
 // when the dropped profile is clicked then it is shown
@@ -78,7 +69,7 @@ fun DropProfileUserProfile(navController: NavHostController,dropProfileResponse:
                     DropProfileUserProfileUI(
                         dropProfileResponse=dropProfileResponse,
                         onSendMessageClicked = {
-                            navController.navigate(SCREENS.SINGLE_CHAT.createPath(dropProfileResponse.createdBy.username,dropProfileResponse.createdBy._id))
+                            navController.navigate(SCREENS.SINGLE_CHAT.createPath(dropProfileResponse.createdBy.username,dropProfileResponse.createdBy.userId))
                         },
                         onBackPressed = {navController.navigateUp()}
                     )

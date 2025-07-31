@@ -70,8 +70,9 @@ import com.example.finalapp.R
 import com.example.finalapp.model.pings.PingRequestDto
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens.dialogBox.uriToFile
-import com.example.finalapp.utils.ProfileObject
+import com.example.finalapp.utils.UserObject
 import com.example.finalapp.utils.RequestState
+import com.example.finalapp.utils.UserLocation
 import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.viewmodels.EventsViewModel
 import java.io.File
@@ -147,16 +148,16 @@ fun CreatePingWrapper(navController: NavHostController, eventsViewModel: EventsV
                     } else return@CreatePingTopNew
                     imageFile?.let {
                         eventsViewModel.uploadImageAndThenCreateEvent(
-                            ProfileObject.profile.userId,
+                            UserObject.user.value.userId ,
                             it
                         ) { imageKey ->
                             eventsViewModel.createPing(
                                 PingRequestDto(
-                                    user = ProfileObject.profile.userId,
-                                    userName = ProfileObject.profile.username,
+                                    user = UserObject.user.value.userId ,
+                                    userName = UserObject.user.value.username,
                                     title = title,
                                     image = imageKey,
-                                    location = ProfileObject.profile.address,
+                                    location = UserLocation.address.toString(),
                                     description = description,
                                     expirationTime = expiration.toString()
                                 )

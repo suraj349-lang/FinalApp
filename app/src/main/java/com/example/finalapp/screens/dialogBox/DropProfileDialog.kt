@@ -42,7 +42,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
@@ -68,7 +67,7 @@ import com.example.finalapp.screens._1home.commonUI.OfferResponseDataAndAction
 import com.example.finalapp.screens._4profile.createImageFile
 import com.example.finalapp.ui.imagePickerText
 import com.example.finalapp.ui.theme.floatingActionBtnColor
-import com.example.finalapp.utils.ProfileObject
+import com.example.finalapp.utils.UserObject
 import com.example.finalapp.utils.RequestState
 import com.example.finalapp.utils.UserLocation
 import com.example.finalapp.utils.constants.Constants
@@ -87,6 +86,8 @@ import java.io.File
 fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewModel, imageUploadViewModel: ImageUploadViewModel, navController: NavHostController, onDismiss: () -> Unit) {
     var caption by remember{ mutableStateOf("") }
     val context= LocalContext.current
+    val user by UserObject.user.collectAsState()
+
     var uri = eventsViewModel.dropProfileUploadUri.value
     var imageFile by mutableStateOf<File?>(null)
     if(uri != Uri.EMPTY) imageFile = uriToFile(uri, context )
@@ -161,7 +162,7 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                                     lineHeight = 14.sp // Adjust line height if needed
                                 )
                                 Text(
-                                    text =  ProfileObject.profile.address,
+                                    text =  UserLocation.address.toString(),
                                     modifier = Modifier.fillMaxWidth(),
                                     color = Color(0xFFF7ECD3),
                                     fontSize = 10.sp,
@@ -350,9 +351,9 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                                         location = authViewModel.address.value,
                                         message = caption,
                                         expirationTime = expirationTime,
-                                        createdBy = ProfileObject.profile.userId
+                                        createdBy = user.userId
                                     )
-                                imageUploadViewModel.s3ImageUploadFunction(ProfileObject.profile.userId,it)
+                                imageUploadViewModel.s3ImageUploadFunction(user.userId,it)
                                 }
                         },
                         shape= RoundedCornerShape(6.dp),

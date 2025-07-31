@@ -1,5 +1,6 @@
 package com.example.finalapp.model
 
+import com.google.gson.annotations.SerializedName
 import kotlinx.serialization.Serializable
 
 data class RegisterUserModel(
@@ -13,15 +14,16 @@ data class RegisterUserModel(
 
 @Serializable
 data class User(
-  val _id:String,
-  val name:String,
-  val number:String,
-  val username: String,
-  val token: String,
-  val address: String,
-  val offers:List<String>?=null,
-  val profileImage:String ="",
-  val backgroundImage:String=""
+    @SerializedName("_id")
+    val userId:String,
+    val name:String,
+    val number:String,
+    val username: String,
+    val token: String,
+    val address: String,
+    val offers:List<String>?=null,
+    val profileImage:String ="",
+    val backgroundImage:String=""
 ){
     constructor():this("","","","","","", emptyList(),"","")
 }

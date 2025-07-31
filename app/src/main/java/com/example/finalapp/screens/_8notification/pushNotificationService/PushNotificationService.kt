@@ -2,24 +2,17 @@ package com.example.finalapp.screens._8notification.pushNotificationService
 
 
 import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.Context
-import android.content.Intent
 import android.graphics.BitmapFactory
-import android.media.RingtoneManager
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat
-import com.example.finalapp.MainActivity
 import com.example.finalapp.R
 import com.example.finalapp.fcm.stateObject.SendFcmTokenDto
+import com.example.finalapp.model.User
 import com.example.finalapp.repository.AuthRepository
-import com.example.finalapp.ui.theme.floatingActionBtnColor
-import com.example.finalapp.utils.ProfileObject
-import com.example.finalapp.viewmodels.AuthViewModel
-import com.example.finalapp.viewmodels.FCMViewModel
+import com.example.finalapp.utils.UserObject
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import dagger.hilt.android.AndroidEntryPoint
@@ -39,10 +32,10 @@ class PushNotificationService: FirebaseMessagingService() {
         super.onNewToken(token)
         try {
             CoroutineScope(Dispatchers.IO).launch {
-                if(ProfileObject.profile !=null && ProfileObject.profile?.userId !=null) {
+                if(UserObject.user.value != User() && UserObject.user.value.userId.isNotEmpty()) {
                     authRepository.updateFcmToken(
                         SendFcmTokenDto(
-                            ProfileObject.profile?.userId!!,
+                            UserObject.user.value.userId,
                             token
                         )
                     )

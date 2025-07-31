@@ -1,6 +1,7 @@
 package com.example.finalapp.screens._1home
 
 
+import android.util.Log
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -74,12 +75,13 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
 import com.example.finalapp.model.DirectChat
 import com.example.finalapp.model.DirectChatRequest
+import com.example.finalapp.model.User
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens.dialogBox.DialogLoading
 import com.example.finalapp.ui.imagePrefix
 import com.example.finalapp.screens.common.CommonErrorScreen
 import com.example.finalapp.ui.theme.floatingActionBtnColor
-import com.example.finalapp.utils.ProfileObject
+import com.example.finalapp.utils.UserObject
 import com.example.finalapp.utils.RequestState
 import com.example.finalapp.utils.UserLocation
 import com.example.finalapp.utils.constants.Constants
@@ -101,14 +103,15 @@ fun DirectChatScreen(
     var remove by remember{
         mutableStateOf(false)
     }
-    val profileObject by eventsViewModel.profileObject.collectAsState()
+    val user by UserObject.user.collectAsState()
+
     LaunchedEffect(key1 =shareProfileClickedON){
         if(shareProfileClickedON ){
             eventsViewModel.checked.value=!checked
-            eventsViewModel.sendDirectChatData(DirectChatRequest( ProfileObject.profile.userId,authViewModel.latitude.value,authViewModel.longitude.value))
+            eventsViewModel.sendDirectChatData(DirectChatRequest( UserObject.user.value.userId,authViewModel.latitude.value,authViewModel.longitude.value))
         } else {
             if(remove){
-                eventsViewModel.removeUserFromDirectChat(ProfileObject.profile.userId)
+                eventsViewModel.removeUserFromDirectChat(UserObject.user.value.userId)
                 remove=false
             }
             // eventsViewModel.emptyNearByUsersList()
@@ -183,7 +186,7 @@ fun DirectChatScreen(
                         }
                     }
                     DirectChatUI(
-                        profileObject,
+                        user!!,
                         scrollBehavior,
                         eventsViewModel,
                         navController,
@@ -200,7 +203,7 @@ fun DirectChatScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DirectChatUI(
-    profileObject: ProfileObject,
+    user: User,
     scrollBehavior: TopAppBarScrollBehavior,
     eventsViewModel: EventsViewModel,
     navController: NavHostController,
@@ -208,7 +211,7 @@ fun DirectChatUI(
     onShareProfileClicked: () -> Unit
 ) {
     if (!checked ) {
-        ShareProfileForDirectChat(profileObject,onShareProfileClicked)
+        ShareProfileForDirectChat(user,onShareProfileClicked)
     } else {
         DirectChatProfiles(scrollBehavior,navController, eventsViewModel )
     }
@@ -252,8 +255,8 @@ fun DirectChatProfiles(
                     user?.let {
                         DirectChatItem(
                             user=it,
-                            onProfileClicked = { navController.navigate(SCREENS.USER_PUBLIC_PROFILE.createPath(it.userId._id)) },
-                            onSendMessageClicked = { eventsViewModel.saveUserToChatList(ProfileObject.profile.userId, it.userId._id) }
+                            onProfileClicked = { navController.navigate(SCREENS.USER_PUBLIC_PROFILE.createPath(it.userId.userId)) },
+                            onSendMessageClicked = { eventsViewModel.saveUserToChatList(UserObject.user.value.userId, it.userId.userId) }
                         )
                     }
                 }
@@ -324,7 +327,7 @@ fun DirectChatItem(
 
 
 @Composable
-fun ShareProfileForDirectChat(profileObject: ProfileObject, onShareProfileClicked: () -> Unit) {
+fun ShareProfileForDirectChat(user:User,onShareProfileClicked: () -> Unit) {
     val shimmerColors = listOf(
         Color.White.copy(alpha = 0.1f),
         Color.White.copy(alpha = 0.4f),
@@ -357,7 +360,7 @@ fun ShareProfileForDirectChat(profileObject: ProfileObject, onShareProfileClicke
             Card(modifier = Modifier
                 .size(200.dp), shape = CircleShape) {
                 AsyncImage(
-                    model = imagePrefix + profileObject.profile.profileImage,
+                    model = imagePrefix + user.profileImage,
                     contentDescription = "",
                     filterQuality = FilterQuality.High,
                     modifier = Modifier
@@ -377,7 +380,7 @@ fun ShareProfileForDirectChat(profileObject: ProfileObject, onShareProfileClicke
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = profileObject.profile.username,
+                        text = user.username,
                         overflow = TextOverflow.Ellipsis,
                         fontFamily = Constants.FONT_LIGHT,
                         fontSize = 18.sp,

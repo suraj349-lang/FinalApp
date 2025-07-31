@@ -60,7 +60,8 @@ import com.example.finalapp.screens._1home._1_1ExperimentScreenEvents.ActiveButt
 import com.example.finalapp.screens._1home._1_1ExperimentScreenEvents.DONGLE
 import com.example.finalapp.screens._1home._1_1ExperimentScreenEvents.SANS
 import com.example.finalapp.screens._1home._1_1ExperimentScreenEvents.images
-import com.example.finalapp.utils.ProfileObject
+import com.example.finalapp.utils.UserLocation
+import com.example.finalapp.utils.UserObject
 import com.example.finalapp.utils.constants.Constants
 
 @OptIn(ExperimentalGlideComposeApi::class)
@@ -89,7 +90,7 @@ fun PreviewCreateEvent(uri: Uri?,
                     .wrapContentHeight()
                     .align(Alignment.BottomCenter)) {
                     //------------------ username and user image----------------------------------------------------
-                    UsernameAndUserProfileImage(ProfileObject.profile?.username!!)
+                    UsernameAndUserProfileImage(UserObject.user.value.username)
 
                     Divider(modifier = Modifier.fillMaxWidth(), thickness = 1.dp, color = Color.LightGray)
 
@@ -142,7 +143,7 @@ fun PreviewCreateEvent(uri: Uri?,
                                     .fillMaxWidth()
                                     .height(24.dp), shape = RoundedCornerShape(0.dp)
                             ) {
-                                RunningText4(ProfileObject.profile.address)
+                                RunningText4(UserLocation.address.toString())
                             }
                         }
                     }

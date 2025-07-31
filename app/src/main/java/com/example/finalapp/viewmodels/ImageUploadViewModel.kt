@@ -9,13 +9,13 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.finalapp.database.Profile
+import com.example.finalapp.datastore.StoreUserState
 import com.example.finalapp.model.PreSignedUrlResponse
 import com.example.finalapp.model.DropProfileModel
 import com.example.finalapp.model.DropProfileResponseModel
 import com.example.finalapp.model.User
 import com.example.finalapp.repository.ProfileRepository
-import com.example.finalapp.utils.ProfileObject
+import com.example.finalapp.utils.UserObject
 import com.example.finalapp.utils.RequestState
 import com.google.android.gms.tasks.Task
 import com.google.firebase.storage.FirebaseStorage
@@ -24,7 +24,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
@@ -49,6 +48,7 @@ class S3UploaderImpl @Inject constructor(private val repository: ProfileReposito
 @HiltViewModel
 class ImageUploadViewModel @Inject constructor(
     private val profileRepository: ProfileRepository,
+    private val storeUserState:StoreUserState,
     private val s3Uploader: S3Uploader)   :ViewModel()
 {
     //--------------------------------------------------------------------------------------//
@@ -92,11 +92,11 @@ class ImageUploadViewModel @Inject constructor(
             .collect{
                 if(it.success) {
                     try {
-                        ProfileObject.profile = ProfileObject.profile.copy(profileImage = it.data.profileImage)
+                        val updated = UserObject.user.value.copy(profileImage = it.data.profileImage)
+                        storeUserState.saveUserInDataStore(updated)
                         _userProfileImageUpdateStatus.value = RequestState.Success(it.data)
                     } catch (e: Exception) {
                         Log.e(TAG, "updateUserProfileImage: ${e.printStackTrace()}", e)
-
                     }
                 }else{
                     _userProfileImageUpdateStatus.value = RequestState.Error(Exception("Error uploading image"))

@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
@@ -25,7 +24,6 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -37,7 +35,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -51,7 +48,6 @@ import com.example.finalapp.utils.constants.Constants.DONGLE_LIGHT
 import com.example.finalapp.utils.constants.Constants.DONGLE_NORMAL
 import com.example.finalapp.viewmodels.EventsViewModel
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.utils.RequestState
 import com.example.finalapp.utils.constants.Constants
@@ -78,7 +74,7 @@ fun UserPublicProfile(eventsViewModel: EventsViewModel,navController:NavHostCont
                         paddingValues = it,
                         user = response.data,
                         onSendMessageClicked = {
-                                               navController.navigate(SCREENS.SINGLE_CHAT.createPath(response.data.username,response.data._id))
+                                               navController.navigate(SCREENS.SINGLE_CHAT.createPath(response.data.username,response.data.userId))
                         },
                         onBackPressed = { navController.navigateUp() }
                     )

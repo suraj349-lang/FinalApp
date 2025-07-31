@@ -12,6 +12,7 @@ import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -40,6 +41,9 @@ fun EventScreenWrapper(
     navController: NavHostController,
     onRetryCalled:()->Unit
 ) {
+//    LaunchedEffect(key1 = true){
+//        eventsViewModel.getAllEvents()
+//    }
     val pagerState = rememberPagerState(
         initialPage = initialPage ?: 0,
         pageCount = { (eventsViewModel.eventsListResponse.value as? RequestState.Success<List<Event>>)?.data?.size ?: 0 }
@@ -52,11 +56,10 @@ fun EventScreenWrapper(
         }
         is RequestState.Error -> {
             Column(modifier=Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-                Log.e("Error in getting events", "EventsScreen:${(eventsState as RequestState.Error).error} ", )
+                Log.e("Events", "EventsScreen:${(eventsState as RequestState.Error).error} ", )
                 CommonErrorScreen(error = "Unable to fetch events.",true){
                     eventsViewModel.getAllEvents()
                 }
-
             }
         }
         is RequestState.Success -> {
@@ -66,20 +69,10 @@ fun EventScreenWrapper(
                     VerticalPager(
                         pageSize = PageSize.Fill,
                         state = pagerState,
-                      //  flingBehavior = fling,
                         beyondBoundsPageCount = 1,
                         modifier = modifier.weight(1f)
                     ) { page ->
                         val event = eventList[page]
-
-//                        PublicEvent(
-//                            event,
-//                            navController,
-//                            height = false,
-//                            index = 2,
-//                            imageUrls = imageUrls
-//
-//                        )
                         EventScreen(
                             event=event,
                             navController=navController,
