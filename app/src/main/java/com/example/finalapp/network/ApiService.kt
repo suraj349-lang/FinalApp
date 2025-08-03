@@ -105,6 +105,11 @@ interface ApiService {
     suspend fun updateUserImage(@Query("email") email: String, @Query("imageUrl") imageUrl: String): OkResponse
     @PATCH("/api/v1/user/updateProfileImage")
     suspend fun updateProfileImage(@Query("userId") userId: String, @Query("imageUrl") imageUrl: String): OkResponse
+    @PATCH("/api/v1/user/updateName")
+    suspend fun updateName(@Query("id") id: String, @Query("name") name: String): ApiResponse<String>
+
+    @PATCH("/api/v1/user/updateUserName")
+    suspend fun updateUserName(@Query("id") id: String, @Query("userName") userName: String): ApiResponse<String>
 
     @Multipart
     @POST("/api/v1/user/uploadImage")

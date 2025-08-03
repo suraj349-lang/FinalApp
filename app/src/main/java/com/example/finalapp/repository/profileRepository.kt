@@ -7,6 +7,8 @@ import com.example.finalapp.model.DropProfileResponseModel
 import com.example.finalapp.model.OkResponse
 import com.example.finalapp.network.ApiService
 import com.example.finalapp.network.NonAuthApiService
+import com.example.finalapp.utils.ApiResponse
+import com.example.finalapp.utils.UserObject
 import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -68,6 +70,15 @@ class ProfileRepository @Inject constructor(private val api: ApiService,private 
 
     fun sendDropProfileData(data: DropProfileModel): Flow<DropProfileResponseModel> = flow  {
         emit(api.dropProfile(data))
+    }.flowOn(Dispatchers.IO)
+
+    //-----------------------------------------------------------------------------------------
+
+    fun updateName(name: String): Flow<ApiResponse<String>> = flow {
+        emit(api.updateName(UserObject.user.value.user,name))
+    }.flowOn(Dispatchers.IO)
+    fun updateUserName(userName: String): Flow<ApiResponse<String>> = flow {
+        emit(api.updateUserName(UserObject.user.value.user,userName))
     }.flowOn(Dispatchers.IO)
 
 }

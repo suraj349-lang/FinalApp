@@ -31,6 +31,7 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.Divider
+import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -50,6 +51,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -74,9 +76,10 @@ import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens.dialogBox.uriToFile
 import com.example.finalapp.utils.UserObject
 import com.example.finalapp.utils.RequestState
-import com.example.finalapp.utils.UserLocation
+import com.example.finalapp.utils.UserLocationObject
 import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.viewmodels.EventsViewModel
+import kotlinx.coroutines.delay
 import java.io.File
 import java.time.Instant
 import java.time.LocalDate
@@ -100,6 +103,8 @@ fun CreateEventMainScreen(parentEventId:String ?= null,navController: NavHostCon
     var expiration by remember {
         mutableStateOf("")
     }
+    val userLocation by UserLocationObject.userLocation.collectAsState()
+    val user by UserObject.user.collectAsState()
 
 
     val pickMedia = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
@@ -113,31 +118,43 @@ fun CreateEventMainScreen(parentEventId:String ?= null,navController: NavHostCon
     val isActive by remember {
         derivedStateOf { title.isNotEmpty() && imageUri != Uri.EMPTY }
     }
+    var showLoading by remember {
+        mutableStateOf(false)
+    }
 
 
 
 
     val context = LocalContext.current
     val createEvent by eventsViewModel.createEventResponse.collectAsState()
-    when(createEvent){
-        is RequestState.Idle ->{}
-        is RequestState.Error ->{
-            Toast.makeText(LocalContext.current,"Error creating event", Toast.LENGTH_SHORT).show()
-            navController.navigate(SCREENS.HOME.route){
-                popUpTo(0)
-            }
-        }
-        is RequestState.Success->{
 
-            Toast.makeText(LocalContext.current,"Event created successfully", Toast.LENGTH_SHORT).show()
-            navController.navigate(SCREENS.HOME.route){
-                popUpTo(0)
+    LaunchedEffect(createEvent) {
+        when (createEvent) {
+            is RequestState.Error -> {
+                showLoading=false
+                Toast.makeText(context, "Error creating event", Toast.LENGTH_SHORT).show()
+                navController.navigate(SCREENS.HOME.route) {
+                    popUpTo(0)
+                }
+                eventsViewModel.resetEventResponseState()
             }
-        }
-        is RequestState.Loading->{
-            CircularProgressIndicator()
+
+            is RequestState.Success -> {
+                showLoading=false
+                Toast.makeText(context, "Event created successfully", Toast.LENGTH_SHORT).show()
+                navController.navigate(SCREENS.HOME.route) {
+                    popUpTo(0)
+                }
+                eventsViewModel.resetEventResponseState()
+            }
+            is RequestState.Loading ->{
+               showLoading=true
+            }
+
+            else -> Unit
         }
     }
+
 
     Scaffold(
         topBar = {
@@ -149,14 +166,15 @@ fun CreateEventMainScreen(parentEventId:String ?= null,navController: NavHostCon
                 var imageFile by mutableStateOf<File?>(null)
                 if(uri != Uri.EMPTY) imageFile = uriToFile(uri!!, context )
                 imageFile?.let {
-                    eventsViewModel.uploadImageAndThenCreateEvent(UserObject.user.value.userId , it){ imageKey->
+                    eventsViewModel.uploadImageAndThenCreateEvent( user.user , it){ imageKey->
+                        Log.i("TAG", "CreateEventMainScreen: ${user.userName}")
                         eventsViewModel.createEvent(
                             Event(
-                                user = UserObject.user.value.userId ,
-                                userName = UserObject.user.value.username,
+                                user = user.user ,
+                                userName = user.userName,
                                 title=title,
                                 image = imageKey,
-                                location = UserLocation.address.toString(),
+                                location = userLocation.address.toString(),
                                 description =description,
                                 parentPostId = if (!parentEventId.isNullOrEmpty()) parentEventId else null,
                                 isChildPost = !parentEventId.isNullOrEmpty(),
@@ -174,16 +192,22 @@ fun CreateEventMainScreen(parentEventId:String ?= null,navController: NavHostCon
                     .padding(it),
                 color = Color.White
             ) {
-                CreateEvent(
-                    title=title,
-                    onTitleChange = { newTitle -> title = newTitle },
-                    description=description,
-                    onDescriptionChange = { newDescription -> description = newDescription },
-                    imageUri = imageUri,
-                    onGalleryClicked={pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))},
-                    onCameraClicked={},
-                    onDeadlineSelected = {expiration=it}
-                )
+                Column(modifier = Modifier.fillMaxSize()) {
+                   if(showLoading){
+                       LinearProgressIndicator(modifier = Modifier.fillMaxWidth().height(3.dp), color = Color(0xFF275203))
+                   }
+                    CreateEvent(
+                        title=title,
+                        onTitleChange = { newTitle -> title = newTitle },
+                        description=description,
+                        onDescriptionChange = { newDescription -> description = newDescription },
+                        imageUri = imageUri,
+                        onGalleryClicked={pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))},
+                        onCameraClicked={},
+                        onDeadlineSelected = {deadline -> expiration=deadline}
+                    )
+                }
+
             }
         }
     )

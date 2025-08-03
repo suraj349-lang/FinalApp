@@ -65,6 +65,7 @@ import com.example.finalapp.screens.pings.EditScreen
 import com.example.finalapp.screens.pings.templates.PingTemplateSelector
 import com.example.finalapp.screens.pings.templates.visualPingTemplates
 import com.example.finalapp.viewmodels.ImageUploadViewModel
+import com.example.finalapp.viewmodels.SettingsViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -76,7 +77,7 @@ import kotlinx.serialization.json.Json
 fun Navigation(authViewModel: AuthViewModel, screen: String) {
     val navController:NavHostController= rememberNavController();
     val imageUploadViewModel= hiltViewModel<ImageUploadViewModel>()
-    val viewModel = hiltViewModel<ChatViewModel>()
+    val settingsViewModel = hiltViewModel<SettingsViewModel>()
     val eventsViewModel= hiltViewModel<EventsViewModel>()
     val chatViewModel= hiltViewModel<ChatViewModel>()
 
@@ -250,10 +251,10 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
 
         // SETTINGS---------------------------------------------------------------------------------------------------------------------------------------------------
         composable(SCREENS.EDIT_NAME.route){
-            EditName(navController = navController)
+            EditName(navController = navController,settingsViewModel)
         }
         composable(SCREENS.EDIT_USER_NAME.route){
-            EditUserName(navController = navController)
+            EditUserName(navController = navController,settingsViewModel)
         }
         composable(SCREENS.PASSWORD.route){
             EditPassword(navController = navController)

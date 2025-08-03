@@ -30,6 +30,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -50,7 +51,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -69,14 +69,12 @@ import com.example.finalapp.ui.imagePickerText
 import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.utils.UserObject
 import com.example.finalapp.utils.RequestState
-import com.example.finalapp.utils.UserLocation
+import com.example.finalapp.utils.UserLocationObject
 import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
 import com.example.finalapp.viewmodels.AuthViewModel
 import com.example.finalapp.viewmodels.EventsViewModel
 import com.example.finalapp.viewmodels.ImageUploadViewModel
-import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.RequestBody
 import java.io.File
 
 
@@ -87,6 +85,7 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
     var caption by remember{ mutableStateOf("") }
     val context= LocalContext.current
     val user by UserObject.user.collectAsState()
+    val userLocation by UserLocationObject.userLocation.collectAsState()
 
     var uri = eventsViewModel.dropProfileUploadUri.value
     var imageFile by mutableStateOf<File?>(null)
@@ -123,11 +122,11 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
             shape = RoundedCornerShape((6.dp)),
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.9f),
+                .wrapContentHeight(),
         ) {
             Column(
                 Modifier
-                    .fillMaxSize()
+                    .fillMaxWidth().wrapContentHeight()
                     //.verticalScroll(enabled = true, state = rememberScrollState())
                     .background(Color.White),
                 verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally
@@ -162,7 +161,7 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                                     lineHeight = 14.sp // Adjust line height if needed
                                 )
                                 Text(
-                                    text =  UserLocation.address.toString(),
+                                    text =  userLocation.address.toString(),
                                     modifier = Modifier.fillMaxWidth(),
                                     color = Color(0xFFF7ECD3),
                                     fontSize = 10.sp,
@@ -277,16 +276,18 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                     .fillMaxWidth()
                     .padding(start = 15.dp), fontSize = 20.sp, color = Color.DarkGray, textAlign = TextAlign.Start)
                 OutlinedTextField(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 60.dp, max = 100.dp)
-                        .padding(start = 15.dp, end = 15.dp)
+                    modifier = Modifier.fillMaxWidth()
+                        .heightIn(min = 48.dp, max = 70.dp)
+                        .padding(horizontal = 15.dp)
                         .background(Color.White, RoundedCornerShape(5.dp)),
                     shape = RoundedCornerShape(5.dp),
                     value = caption,
                     onValueChange = { caption = it },
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
                     maxLines = 4,
+                    textStyle = LocalTextStyle.current.copy(
+                        lineHeight = 18.sp, fontSize = 14.sp
+                    ),
                     placeholder={ Text(text = "Type something ...", fontFamily = DONGLE_BOLD)},
                     colors = OutlinedTextFieldDefaults.colors(cursorColor = Color.Red, unfocusedBorderColor = Color.LightGray, focusedBorderColor = Color.LightGray)
                 )
@@ -351,15 +352,15 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                                         location = authViewModel.address.value,
                                         message = caption,
                                         expirationTime = expirationTime,
-                                        createdBy = user.userId
+                                        createdBy = user.user
                                     )
-                                imageUploadViewModel.s3ImageUploadFunction(user.userId,it)
+                                imageUploadViewModel.s3ImageUploadFunction(user.user,it)
                                 }
                         },
                         shape= RoundedCornerShape(6.dp),
                         modifier= Modifier
                             .fillMaxWidth(1f)
-                            .padding(15.dp),
+                            .padding(horizontal = 15.dp, vertical = 4.dp),
                         enabled= uri !=Uri.EMPTY,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = floatingActionBtnColor, //statusAndTopAppBarColor,
@@ -399,30 +400,8 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
 }
 
 
-@Composable
-fun UserLocationUI() {
-    Row(modifier = Modifier
-        .fillMaxWidth()
-        .height(20.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-       // Image(painter = painterResource(id = R.drawable.location_new), contentDescription ="", modifier = Modifier.size(18.dp) )
-        UserLocation.street?.let {
-            Text(
-                it,fontFamily = DONGLE_BOLD, overflow = TextOverflow.Ellipsis, maxLines = 1,modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 15.dp), fontSize = 20.sp, color = Color.DarkGray, textAlign = TextAlign.Start)
-        }
 
-    }
-}
 
-fun getImageRequestBody(context: Context, imageUri: Uri?): RequestBody? {
-    imageUri ?: return null
-
-    val filePath = getPathFromUri(context, imageUri) ?: return null
-    val file = File(filePath)
-
-    return RequestBody.create("image/jpeg".toMediaTypeOrNull(), file)
-}
 
 // Function to get file path from Uri (implementation depends on your app needs)
 fun getPathFromUri(context: Context, uri: Uri): String? {

@@ -85,6 +85,7 @@ import com.example.finalapp.screens.common.CommonErrorScreen
 import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.utils.UserObject
 import com.example.finalapp.utils.UserLocation
+import com.example.finalapp.utils.UserLocationObject
 import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.utils.formatDateTime
 import com.example.finalapp.utils.testdata.Item
@@ -117,6 +118,7 @@ fun DroppedProfilesUI(
         mutableStateOf(false)
     }
     val scope= rememberCoroutineScope()
+    val userLocation by UserLocationObject.userLocation.collectAsState()
 
     val predictions by eventsViewModel.getAutocompletePredictions(query).collectAsState(emptyList())
     val shouldLoadDroppedProfiles by eventsViewModel.shouldLoadDroppedProfiles.collectAsState()
@@ -200,7 +202,7 @@ fun DroppedProfilesUI(
                             }
 
                             Spacer(modifier = Modifier.height(10.dp))
-                            UserLocation.address?.let {
+                            userLocation.address?.let {
                                 DroppedProfileLocation(trim = true, backgroundColor = Color.Transparent,location = it)
                             }
                         }
@@ -291,6 +293,8 @@ fun DroppedProfilesUI(
                            // .nestedScroll(scrollBehavior.nestedScrollConnection),
                        , columns = StaggeredGridCells.Fixed(2),
                         contentPadding = PaddingValues(2.dp),
+                        verticalItemSpacing = 3.dp,
+                        horizontalArrangement = Arrangement.spacedBy(3.dp)
                     ) {
                         droppedProfilesList?.itemCount?.let {
                             items(it) { index ->
@@ -385,14 +389,14 @@ fun LazyRowItem(item: Item) {
 fun DroppedProfileItem(profile: DropProfileResponse, onProfileClicked:()->Unit) {
     Box(
         modifier = Modifier
-            .shadow(elevation = 60.dp)
+            .shadow(elevation = 10.dp)
             .zIndex(4f)
             .clickable { onProfileClicked() }
             .padding(2.dp)
             .fillMaxWidth()
             .height(300.dp)
             .clip(shape = RoundedCornerShape(10.dp))
-            .background(color = Color.White))
+            .background(color = Color.Black))
     {
         AsyncImage(model = imagePrefix + profile.image, // Replace with your image resource
             contentDescription = "Background Image",
@@ -437,7 +441,7 @@ fun DroppedProfileItem(profile: DropProfileResponse, onProfileClicked:()->Unit) 
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Text(
-                            text = profile.createdBy.name,
+                            text = profile.createdBy.name ?: "",
                             modifier = Modifier
                                 .shadow(elevation = 10.dp, spotColor = Color.White)
                                 .fillMaxWidth(0.6f),
@@ -453,7 +457,8 @@ fun DroppedProfileItem(profile: DropProfileResponse, onProfileClicked:()->Unit) 
                             fontFamily = Constants.FONT_LIGHT,
                             fontWeight = FontWeight.Bold,
                             fontSize = 10.sp,
-                            modifier=Modifier.shadow(elevation = 60.dp)
+                            modifier= Modifier
+                                .shadow(elevation = 60.dp)
                                 .zIndex(2f),
                             color = Color.White
                         )

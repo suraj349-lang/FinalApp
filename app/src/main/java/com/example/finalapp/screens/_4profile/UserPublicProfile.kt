@@ -74,7 +74,7 @@ fun UserPublicProfile(eventsViewModel: EventsViewModel,navController:NavHostCont
                         paddingValues = it,
                         user = response.data,
                         onSendMessageClicked = {
-                                               navController.navigate(SCREENS.SINGLE_CHAT.createPath(response.data.username,response.data.userId))
+                                               navController.navigate(SCREENS.SINGLE_CHAT.createPath(response.data.userName,response.data.user))
                         },
                         onBackPressed = { navController.navigateUp() }
                     )

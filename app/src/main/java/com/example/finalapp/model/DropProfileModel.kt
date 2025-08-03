@@ -27,7 +27,7 @@ data class DropProfileResponse(
     val expirationTime:String,
     val validTill:String? =null,
     val createdAt:String?=null,
-    val createdBy:User,
+    val createdBy:User=User(),
 )
 
 data class DropProfileResponseModel(

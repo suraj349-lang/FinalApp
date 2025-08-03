@@ -20,6 +20,7 @@ import androidx.navigation.NavController
 import com.example.finalapp.model.Event
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens.dialogBox.uriToFile
+import com.example.finalapp.utils.UserLocationObject
 import com.example.finalapp.viewmodels.EventsViewModel
 import java.io.File
 
@@ -46,20 +47,13 @@ fun CreateEventMainScreenOld(parentEventId:String ?= null,navController: NavCont
     var location by remember {
         mutableStateOf("")
     }
-    val success by eventsViewModel.createEventIsSuccess.collectAsState()
-    val loading by eventsViewModel.createEventIsLoading.collectAsState()
+
     val context= LocalContext.current
+    val userLocation by UserLocationObject.userLocation.collectAsState()
     var showButton by remember {
         mutableStateOf(false)
     }
-    if(loading) CircularProgressIndicator()
-    if(success){
-        Toast.makeText(LocalContext.current,"Event created successfully",Toast.LENGTH_SHORT).show()
-        navController.navigate(SCREENS.HOME.route){
-            popUpTo(0)
-        }
-        eventsViewModel.createEventIsSuccess.value=false
-    }
+
 
 
     Scaffold(
@@ -72,11 +66,11 @@ fun CreateEventMainScreenOld(parentEventId:String ?= null,navController: NavCont
                 var imageFile by mutableStateOf<File?>(null)
                 if(uri != Uri.EMPTY) imageFile = uriToFile(uri!!, context )
                 imageFile?.let {
-                    eventsViewModel.uploadImageAndThenCreateEvent(UserObject.user.value.userId , it){ imageKey->
+                    eventsViewModel.uploadImageAndThenCreateEvent(UserObject.user.value.user , it){ imageKey->
                         eventsViewModel.createEvent(
                             Event(
-                                user = UserObject.user.value.userId ,
-                                userName = UserObject.user.value.username,
+                                user = UserObject.user.value.user ,
+                                userName = UserObject.user.value.userName,
                                 title=type,
                                 image = imageKey,
                                 location = location,
@@ -111,7 +105,10 @@ fun CreateEventMainScreenOld(parentEventId:String ?= null,navController: NavCont
                     }
                 }
                 CREATE_EVENT.LOCATION ->{
-                    AddLocationCreateEvent{
+                    AddLocationCreateEvent(
+                        city = userLocation.city ?: "",
+                        country = userLocation.country ?: ""
+                    ){
                         location=it;
                         page= CREATE_EVENT.PREVIEW
                     }

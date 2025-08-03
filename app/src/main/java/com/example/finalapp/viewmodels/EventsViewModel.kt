@@ -39,11 +39,13 @@ import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRe
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
@@ -398,41 +400,21 @@ class EventsViewModel @Inject constructor(
         }
     }
 
-    var createEventResponse = MutableStateFlow<RequestState<EventResponseDTO>>(RequestState.Idle)
-    var createEventIsLoading = MutableStateFlow(false)
-    var createEventIsSuccess= MutableStateFlow(false)
+    var createEventResponse = MutableStateFlow<RequestState<String>>(RequestState.Idle)
     fun createEvent(data:Event){
-        createEventIsLoading.value=true
-        viewModelScope.launch(Dispatchers.IO) {
-//            if(data.location=="") return@launch
-            try {
-                when(val response=eventsRepository.createEvent(data)){
-                    is Resource.Success->{
-
-                        createEventIsLoading.value=false
-                        createEventResponse.value= RequestState.Success(response.data!!)
-                        createEventIsSuccess.value=true
-
-                    }
-                    is Resource.Error->{
-                        createEventIsLoading.value=false
-                        createEventIsSuccess.value=false
-                        Log.d("TAG","create event ${response.message.toString()}")
-                    }
-                    else->{
-                     }
+        createEventResponse.value=RequestState.Loading
+        viewModelScope.launch(Dispatchers.IO){
+            eventsRepository.createEvent(data)
+                .catch {
+                    Log.e(TAG, "createEvent: ${it.printStackTrace()}",it )
+                    createEventResponse.value=RequestState.Error(it)
+                }.collect{
+                    createEventResponse.value=RequestState.Success(it.data)
                 }
-            }catch (e:Exception){
-                createEventIsLoading.value=false
-                createEventIsSuccess.value=false
-                Log.d("TAG","create event ${e.message.toString()}")
-            }
-            finally {
-                createEventIsLoading.value=false
-            }
-
         }
-
+    }
+    fun resetEventResponseState(){
+        createEventResponse.value=RequestState.Idle
     }
 
 
@@ -481,7 +463,6 @@ class EventsViewModel @Inject constructor(
             .collect {
                 if(it.success.uppercase() =="TRUE") {
                     Log.i(tag, "createPing: success")
-                    createEventIsSuccess.value=true
                     _createPingResponse.value = RequestState.Success(it.data);
                 }else{
                     Log.e(tag, it.message)
@@ -561,7 +542,8 @@ class EventsViewModel @Inject constructor(
                 _userDetailsUpdateResponse.value = RequestState.Error(it)
             }
             .collect { result ->
-                UserObject.updateBackgroundImage(result.data.backgroundImage)
+                 val updated=UserObject.user.value.copy(backgroundImage = backgroundImage)
+                storeUserState.saveUserInDataStore(updated)
                 _userDetailsUpdateResponse.value = RequestState.Success(result.data)
             }
     }

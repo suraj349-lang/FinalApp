@@ -39,7 +39,7 @@ class ChatViewModel @Inject constructor(
 
     private val socketManager by lazy { SocketManager()}
     fun connectSocket() {
-        socketManager.connect(UserObject.user.value.userId) { receivedMessage ->
+        socketManager.connect(UserObject.user.value.user) { receivedMessage ->
             Log.d("Messageschat", "connectSocket:${receivedMessage} ")
             _messagesFromServer.update { oldState ->
                 when (oldState) {

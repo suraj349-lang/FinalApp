@@ -32,10 +32,10 @@ class PushNotificationService: FirebaseMessagingService() {
         super.onNewToken(token)
         try {
             CoroutineScope(Dispatchers.IO).launch {
-                if(UserObject.user.value != User() && UserObject.user.value.userId.isNotEmpty()) {
+                if(UserObject.user.value != User() && UserObject.user.value.user.isNotEmpty()) {
                     authRepository.updateFcmToken(
                         SendFcmTokenDto(
-                            UserObject.user.value.userId,
+                            UserObject.user.value.user,
                             token
                         )
                     )

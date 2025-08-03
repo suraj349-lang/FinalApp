@@ -33,7 +33,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -135,7 +134,7 @@ fun EventScreenUI(
             Column(modifier = Modifier
                 .wrapContentSize()
                 .shadow(60.dp, spotColor = Color.White)) {
-                Text(text = event.user.username, fontFamily = Constants.USER_NAME_FONT,fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = Color.White)
+                Text(text = event.userName, fontFamily = Constants.USER_NAME_FONT,fontSize = 13.sp, fontWeight = FontWeight.SemiBold, color = Color.White)
                 EventTitle(event.title)
             }
         }
@@ -354,7 +353,7 @@ fun ChildMicroPosts(events: List<EventResponse>, onAddChildPostClicked: () -> Un
                             .fillMaxSize(), alpha = 0.8f,
                         filterQuality = FilterQuality.High
                     )
-                    Text(text = event.user.username, modifier = Modifier.align(Alignment.TopStart))
+                    Text(text = event.user.userName, modifier = Modifier.align(Alignment.TopStart))
                     Text(text = event.title, modifier = Modifier.align(Alignment.BottomStart))
                     Text(text = event.description ?: "", modifier = Modifier.align(Alignment.BottomStart))
                 }

@@ -80,6 +80,7 @@ class ImageUploadViewModel @Inject constructor(
     private var _userProfileImageUpdateStatus= MutableStateFlow<RequestState<User>>(RequestState.Idle)
     val userProfileImageUpdateStatus: StateFlow<RequestState<User>> =_userProfileImageUpdateStatus
     fun updateUserProfileImage(userId: String, url:String)=viewModelScope.launch {
+
         _userProfileImageUpdateStatus.value= RequestState.Loading
         Log.i("profileImage", "updateUserProfileImage: called in viewmodel ")
         profileRepository.updateProfileImage(userId,url)
@@ -87,6 +88,7 @@ class ImageUploadViewModel @Inject constructor(
                 _userProfileImageUpdateStatus.value= RequestState.Loading
             }
             .catch {
+                Log.e("updateUserProfileImage", "updateUserProfileImage: ${it.printStackTrace()}", it)
                 _userProfileImageUpdateStatus.value = RequestState.Error(it)
             }
             .collect{
@@ -96,9 +98,10 @@ class ImageUploadViewModel @Inject constructor(
                         storeUserState.saveUserInDataStore(updated)
                         _userProfileImageUpdateStatus.value = RequestState.Success(it.data)
                     } catch (e: Exception) {
-                        Log.e(TAG, "updateUserProfileImage: ${e.printStackTrace()}", e)
+                        Log.e("updateUserProfileImage", "updateUserProfileImage: ${e.printStackTrace()}", e)
                     }
                 }else{
+                    Log.e("updateUserProfileImage", "updateUserProfileImage: $it")
                     _userProfileImageUpdateStatus.value = RequestState.Error(Exception("Error uploading image"))
                 }
             }

@@ -1,16 +1,16 @@
 package com.example.finalapp.model
 
 data class Event(
-  val user: String,
-  val userName:String,
-  val title: String = "",
-  val description: String="",
-  val image: String,
-  val location: String = "",
-  val isChildPost :Boolean=false,
-  val parentPostId:String?=null,
-  val childPosts:List<Event> = listOf(),
-  val expirationTime: String,
+    val user: String,
+    val userName:String,
+    val title: String = "",
+    val description: String="",
+    val image: String,
+    val location: String = "",
+    val isChildPost :Boolean=false,
+    val parentPostId:String?=null,
+    val childPosts:List<Event> = listOf(),
+    val expirationTime: String,
 ){
   companion object{
     fun empty():Event{
@@ -34,6 +34,7 @@ data class Event(
 data class EventResponse(
   val _id:String,
   val user: User = User(),
+  val userName: String,
   val title: String="",
   val description: String? = null,
   val image: String = "",

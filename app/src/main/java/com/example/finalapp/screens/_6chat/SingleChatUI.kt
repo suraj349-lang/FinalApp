@@ -165,7 +165,7 @@ fun SingleChatScreenUI(
     // Fetch messages on startup or trigger
     LaunchedEffect(chatViewModel.canFetch.value) {
         if (chatViewModel.canFetch.value) {
-            chatViewModel.getAllMessages(UserObject.user.value.userId ?: "", chatListUserId)
+            chatViewModel.getAllMessages(UserObject.user.value.user ?: "", chatListUserId)
             chatViewModel.canFetch.value = false
         }
     }
@@ -214,7 +214,7 @@ fun SingleChatScreenUI(
                                     sent = message.sent,
                                     received = message.received,
                                     timestamp = message.timestamp,
-                                    isSentByLoggedInUser = message.senderId == UserObject.user.value.userId
+                                    isSentByLoggedInUser = message.senderId == UserObject.user.value.user
                                 )
                             }
                         }
@@ -315,7 +315,7 @@ fun SingleChatScreenUI(
                                             val newChat = ChatItem(
                                                 id = tempId,
                                                 message = inputText.trim(),
-                                                sentFrom = UserObject.user.value.userId ,
+                                                sentFrom = UserObject.user.value.user ,
                                                 sentTo = chatListUserId,
                                                 sent = 0,
                                                 received = false,

@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,6 +12,7 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -66,14 +68,24 @@ fun PasswordForPrivateUsername(onEnterClicked:(String)->Unit={},onDismiss:()->Un
             Column(
                 Modifier
                     .fillMaxWidth()
-                    .wrapContentHeight()
-                    .padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp), horizontalAlignment = Alignment.Start) {
-                Text(
-                    text = "Enter password to access private username",
-                    fontFamily = Constants.FONT_MEDIUM,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
+                    .wrapContentHeight(), verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.Start) {
+                Card(
+                    shape = RoundedCornerShape(topEnd = 6.dp, topStart = 6.dp),
+                    modifier = Modifier.padding(bottom = 16.dp)
+                        .fillMaxWidth()
+                        .height(70.dp),
+                    colors = CardDefaults.cardColors(containerColor = floatingActionBtnColor)
+                ) {
+                    Text(
+                        text = "Enter password to access private profile",
+                        fontFamily = Constants.FONT_MEDIUM,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color.White,
+                        lineHeight=18.sp,
+                        modifier = Modifier.padding(10.dp)
+                    )
+                }
                 OutlinedTextField(
                     value = password,
                     onValueChange = {
@@ -81,6 +93,7 @@ fun PasswordForPrivateUsername(onEnterClicked:(String)->Unit={},onDismiss:()->Un
                             password = it
                         }
                     },
+                    modifier = Modifier.padding(horizontal = 16.dp),
                     placeholder = {
                         Text(
                             text = "******",
@@ -111,10 +124,15 @@ fun PasswordForPrivateUsername(onEnterClicked:(String)->Unit={},onDismiss:()->Un
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                     Button(
                         onClick = { onEnterClicked(password) },
-                        modifier=Modifier.clip(RoundedCornerShape(6.dp)),
+                        modifier=Modifier.clip(RoundedCornerShape(6.dp)).padding(top=16.dp),
                         enabled= password.length==6,
-                        colors = ButtonDefaults.buttonColors(containerColor = floatingActionBtnColor,
-                            contentColor = Color.White)
+                        colors = ButtonDefaults
+                            .buttonColors(
+                                containerColor = Color(0xFF022C04),
+                                contentColor = Color.White,
+                                disabledContainerColor = Color.DarkGray,
+                                disabledContentColor = Color.White
+                            )
                     ) {
                         Text(
                             text = "Enter ->", fontFamily = Constants.FONT_MEDIUM,

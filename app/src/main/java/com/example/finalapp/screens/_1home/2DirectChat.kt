@@ -1,7 +1,7 @@
 package com.example.finalapp.screens._1home
 
 
-import android.util.Log
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -55,6 +55,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -83,13 +84,14 @@ import com.example.finalapp.screens.common.CommonErrorScreen
 import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.utils.UserObject
 import com.example.finalapp.utils.RequestState
-import com.example.finalapp.utils.UserLocation
+import com.example.finalapp.utils.UserLocationObject
 import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.viewmodels.AuthViewModel
 import com.example.finalapp.viewmodels.EventsViewModel
+import com.google.accompanist.pager.ExperimentalPagerApi
 
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class, ExperimentalPagerApi::class)
 @Composable
 fun DirectChatScreen(
     scrollBehavior: TopAppBarScrollBehavior,
@@ -104,14 +106,15 @@ fun DirectChatScreen(
         mutableStateOf(false)
     }
     val user by UserObject.user.collectAsState()
+    val userLocation by UserLocationObject.userLocation.collectAsState()
 
     LaunchedEffect(key1 =shareProfileClickedON){
         if(shareProfileClickedON ){
             eventsViewModel.checked.value=!checked
-            eventsViewModel.sendDirectChatData(DirectChatRequest( UserObject.user.value.userId,authViewModel.latitude.value,authViewModel.longitude.value))
+            eventsViewModel.sendDirectChatData(DirectChatRequest( UserObject.user.value.user,authViewModel.latitude.value,authViewModel.longitude.value))
         } else {
             if(remove){
-                eventsViewModel.removeUserFromDirectChat(UserObject.user.value.userId)
+                eventsViewModel.removeUserFromDirectChat(UserObject.user.value.user)
                 remove=false
             }
             // eventsViewModel.emptyNearByUsersList()
@@ -135,7 +138,7 @@ fun DirectChatScreen(
                         .wrapContentHeight()){
                         if(checked) {
                             Text(
-                                text = "Users near you",
+                                text = "Verified users near you",
                                 fontFamily = Constants.FONT_MEDIUM,
                                 color = floatingActionBtnColor,
                                 fontWeight = FontWeight.ExtraBold,
@@ -161,6 +164,7 @@ fun DirectChatScreen(
                                     .padding(end = 16.dp)
                             )
                         }else{
+
                             Column(modifier = Modifier
                                 .align(Alignment.TopEnd)
                                 .padding(end = 16.dp, top = 16.dp), verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally) {
@@ -170,23 +174,14 @@ fun DirectChatScreen(
                                     Text(text = "Edit",fontFamily = Constants.FONT_LIGHT, color = Color(0xFF280636), fontSize = 9.sp)
                                 }
                             }
-                            Column(modifier = Modifier
-                                .fillMaxWidth()
-                                .wrapContentHeight()
-                                .align(Alignment.TopCenter), verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.direct_chat),
-                                    contentDescription = "",
-                                    modifier = Modifier
-                                        .size(100.dp)
-                                )
-                                Text(text = "Connect to nearby people.", fontFamily = Constants.FONT_MEDIUM, color = Color(0xFF520772), fontWeight = FontWeight.ExtraBold, fontSize = 24.sp)
-                                Text(text = "Click connect to share your profile!", style = TextStyle(textDecoration = TextDecoration.Underline),fontFamily = Constants.FONT_MEDIUM, color = Color(0xFF280636), fontSize = 14.sp) //0xFF520772 0xFF256828 0xFF045708
+                            Column(modifier = Modifier.wrapContentSize().align(Alignment.TopCenter)) {
+                                DirectChatHorizontalPager()
                             }
                         }
                     }
                     DirectChatUI(
-                        user!!,
+                        user,
+                        address = userLocation.address ?: "",
                         scrollBehavior,
                         eventsViewModel,
                         navController,
@@ -204,6 +199,7 @@ fun DirectChatScreen(
 @Composable
 fun DirectChatUI(
     user: User,
+    address:String,
     scrollBehavior: TopAppBarScrollBehavior,
     eventsViewModel: EventsViewModel,
     navController: NavHostController,
@@ -211,7 +207,7 @@ fun DirectChatUI(
     onShareProfileClicked: () -> Unit
 ) {
     if (!checked ) {
-        ShareProfileForDirectChat(user,onShareProfileClicked)
+        ShareProfileForDirectChat(user, address = address,onShareProfileClicked)
     } else {
         DirectChatProfiles(scrollBehavior,navController, eventsViewModel )
     }
@@ -255,8 +251,8 @@ fun DirectChatProfiles(
                     user?.let {
                         DirectChatItem(
                             user=it,
-                            onProfileClicked = { navController.navigate(SCREENS.USER_PUBLIC_PROFILE.createPath(it.userId.userId)) },
-                            onSendMessageClicked = { eventsViewModel.saveUserToChatList(UserObject.user.value.userId, it.userId.userId) }
+                            onProfileClicked = { navController.navigate(SCREENS.USER_PUBLIC_PROFILE.createPath(it.userId.user)) },
+                            onSendMessageClicked = { eventsViewModel.saveUserToChatList(UserObject.user.value.user, it.userId.user) }
                         )
                     }
                 }
@@ -317,7 +313,11 @@ fun DirectChatItem(
                 containerColor = Color.Black,
             )
         ) {
-            Text(text = "Send Message", color = Color.White,fontFamily = Constants.FONT_LIGHT)
+            Row(modifier = Modifier.wrapContentWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Image(painter = painterResource(id = R.drawable.chat_new), contentDescription ="", modifier = Modifier.size(16.dp), colorFilter = ColorFilter.tint(Color.White) )
+                Text(text = "Send Message", color = Color.White,fontFamily = Constants.FONT_LIGHT)
+            }
+
         }
         Divider(color = floatingActionBtnColor, thickness = 0.5.dp)
 
@@ -327,7 +327,7 @@ fun DirectChatItem(
 
 
 @Composable
-fun ShareProfileForDirectChat(user:User,onShareProfileClicked: () -> Unit) {
+fun ShareProfileForDirectChat(user:User,address:String,onShareProfileClicked: () -> Unit) {
     val shimmerColors = listOf(
         Color.White.copy(alpha = 0.1f),
         Color.White.copy(alpha = 0.4f),
@@ -380,7 +380,7 @@ fun ShareProfileForDirectChat(user:User,onShareProfileClicked: () -> Unit) {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = user.username,
+                        text = user.userName,
                         overflow = TextOverflow.Ellipsis,
                         fontFamily = Constants.FONT_LIGHT,
                         fontSize = 18.sp,
@@ -389,7 +389,7 @@ fun ShareProfileForDirectChat(user:User,onShareProfileClicked: () -> Unit) {
                     )
                     //0xFF2CA832  0xFF045708 0xFF77209C
 
-                    UserLocation.address?.let { DroppedProfileLocation(location = it, backgroundColor = Color(0xFF558B26), trim = true) }
+                    DroppedProfileLocation(location = address, backgroundColor = Color(0xFF558B26), trim = true)
 
                     Box(
                         modifier = Modifier
@@ -432,5 +432,4 @@ fun ShareProfileForDirectChat(user:User,onShareProfileClicked: () -> Unit) {
             }
 
     }
-
 }

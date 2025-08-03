@@ -15,10 +15,10 @@ data class RegisterUserModel(
 @Serializable
 data class User(
     @SerializedName("_id")
-    val userId:String,
+    val user:String,
     val name:String,
     val number:String,
-    val username: String,
+    val userName: String,
     val token: String,
     val address: String,
     val offers:List<String>?=null,
@@ -37,4 +37,6 @@ data class OkResponse(
     val success: Boolean,
     val data: User
 )
+
+
 

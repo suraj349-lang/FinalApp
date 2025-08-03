@@ -21,6 +21,7 @@ import com.example.finalapp.model.pings.PingRequestDto
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens.dialogBox.uriToFile
 import com.example.finalapp.utils.RequestState
+import com.example.finalapp.utils.UserLocationObject
 import com.example.finalapp.viewmodels.EventsViewModel
 import java.io.File
 
@@ -47,6 +48,7 @@ fun CreatePingMainScreen(navController: NavController, eventsViewModel: EventsVi
     var location by remember {
         mutableStateOf("")
     }
+    val userLocation by UserLocationObject.userLocation.collectAsState()
 
     val context= LocalContext.current
     var showButton by remember {
@@ -82,11 +84,11 @@ fun CreatePingMainScreen(navController: NavController, eventsViewModel: EventsVi
                 var imageFile by mutableStateOf<File?>(null)
                 if(uri != Uri.EMPTY) imageFile = uriToFile(uri!!, context )
                 imageFile?.let {
-                    eventsViewModel.uploadImageAndThenCreateEvent(UserObject.user.value.userId , it){ imageKey->
+                    eventsViewModel.uploadImageAndThenCreateEvent(UserObject.user.value.user , it){ imageKey->
                         eventsViewModel.createPing(
                             PingRequestDto(
-                                user =UserObject.user.value.userId ,
-                                userName = UserObject.user.value.username,
+                                user =UserObject.user.value.user ,
+                                userName = UserObject.user.value.userName,
                                 title=type,
                                 image = imageKey,
                                 category = type,
@@ -120,7 +122,10 @@ fun CreatePingMainScreen(navController: NavController, eventsViewModel: EventsVi
                     }
                 }
                 CREATE_PING.LOCATION ->{
-                    AddLocationCreatePing{
+                    AddLocationCreatePing(
+                        city = userLocation.city ?: "",
+                        country = userLocation.country ?: ""
+                    ){
                         location=it;
                         page= CREATE_PING.PREVIEW
                     }

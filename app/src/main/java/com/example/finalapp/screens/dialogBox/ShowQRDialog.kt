@@ -1,22 +1,29 @@
 package com.example.finalapp.screens.dialogBox
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
@@ -39,16 +46,28 @@ import com.example.finalapp.utils.testdata.DynamicText
 @Composable
 fun ShowQRDialog(navController: NavHostController, onDismiss: () -> Unit) {
     val context= LocalContext.current
+    val user by UserObject.user.collectAsState()
     Dialog(onDismissRequest = { onDismiss() }, properties = DialogProperties(
         dismissOnBackPress = true,dismissOnClickOutside = true
     )
     ) {
-        Card(
-            shape = RoundedCornerShape(10.dp),
+        Box(
             modifier = Modifier
                 .wrapContentSize()
-                .padding(8.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF000000)) //0xFF1C1B2F
+                .padding(8.dp)
+                .clip(shape = RoundedCornerShape(10.dp))
+                .background(
+//                    brush = Brush.sweepGradient(
+//                        colors = listOf(
+//                            Color(0xFF689F38), Color(0xFFAFB42B)
+//                        )
+//                    )
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            Color(0xFFFBC02D), Color(0xFFFFA000)
+                        )
+                    )
+                )
         ) {
             Column(modifier = Modifier
                 .wrapContentSize()
@@ -56,15 +75,26 @@ fun ShowQRDialog(navController: NavHostController, onDismiss: () -> Unit) {
                 Text(
                     text = Constants.APP_NAME,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 8.dp),
                     color = floatingActionBtnColor,
                     fontSize = 20.sp,
                     fontFamily = Constants.APP_NAME_FONT
                 )
+                Text(
+                    text = "Get the qr code scanned to connect to you.",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 8.dp),
+                    color = floatingActionBtnColor,
+                    fontSize =11.sp,
+                    fontFamily = Constants.FONT_EXTRA_LIGHT
+                )
 
-                QRCode(userIMAGE = UserObject.user.value.profileImage,userId = UserObject.user.value.userId)
+                QRCode(userIMAGE = user.profileImage,userId = user.user)
 
-                DynamicText(text = UserObject.user.value.username, color = Color.White, fontSize = 16.sp, fontFamily = Constants.FONT_MEDIUM, fontWeight = FontWeight.Bold)
+                DynamicText(text = user.userName, color = Color.White, fontSize = 16.sp, fontFamily = Constants.FONT_MEDIUM, fontWeight = FontWeight.Bold)
 
                 Divider(modifier = Modifier.fillMaxWidth(), thickness = 0.5.dp, color = Color(0xFF745509))
 
@@ -72,18 +102,32 @@ fun ShowQRDialog(navController: NavHostController, onDismiss: () -> Unit) {
 
                     Image(painter = painterResource(id = R.drawable.color_camera), contentDescription ="", modifier = Modifier.size(40.dp), colorFilter = ColorFilter.tint(Color.Transparent) )
 
-                    Column(modifier = Modifier
-                        .clickable {
-                            navController.navigate("qrcode")
+                    Column(
+                        modifier = Modifier
+                            .clickable { navController.navigate("qrcode") }
+                            .wrapContentSize(),
+                        verticalArrangement = Arrangement.Top,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+//                        Image(
+//                            painter = painterResource(id = R.drawable.color_camera),
+//                            contentDescription = "",
+//                            modifier = Modifier.size(50.dp)
+//                        )
+                        Card(modifier = Modifier.size(50.dp), shape = CircleShape, colors = CardDefaults.cardColors(containerColor = Color.White)) {
+                             Card(modifier = Modifier
+                                 .padding(4.dp)
+                                 .size(50.dp)
+                                 .clip(CircleShape), colors = CardDefaults.cardColors(containerColor = floatingActionBtnColor)) {
+
+                             }
                         }
-                        .wrapContentSize(), verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally) {
-                        Image(painter = painterResource(id = R.drawable.color_camera), contentDescription ="", modifier = Modifier.size(40.dp) )
 
                         DynamicText(text = "Scan QR", color = Color.White)
                     }
                     Column(modifier = Modifier
                         .clickable {
-                            shareDeepLink(context, UserObject.user.value.userId)
+                            shareDeepLink(context, user.user)
                         }
                         .wrapContentSize(), verticalArrangement = Arrangement.Bottom, horizontalAlignment = Alignment.CenterHorizontally) {
                         Image(painter = painterResource(id = R.drawable.share), contentDescription ="", modifier = Modifier.size(20.dp), colorFilter = ColorFilter.tint(Color.White) )
@@ -91,8 +135,6 @@ fun ShowQRDialog(navController: NavHostController, onDismiss: () -> Unit) {
                         DynamicText(text = "Share", color = Color.White, fontSize = 10.sp)
                     }
                 }
-
-
             }
         }
     }
@@ -100,7 +142,7 @@ fun ShowQRDialog(navController: NavHostController, onDismiss: () -> Unit) {
 
 
 
-enum class showDialog{
+enum class ShowDialog{
     OPEN,
     CLOSE
 }

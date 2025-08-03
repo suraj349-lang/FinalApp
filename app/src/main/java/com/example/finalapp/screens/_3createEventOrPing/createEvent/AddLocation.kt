@@ -25,17 +25,17 @@ import com.example.finalapp.utils.UserLocation
 import com.example.finalapp.utils.constants.Constants
 
 @Composable
-fun AddLocationCreateEvent(onNextClicked: (String) -> Unit) {
-    val city=UserLocation.city  + ", " + UserLocation.country
+fun AddLocationCreateEvent(city:String,country:String,onNextClicked: (String) -> Unit) {
+    val cityCountry= "$city, $country"
     Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
         Text(text = "Your Location", fontFamily = Constants.FONT_MEDIUM, fontSize = 24.sp)
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
             Image(painterResource(id = R.drawable.location_new),contentDescription = null, modifier = Modifier.size(30.dp))
-            Text(text = city, modifier = Modifier , fontFamily = Constants.FONT_MEDIUM, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+            Text(text = cityCountry, modifier = Modifier , fontFamily = Constants.FONT_MEDIUM, fontSize = 20.sp, fontWeight = FontWeight.Bold)
         }
 
         Button(
-            onClick = { onNextClicked(city)} ,
+            onClick = { onNextClicked(cityCountry)} ,
             colors = ButtonDefaults.buttonColors(containerColor = floatingActionBtnColor),
             shape = RoundedCornerShape(6.dp)
             ) {

@@ -1,5 +1,6 @@
 package com.example.finalapp.screens._5settings
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,7 +10,9 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -22,13 +25,35 @@ import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import com.example.finalapp.ui.theme.floatingActionBtnColor
+import com.example.finalapp.utils.RequestState
+import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.utils.constants.Constants.DONGLE_NORMAL
+import com.example.finalapp.viewmodels.SettingsViewModel
 
 @Composable
-fun EditName(navController: NavHostController) {
+fun EditName(navController: NavHostController,settingsViewModel: SettingsViewModel) {
+    val context= LocalContext.current
     var name by remember {
         mutableStateOf(UserObject.user.value.name)
+    }
+    val updateName by settingsViewModel.updateName.collectAsState()
+    when(updateName){
+        is RequestState.Loading->{
+            LinearProgressIndicator()
+        }
+        is RequestState.Error ->{
+            settingsViewModel.resetNameStateToIdle()
+            Toast.makeText(context,"Error updating name, Try again!",Toast.LENGTH_SHORT).show()
+        }
+        is RequestState.Success ->{
+            settingsViewModel.resetNameStateToIdle()
+            Toast.makeText(context,"Name updated successfully.",Toast.LENGTH_SHORT).show()
+        }
+        else ->{
+
+        }
     }
     Scaffold(topBar = {
         CommonTopBar(title = "Your Display Name") {
@@ -43,16 +68,16 @@ fun EditName(navController: NavHostController) {
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(text = "Update Your Name", fontSize = 30.sp, fontFamily = DONGLE_BOLD)
-                OutlinedTextField(value = name ?: "", onValueChange = { name = it })
+                Text(text = "Update Your Name", fontSize = 24.sp, fontFamily = Constants.FONT_MEDIUM)
+                OutlinedTextField(value = name, onValueChange = { name = it })
                 Button(
-                    onClick = { /*TODO make and api call and then make a db call */ },
+                    onClick = {if(name.trim().isNotEmpty()) settingsViewModel.updateName(name)},
                     colors = ButtonDefaults.buttonColors(containerColor = floatingActionBtnColor)
                 ) {
                     Text(
                         text = "Update Name",
-                        fontFamily = DONGLE_NORMAL,
-                        fontSize = 20.sp,
+                        fontFamily = Constants.FONT_MEDIUM,
+                        fontSize = 14.sp,
                         color = Color.White
                     )
 
@@ -66,9 +91,29 @@ fun EditName(navController: NavHostController) {
 }
 
 @Composable
-fun EditUserName(navController: NavHostController) {
-    var username by remember {
-        mutableStateOf(UserObject.user.value.username)
+fun EditUserName(navController: NavHostController,settingsViewModel: SettingsViewModel) {
+    val savedUsername=UserObject.user.collectAsState()
+    var userName by remember {
+        mutableStateOf("")
+    }
+    val context= LocalContext.current
+    val updateUserName by settingsViewModel.updateUserName.collectAsState()
+    when(updateUserName){
+        is RequestState.Loading->{
+            LinearProgressIndicator()
+        }
+        is RequestState.Error ->{
+            Toast.makeText(context,"Error updating name, Try again!",Toast.LENGTH_SHORT).show()
+            settingsViewModel.resetUserNameStateToIdle()
+        }
+        is RequestState.Success ->{
+            userName=savedUsername.value.name
+            Toast.makeText(context,"Name updated successfully.",Toast.LENGTH_SHORT).show()
+            settingsViewModel.resetUserNameStateToIdle()
+        }
+        else ->{
+
+        }
     }
     Scaffold(topBar = {
         CommonTopBar(title = "Your UserName") {
@@ -84,9 +129,9 @@ fun EditUserName(navController: NavHostController) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(text = "Update Your UserName", fontSize = 30.sp, fontFamily = DONGLE_BOLD)
-                OutlinedTextField(value = username ?: "", onValueChange = { username = it })
+                OutlinedTextField(value = userName.ifEmpty { savedUsername.value.userName }, onValueChange = { userName = it })
                 Button(
-                    onClick = { /*TODO make and api call and then make a db call */ },
+                    onClick = {if(userName.trim().isNotEmpty()) { settingsViewModel.updateUserName(userName) }  },
                     colors = ButtonDefaults.buttonColors(containerColor = floatingActionBtnColor)
                 ) {
                     Text(

@@ -49,8 +49,8 @@ fun PingsItemUI(item: PingResponse,onShareClicked: () -> Unit,onRespondClicked: 
     ) {
         Column {
 
-            if(item.user !=null && item.user.username.isNotEmpty() && item.user.profileImage?.isNotEmpty() == true){
-                UserImageNameTime2(item.user.username,item.user.profileImage ?: "",item.expirationTime)
+            if(item.user !=null && item.user.userName.isNotEmpty() && item.user.profileImage?.isNotEmpty() == true){
+                UserImageNameTime2(item.user.userName,item.user.profileImage ?: "",item.expirationTime)
             }
             Column(
                 modifier = Modifier

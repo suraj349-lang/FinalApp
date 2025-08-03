@@ -89,7 +89,7 @@ fun ChatListScreen(navController: NavHostController,chatViewModel: ChatViewModel
         }
     }
     LaunchedEffect(key1 = Unit) {
-        chatViewModel.getUserChatList(user.userId)
+        chatViewModel.getUserChatList(user.user)
     }
 
     val chatListState by chatViewModel.getUserChatList.collectAsState()

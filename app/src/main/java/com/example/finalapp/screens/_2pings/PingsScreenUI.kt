@@ -55,6 +55,7 @@ import com.example.finalapp.screens._3createEventOrPing.CreateEventOrPingBottomS
 import com.example.finalapp.screens.common.CommonErrorScreen
 import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.utils.UserLocation
+import com.example.finalapp.utils.UserLocationObject
 import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
 import com.example.finalapp.viewmodels.EventsViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -68,6 +69,7 @@ fun PingsScreenUI(navController:NavHostController,eventsViewModel: EventsViewMod
     var isScrollingUp by remember { mutableStateOf(true) }
     var previousIndex by remember { mutableStateOf(0) }
     var previousScrollOffset by remember { mutableStateOf(0) }
+    val userLocation by UserLocationObject.userLocation.collectAsState()
     var showSheet by remember {
         mutableStateOf(false)
     }
@@ -75,7 +77,7 @@ fun PingsScreenUI(navController:NavHostController,eventsViewModel: EventsViewMod
     val allPingsState = allPings?.collectAsLazyPagingItems()
 
     LaunchedEffect(key1 = Unit){
-        eventsViewModel.getAllPings(UserLocation.address.toString())
+        eventsViewModel.getAllPings(userLocation.address.toString())
     }
 
     LaunchedEffect(listState) {

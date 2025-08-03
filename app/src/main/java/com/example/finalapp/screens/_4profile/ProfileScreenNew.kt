@@ -27,8 +27,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -36,8 +38,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -51,6 +57,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -62,6 +69,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavHostController
@@ -86,15 +94,17 @@ import com.example.finalapp.viewmodels.AuthViewModel
 import com.example.finalapp.viewmodels.EventsViewModel
 import com.example.finalapp.viewmodels.ImageUploadViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import kotlinx.coroutines.delay
 import java.io.File
 
-@OptIn(ExperimentalGlideComposeApi::class)
+@OptIn(ExperimentalGlideComposeApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewModel,eventsViewModel:EventsViewModel,imageUploadViewModel:ImageUploadViewModel) {
     val context= LocalContext.current
     var showPasswordDialog by remember {
         mutableStateOf(false)
     }
+    val lazyListState = rememberLazyListState()
     val user by UserObject.user.collectAsState()
 
     var showCustomDialog by remember { mutableStateOf(false) }
@@ -115,8 +125,8 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
             var imageFile by mutableStateOf<File?>(null)
             if(imageUri != Uri.EMPTY) imageFile = uriToFile(uri, context )
             imageFile?.let {
-                eventsViewModel.uploadImageAndThenCreateEvent(user.userId, it){ urlKey->
-                    eventsViewModel.updateUserDetails(user.userId, urlKey)
+                eventsViewModel.uploadImageAndThenCreateEvent(user.user, it){ urlKey->
+                    eventsViewModel.updateUserDetails(user.user, urlKey)
                 }
             }
         } else {
@@ -139,9 +149,9 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                         var imageFile by mutableStateOf<File?>(null)
                         if(uri != Uri.EMPTY) imageFile = uriToFile(uri, context )
                         Log.i("profileImage", "ProfileScreenNew: called with $imageFile")
-                        imageUploadViewModel.uploadImageAndThen(userId =user.userId, file = imageFile!!){ url->
+                        imageUploadViewModel.uploadImageAndThen(userId =user.user, file = imageFile!!){ url->
                             Log.i("profileImage", "updateUserProfileImage: called with $url")
-                            imageUploadViewModel.updateUserProfileImage(user.userId,url)
+                            imageUploadViewModel.updateUserProfileImage(user.user,url)
                         }
 
                         imageUploadViewModel.startProfileImageUpload.value=false
@@ -183,26 +193,56 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
     if(showPasswordDialog){
         PasswordForPrivateUsername(onDismiss = {showPasswordDialog=false}, onEnterClicked = {navController.navigate(SCREENS.PRIVATE_PROFILE.route)})
     }
-    LaunchedEffect(key1 = user.userId){
+    LaunchedEffect(key1 = user.user){
         if(eventsViewModel.canFetchEvents.value && eventsViewModel.canFetchDroppedProfiles.value) {
-            eventsViewModel.getUserPings(user.userId)
-            eventsViewModel.getUserEvents(user.userId)
-            eventsViewModel.getUserDropProfiles(user.userId)
+            eventsViewModel.getUserPings(user.user)
+            eventsViewModel.getUserEvents(user.user)
+            eventsViewModel.getUserDropProfiles(user.user)
         }
     }
-    Surface(modifier = Modifier
+    var isRefreshing by remember { mutableStateOf(false) }
+    LaunchedEffect(isRefreshing) {
+        if (isRefreshing) {
+            eventsViewModel.getUserPings(user.user)
+            eventsViewModel.getUserEvents(user.user)
+            eventsViewModel.getUserDropProfiles(user.user)
+            delay(1500L)
+            isRefreshing = false
+        }
+    }
+
+
+    val pullRefreshState = rememberPullRefreshState(
+        refreshing = isRefreshing,
+        onRefresh = { isRefreshing = true }
+    )
+    Box(modifier = Modifier
         .fillMaxSize()
-        .statusBarsPadding(), color = backgroundColor) {
-        Column(modifier = Modifier
+        .pullRefresh(pullRefreshState)
+        .background(color = backgroundColor)) {
+        PullRefreshIndicator(
+            refreshing = isRefreshing,
+            state = pullRefreshState,
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = 16.dp) // for spacing
+                .zIndex(1f),
+            backgroundColor = Color.White,
+            contentColor = Color.Black
+        )
+        LazyColumn(modifier = Modifier
             .fillMaxSize()
-            .navigationBarsPadding()
-            .verticalScroll(rememberScrollState())) {
-                Box(modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-                    .background(color = upperCardColor)){ // 0xFF1B1A1A
+            .statusBarsPadding()
+            .navigationBarsPadding(), state = lazyListState) {
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                        .background(color = upperCardColor)
+                ) { // 0xFF1B1A1A
                     AsyncImage(
-                        model =  imagePrefix+user.backgroundImage ,
+                        model = imagePrefix + user.backgroundImage,
                         contentDescription = "",
                         modifier = Modifier
                             .fillMaxSize()
@@ -217,22 +257,32 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                             .size(30.dp)
                             .clickable { navController.navigate(SCREENS.HOME.route) }
                             .align(Alignment.TopStart),
-                        contentScale = ContentScale.Crop, colorFilter = ColorFilter.tint(Color.White)
+                        contentScale = ContentScale.Crop,
+                        colorFilter = ColorFilter.tint(Color.White)
                     )
                     Row(modifier = Modifier
                         .wrapContentWidth()
                         .align(Alignment.TopEnd)
                         .clickable {
                             pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-                        }, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
-                        Text(text = "Add Background image", fontSize = 8.sp, fontFamily = Constants.FONT_MEDIUM, color = Color.White)
+                        },
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = "Add Background image",
+                            fontSize = 8.sp,
+                            fontFamily = Constants.FONT_MEDIUM,
+                            color = Color.White
+                        )
                         Image(
                             painterResource(id = R.drawable.edit_new),
                             contentDescription = "",
                             modifier = Modifier
                                 .padding(16.dp)
                                 .size(30.dp),
-                            contentScale = ContentScale.Crop, colorFilter = ColorFilter.tint(Color.White)
+                            contentScale = ContentScale.Crop,
+                            colorFilter = ColorFilter.tint(Color.White)
                         )
 
                     }
@@ -268,24 +318,34 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                                     elevation = 20.dp
                                 ) {
                                     //user dp
-                                    when(val response=imageUploadStatus){
-                                        is RequestState.Error -> Toast.makeText(context,"Error Uploading image",Toast.LENGTH_SHORT).show()
-                                        is RequestState.Success->{
+                                    when (imageUploadStatus) {
+                                        is RequestState.Error -> Toast.makeText(
+                                            context,
+                                            "Error Uploading image",
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+
+                                        is RequestState.Success -> {
                                             GlideImage(
-                                                model=  imagePrefix+user.profileImage,
+                                                model = imagePrefix + user.profileImage,
                                                 contentDescription = "",
-                                                modifier=Modifier.fillMaxSize(),
+                                                modifier = Modifier.fillMaxSize(),
                                                 contentScale = ContentScale.Crop
                                             )
                                         }
-                                        is RequestState.Loading ->{
-                                            CircularProgressIndicator(color=Color.LightGray, modifier = Modifier.size(10.dp))
+
+                                        is RequestState.Loading -> {
+                                            CircularProgressIndicator(
+                                                color = Color.LightGray,
+                                                modifier = Modifier.size(10.dp)
+                                            )
                                         }
-                                        else ->{
+
+                                        else -> {
                                             GlideImage(
-                                                model=  imagePrefix+user.profileImage,
+                                                model = imagePrefix + user.profileImage,
                                                 contentDescription = "",
-                                                modifier=Modifier.fillMaxSize(),
+                                                modifier = Modifier.fillMaxSize(),
                                                 contentScale = ContentScale.Crop
                                             )
                                         }
@@ -296,14 +356,14 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                                     modifier = Modifier.padding(start = 8.dp)
                                 ) {
                                     Text(
-                                        text =user.name ,
+                                        text = user.name,
                                         fontWeight = FontWeight.Bold,
-                                        fontFamily=Constants.FONT_MEDIUM,
+                                        fontFamily = Constants.FONT_MEDIUM,
                                         color = Color.White,
                                         fontSize = 18.sp
                                     )
                                     Text(
-                                        text = user.username,
+                                        text = user.userName,
                                         fontWeight = FontWeight.SemiBold,
                                         color = Color.White,
                                         fontSize = 10.sp
@@ -311,14 +371,29 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                                 }
                             }
                             Spacer(modifier = Modifier.height(10.dp))
-                            Row(modifier = Modifier
-                                .fillMaxWidth()
-                                .wrapContentHeight()) {
-                                Card(modifier = Modifier
-                                    .fillMaxWidth(0.5f)
-                                    .height(30.dp), backgroundColor = Color(0xFFFFFFFF).copy(alpha = 0.2f),border = BorderStroke(width = 2.dp, color = Color.White),shape = RoundedCornerShape(30.dp)) {
-                                    Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-                                        Text(text = "Edit account", color = Color.White, fontWeight = FontWeight.Bold)
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .wrapContentHeight()
+                            ) {
+                                Card(
+                                    modifier = Modifier
+                                        .fillMaxWidth(0.5f)
+                                        .height(30.dp),
+                                    backgroundColor = Color(0xFFFFFFFF).copy(alpha = 0.2f),
+                                    border = BorderStroke(width = 2.dp, color = Color.White),
+                                    shape = RoundedCornerShape(30.dp)
+                                ) {
+                                    Column(
+                                        Modifier.fillMaxSize(),
+                                        verticalArrangement = Arrangement.Center,
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        Text(
+                                            text = "Edit account",
+                                            color = Color.White,
+                                            fontWeight = FontWeight.Bold
+                                        )
                                     }
 
                                 }
@@ -326,13 +401,23 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                                 Card(modifier = Modifier
                                     .clickable { showPasswordDialog = true }
                                     .fillMaxWidth(1f)
-                                    .height(30.dp), backgroundColor = Color.White.copy(alpha = 0.5f),shape = RoundedCornerShape(30.dp)) {
-                                    Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-                                        Text(text = "Private profile", color = Color.White, fontWeight = FontWeight.Bold)
+                                    .height(30.dp),
+                                    backgroundColor = Color.White.copy(alpha = 0.5f),
+                                    shape = RoundedCornerShape(30.dp)) {
+                                    Column(
+                                        Modifier.fillMaxSize(),
+                                        verticalArrangement = Arrangement.Center,
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        Text(
+                                            text = "Private profile",
+                                            color = Color.White,
+                                            fontWeight = FontWeight.Bold
+                                        )
                                     }
 
                                 }
-                                
+
                             }
 
 
@@ -340,67 +425,86 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
 
                     }
 
+                }
             }
-            Column(modifier = Modifier.padding(start = 16.dp,end=16.dp,top=10.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                //--------------------------------------------------------------------------------
+            item {
+                Column(
+                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 10.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    //--------------------------------------------------------------------------------
 
-                when(val response=userEventsList){
-                    is RequestState.Loading -> CircularProgressIndicator()
-                    is RequestState.Error -> CommonErrorScreen(error = "Error getting events!", onRetryClicked = {
-                        eventsViewModel.getUserEvents(user.userId)
-                    })
-                    is RequestState.Success -> {
-                        MyEvents(response.data){
-                            navController.navigate(SCREENS.CREATE_EVENT.route)
+                    when (val response = userEventsList) {
+                        is RequestState.Loading -> CircularProgressIndicator()
+                        is RequestState.Error ->
+                            CommonErrorScreen(
+                                error = "Error getting events!",
+                                onRetryClicked = { eventsViewModel.getUserEvents(user.user) }
+                            )
+
+                        is RequestState.Success -> {
+                            MyEvents(response.data) {
+                                navController.navigate(SCREENS.CREATE_EVENT.route)
+                            }
                         }
-                    }
-                    else ->{}
-                }
 
-                //--------------------------------------------------------------------------------------
-
-                when(val response=userPingsList){
-                    is RequestState.Loading -> CircularProgressIndicator()
-                    is RequestState.Error -> CommonErrorScreen(error = "Error getting pings!"){
-                        eventsViewModel.getUserPings(user.userId)
+                        else -> {}
                     }
-                    is RequestState.Success -> {
-                        MyPings(response.data){
-                           navController.navigate(SCREENS.CREATE_PING.route)
+
+                    //--------------------------------------------------------------------------------------
+
+                    when (val response = userPingsList) {
+                        is RequestState.Loading -> CircularProgressIndicator()
+                        is RequestState.Error -> CommonErrorScreen(error = "Error getting pings!") {
+                            eventsViewModel.getUserPings(user.user)
                         }
+
+                        is RequestState.Success -> {
+                            MyPings(response.data) {
+                                navController.navigate(SCREENS.CREATE_PING.route)
+                            }
+                        }
+
+                        else -> {}
                     }
-                    else ->{}
+                    //--------------------------------------------------------------------------------
+
+                    when (val response = userDropProfilesList) {
+                        is RequestState.Loading -> CircularProgressIndicator()
+                        is RequestState.Error -> CommonErrorScreen(error = "Error getting events!") {
+                            eventsViewModel.getUserDropProfiles(user.user)
+                        }
+
+                        is RequestState.Success -> {
+                            RecentDrops(
+                                response.data.data,
+                                onDropProfileClicked = { showCustomDialog = !showCustomDialog },
+                                onItemClicked = {
+                                    val route = SCREENS.DROP_PROFILE_USER_PROFILE.createRoute(it)
+                                    navController.navigate(route)
+                                }
+                            )
+                        }
+
+                        else -> {}
+                    }
+
+                    //----------------------------------------------------------------------------------------
+
+
+                    //UserStatsScreen(12,12,34)
+                    LogoutUser(
+                        onLogoutClicked = {
+                            authViewModel.logout {
+                                navController.navigate(SCREENS.LOGIN.route) {
+                                    popUpTo(0) {
+                                        inclusive = true
+                                    } // This clears the entire back stack
+                                    launchSingleTop = true
+                                }
+                            }
+                        })
                 }
-                //--------------------------------------------------------------------------------
-
-                when(val response=userDropProfilesList){
-                    is RequestState.Loading -> CircularProgressIndicator()
-                    is RequestState.Error -> CommonErrorScreen(error = "Error getting events!"){
-                        eventsViewModel.getUserDropProfiles(user.userId)
-                    }
-                    is RequestState.Success -> {
-                        RecentDrops(
-                            response.data.data,
-                            onDropProfileClicked = { showCustomDialog = !showCustomDialog },
-                            onItemClicked = {
-                                val route=  SCREENS.DROP_PROFILE_USER_PROFILE.createRoute(it)
-                                navController.navigate(route)}
-                        )
-                    }
-
-                    else -> {}
-                }
-
-                //----------------------------------------------------------------------------------------
-
-
-                UserStatsScreen(12,12,34)
-                LogoutUser(
-                    onLogoutClicked = {authViewModel.logout {
-                    navController.navigate(SCREENS.LOGIN.route){
-                        popUpTo(0) { inclusive = true } // This clears the entire back stack
-                        launchSingleTop = true
-                } }})
             }
 
         }
@@ -418,18 +522,6 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
         navHostController = navController,
         onChangeImageClicked={ navController.navigate("camerax/profile");/*showImageCropper=true*/}
     )
-
-//    ImageUpdateDialogBox(
-//        showSheet=showSheetForImageUpdate,
-//        onDismiss = {showSheetForImageUpdate=false},
-//        temporaryImage,
-//        onCameraClicked = {cameraDialog=true},
-//        onGalleryClicked = {galleryDialog=true}
-//    )
-
-//    if (cameraDialog) { ImageCaptureFromCameraForDropProfile({imageFile=it}){imageUri=it} }
-//    if(galleryDialog) GalleryPickerForDropProfile(navController = navController,{imageFile=it}) { imageUri = it }
-
 }
 
 
@@ -496,7 +588,6 @@ fun MyEvents(items: List<EventResponse>, onAddEventClicked:()->Unit) {
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun MyEventItem(item: EventResponse) {
-    Log.i("CALLAPI", "LiveEventItem:$item ")
     Box(modifier = Modifier
         .size(180.dp) //120 earlier
         .padding(end = 8.dp, top = 8.dp)
@@ -564,6 +655,7 @@ fun RecentDrops(
 
                         }
                     }
+
                         Row(
                             modifier = Modifier
                                 .clickable { onDropProfileClicked() }
@@ -575,16 +667,18 @@ fun RecentDrops(
                             Image(
                                 painterResource(id = R.drawable.drop_profile_filled_rounded),
                                 contentDescription = "",
-                                colorFilter = ColorFilter.tint(Color(0xFF0481FD)),
+                                colorFilter = ColorFilter.tint(Color(0xFFE1E9F1)),
                                 modifier = Modifier
                                     .size(30.dp)
+                                    .shadow(elevation = 10.dp, spotColor = Color.White)
                             )
                             Text(
                                 text = "Drop your profile",
+                                modifier = Modifier.shadow(elevation = 10.dp, spotColor = Color.White),
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Bold,
                                 fontFamily = Constants.FONT_MEDIUM,
-                                color = Color.Black
+                                color = Color.White
                             )
                     }
                 }

@@ -15,7 +15,6 @@ import com.example.finalapp.database.Profile
 import com.example.finalapp.datastore.StoreLoginState
 import com.example.finalapp.datastore.StoreUserState
 import com.example.finalapp.fcm.stateObject.SendFcmTokenDto
-import com.example.finalapp.login.LoginMethod
 import com.example.finalapp.model.LatLng
 import com.example.finalapp.repository.ProfileDatabaseRepository
 import com.example.finalapp.model.LoginModel
@@ -23,7 +22,6 @@ import com.example.finalapp.model.RegisterUserModel
 import com.example.finalapp.model.SignupAPIResponse
 import com.example.finalapp.model.User
 import com.example.finalapp.utils.LoginState
-import com.example.finalapp.utils.UserObject
 import com.example.finalapp.utils.RequestState
 import com.example.finalapp.utils.TokenObject
 import com.google.firebase.ktx.Firebase
@@ -137,7 +135,7 @@ class AuthViewModel @Inject constructor(
                     try {
                         val fcmToken= Firebase.messaging.token.await()
                         if (fcmToken!=null) {
-                            repository.updateFcmToken(SendFcmTokenDto(userId = response.data.userId, fcmToken = fcmToken))
+                            repository.updateFcmToken(SendFcmTokenDto(userId = response.data.user, fcmToken = fcmToken))
                                 .catch {
                                     Log.d("FCMTOKENUPDATE", "loginUser error:$it ")
                                 }.collect {
@@ -149,10 +147,12 @@ class AuthViewModel @Inject constructor(
                         storeLoginState.saveUserToken( response.data.token)
                         _loginState.value = LoginState.Success(response.data)
                     } catch (e: Exception) {
+                        Log.e("LOGIN ERROR", "loginUser: ${e.printStackTrace()}",e )
                         _loginState.value = LoginState.Error("Issue in shared preference: ${e.message}")
                     }
                 } else {
-                    _loginState.value = LoginState.Error(response.success.toString())
+                    Log.e("LOGIN ERROR", "loginUser: $response" )
+                    _loginState.value = LoginState.Error(response.code.toString())
                 }
             }
     }

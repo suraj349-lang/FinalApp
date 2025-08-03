@@ -52,7 +52,7 @@ class SocketManager {
         messageData.put("senderId", newChatItem.sentFrom)
         messageData.put("receiverId", newChatItem.sentTo)
         messageData.put("message", newChatItem.message)
-        messageData.put("senderUserName",UserObject.user.value.username)
+        messageData.put("senderUserName",UserObject.user.value.userName)
         Log.d("SocketManager", "Emitting sendMessage event with data: $messageData")
         mSocket?.emit("sendMessage", messageData)
         Log.d("SocketManager", "sendMessage event emitted")

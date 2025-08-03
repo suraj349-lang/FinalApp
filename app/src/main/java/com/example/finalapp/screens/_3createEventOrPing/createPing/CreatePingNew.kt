@@ -72,7 +72,7 @@ import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens.dialogBox.uriToFile
 import com.example.finalapp.utils.UserObject
 import com.example.finalapp.utils.RequestState
-import com.example.finalapp.utils.UserLocation
+import com.example.finalapp.utils.UserLocationObject
 import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.viewmodels.EventsViewModel
 import java.io.File
@@ -102,6 +102,7 @@ fun CreatePingWrapper(navController: NavHostController, eventsViewModel: EventsV
     val isActive by remember {
         derivedStateOf {  title.isNotEmpty()}
     }
+    val userLocation by UserLocationObject.userLocation.collectAsState()
 
     val pickMedia = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         if (uri != null) {
@@ -148,16 +149,16 @@ fun CreatePingWrapper(navController: NavHostController, eventsViewModel: EventsV
                     } else return@CreatePingTopNew
                     imageFile?.let {
                         eventsViewModel.uploadImageAndThenCreateEvent(
-                            UserObject.user.value.userId ,
+                            UserObject.user.value.user ,
                             it
                         ) { imageKey ->
                             eventsViewModel.createPing(
                                 PingRequestDto(
-                                    user = UserObject.user.value.userId ,
-                                    userName = UserObject.user.value.username,
+                                    user = UserObject.user.value.user ,
+                                    userName = UserObject.user.value.userName,
                                     title = title,
                                     image = imageKey,
-                                    location = UserLocation.address.toString(),
+                                    location = userLocation.address.toString(),
                                     description = description,
                                     expirationTime = expiration.toString()
                                 )
@@ -224,7 +225,9 @@ fun CreatePing(
 
 @Composable
 fun SelectedImage(imageUri:Uri?) {
-    AsyncImage(model =imageUri , contentDescription = "", modifier = Modifier.width(100.dp).aspectRatio(9f/16f), contentScale = ContentScale.Fit)
+    AsyncImage(model =imageUri , contentDescription = "", modifier = Modifier
+        .width(100.dp)
+        .aspectRatio(9f / 16f), contentScale = ContentScale.Fit)
 }
 
 

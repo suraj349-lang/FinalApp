@@ -52,21 +52,9 @@ class EventsRepository @Inject constructor(private val api: ApiService) {
         return api.getAllDropProfiles(page)
     }
 
-   suspend fun createEvent(data:Event):Resource<EventResponseDTO>{
-       Log.i("eventsData", "createEvent: $data")
-        return try {
-          Resource.Loading(data=true)
-           val createEventsResponse =api.createEvent(data)
-           if(createEventsResponse.success){
-               Resource.Loading(data=false)
-           }
-            Resource.Success(data=createEventsResponse)
-       }catch (e:Exception){
-           Resource.Error(e.message.toString())
-
-       }
-
-   }
+   suspend fun createEvent(data:Event):Flow<EventResponseDTO> = flow {
+       emit(api.createEvent(data))
+   }.flowOn(Dispatchers.IO)
     fun getAllEvents(): Flow<AllEventsResponseDTO> = flow {
         emit(api.getAllEvents())
     }.flowOn(Dispatchers.IO)

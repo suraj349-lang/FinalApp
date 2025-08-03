@@ -35,12 +35,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import coil.compose.AsyncImage
-import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
 import com.example.finalapp.model.pings.PingResponse
 import com.example.finalapp.ui.imagePrefix
@@ -97,7 +95,7 @@ fun PingItem2(item: PingResponse) {
                 Spacer(Modifier.width(8.dp))
                 Column {
 
-                    item.user?.username?.let {
+                    item.user?.userName?.let {
                         Text(
                             text = it,
                             modifier = Modifier.zIndex(4f).shadow(

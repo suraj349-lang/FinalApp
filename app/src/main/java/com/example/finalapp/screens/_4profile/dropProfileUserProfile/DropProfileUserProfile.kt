@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -26,6 +27,7 @@ import androidx.compose.material.Card
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,22 +56,24 @@ import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.utils.formatDateTime
 
 // when the dropped profile is clicked then it is shown
+@OptIn(ExperimentalMaterial3Api::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DropProfileUserProfile(navController: NavHostController,dropProfileResponse: DropProfileResponse?) {
     val buttonsVisible = remember { mutableStateOf(true) }
     if(dropProfileResponse!=null) {
         Scaffold(
+            topBar = { },
           //  bottomBar = {BottomBar(navController = navController, state = buttonsVisible)},
             content = {
                 Surface(modifier = Modifier
-                    .background(Color.White)
+                    .background(Color.Transparent)
                     .padding(it)
                     .fillMaxSize()){
                     DropProfileUserProfileUI(
                         dropProfileResponse=dropProfileResponse,
                         onSendMessageClicked = {
-                            navController.navigate(SCREENS.SINGLE_CHAT.createPath(dropProfileResponse.createdBy.username,dropProfileResponse.createdBy.userId))
+                            navController.navigate(SCREENS.SINGLE_CHAT.createPath(dropProfileResponse.createdBy.userName,dropProfileResponse.createdBy.user))
                         },
                         onBackPressed = {navController.navigateUp()}
                     )
@@ -87,32 +91,36 @@ fun DropProfileUserProfile(navController: NavHostController,dropProfileResponse:
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun DropProfileUserProfileUI(dropProfileResponse: DropProfileResponse?,onSendMessageClicked:()->Unit,onBackPressed:()->Unit) {
-    val context= LocalContext.current
-    if (dropProfileResponse!=null) {
+    val context = LocalContext.current
+    if (dropProfileResponse != null) {
+        Box(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
+            Image(
+                painter = painterResource(id = R.drawable.baseline_arrow_back_24),
+                contentDescription = "Back",
+                modifier = Modifier.align(Alignment.TopStart)
+                    .clickable {onBackPressed() }
+                    .padding(8.dp)
+                    .shadow(elevation = 10.dp, spotColor = Color.White).zIndex(4f)
+                    .size(30.dp),
+                colorFilter = ColorFilter.tint(Color.White)
+            )
             Column(
-                modifier = Modifier
-                    .statusBarsPadding()
+                modifier = Modifier.padding(bottom = 16.dp)
                     .fillMaxSize()
+                    .navigationBarsPadding()
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Row(modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()) {
-                    Box(modifier = Modifier
+                Row(
+                    modifier = Modifier
                         .fillMaxWidth()
-                        .height(600.dp)) {
-                        Image(painter = painterResource(id = R.drawable.baseline_arrow_back_24),
-                            contentDescription = "",
-                            modifier = Modifier
-                                .shadow(elevation = 10.dp, spotColor = Color.White)
-                                .zIndex(4f)
-                                .align(Alignment.TopStart)
-                                .clickable { onBackPressed() }
-                                .padding(4.dp)
-                                .size(30.dp),
-                            colorFilter = ColorFilter.tint(Color.White)
-                        )
+                        .wrapContentHeight()
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(600.dp)
+                    ) {
                         GlideImage(
                             model = imagePrefix + dropProfileResponse.image,
                             contentDescription = "",
@@ -133,7 +141,7 @@ fun DropProfileUserProfileUI(dropProfileResponse: DropProfileResponse?,onSendMes
                                 fontWeight = FontWeight.SemiBold,
                                 fontSize = 20.sp,
                                 color = Color.White,
-                                lineHeight=12.sp,
+                                lineHeight = 12.sp,
                                 modifier = Modifier
                                     .shadow(elevation = 10.dp, spotColor = Color.White)
                                     .zIndex(4f)
@@ -148,33 +156,49 @@ fun DropProfileUserProfileUI(dropProfileResponse: DropProfileResponse?,onSendMes
                             )
                         }
 
-                        Image(painter = painterResource(id = R.drawable.share), contentDescription ="", modifier = Modifier
-                            .padding(end = 30.dp, bottom = 26.dp)
-                            .align(Alignment.BottomEnd)
-                            .clickable { shareDeepLink(context, dropProfileResponse.id ?: "") }
-                            .size(20.dp), colorFilter = ColorFilter.tint(Color.White) )
+                        Image(painter = painterResource(id = R.drawable.share),
+                            contentDescription = "",
+                            modifier = Modifier
+                                .padding(end = 30.dp, bottom = 26.dp)
+                                .align(Alignment.BottomEnd)
+                                .clickable { shareDeepLink(context, dropProfileResponse.id ?: "") }
+                                .size(20.dp),
+                            colorFilter = ColorFilter.tint(Color.White))
 
                     }
 
                 }
 
-                Row(modifier = Modifier
-                    .padding(start = 16.dp, end = 16.dp)
-                    .fillMaxWidth()
-                    .wrapContentHeight(),
+                Row(
+                    modifier = Modifier
+                        .padding(start = 16.dp, end = 16.dp)
+                        .fillMaxWidth()
+                        .wrapContentHeight(),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically) {
-                    Row(modifier = Modifier
-                        .wrapContentHeight()
-                        .fillMaxWidth(0.6f), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .wrapContentHeight()
+                            .fillMaxWidth(0.6f), horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
                         Card(modifier = Modifier.wrapContentSize(), shape = CircleShape) {
-                            GlideImage(model = imagePrefix+dropProfileResponse.createdBy.profileImage, contentDescription ="", modifier = Modifier.size(40.dp), contentScale = ContentScale.Crop )
+                            GlideImage(
+                                model = imagePrefix + dropProfileResponse.createdBy.profileImage,
+                                contentDescription = "",
+                                modifier = Modifier.size(40.dp),
+                                contentScale = ContentScale.Crop
+                            )
                         }
-                        Column(modifier = Modifier
-                            .fillMaxWidth()
-                            .wrapContentHeight(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.Start) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentHeight(),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.Start
+                        ) {
                             Text(
-                                text = dropProfileResponse.createdBy.username.lowercase(),
+                                text = dropProfileResponse.createdBy.userName.lowercase(),
                                 fontFamily = Constants.USER_NAME_FONT,
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Bold
@@ -195,12 +219,26 @@ fun DropProfileUserProfileUI(dropProfileResponse: DropProfileResponse?,onSendMes
                             }
                         }
                     }
-                    Button(onClick = { onSendMessageClicked() },
-                           colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF96053E))
+                    Button(
+                        onClick = { onSendMessageClicked() },
+                        colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF96053E))
                     ) {
-                        Row(modifier = Modifier.wrapContentSize(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Image(painter = painterResource(id = R.drawable.chat_new), contentDescription ="", modifier = Modifier.size(18.dp), colorFilter = ColorFilter.tint(Color.White) )
-                            Text(text = "Chat", color = Color.White, fontFamily = Constants.FONT_MEDIUM, fontSize = 16.sp)
+                        Row(
+                            modifier = Modifier.wrapContentSize(),
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.chat_new),
+                                contentDescription = "",
+                                modifier = Modifier.size(18.dp),
+                                colorFilter = ColorFilter.tint(Color.White)
+                            )
+                            Text(
+                                text = "Chat",
+                                color = Color.White,
+                                fontFamily = Constants.FONT_MEDIUM,
+                                fontSize = 16.sp
+                            )
                         }
                     }
 
@@ -222,7 +260,7 @@ fun DropProfileUserProfileUI(dropProfileResponse: DropProfileResponse?,onSendMes
                     )
                     Text(
                         text = formatDateTime(dropProfileResponse.validTill.toString()),
-                        modifier= Modifier,
+                        modifier = Modifier,
                         color = floatingActionBtnColor,
                         fontFamily = Constants.FONT_MEDIUM,
                         fontSize = 14.sp,
@@ -232,7 +270,7 @@ fun DropProfileUserProfileUI(dropProfileResponse: DropProfileResponse?,onSendMes
 
                 Text(
                     text = dropProfileResponse.message.capitalize(),
-                    modifier= Modifier
+                    modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 16.dp, top = 4.dp),
                     color = Color(0xFF021A31),
@@ -242,10 +280,11 @@ fun DropProfileUserProfileUI(dropProfileResponse: DropProfileResponse?,onSendMes
                 )
 
 
-              //  Divider(Modifier.fillMaxWidth(), thickness = 1.dp, color = Color.LightGray)
+                //  Divider(Modifier.fillMaxWidth(), thickness = 1.dp, color = Color.LightGray)
 
             }
 
         }
     }
+}
 

@@ -1,6 +1,5 @@
 package com.example.finalapp.screens._5settings
 
-import BottomBar
 import android.annotation.SuppressLint
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -10,7 +9,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -22,6 +23,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -49,14 +51,15 @@ import androidx.compose.ui.draw.shadow
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun SettingsScreenUI(navController: NavHostController,authViewModel: AuthViewModel){
-    val buttonVisible= remember { mutableStateOf(false) };
+    val buttonVisible= remember { mutableStateOf(true) };
+    val user by UserObject.user.collectAsState()
     var showSheet by remember {
         mutableStateOf(false)
     }
     val list= listOf(
-         MyAccount("Name", UserObject.user.value.name,SCREENS.EDIT_NAME.route) ,
-         MyAccount("Username", UserObject.user.value.username,SCREENS.EDIT_USER_NAME.route) ,
-         MyAccount("Phone Number", UserObject.user.value.number,SCREENS.PHONE_NUMBER.route) ,
+         MyAccount("Name", user.name,SCREENS.EDIT_NAME.route) ,
+         MyAccount("Username", user.userName,SCREENS.EDIT_USER_NAME.route) ,
+         MyAccount("Phone Number", user.number,SCREENS.PHONE_NUMBER.route) ,
          MyAccount("Password","",SCREENS.PASSWORD.route) ,
          MyAccount("Delete Account","",SCREENS.DELETE_ACCOUNT.route)
     )
@@ -67,7 +70,16 @@ fun SettingsScreenUI(navController: NavHostController,authViewModel: AuthViewMod
 
     Scaffold(
         topBar = { SettingsTopBar { navController.navigate(SCREENS.HOME.route) } },
-        bottomBar = { BottomBar(navController =navController , state = buttonVisible,modifier = Modifier.height(45.dp), onCreateEventClick = {showSheet=true}) }
+        bottomBar = {
+//            BottomBar(
+//                navController = navController,
+//                state = buttonVisible,
+//                modifier = Modifier.height(45.dp),
+//                highlightedTextColor = Constants.BOTTOM_BAR_ACTIVE_TEXT_COLOR,
+//                inactiveTextColor = Constants.BOTTOM_BAR_INACTIVE_TEXT_COLOR,
+//                inactiveIconColor = Constants.BOTTOM_BAR_INACTIVE_ICON_COLOR,
+//                onCreateEventClick = { showSheet = true })
+        }
     ) {
         Surface(
             Modifier
@@ -75,6 +87,7 @@ fun SettingsScreenUI(navController: NavHostController,authViewModel: AuthViewMod
                 .padding(it)) {
             Column(modifier = Modifier
                 .fillMaxSize()
+                .navigationBarsPadding()
                 .verticalScroll(rememberScrollState())) {
                 MyAccount(list as List<MyAccount>,navController)
                 SupportAndFeedback(list = listSupportAndFeedback,navController)
@@ -106,7 +119,9 @@ fun SettingsTopBar(onBackClicked: () -> Unit) {
                 fontFamily = Constants.FONT_MEDIUM
             )
         },
-        modifier = Modifier.shadow(elevation = 40.dp),
+        modifier = Modifier
+            .shadow(elevation = 10.dp)
+            .statusBarsPadding(),
         navigationIcon = { BackImage(onBackClicked) })
 }
 
@@ -119,18 +134,22 @@ fun MyAccount(list: List<MyAccount>,navController: NavHostController) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(45.dp),
+                .height(40.dp),
             shape = RoundedCornerShape(0.dp),
             colors = CardDefaults.cardColors(containerColor = LIGHT_GREY_BG_COLOR),
             border = BorderStroke(width = 0.25.dp, color = Color.LightGray)
         ) {
-            Text(
-                text = "MY ACCOUNT",
-                color = LIGHT_GREEN,
-                fontFamily = DONGLE_BOLD,
-                fontSize = 20.sp,
-                modifier = Modifier.padding(start = 16.dp)
-            )
+            Column(modifier = Modifier
+                .fillMaxSize()
+                .padding(start = 16.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.Start) {
+                Text(
+                    text = "MY ACCOUNT",
+                    color = LIGHT_GREEN,
+                    fontFamily = DONGLE_BOLD,
+                    fontSize = 20.sp,
+                    modifier = Modifier
+                )
+            }
         }
         list.forEach { 
             MyAccountUI(item = it, navController)

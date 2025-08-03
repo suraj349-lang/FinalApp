@@ -1,7 +1,6 @@
 package com.example.finalapp.screens._1home.publicEvent
 
 
-import android.provider.SyncStateContract.Constants
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
@@ -33,11 +32,7 @@ import com.example.finalapp.model.EventResponse
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens._1home.commentBottomSheet.CommentBottomSheet
 import com.example.finalapp.screens._1home.commonUI.shareDeepLink
-import com.example.finalapp.screens._1home.eventWarScreen.comments
 import com.example.finalapp.ui.imagePrefix
-import com.example.finalapp.ui.theme.PURPLE
-import com.example.finalapp.ui.theme.floatingActionBtnColor
-import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
 import com.example.finalapp.utils.constants.Constants.DONGLE_NORMAL
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
@@ -151,7 +146,7 @@ fun PublicEvent(  //currently in use
                     backgroundColor = Color.Transparent,
                     elevation = 0.dp
                 ) {
-                   UserData(event.user?.username ?: "testing", event.user?.profileImage ?: "")
+                   UserData(event.user?.userName ?: "testing", event.user?.profileImage ?: "")
 
                 }
             }

@@ -37,6 +37,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -60,7 +62,7 @@ import com.example.finalapp.screens._1home._1_1ExperimentScreenEvents.ActiveButt
 import com.example.finalapp.screens._1home._1_1ExperimentScreenEvents.DONGLE
 import com.example.finalapp.screens._1home._1_1ExperimentScreenEvents.SANS
 import com.example.finalapp.screens._1home._1_1ExperimentScreenEvents.images
-import com.example.finalapp.utils.UserLocation
+import com.example.finalapp.utils.UserLocationObject
 import com.example.finalapp.utils.UserObject
 import com.example.finalapp.utils.constants.Constants
 
@@ -69,6 +71,7 @@ import com.example.finalapp.utils.constants.Constants
 fun PreviewCreateEvent(uri: Uri?,
                        caption: String,
                        eventType: String) {
+    val userLocation by UserLocationObject.userLocation.collectAsState()
     Surface(modifier = Modifier
         .fillMaxSize().padding(16.dp)) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -90,7 +93,7 @@ fun PreviewCreateEvent(uri: Uri?,
                     .wrapContentHeight()
                     .align(Alignment.BottomCenter)) {
                     //------------------ username and user image----------------------------------------------------
-                    UsernameAndUserProfileImage(UserObject.user.value.username)
+                    UsernameAndUserProfileImage(UserObject.user.value.userName)
 
                     Divider(modifier = Modifier.fillMaxWidth(), thickness = 1.dp, color = Color.LightGray)
 
@@ -143,7 +146,7 @@ fun PreviewCreateEvent(uri: Uri?,
                                     .fillMaxWidth()
                                     .height(24.dp), shape = RoundedCornerShape(0.dp)
                             ) {
-                                RunningText4(UserLocation.address.toString())
+                                RunningText4(userLocation.address.toString())
                             }
                         }
                     }

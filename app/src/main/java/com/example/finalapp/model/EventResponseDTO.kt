@@ -1,9 +1,9 @@
 package com.example.finalapp.model
 
 data class EventResponseDTO(
-    val success:Boolean=false,
-    val code:Int=0,
-    val data: Event = Event.empty()
+    val success:Boolean,
+    val code:Int,
+    val data: String
 )
 
 data class PremiumEventResponseDTO(

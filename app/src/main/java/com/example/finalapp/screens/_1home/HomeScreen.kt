@@ -36,6 +36,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,9 +55,9 @@ import com.example.finalapp.screens._1home.commonUI.HomeTopBar
 import com.example.finalapp.screens._3createEventOrPing.CreateEventOrPingBottomSheet
 import com.example.finalapp.viewmodels.EventsViewModel
 import com.example.finalapp.screens.dialogBox.ShowQRDialog
-import com.example.finalapp.screens.dialogBox.showDialog
+import com.example.finalapp.screens.dialogBox.ShowDialog
 import com.example.finalapp.ui.TAB_ITEMS
-import com.example.finalapp.utils.UserLocation
+import com.example.finalapp.utils.UserLocationObject
 import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.viewmodels.ImageUploadViewModel
 import kotlinx.coroutines.delay
@@ -71,14 +72,15 @@ import kotlinx.coroutines.launch
 fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewModel, imageUploadViewModel: ImageUploadViewModel, authViewModel: AuthViewModel) {
     val buttonsVisible = remember { mutableStateOf(true) }
     val scope = rememberCoroutineScope()
-    var showQR: showDialog by remember { mutableStateOf(showDialog.CLOSE) }
+    var showQR: ShowDialog by remember { mutableStateOf(ShowDialog.CLOSE) }
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    val userLocation by UserLocationObject.userLocation.collectAsState()
 
 
-    if (showQR == showDialog.OPEN) {
+    if (showQR == ShowDialog.OPEN) {
         ShowQRDialog(
             navController = navController,
-            onDismiss = { showQR = showDialog.CLOSE }
+            onDismiss = { showQR = ShowDialog.CLOSE }
         )
     }
 
@@ -96,7 +98,7 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
         }
         else if (isRefreshing && pagerState.currentPage==1) {
             delay(1000L)
-            eventsViewModel.loadDirectChatUsers(UserLocation.latitude ?: 0.0,UserLocation.longitude ?: 0.0)
+            eventsViewModel.loadDirectChatUsers(userLocation.latitude ?: 0.0,userLocation.longitude ?: 0.0)
             delay(500L)
             isRefreshing = false
         }
@@ -126,7 +128,7 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
                 navIcon = true,
                 actionIcon = true,
                 icon = R.drawable.chat_new
-            ) { showQR = showDialog.OPEN }
+            ) { showQR = ShowDialog.OPEN }
         },
         modifier = Modifier.windowInsetsPadding(WindowInsets.systemBars),
         bottomBar = {
@@ -171,7 +173,7 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
                         },
                         backgroundColor = Constants.HOME_TOP_BAR_COLOR,
                         modifier = Modifier
-                         //   .border(width = 0.dp, color = Color.White)
+                            //   .border(width = 0.dp, color = Color.White)
                             .padding(bottom = 0.dp)
                             .fillMaxWidth()
                             .height(35.dp)
@@ -192,7 +194,9 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
                             )
                         }
                     }
-                    Box(modifier = Modifier.fillMaxSize().pullRefresh(pullRefreshState)) {
+                    Box(modifier = Modifier
+                        .fillMaxSize()
+                        .pullRefresh(pullRefreshState)) {
                         HorizontalPager(
                             state = pagerState,
                             modifier = Modifier

@@ -47,6 +47,7 @@ import com.example.finalapp.screens._3createEventOrPing.CreateEventOrPingBottomS
 import com.example.finalapp.screens.common.CommonErrorScreen
 import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.utils.UserLocation
+import com.example.finalapp.utils.UserLocationObject
 import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.viewmodels.EventsViewModel
 
@@ -70,6 +71,7 @@ fun PingScreenFinal(
     var searchQuery by remember { mutableStateOf("") }
     val cities = listOf(R.drawable.img_3, R.drawable.img_4)
     val girls = listOf(R.drawable.img, R.drawable.img_1, R.drawable.img_2)
+    val userLocation by UserLocationObject.userLocation.collectAsState()
     val cardColors = listOf(
         Color(0xFFEF476F), // Red
         Color(0xFF03CC98), // Green
@@ -86,7 +88,7 @@ fun PingScreenFinal(
         "Study" to 10f
     )
     LaunchedEffect(key1 = Unit){
-        eventsViewModel.getAllPings(UserLocation.address.toString())
+        eventsViewModel.getAllPings(userLocation.address.toString())
     }
     Scaffold(
         topBar = {
@@ -98,7 +100,9 @@ fun PingScreenFinal(
             Surface(modifier = Modifier.fillMaxSize()) {
                 LazyColumn(
                     //state = listState,
-                    modifier=Modifier.padding(it).background(color = Color.Black),
+                    modifier= Modifier
+                        .padding(it)
+                        .background(color = Color.Black),
                     contentPadding = PaddingValues(top = 0.dp, bottom = 16.dp))
                 {
 
