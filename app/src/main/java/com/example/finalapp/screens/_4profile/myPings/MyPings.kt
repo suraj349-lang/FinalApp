@@ -45,17 +45,6 @@ import com.example.finalapp.utils.constants.Constants
 fun MyPings(items: List<PingResponse>, onCreatePingClicked:()->Unit) {
     val pingsList= remember{ items}
     Column() {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Start
-        ) {
-            Text(text = "My Pings", color = Color.White,fontWeight = FontWeight.Bold,
-                fontSize=18.sp,
-                fontFamily = Constants.FONT_MEDIUM)
-        }
         LazyRow{
             items(pingsList){ item->
                 MyPingItem(item)

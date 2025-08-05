@@ -34,6 +34,7 @@ class DirectChatUsersPagingSource(
                     prevKey = if (page == 1) null else page - 1,
                     nextKey = if (body.isEmpty()) null else page + 1
                 )
+
             } else {
                 LoadResult.Error(Exception("API Error: ${response.errorBody()?.string()}"))
             }

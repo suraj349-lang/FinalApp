@@ -1,7 +1,5 @@
 package com.example.finalapp.model
 
-import com.bumptech.glide.request.RequestCoordinator.RequestState
-
 data class DirectChat(
     val userId:User,
     val lat: Double,

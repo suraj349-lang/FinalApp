@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
@@ -34,7 +35,8 @@ fun PingsTopBar(backgroundColor: Color, showIcon: Boolean, onBackClicked:()->Uni
                     modifier = Modifier.padding(end = 16.dp).size(28.dp).clickable { onSearchIconClicked() })
             }
         },
-        backgroundColor = backgroundColor
+        backgroundColor = backgroundColor,
+        modifier = Modifier.statusBarsPadding()
     )
 
 }

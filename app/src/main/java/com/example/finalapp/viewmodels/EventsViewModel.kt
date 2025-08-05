@@ -501,6 +501,7 @@ class EventsViewModel @Inject constructor(
                 _saveUserToChatListResponseState.value=RequestState.Error(it)
             }
             .collect {
+                Log.i("Userr", "saveUserToChatList: ${it.data}")
                 _saveUserToChatListResponseState.value = RequestState.Success(it.data)
             }
     }

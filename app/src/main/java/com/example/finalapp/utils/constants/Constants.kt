@@ -9,7 +9,7 @@ object Constants {
 
     const val IP_ADD ="3.108.55.84" //"192.168.1.19"//"192.168.1.2" //"3.108.55.84"
     const val SOCKET_CHAT_BASE_URL = "http://${IP_ADD}/chat/"
-    const val TEMP_SOCKET_URL = "http://${IP_ADD}/";
+    const val TEMP_SOCKET_URL = "http://3.108.55.84:5001/"
     const val BASE_URL = "http://${IP_ADD}/"
 
 

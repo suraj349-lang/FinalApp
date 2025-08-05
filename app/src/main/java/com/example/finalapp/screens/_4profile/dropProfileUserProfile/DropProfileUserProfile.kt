@@ -71,7 +71,7 @@ fun DropProfileUserProfile(navController: NavHostController,dropProfileResponse:
                     .padding(it)
                     .fillMaxSize()){
                     DropProfileUserProfileUI(
-                        dropProfileResponse=dropProfileResponse,
+                        dropProfileResponse = dropProfileResponse,
                         onSendMessageClicked = {
                             navController.navigate(SCREENS.SINGLE_CHAT.createPath(dropProfileResponse.createdBy.userName,dropProfileResponse.createdBy.user))
                         },

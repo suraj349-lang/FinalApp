@@ -104,6 +104,7 @@ fun SingleChatScreenUI(
     var inputText by remember { mutableStateOf("") }
     val context = LocalContext.current
     val activity = context as Activity
+    val user by UserObject.user.collectAsState()
 
     var isListening by remember { mutableStateOf(false) }
     var isRecording by remember { mutableStateOf(false) }
@@ -165,7 +166,7 @@ fun SingleChatScreenUI(
     // Fetch messages on startup or trigger
     LaunchedEffect(chatViewModel.canFetch.value) {
         if (chatViewModel.canFetch.value) {
-            chatViewModel.getAllMessages(UserObject.user.value.user ?: "", chatListUserId)
+            chatViewModel.getAllMessages(user.user, chatListUserId)
             chatViewModel.canFetch.value = false
         }
     }
@@ -194,12 +195,7 @@ fun SingleChatScreenUI(
             }
 
             if (showError) {
-                Text(
-                    text = "Error connecting to server",
-                    modifier = Modifier.padding(8.dp),
-                    color = Color.Red,
-                    fontFamily = Constants.FONT_MEDIUM
-                )
+                NoMessagesScreen(Modifier.weight(1f,true),"Error connecting to server")
             }
 
             when (messages) {
@@ -207,7 +203,7 @@ fun SingleChatScreenUI(
                     showLinearIndicator = false
                     val messageList = (messages as RequestState.Success<List<Message>>).data
                     if (messageList.isNotEmpty()) {
-                        LazyColumn(state = listState, modifier = Modifier.weight(1f)) {
+                        LazyColumn(state = listState, modifier = Modifier.weight(1f,true)) {
                             items(messageList) { message ->
                                 MessageItemUI(
                                     msg = message.message,
@@ -219,7 +215,7 @@ fun SingleChatScreenUI(
                             }
                         }
                     } else {
-                        NoMessagesScreen(modifier = Modifier.weight(1f))
+                        NoMessagesScreen(Modifier.weight(1f,true),"Say hi!")
                     }
                 }
                 is RequestState.Loading -> {
@@ -710,11 +706,15 @@ fun SingleChatTopBar(title: String,profileImage:String, navController: NavHostCo
 }
 
 @Composable
-fun NoMessagesScreen(modifier: Modifier) {
+fun NoMessagesScreen(modifier: Modifier,text:String) {
     Box(modifier) {
-        Text(text = "Say hi!", modifier = Modifier
+        Text(text = text, modifier = Modifier
             .fillMaxWidth()
-            .align(Alignment.Center), textAlign = TextAlign.Center, fontSize = 20.sp, color = Color.LightGray, fontFamily = Constants.FONT_MEDIUM)
+            .align(Alignment.Center),
+            textAlign = TextAlign.Center,
+            fontSize = 20.sp,
+            color = Color.LightGray,
+            fontFamily = Constants.FONT_MEDIUM)
     }
 }
 class VoiceRecognizerHelper(

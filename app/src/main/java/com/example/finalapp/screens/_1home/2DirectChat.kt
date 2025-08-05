@@ -1,6 +1,7 @@
 package com.example.finalapp.screens._1home
 
 
+import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -111,7 +112,7 @@ fun DirectChatScreen(
     LaunchedEffect(key1 =shareProfileClickedON){
         if(shareProfileClickedON ){
             eventsViewModel.checked.value=!checked
-            eventsViewModel.sendDirectChatData(DirectChatRequest( UserObject.user.value.user,authViewModel.latitude.value,authViewModel.longitude.value))
+            eventsViewModel.sendDirectChatData(DirectChatRequest(user.user,userLocation.latitude ?: 0.0,userLocation.longitude ?: 0.0))
         } else {
             if(remove){
                 eventsViewModel.removeUserFromDirectChat(UserObject.user.value.user)
@@ -174,7 +175,9 @@ fun DirectChatScreen(
                                     Text(text = "Edit",fontFamily = Constants.FONT_LIGHT, color = Color(0xFF280636), fontSize = 9.sp)
                                 }
                             }
-                            Column(modifier = Modifier.wrapContentSize().align(Alignment.TopCenter)) {
+                            Column(modifier = Modifier
+                                .wrapContentSize()
+                                .align(Alignment.TopCenter)) {
                                 DirectChatHorizontalPager()
                             }
                         }
@@ -222,14 +225,21 @@ fun DirectChatProfiles(
     eventsViewModel: EventsViewModel,
 ) {
     val chatState by eventsViewModel.directChatResponse.collectAsState()
-    val userList = eventsViewModel.nearByUsersList.collectAsLazyPagingItems()
+    val directChatObjectList = eventsViewModel.nearByUsersList.collectAsLazyPagingItems()
     val saveToChatListSuccess by eventsViewModel.saveUserToChatListResponseState.collectAsState()
+    val userObject by UserObject.user.collectAsState()
     when(val response=saveToChatListSuccess){
         is RequestState.Error ->  {
             Text(text = response.error.toString())
         }
         is RequestState.Success ->{
-            navController.navigate(SCREENS.SINGLE_CHAT.createPath(response.data.withUserId.username,response.data.withUserId._id))
+            Log.i("Userr", "DirectChatProfiles: ${response.data.withUserId.userName} other user id ${response.data.withUserId._id}")
+            navController.navigate(
+                SCREENS.SINGLE_CHAT.createPath(
+                    userName = response.data.withUserId.userName,
+                    chatListUserId = response.data.withUserId._id
+                )
+            )
             eventsViewModel.resetSaveToChatListSuccessToIdle()
         }
         is RequestState.Loading ->{
@@ -247,12 +257,21 @@ fun DirectChatProfiles(
         }
         is RequestState.Success -> {
             LazyColumn(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)) {
-                items(userList) { user ->
-                    user?.let {
+                items(directChatObjectList) {directChatObject->
+                    if(directChatObject != null) {
+
                         DirectChatItem(
-                            user=it,
-                            onProfileClicked = { navController.navigate(SCREENS.USER_PUBLIC_PROFILE.createPath(it.userId.user)) },
-                            onSendMessageClicked = { eventsViewModel.saveUserToChatList(UserObject.user.value.user, it.userId.user) }
+                            directChatObject = directChatObject,
+                            onProfileClicked = {
+                                navController.navigate(SCREENS.USER_PUBLIC_PROFILE.createPath(userId = directChatObject.userId.user))
+                            },
+                            onSendMessageClicked = {
+                                Log.i("Userr", "DirectChatProfiles: ${userObject.user} other ${directChatObject.userId.user}")
+                                eventsViewModel.saveUserToChatList(
+                                    currentUserId = userObject.user,
+                                    otherUserUserId = directChatObject.userId.user
+                                )
+                            }
                         )
                     }
                 }
@@ -265,7 +284,7 @@ fun DirectChatProfiles(
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun DirectChatItem(
-    user: DirectChat?,
+    directChatObject: DirectChat?,
     onProfileClicked: () -> Unit,
     onSendMessageClicked: () -> Unit
 ) {
@@ -286,7 +305,7 @@ fun DirectChatItem(
             border = BorderStroke(width = 1.dp, color = Color.LightGray)
         ) {
             GlideImage(
-                model = if(user?.userId?.profileImage?.isNotEmpty() == true) imagePrefix+user.userId.profileImage else "",
+                model = if(directChatObject?.userId?.profileImage?.isNotEmpty()==true) imagePrefix+directChatObject.userId.profileImage else "",
                 contentDescription = "",
                 contentScale = ContentScale.Crop
             )
@@ -297,7 +316,7 @@ fun DirectChatItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = if(user?.userId?.name?.isNotEmpty() == true) user.userId.name.capitalize() else "...",
+                text = if(directChatObject?.userId?.name?.isNotEmpty()==true) directChatObject.userId.name.capitalize() else "...",
                 fontSize = 20.sp,
                 fontFamily = Constants.USER_NAME_FONT, fontWeight = FontWeight.Bold
             )

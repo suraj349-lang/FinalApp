@@ -100,6 +100,7 @@ class ChatViewModel @Inject constructor(
             .onStart {
                 _messagesFromServer.value = RequestState.Loading
             }.catch {
+                Log.e("Messageschat", "getAllMessages:${it.message} ",it )
                 _messagesFromServer.value = RequestState.Error(it)
             }.collect { response ->
                 Log.d("Messageschat ", "getAllMessages: $response")

@@ -42,9 +42,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.finalapp.R
 
-@Preview(showBackground = true)
+
 @Composable
-fun CommentsScreen() {
+fun CommentsScreen(comments:List<Comment> = emptyList()) {
     // Use mutable state list for top-level comments
     val commentsState = remember { mutableStateListOf<Comment>().apply { addAll(comments) } }
 

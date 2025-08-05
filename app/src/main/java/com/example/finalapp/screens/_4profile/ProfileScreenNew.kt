@@ -40,6 +40,10 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Surface
+import androidx.compose.material.Tab
+import androidx.compose.material.TabRow
+import androidx.compose.material.TabRowDefaults
+import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material.Text
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -104,6 +108,8 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
     var showPasswordDialog by remember {
         mutableStateOf(false)
     }
+    val tabs = listOf("Events", "Pings")
+    var selectedTabIndex by remember { mutableStateOf(0) }
     val lazyListState = rememberLazyListState()
     val user by UserObject.user.collectAsState()
 
@@ -167,7 +173,7 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
         }
     }
     val systemUiController = rememberSystemUiController()
-    val backgroundColor = Color.DarkGray
+    val backgroundColor = Color(0xFF040A36)
     val upperCardColor= Color.Black
     val navColor=Color.DarkGray
 
@@ -432,41 +438,7 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                     modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 10.dp),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    //--------------------------------------------------------------------------------
 
-                    when (val response = userEventsList) {
-                        is RequestState.Loading -> CircularProgressIndicator()
-                        is RequestState.Error ->
-                            CommonErrorScreen(
-                                error = "Error getting events!",
-                                onRetryClicked = { eventsViewModel.getUserEvents(user.user) }
-                            )
-
-                        is RequestState.Success -> {
-                            MyEvents(response.data) {
-                                navController.navigate(SCREENS.CREATE_EVENT.route)
-                            }
-                        }
-
-                        else -> {}
-                    }
-
-                    //--------------------------------------------------------------------------------------
-
-                    when (val response = userPingsList) {
-                        is RequestState.Loading -> CircularProgressIndicator()
-                        is RequestState.Error -> CommonErrorScreen(error = "Error getting pings!") {
-                            eventsViewModel.getUserPings(user.user)
-                        }
-
-                        is RequestState.Success -> {
-                            MyPings(response.data) {
-                                navController.navigate(SCREENS.CREATE_PING.route)
-                            }
-                        }
-
-                        else -> {}
-                    }
                     //--------------------------------------------------------------------------------
 
                     when (val response = userDropProfilesList) {
@@ -488,27 +460,90 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
 
                         else -> {}
                     }
-
-                    //----------------------------------------------------------------------------------------
-
-
-                    //UserStatsScreen(12,12,34)
-                    LogoutUser(
-                        onLogoutClicked = {
-                            authViewModel.logout {
-                                navController.navigate(SCREENS.LOGIN.route) {
-                                    popUpTo(0) {
-                                        inclusive = true
-                                    } // This clears the entire back stack
-                                    launchSingleTop = true
-                                }
-                            }
-                        })
                 }
             }
+                    //--------------------------------------------------------------------------------
+                item {
+                    Column(modifier = Modifier) {
+                        TabRow(
+                            indicator = { tabPositions ->
+                                TabRowDefaults.Indicator(
+                                    Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
+                                    color = Constants.TAB_ROW_INDICATOR_COLOR,
+                                    height = 2.dp
+                                )
+                            },
+                            selectedTabIndex = selectedTabIndex,
+                            modifier = Modifier.fillMaxWidth(),
+                            backgroundColor = Color.Black,
+                            contentColor = Color.White
+                        ) {
+                            tabs.forEachIndexed { index, title ->
+                                Tab(
+                                    selected = selectedTabIndex == index,
+                                    onClick = { selectedTabIndex = index },
+                                    text = { Text(title, fontFamily = Constants.FONT_LIGHT, fontSize = 14.sp) }
+                                )
+                            }
+                        }
 
+                        when (selectedTabIndex) {
+                            0 -> {
+                                when (val response = userEventsList) {
+                                    is RequestState.Loading -> CircularProgressIndicator()
+                                    is RequestState.Error ->
+                                        CommonErrorScreen(
+                                            error = "Error getting events!",
+                                            onRetryClicked = { eventsViewModel.getUserEvents(user.user) }
+                                        )
+
+                                    is RequestState.Success -> {
+                                        MyEvents(response.data) {
+                                            navController.navigate(SCREENS.CREATE_EVENT.route)
+                                        }
+                                    }
+
+                                    else -> {}
+                                }
+                            }
+
+                            1 -> {
+                                when (val response = userPingsList) {
+                                    is RequestState.Loading -> CircularProgressIndicator()
+                                    is RequestState.Error -> CommonErrorScreen(error = "Error getting pings!") {
+                                        eventsViewModel.getUserPings(user.user)
+                                    }
+
+                                    is RequestState.Success -> {
+                                        MyPings(response.data) {
+                                            navController.navigate(SCREENS.CREATE_PING.route)
+                                        }
+                                    }
+
+                                    else -> {}
+                                }
+                            }
+                        }
+                    }
+                }
+                    //----------------------------------------------------------------------------------------
+            item {
+
+
+                //UserStatsScreen(12,12,34)
+                LogoutUser(
+                    onLogoutClicked = {
+                        authViewModel.logout {
+                            navController.navigate(SCREENS.LOGIN.route) {
+                                popUpTo(0) {
+                                    inclusive = true
+                                } // This clears the entire back stack
+                                launchSingleTop = true
+                            }
+                        }
+                    })
+            }
         }
-
     }
     CreateEventOrPingBottomSheet(
         showSheet = showSheet,
@@ -531,17 +566,6 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
 fun MyEvents(items: List<EventResponse>, onAddEventClicked:()->Unit) {
     val eventsList=remember{ items}
     Column() {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start
-            ) {
-                Text(text = "My Events", color = Color.White,fontWeight = FontWeight.Bold,
-                    fontSize=18.sp,
-                    fontFamily = Constants.FONT_MEDIUM)
-            }
         LazyRow{
             items(eventsList){item->
                 MyEventItem(item)
@@ -646,13 +670,12 @@ fun RecentDrops(
             }
             Card(modifier = Modifier
                 .fillMaxWidth()
-                .wrapContentHeight(), elevation = 40.dp, backgroundColor = Color.DarkGray
+                .wrapContentHeight(), elevation = 40.dp, backgroundColor = Color(0xFF040A36)
             ) {
                 Column(modifier = Modifier.padding(bottom = 16.dp)) {
-                    LazyRow(modifier = Modifier.padding(vertical = 8.dp)) {
+                    LazyRow(modifier = Modifier.padding(vertical = 8.dp).padding(start = 8.dp)) {
                         items(droppedProfilesList) { item ->
                             RecentProfileDropItem(item) { onItemClicked(item) }
-
                         }
                     }
 
@@ -670,11 +693,10 @@ fun RecentDrops(
                                 colorFilter = ColorFilter.tint(Color(0xFFE1E9F1)),
                                 modifier = Modifier
                                     .size(30.dp)
-                                    .shadow(elevation = 10.dp, spotColor = Color.White)
                             )
                             Text(
                                 text = "Drop your profile",
-                                modifier = Modifier.shadow(elevation = 10.dp, spotColor = Color.White),
+                                modifier = Modifier,
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Bold,
                                 fontFamily = Constants.FONT_MEDIUM,

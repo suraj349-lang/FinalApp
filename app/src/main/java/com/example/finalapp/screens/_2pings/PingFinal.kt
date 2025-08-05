@@ -97,11 +97,10 @@ fun PingScreenFinal(
             }
         },
         content = {
-            Surface(modifier = Modifier.fillMaxSize()) {
+            Surface(modifier = Modifier.fillMaxSize().padding(it)) {
                 LazyColumn(
                     //state = listState,
                     modifier= Modifier
-                        .padding(it)
                         .background(color = Color.Black),
                     contentPadding = PaddingValues(top = 0.dp, bottom = 16.dp))
                 {

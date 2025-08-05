@@ -232,7 +232,7 @@ fun UserItem(navController: NavHostController, user: ChatList,setProfileImage:(S
             setProfileImage(user.withUserId.profileImage)
             navController.navigate(
                 SCREENS.SINGLE_CHAT.createPath(
-                    user.withUserId.username,
+                    user.withUserId.userName,
                     user.withUserId._id
                 )
             )
@@ -263,7 +263,7 @@ fun UserItem(navController: NavHostController, user: ChatList,setProfileImage:(S
                 .fillMaxSize()
                 .padding(start = 8.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.Start) {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text(text = user.withUserId.username, fontFamily =FONT_MEDIUM,fontSize = 18.sp, color = Color.Black, fontWeight = FontWeight.SemiBold)
+                    Text(text = user.withUserId.userName, fontFamily =FONT_MEDIUM,fontSize = 18.sp, color = Color.Black, fontWeight = FontWeight.SemiBold)
                     Text(text = "08:38", fontSize = 12.sp, color = Color.LightGray)
                 }
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
