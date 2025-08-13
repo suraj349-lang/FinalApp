@@ -39,9 +39,11 @@ import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -68,18 +70,20 @@ import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.finalapp.model.EventResponse
 import com.example.finalapp.navigation.SCREENS
+import com.example.finalapp.screens._1home.DirectChatScreen
 import com.example.finalapp.screens.dialogBox.DialogError
 import com.example.finalapp.screens.dialogBox.DialogLoading
 import com.example.finalapp.testing.TabItem
 import com.example.finalapp.ui.imagePrefix
 import com.example.finalapp.utils.RequestState
+import com.example.finalapp.viewmodels.AuthViewModel
 import com.example.finalapp.viewmodels.EventsViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
 @Composable
-fun PublicEventDetailsScreenWrapper(id:String,navController: NavHostController,eventsViewModel: EventsViewModel) {
+fun PublicEventDetailsScreenWrapper(id:String,navController: NavHostController,eventsViewModel: EventsViewModel,authViewModel: AuthViewModel) {
 
     val eventDetailsResponse by eventsViewModel.eventDetailsResponse.collectAsState()
     Log.i("EventDetailsResponse", "PublicEventDetailsScreenWrapper: $eventDetailsResponse")
@@ -95,7 +99,7 @@ fun PublicEventDetailsScreenWrapper(id:String,navController: NavHostController,e
                     Surface(modifier = Modifier
                         .padding(it)
                         .fillMaxSize()) {
-                        PublicEventDetailsScreen(response.data, { navController.navigateUp() }) {
+                        PublicEventDetailsScreen(response.data, authViewModel ,eventsViewModel, navController,{ navController.navigateUp() }) {
                             navController.navigate(SCREENS.COMMENT.route)
                         }
                     }
@@ -131,6 +135,9 @@ fun PublicEventDetailsScreenWrapper(id:String,navController: NavHostController,e
 @Composable
 fun PublicEventDetailsScreen(
     response: EventResponse,
+    authViewModel: AuthViewModel,
+    eventsViewModel: EventsViewModel,
+    navController: NavHostController,
     onBackClicked: () -> Unit,
     onCommentClicked: () -> Unit
 ) {
@@ -191,7 +198,7 @@ fun PublicEventDetailsScreen(
                 eventDescription = response.description
             )
 
-            ThreeOptions(events = response.childPosts ?: listOf())
+            ThreeOptions(events = response.childPosts ?: listOf(), authViewModel, eventsViewModel , navController )
 
         }
     }
@@ -367,11 +374,14 @@ fun EventTitleAndDescriptionWar(eventTitle:String,eventDescription:String?) {
         }}
 }
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class,
+    ExperimentalMaterial3Api::class
+)
 @Composable
-fun ThreeOptions(events:List<EventResponse>) {
+fun ThreeOptions(events:List<EventResponse>,authViewModel:AuthViewModel,eventsViewModel:EventsViewModel,navController:NavHostController) {
     val pagerState = rememberPagerState(0, pageCount = { 3 })
     val scope= rememberCoroutineScope()
+    val scrollBehavior =TopAppBarDefaults.enterAlwaysScrollBehavior()
     var isRefreshing by remember { mutableStateOf(false) }
     val pullRefreshState = rememberPullRefreshState(
         refreshing = isRefreshing,
@@ -449,7 +459,7 @@ fun ThreeOptions(events:List<EventResponse>) {
         ) { page ->
             when (page) {
                 0 -> ChildPosts(events =events )
-                1 -> NearByPeoplePosts()
+                1 -> DirectChatScreen(scrollBehavior, authViewModel, eventsViewModel, navController)
                 2 -> GeneralPosts()
             }
         }

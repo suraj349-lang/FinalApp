@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
@@ -103,6 +104,7 @@ fun CreatePingWrapper(navController: NavHostController, eventsViewModel: EventsV
         derivedStateOf {  title.isNotEmpty()}
     }
     val userLocation by UserLocationObject.userLocation.collectAsState()
+    val user by UserObject.user.collectAsState()
 
     val pickMedia = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         if (uri != null) {
@@ -149,13 +151,13 @@ fun CreatePingWrapper(navController: NavHostController, eventsViewModel: EventsV
                     } else return@CreatePingTopNew
                     imageFile?.let {
                         eventsViewModel.uploadImageAndThenCreateEvent(
-                            UserObject.user.value.user ,
+                            user.user ,
                             it
                         ) { imageKey ->
                             eventsViewModel.createPing(
                                 PingRequestDto(
-                                    user = UserObject.user.value.user ,
-                                    userName = UserObject.user.value.userName,
+                                    user = user.user,
+                                    userName = user.userName ,
                                     title = title,
                                     image = imageKey,
                                     location = userLocation.address.toString(),
@@ -493,9 +495,10 @@ fun DatePickerDialog(onDateSelected: (LocalDate) -> Unit, onDismiss: () -> Unit)
 @Composable
 fun CreatePingTopNew(isActive:Boolean, onNext: () -> Unit) {
     Box(modifier = Modifier
+        .statusBarsPadding()
         .fillMaxWidth()
         .height(60.dp)
-        .background(color = Color.White)){
+        .background(color = Constants.HOME_TOP_BAR_COLOR)){
         Row(modifier= Modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
@@ -504,6 +507,7 @@ fun CreatePingTopNew(isActive:Boolean, onNext: () -> Unit) {
                 contentDescription = null,
                 modifier = Modifier.size(24.dp)
             )
+            Text(text = "Create ping")
             Card(
                 modifier = Modifier
                     .wrapContentSize()

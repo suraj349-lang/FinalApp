@@ -176,7 +176,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
             }
         )){navBackStackEntry->
             val id=navBackStackEntry.arguments?.getString("id") ?: ""
-            PublicEventDetailsScreenWrapper(id, navController,eventsViewModel)
+            PublicEventDetailsScreenWrapper(id, navController,eventsViewModel,authViewModel)
         }
         composable(SCREENS.PRIVATE_PROFILE.route){
             PrivateUserNameScreenWrapper(navController = navController)

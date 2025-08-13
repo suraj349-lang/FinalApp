@@ -1,7 +1,6 @@
 package com.example.finalapp.screens._2pings
 
 import android.util.Log
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -10,14 +9,9 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Build
@@ -29,15 +23,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -45,21 +34,19 @@ import com.example.finalapp.R
 import com.example.finalapp.screens._1home.EventAndPingDesigns.pings.PingItem3
 import com.example.finalapp.screens._3createEventOrPing.CreateEventOrPingBottomSheet
 import com.example.finalapp.screens.common.CommonErrorScreen
-import com.example.finalapp.ui.theme.floatingActionBtnColor
-import com.example.finalapp.utils.UserLocation
 import com.example.finalapp.utils.UserLocationObject
 import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.viewmodels.EventsViewModel
 
 
-@OptIn(ExperimentalLayoutApi::class)
+
 @Composable
 fun PingScreenFinal(
     navController: NavHostController,
     eventsViewModel: EventsViewModel,
 ) {
     val selectedCategory = remember { mutableStateOf("All") }
-    val categories = listOf("All", "Sports", "Politics", "Adventure", "Dating", "Personal")
+    val categories = listOf("All", "Dating", "Personal", "Sports", "Politics", "Adventure")
     val gridItems = listOf("Alpha-1", "Pari Chowk")
     val shorts = listOf("Ending in hours", "Today's pings", "Ending this week")
     val staggeredItems = listOf("Music", "Travel", "Education", "Gaming", "Art", "Food")
@@ -92,7 +79,7 @@ fun PingScreenFinal(
     }
     Scaffold(
         topBar = {
-            PingsTopBar(backgroundColor = Color.DarkGray, false,{navController.navigateUp()}) {
+            PingsTopBar(backgroundColor = Constants.HOME_TOP_BAR_COLOR, false,{navController.navigateUp()}) {
                 searchOn = !searchOn
             }
         },
@@ -113,13 +100,13 @@ fun PingScreenFinal(
 //                        .background(Color.Black)
 //                ) {
                     item {
-                        LazyRow(modifier = Modifier.padding(8.dp)) {
+                        LazyRow {
                             items(categories.size) { index ->
                                 val category = categories[index]
                                 val isSelected = category == selectedCategory.value
                                 Box(
                                     modifier = Modifier
-                                        .padding(8.dp)
+                                        .padding(horizontal = 4.dp, vertical = 8.dp)
                                         .clip(RoundedCornerShape(15.dp))
                                         .wrapContentSize()
                                         .background(if (isSelected) Color(0xFF065F0A) else Color.Gray)
@@ -127,9 +114,10 @@ fun PingScreenFinal(
                                 ) {
                                     Text(
                                         category,
-                                        modifier = Modifier.padding(6.dp),
+                                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
                                         color = Color.White,
-                                        fontFamily = Constants.FONT_LIGHT
+                                        fontFamily = Constants.FONT_MEDIUM,
+                                        fontSize = 12.sp
                                     )
                                 }
                             }
@@ -139,23 +127,22 @@ fun PingScreenFinal(
                     item {
                         if (searchOn) {
                             Box(
-                                modifier = Modifier
-                                    .padding(16.dp)
+                                modifier = Modifier.padding(8.dp)
                                     .fillMaxWidth()
                                     .background(Color.DarkGray, shape = MaterialTheme.shapes.medium)
-                                    .padding(12.dp)
+                                    .padding(16.dp)
                             ) {
                                 BasicTextField(
                                     value = searchQuery,
-                                    onValueChange = { searchQuery = it },
+                                    onValueChange = {query-> searchQuery = query },
                                     textStyle = TextStyle(color = Color.White, fontSize = 16.sp),
                                     modifier = Modifier.fillMaxWidth(),
                                     decorationBox = { innerTextField ->
                                         if (searchQuery.isEmpty()) {
                                             Text(
                                                 "Search",
-                                                color = Color.Gray,
-                                                fontFamily = Constants.FONT_MEDIUM
+                                                color = Color.White,
+                                                fontFamily = Constants.FONT_EXTRA_LIGHT
                                             )
                                         }
                                         innerTextField()
@@ -168,6 +155,7 @@ fun PingScreenFinal(
 //        StatsGrid(examplePingStats)
                     //VerticalBarStats(examplePingStats)
 //        StatsChipsRow(examplePingStats)
+                    /*
                    item {
                        Text(
                            "Discover near you.",
@@ -252,6 +240,7 @@ fun PingScreenFinal(
                             }
                         }
                     }
+                    */
 
 //                    Column(
 //                        modifier = Modifier
@@ -304,8 +293,8 @@ fun PingScreenFinal(
                         //PingsScreenUI(navController = navController, eventsViewModel = eventsViewModel)
 
                         // val number=Random.nextInt()
-                        allPingsState?.itemCount?.let {
-                            items(it) { index ->
+                        allPingsState?.itemCount?.let {count->
+                            items(count) { index ->
                                 val item = allPingsState[index]
                                 if (item != null) {
 //                                    PingItemCard(
@@ -315,8 +304,14 @@ fun PingScreenFinal(
 //                                    )
                                     //   PingItem1(item)
                                     // PingItem2(item = item)
+
+
                                     PingItem3(item)
-                                    androidx.compose.material.Divider(
+
+
+
+
+                                    Divider(
                                         modifier = Modifier.fillMaxWidth(),
                                         thickness = 0.5.dp,
                                         color = Color.LightGray.copy(alpha = 0.2f)

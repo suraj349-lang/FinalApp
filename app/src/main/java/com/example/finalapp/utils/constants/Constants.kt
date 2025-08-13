@@ -52,6 +52,6 @@ object Constants {
     val HOME_BOTTOM_BAR_COLOR= HOME_TOP_BAR_COLOR
     val BOTTOM_BAR_ACTIVE_TEXT_COLOR= Color.Black
 
-    val BOTTOM_BAR_INACTIVE_ICON_COLOR= Color.DarkGray.copy(alpha = 0.8f)
-    val BOTTOM_BAR_INACTIVE_TEXT_COLOR= Color.DarkGray.copy(alpha = 0.8f)
+    val BOTTOM_BAR_INACTIVE_ICON_COLOR= Color.Black
+    val BOTTOM_BAR_INACTIVE_TEXT_COLOR= Color.Black
 }

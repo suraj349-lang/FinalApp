@@ -4,12 +4,15 @@ package com.example.finalapp.screens._1home.EventAndPingDesigns.pings
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -44,84 +47,34 @@ import com.example.finalapp.ui.imagePrefix
 import com.example.finalapp.utils.constants.Constants
 import kotlin.random.Random
 
-val VibrantBackgroundColors = listOf(
-    Color(0xFFFF6F61), // Coral Red
-    Color(0xFF00D26A), // Mint Green
-    Color(0xFF3DDC84), // Android Green
-    Color(0xFFFFC107), // Amber Yellow
-    Color(0xFF6200EA), // Deep Purple
-    Color(0xFF009688), // Teal
-    Color(0xFF4CAF50), // Vibrant Green
-    Color(0xFFFF4081), // Pink Accent
-    Color(0xFF3F51B5), // Indigo
-    Color(0xFF00BCD4), // Cyan
-    Color(0xFFFF5722), // Deep Orange
-    Color(0xFF8BC34A), // Light Green
-    Color(0xFF2962FF), // Bright Blue
-    Color(0xFFE91E63), // Magenta
-    Color(0xFFFFEB3B), // Vibrant Yellow
-    Color(0xFFAA00FF), // Electric Purple
-)
-val SoftVibrantColors = listOf(
-    Color(0xFFFF8A80), // Soft Red
-    Color(0xFF80CBC4), // Soft Teal
-    Color(0xFFFFF176), // Soft Yellow
-    Color(0xFF81D4FA), // Soft Blue
-    Color(0xFFE1BEE7), // Lavender
-    Color(0xFFFFCCBC), // Light Peach
-    Color(0xFFCE93D8), // Light Purple
-    Color(0xFFA5D6A7), // Light Green
-    Color(0xFFB3E5FC), // Light Cyan
-    Color(0xFFFFF59D), // Banana Yellow
-    Color(0xFFFFAB91), // Coral
-    Color(0xFFB39DDB), // Soft Indigo
-    Color(0xFF90CAF9), // Sky Blue
-    Color(0xFFFFE082), // Sun Glow
-    Color(0xFFF48FB1), // Rose Pink
-)
-
-val DarkVibrantColors = listOf(
-    Color(0xFF1E1E2F), // Charcoal Blue
-    Color(0xFF2C2C54), // Midnight Indigo
-    Color(0xFF3A3F5C), // Slate Navy
-    Color(0xFF283149), // Twilight Blue
-    Color(0xFF1F1B24), // True Black-Purple
-    Color(0xFF1E272E), // Dark Steel
-    Color(0xFF2E3A59), // Deep Sky Blue Navy
-    Color(0xFF3E4C59), // Soft Iron Blue
-    Color(0xFF1B1B2F), // Deep Black Navy
-    Color(0xFF2D2A32), // Dim Purple Gray
-    Color(0xFF252525), // Jet Gray
-    Color(0xFF2F3E46), // Storm Grey Blue
-    Color(0xFF373B44), // Smoky Steel
-    Color(0xFF2C3E50), // Dark Ocean
-    Color(0xFF3F3F74), // Muted Royal Indigo
-)
-
 
 @Composable
 fun PingItem3(item: PingResponse) {
-    val random = remember { Random.nextInt(DarkVibrantColors.size) }
     Box(
         modifier = Modifier
             .padding(10.dp)
             .fillMaxWidth()
             .clip(shape = RoundedCornerShape(16.dp))
+            .border(width = 0.25.dp, color = Color.White.copy(alpha = 0.5f), shape = RoundedCornerShape(16.dp))
             .background(
-                shape = RoundedCornerShape(1.dp),
-                color = DarkVibrantColors
-                    .get(random)
-                    .copy(alpha = 0.8f)
+                shape = RoundedCornerShape(16.dp),
+                color = Color(0xFF01011A)
             ),
     ) {
 
         Column(modifier = Modifier.padding(1.dp)) {
-            AsyncImage(
-                model = imagePrefix+item.image,
-                contentDescription = "",
-                modifier = Modifier.wrapContentHeight(),
-                contentScale = ContentScale.Crop
-            )
+            Card(modifier = Modifier
+                .fillMaxWidth()
+                .height(300.dp).shadow(elevation = 10.dp, spotColor = Color.White, ambientColor = Color.White), shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)) {
+                AsyncImage(
+                    model = imagePrefix+item.image,
+                    contentDescription = "",
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            }
+
 
             Box {
                 Column(
