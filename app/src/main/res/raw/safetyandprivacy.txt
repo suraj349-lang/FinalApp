@@ -6,8 +6,8 @@ Last Updated:9 July 2025
 This Privacy & Safety Policy explains how SPINT APP  collects, uses, shares, and protects your information when you use our social media platform ("the App").
 
 1. What We Collect
-   We may collect:
 
+   We may collect:
 * Account Info: Name, username, email/phone, password (hashed), profile image.
 * Content: Posts, comments, images, chat messages, disappearing content.
 * Device & Usage Data: IP address, device model, OS, crash logs, app usage patterns.
@@ -15,8 +15,8 @@ This Privacy & Safety Policy explains how SPINT APP  collects, uses, shares, and
 * Anonymous Profiles: Pseudonymous identifiers without linking to identifiable data unless needed for abuse prevention.
 
 2. Why We Collect It
-   We use your data to:
 
+   We use your data to:
 * Provide and improve app functionality
 * Personalize your experience
 * Facilitate safe user interaction and moderation
@@ -47,9 +47,8 @@ This Privacy & Safety Policy explains how SPINT APP  collects, uses, shares, and
    The platform is not intended for users under 13 (or equivalent age under local law). We do not knowingly collect data from children.
 
 7. Contact
-   \[Your App Name] Privacy Officer
-   Email: privacy@\[yourapp].com
-   Address: \[Company Address, if applicable]
+   \Spint Privacy Officer
+   Email: privacy@spint.com
 
 ---
 

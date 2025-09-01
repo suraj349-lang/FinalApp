@@ -1,5 +1,7 @@
 package com.example.finalapp.model
 
+import com.example.finalapp.model.pings.PingResponse
+
 data class Event(
     val user: String,
     val userName:String,
@@ -41,6 +43,9 @@ data class EventResponse(
   val location: String = "",
   val isChildPost: Boolean=false,
   val childPosts:List<EventResponse>? = emptyList(),
+  val childPings:List<PingResponse>? = emptyList(),
+  val childDropProfiles:List<DropProfileResponse>? = emptyList(),
+  val childNearByUsers:List<User>? = emptyList(),
   val expirationTime: String = "",
   val upvoted:Boolean=false,
   val downvoted:Boolean=false,

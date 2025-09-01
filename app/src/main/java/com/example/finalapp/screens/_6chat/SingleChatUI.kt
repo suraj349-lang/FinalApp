@@ -29,6 +29,8 @@ import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -90,6 +92,7 @@ import com.example.finalapp.viewmodels.ChatViewModel
 import kotlinx.coroutines.launch
 import java.io.File
 import java.util.Locale
+
 @RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
@@ -182,57 +185,11 @@ fun SingleChatScreenUI(
     }
 
     Scaffold(
-        topBar = { SingleChatTopBar(title = sentTo, chatUserImage, navController) }
-    ) {
-        Column(modifier = Modifier.padding(it)) {
-            if (showLinearIndicator) {
-                LinearProgressIndicator(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(2.dp),
-                    color = floatingActionBtnColor
-                )
-            }
-
-            if (showError) {
-                NoMessagesScreen(Modifier.weight(1f,true),"Error connecting to server")
-            }
-
-            when (messages) {
-                is RequestState.Success -> {
-                    showLinearIndicator = false
-                    val messageList = (messages as RequestState.Success<List<Message>>).data
-                    if (messageList.isNotEmpty()) {
-                        LazyColumn(state = listState, modifier = Modifier.weight(1f,true)) {
-                            items(messageList) { message ->
-                                MessageItemUI(
-                                    msg = message.message,
-                                    sent = message.sent,
-                                    received = message.received,
-                                    timestamp = message.timestamp,
-                                    isSentByLoggedInUser = message.senderId == UserObject.user.value.user
-                                )
-                            }
-                        }
-                    } else {
-                        NoMessagesScreen(Modifier.weight(1f,true),"Say hi!")
-                    }
-                }
-                is RequestState.Loading -> {
-                    showLinearIndicator = true
-                }
-                is RequestState.Error -> {
-                    showLinearIndicator = false
-                    showError = true
-                }
-                else -> {
-                    Box(modifier = Modifier.weight(1f)) {}
-                }
-            }
-
+        topBar = { SingleChatTopBar(title = sentTo, chatUserImage, navController) },
+        bottomBar = {
             // Input row with text field and mic button
             Row(
-                modifier = Modifier
+                modifier = Modifier.navigationBarsPadding().imePadding()
                     .padding(horizontal = 16.dp, vertical = 8.dp)
                     .fillMaxWidth()
                     .heightIn(min = 56.dp, max = 150.dp),
@@ -332,6 +289,53 @@ fun SingleChatScreenUI(
                     }
 
                 )
+            }
+        }
+    ) {
+        Column(modifier = Modifier.padding(it).imePadding()) {
+            if (showLinearIndicator) {
+                LinearProgressIndicator(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(2.dp),
+                    color = floatingActionBtnColor
+                )
+            }
+
+            if (showError) {
+                NoMessagesScreen(Modifier.weight(1f,true),"Error connecting to server")
+            }
+
+            when (messages) {
+                is RequestState.Success -> {
+                    showLinearIndicator = false
+                    val messageList = (messages as RequestState.Success<List<Message>>).data
+                    if (messageList.isNotEmpty()) {
+                        LazyColumn(state = listState, modifier = Modifier.weight(1f,true)) {
+                            items(messageList) { message ->
+                                MessageItemUI(
+                                    msg = message.message,
+                                    sent = message.sent,
+                                    received = message.received,
+                                    timestamp = message.timestamp,
+                                    isSentByLoggedInUser = message.senderId == UserObject.user.value.user
+                                )
+                            }
+                        }
+                    } else {
+                        NoMessagesScreen(Modifier.weight(1f,true),"Say hi!")
+                    }
+                }
+                is RequestState.Loading -> {
+                    showLinearIndicator = true
+                }
+                is RequestState.Error -> {
+                    showLinearIndicator = false
+                    showError = true
+                }
+                else -> {
+                    Box(modifier = Modifier.weight(1f)) {}
+                }
             }
         }
     }
@@ -645,7 +649,7 @@ fun ChatScreenUI(sentTo: String,chatListUserId:String,navController: NavHostCont
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
 @Composable
-fun SingleChatTopBar(title: String,profileImage:String, navController: NavHostController) {
+fun SingleChatTopBar(title: String,profileImage:String?, navController: NavHostController) {
     TopAppBar(
         title = {
             Text(
@@ -679,7 +683,9 @@ fun SingleChatTopBar(title: String,profileImage:String, navController: NavHostCo
                         model =  imagePrefix + profileImage ,
                         contentDescription = "",
                         contentScale=ContentScale.Crop,
-                        modifier = Modifier.clickable { navController.navigate(SCREENS.PROFILE.route) })
+                        modifier = Modifier.clickable { navController.navigate(SCREENS.PROFILE.route) }
+                    )
+                    Log.i("IMagePrefix", "SingleChatTopBar: $imagePrefix + $profileImage")
                 }
             }
         }, actions = {

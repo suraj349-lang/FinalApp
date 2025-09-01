@@ -4,22 +4,28 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Card
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.finalapp.R
 import com.example.finalapp.utils.constants.Constants
+import com.google.firebase.annotations.concurrent.Background
 
 @Composable
 fun CommonErrorScreen(error:String,showButton:Boolean=false,onRetryClicked:()->Unit ={}) {
@@ -36,5 +42,19 @@ fun CommonErrorScreen(error:String,showButton:Boolean=false,onRetryClicked:()->U
 
         }
 
+    }
+}
+@Composable
+fun NoEventsFoundScreen(backgroundColor:Color,error:String,showButton:Boolean=false,onRetryClicked:()->Unit ={}) {
+    Surface(modifier = Modifier.fillMaxSize(), color = backgroundColor) {
+        Card(
+            Modifier.padding(bottom = 16.dp)
+                .height(50.dp)
+                .width(40.dp), backgroundColor = Color.DarkGray) {
+            Column(modifier = Modifier, verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                Image(painter = painterResource(id = R.drawable.add), contentDescription = "", colorFilter = ColorFilter.tint(Color.White), modifier = Modifier.size(24.dp))
+                Text(text = "Drop your profile", fontFamily = Constants.FONT_MEDIUM, fontSize = 10.sp)
+            }
+        }
     }
 }

@@ -1,7 +1,6 @@
 package com.example.finalapp.screens.dialogBox
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -51,6 +50,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
@@ -78,7 +78,7 @@ import com.example.finalapp.viewmodels.ImageUploadViewModel
 import java.io.File
 
 
-@SuppressLint("SuspiciousIndentation")
+
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewModel, imageUploadViewModel: ImageUploadViewModel, navController: NavHostController, onDismiss: () -> Unit) {
@@ -88,16 +88,19 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
     val userLocation by UserLocationObject.userLocation.collectAsState()
 
     var uri = eventsViewModel.dropProfileUploadUri.value
-    var imageFile by mutableStateOf<File?>(null)
+
+    var imageFile by remember {
+        mutableStateOf<File?>(null)
+    }
     if(uri != Uri.EMPTY) imageFile = uriToFile(uri, context )
 
-    var key by remember { mutableStateOf(false) }
+    var keyForCamera by remember { mutableStateOf(false) }
+    if (keyForCamera) { ImageCaptureFromCameraForDropProfile({imageFile=it}){eventsViewModel.dropProfileUploadUri.value=it} }
+
     var keyForGallery by remember { mutableStateOf(0) }
-    if (key) { ImageCaptureFromCameraForDropProfile({imageFile=it}){uri=it} }
+
     if(keyForGallery!=0) {
-        GalleryPickerForDropProfile(navController = navController,{imageFile=it}) {
-            uri = it
-        }
+        GalleryPickerForDropProfile(navController = navController, onFileCreated = {imageFile=it}, onImageSelected = { eventsViewModel.dropProfileUploadUri.value=it })
     }
     var activeBtnKey by remember {
         mutableStateOf(0)
@@ -116,7 +119,7 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
 
 
     Dialog(
-        onDismissRequest = { onDismiss() },
+        onDismissRequest = { onDismiss();eventsViewModel.dropProfileUploadUri.value=Uri.EMPTY },
         properties = DialogProperties(dismissOnBackPress = true,dismissOnClickOutside = false)) {
         Card(
             shape = RoundedCornerShape((6.dp)),
@@ -126,7 +129,8 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
         ) {
             Column(
                 Modifier
-                    .fillMaxWidth().wrapContentHeight()
+                    .fillMaxWidth()
+                    .wrapContentHeight()
                     //.verticalScroll(enabled = true, state = rememberScrollState())
                     .background(Color.White),
                 verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally
@@ -163,6 +167,8 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                                 Text(
                                     text =  userLocation.address.toString(),
                                     modifier = Modifier.fillMaxWidth(),
+                                    maxLines=1,
+                                    overflow = TextOverflow.Ellipsis,
                                     color = Color(0xFFF7ECD3),
                                     fontSize = 10.sp,
                                     textAlign = TextAlign.Start,
@@ -235,7 +241,7 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                                                     contentDescription = "",
                                                     modifier = Modifier
                                                         .size(50.dp)
-                                                        .clickable { key = !key }
+                                                        .clickable { keyForCamera = !keyForCamera }
                                                 )
                                                 Text(text = "Camera", modifier = Modifier,fontFamily = DONGLE_BOLD)
 
@@ -276,7 +282,8 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                     .fillMaxWidth()
                     .padding(start = 15.dp), fontSize = 20.sp, color = Color.DarkGray, textAlign = TextAlign.Start)
                 OutlinedTextField(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                         .heightIn(min = 48.dp, max = 70.dp)
                         .padding(horizontal = 15.dp)
                         .background(Color.White, RoundedCornerShape(5.dp)),
@@ -336,7 +343,8 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                     }
                 }
                 Divider(modifier = Modifier
-                    .fillMaxWidth(), thickness = 1.dp,color=Color(0xFFDCD6DD)
+                    .fillMaxWidth()
+                    .padding(bottom = 8.dp), thickness = 1.dp,color=Color(0xFFDCD6DD)
                 )
 
                     Button(
@@ -357,10 +365,9 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                                 imageUploadViewModel.s3ImageUploadFunction(user.user,it)
                                 }
                         },
-                        shape= RoundedCornerShape(6.dp),
+                        shape= RoundedCornerShape(0.dp),
                         modifier= Modifier
-                            .fillMaxWidth(1f)
-                            .padding(horizontal = 15.dp, vertical = 4.dp),
+                            .fillMaxWidth(1f),
                         enabled= uri !=Uri.EMPTY,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = floatingActionBtnColor, //statusAndTopAppBarColor,
@@ -402,13 +409,6 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
 
 
 
-
-// Function to get file path from Uri (implementation depends on your app needs)
-fun getPathFromUri(context: Context, uri: Uri): String? {
-    // Implement logic to get file path from Uri (use ContentResolver, MediaStore, etc.)
-    return uri.path // Replace with actual path retrieval logic
-}
-
 @Composable
 fun ImageCaptureFromCameraForDropProfile(onFileCreated:(File)->Unit,onUriChange:(Uri)->Unit) {
 
@@ -419,11 +419,12 @@ fun ImageCaptureFromCameraForDropProfile(onFileCreated:(File)->Unit,onUriChange:
             "${context.packageName}.provider",
             file
         )
-        var capturedImageUri by remember { mutableStateOf<Uri>(Uri.EMPTY) }
+        var capturedImageUri by remember { mutableStateOf<Uri?>(Uri.EMPTY) }
 
         val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
             if (success) {
                 capturedImageUri = uri
+                onUriChange(uri)
                 val imageFile = uriToFile(uri, context )
                 onFileCreated(imageFile)
                 onUriChange(uri)

@@ -117,109 +117,16 @@ fun uriToMultipart(uri: Uri, context: Context): MultipartBody.Part {
     return MultipartBody.Part.createFormData("image", "filename.jpg", requestBody)
 }
 
-fun Context.createImageFile(): File {
-    val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-    val imageFileName = "JPEG_${timeStamp}_"
-    val storageDir = externalCacheDir // Get external cache directory
-    return File.createTempFile(imageFileName, ".jpg", storageDir)
-}
-
-
-//@Composable
-//fun ImageCaptureFromCamera(profileViewModel: ProfileViewModel) {
-//    val context = LocalContext.current
-//    val file = context.createImageFile()
-//    if (!file.exists()) {
-//        Log.e(TAG, "Failed to create image file at: ${file.absolutePath}")
-//        return // Handle the error or return an error state
-//    }
-//
-//    val uri = FileProvider.getUriForFile(
-//        context,
-//        context.packageName + ".provider",
-//        file
-//    )
-//
-//
-//    var capturedImageUri by remember { mutableStateOf<Uri>(Uri.EMPTY) }
-//    // Camera Launcher
-//    val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
-//        if (success) {
-//            capturedImageUri = uri
-//        } else {
-//            Toast.makeText(context, "Image capture failed", Toast.LENGTH_SHORT).show()
-//        }
-//    }
-//
-//    // Permission Launcher
-//    val permissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-//        if (granted) {
-//            cameraLauncher.launch(uri)
-//        } else {
-//            Toast.makeText(context, "Camera permission denied", Toast.LENGTH_SHORT).show()
-//        }
-//    }
-//
-//
-//
-//    // Launching permission and camera based on current permissions
-//    LaunchedEffect(key1 = Unit) {
-//        if (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-//            cameraLauncher.launch(uri)
-//        } else {
-//            permissionLauncher.launch(Manifest.permission.CAMERA)
-//        }
-//    }
-//    if (capturedImageUri == Uri.EMPTY) {
-//        Log.e(TAG, "No image captured")
-//        // Handle the error or return an error state
-//    }
-//
-//
-//    Surface(modifier = Modifier.fillMaxSize()) {
-//        if (capturedImageUri != Uri.EMPTY) {
-//            Image(
-//                painter = rememberImagePainter(capturedImageUri),
-//                contentDescription = "Captured Image",
-//                contentScale = ContentScale.Crop,
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .padding(16.dp)
-//            )
-//            if (uri.toString() != file.toURI().toString()) {
-//                Log.e(TAG, "Mismatch between URI and file path")
-//                return@Surface // Handle the error or return an error state
-//            }
-//            // Update ViewModel
-//            profileViewModel.imageUri.value = capturedImageUri
-//            LaunchedEffect(key1 = capturedImageUri) {
-//                profileViewModel.uploadImage(capturedImageUri)
-//            }
-//        } else {
-//            // Handle scenario where no image is captured yet
-//        }
-//        when (val result=profileViewModel.imageUploadResponse.value){
-//            is RequestState.Idle->{
-//                CircularProgressIndicator()
-//            }
-//            is RequestState.Loading -> {
-//                CircularProgressIndicator()
-//            }
-//            is RequestState.Success ->{
-//                Toast.makeText(context,result.data.toString(),Toast.LENGTH_SHORT).show()
-//
-//            }
-//            is RequestState.Error ->{
-//                Toast.makeText(context,result.error.message.toString(),Toast.LENGTH_SHORT).show()
-//                Log.d(TAG, "ImageCaptureFromCamera: ${result.error.message}")
-//
-//            }
-//
-//            else -> {}
-//        }
-//    }
-//
-//
+//fun Context.createImageFile(): File {
+//    val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
+//    val imageFileName = "JPEG_${timeStamp}_"
+//    val storageDir = externalCacheDir // Get external cache directory
+//    return File.createTempFile(imageFileName, ".jpg", storageDir)
 //}
 
+fun Context.createImageFile(): File {
+    val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(Date())
+    val storageDir = externalCacheDir ?: cacheDir
+    return File.createTempFile("JPEG_${timestamp}_", ".jpg", storageDir)
+}
 

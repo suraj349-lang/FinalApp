@@ -16,10 +16,12 @@ import com.google.firebase.auth.PhoneAuthProvider
 import java.util.concurrent.TimeUnit
 
 
+interface PhoneAuthSignUp{
+    fun signInWithPhoneCredential()
+    fun sendVerificationCode()
+}
+class SignUpAuthRepo {
 
-class FirebaseRepository {
-    // on below line creating method to
-// sign in with phone credentials.
      fun signInWithPhoneAuthCredential(
         credential: PhoneAuthCredential,
         auth: FirebaseAuth,

@@ -194,7 +194,9 @@ fun CreateEventMainScreen(parentEventId:String ?= null,navController: NavHostCon
             ) {
                 Column(modifier = Modifier.fillMaxSize()) {
                    if(showLoading){
-                       LinearProgressIndicator(modifier = Modifier.fillMaxWidth().height(3.dp), color = Color(0xFF275203))
+                       LinearProgressIndicator(modifier = Modifier
+                           .fillMaxWidth()
+                           .height(3.dp), color = Color(0xFF275203))
                    }
                     CreateEvent(
                         title=title,
@@ -602,5 +604,14 @@ fun CreatePingTopNew(isActive:Boolean, onNext: () -> Unit) {
                 )
             }
         }
+    }
+}
+
+
+@Composable
+fun CategoriesList() {
+    Surface(modifier = Modifier.fillMaxSize()) {
+
+
     }
 }

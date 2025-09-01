@@ -1,27 +1,23 @@
 package com.example.finalapp.screens.auth
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.text.TextUtils
 import android.util.Log
 import android.widget.Toast
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,15 +27,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -47,10 +45,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.finalapp.R
 import com.example.finalapp.viewmodels.AuthViewModel
-import com.example.finalapp.repository.FirebaseRepository
+import com.example.finalapp.repository.SignUpAuthRepo
 import com.example.finalapp.screens.auth.util.OtpBox
-import com.example.finalapp.ui.theme.statusAndTopAppBarColor
-import com.example.finalapp.ui.theme.topAppBarTextColor
 import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.utils.constants.Constants.TAG
 import com.google.firebase.FirebaseException
@@ -61,12 +57,10 @@ import kotlinx.coroutines.launch
 
 
 @Preview(showBackground = true)
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
-@SuppressLint("UnrememberedMutableState")
 @Composable
 fun SignupScreenUI(navController: NavController = NavController(LocalContext.current)) {
 
-    val firebaseRepository = FirebaseRepository()
+    val signUpAuthRepo = SignUpAuthRepo()
     val authViewModel= hiltViewModel<AuthViewModel>()
     val focusManager = LocalFocusManager.current
     val passwordVisibility by rememberSaveable { mutableStateOf(false) }
@@ -82,69 +76,82 @@ fun SignupScreenUI(navController: NavController = NavController(LocalContext.cur
     val mAuth: FirebaseAuth = FirebaseAuth.getInstance();
     lateinit var callbacks: PhoneAuthProvider.OnVerificationStateChangedCallbacks
     val context = LocalContext.current
-    var key = remember { mutableStateOf(0) }
+    val key = remember { mutableStateOf(0) }
     val scope=rememberCoroutineScope()
-    Surface(modifier = Modifier.fillMaxSize()) {
+    Surface(modifier = Modifier.fillMaxSize(), color = Color(0xFFFFFFFF)) {
         Column(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Image(
-                painter = painterResource(id = R.drawable.tree),
-                contentDescription = "",
-                modifier = Modifier.size(20.dp)
-            )
             Text(
                 text = Constants.APP_NAME,
                 fontSize = 45.sp,
                 modifier = Modifier.padding(top = 8.dp, bottom = 0.dp),
-                color = statusAndTopAppBarColor,
-                style = MaterialTheme.typography.titleMedium
+                color = Color.Black,
+                fontFamily = Constants.APP_NAME_FONT
             )
             Text(
-                text = "date your way...",
+                text = "Dynamic,Live,Real",
                 fontSize = 18.sp,
                 modifier = Modifier.padding(top = 0.dp, start = 120.dp),
-                color = Color(
-                    0xFFE71708
-                ),
-                style = MaterialTheme.typography.titleMedium
+                color = Color(0xFF000000),
+                fontFamily =Constants.FONT_MEDIUM
             )
-            Log.d(TAG, "SignupScreenUI: called")
             if (key.value==0) {
-                Log.d(TAG, "SignupScreenUI  in key.value==0 called: ")
                 OutlinedTextField(
                     value = phoneNumber.value,
-                    onValueChange = { phoneNumber.value = it },
+                    onValueChange = {
+                        if (it.length <= 10) phoneNumber.value = it
+                        else Toast.makeText(context, "Can be 10 digits only !", Toast.LENGTH_SHORT)
+                            .show()
+                    },
+                    textStyle = TextStyle(
+                        fontFamily = Constants.FONT_MEDIUM
+                    ),
                     label = {
                         Text(
-                            text = "Enter number",
-                            style = MaterialTheme.typography.bodyMedium
+                            text = if (phoneNumber.value.isEmpty()) "Enter number..." else "Number",
+                            fontFamily = Constants.FONT_MEDIUM
                         )
                     },
-                    singleLine = true,
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color.Black,
+                        unfocusedTextColor = Color.Black,
+                        cursorColor = Color.Black,
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color.White,
+                        unfocusedLabelColor = Color.LightGray,
+                        focusedLabelColor = Color.LightGray,
+                    ),
+                    leadingIcon = {
+                        Text(
+                            text = "+91",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp, textAlign = TextAlign.Justify,
+                            color = Color.Black
+                        )
+                    },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Number,
                         imeAction = ImeAction.Next
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onNext = { focusManager.clearFocus() }
-                    )
+                    ), keyboardActions = KeyboardActions(
+                        onNext = { focusManager.clearFocus();keyboardController?.hide() })
+                    //visualTransformation = CameroonNumberVisualTransformation(),
+
 
                 )
-
                 Spacer(modifier = Modifier.height(10.dp))
                 Button(
                     onClick = {
                         // on below line we are validating user inputs
-                        if (TextUtils.isEmpty(phoneNumber.value.toString())) {
+                        if (TextUtils.isEmpty(phoneNumber.value)) {
                             Toast.makeText(context, "Please enter phone number..", Toast.LENGTH_SHORT).show()
                         } else {
 
                             val number = "+91${phoneNumber.value}"
                             key.value = 1;
                             // on below line calling method to generate verification code.
-                            firebaseRepository.sendVerificationCode(
+                            signUpAuthRepo.sendVerificationCode(
                                 number,
                                 mAuth,
                                 context as Activity,
@@ -152,13 +159,20 @@ fun SignupScreenUI(navController: NavController = NavController(LocalContext.cur
                             )
                         }
                     },
-                    modifier = Modifier.width(160.dp), colors = ButtonDefaults.buttonColors(
-                        containerColor = statusAndTopAppBarColor,
-                        contentColor = topAppBarTextColor
+                    modifier = Modifier.width(160.dp), colors = ButtonDefaults.buttonColors(containerColor = if(phoneNumber.toString().trim().length==10) Color.White else Color(
+                        0xFF112402
                     )
-                ) {
-                    // on below line we are adding text for our button
-                    Text(text = "Generate OTP", modifier = Modifier.padding(8.dp))
+                    )) {
+                    Text(
+                        text = "Generate OTP",
+                        modifier = Modifier.padding(8.dp),
+                        fontFamily = Constants.FONT_MEDIUM,
+                        color = if (phoneNumber.toString().trim().length == 10){
+                            Color.LightGray
+                        } else {
+                            Color.White
+                        }
+                    )
                 }
             }
             // adding spacer on below line.
@@ -166,7 +180,6 @@ fun SignupScreenUI(navController: NavController = NavController(LocalContext.cur
 
             if (key.value==1) {
                 OtpBox()
-                Log.d(TAG, "SignupScreenUI  in key.value===1 called: ")
                 Button(
                     onClick = {
                         if (TextUtils.isEmpty(authViewModel.otp)) {
@@ -186,7 +199,7 @@ fun SignupScreenUI(navController: NavController = NavController(LocalContext.cur
                                 PhoneAuthProvider.getCredential(verificationID.value, authViewModel.otp)
 
                             // on below line signing within credentials.
-                            firebaseRepository.signInWithPhoneAuthCredential(
+                            signUpAuthRepo.signInWithPhoneAuthCredential(
                                 credential,
                                 mAuth,
                                 context as Activity,
@@ -198,11 +211,11 @@ fun SignupScreenUI(navController: NavController = NavController(LocalContext.cur
                     },
                     modifier = Modifier.wrapContentWidth(),
                     colors = ButtonDefaults.buttonColors(
-                        contentColor = topAppBarTextColor,
-                        containerColor = statusAndTopAppBarColor
+                        contentColor = if(otp.value.length==6) Color(0xFFFFFFFF) else Color.Black,
+                        containerColor = if(otp.value.length==6) Color(0xFF112202) else Color.LightGray
                     )
                 ) {
-                    Text(text = "Submit")
+                    Text(text = "Submit", fontFamily = Constants.FONT_MEDIUM)
                 }
             }
 
@@ -222,6 +235,7 @@ fun SignupScreenUI(navController: NavController = NavController(LocalContext.cur
             override fun onVerificationFailed(p0: FirebaseException) {
                 // on below line displaying error as toast message.
                 message.value = "Fail to verify user : \n" + p0.message
+                Log.e(TAG, "onVerificationFailed: ${p0.message}", p0)
                 Toast.makeText(context, "Verification failed..", Toast.LENGTH_SHORT).show()
             }
 

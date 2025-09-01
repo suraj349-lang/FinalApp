@@ -128,8 +128,10 @@ fun ChatListScreen(navController: NavHostController,chatViewModel: ChatViewModel
                     LazyColumn(modifier = Modifier) {
                         itemsIndexed(users) { i, user ->
                             UserItem(navController, user){imageUrl->
-                                chatViewModel.profileImage.value=imageUrl
-                            }
+                                if(!imageUrl.isNullOrEmpty()) {
+                                    chatViewModel.profileImage.value = imageUrl
+                                    }
+                                }
                             Divider(modifier = Modifier.fillMaxWidth(), color = Color(0xFFF1EAEA))
                         }
                     }
@@ -222,7 +224,7 @@ fun ChatTopBar(title: String,profileImage:String, navController: NavHostControll
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun UserItem(navController: NavHostController, user: ChatList,setProfileImage:(String)->Unit){
+fun UserItem(navController: NavHostController, user: ChatList,setProfileImage:(String?)->Unit){
 
     Card(modifier = Modifier
         .padding(start = 8.dp, end = 8.dp)

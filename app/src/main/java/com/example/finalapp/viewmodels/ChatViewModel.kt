@@ -35,7 +35,7 @@ class ChatViewModel @Inject constructor(
     val messagesFromDB: StateFlow<List<Chat>> = _messagesFromDB
     private val _messagesFromServer = MutableStateFlow<RequestState<List<Message>>>(RequestState.Idle)
     val messagesFromServer: StateFlow<RequestState<List<Message>>> = _messagesFromServer
-    val profileImage= MutableStateFlow("")
+    val profileImage= MutableStateFlow<String?>(null)
 
     private val socketManager by lazy { SocketManager()}
     fun connectSocket() {

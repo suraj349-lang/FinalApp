@@ -127,14 +127,14 @@ class ImageUploadViewModel @Inject constructor(
      fun s3ImageUploadFunction(userId: String, file: File) {
          imageUploadState.value=RequestState.Loading
          viewModelScope.launch {
-             getSignedUrl(userId,file)
+             getSignedUrl(userId,file, onFailure = {imageUploadState.value=RequestState.Error(Exception("Error getting presigned url"))})
          }
      }
 
     val preSignedUrlDataState:MutableState<RequestState<PreSignedUrlResponse>> = mutableStateOf(RequestState.Idle)
     val preSignedUrlData= MutableStateFlow <PreSignedUrlResponse> (PreSignedUrlResponse("",""))
     val TAG="S3";
-    fun getSignedUrl(userId:String,file: File){
+    fun getSignedUrl(userId:String,file: File,onSuccess: () -> Unit={},onFailure:()->Unit={}){
         viewModelScope.launch {
             profileRepository.getPreSignedUrl(userId)
                 .onStart {
@@ -143,12 +143,14 @@ class ImageUploadViewModel @Inject constructor(
 
                 }.catch {
                     preSignedUrlDataState.value = RequestState.Error(it)
+                    onFailure()
                     Log.d(TAG, "preSignedUrl error ${it.message}")
 
                 }.collect {
+                    onSuccess()
                     preSignedUrlDataState.value = RequestState.Success(it)//RequestState.Success(it.data)
                     preSignedUrlData.value=PreSignedUrlResponse(it.key,it.url)
-                    uploadImageToS3(it.url, preSignedUrlData.value.key,file)
+                    uploadImageToS3(it.url, preSignedUrlData.value.key,file,onFailure={onFailure()})
                     Log.d(TAG, "preSignedUrl data ${preSignedUrlDataState.value}")
 
                 }
@@ -158,7 +160,7 @@ class ImageUploadViewModel @Inject constructor(
     val s3DataState: MutableState<RequestState<Unit>> = mutableStateOf(RequestState.Idle)
     val s3Response = MutableStateFlow(false) // Track success/failure
 
-    fun uploadImageToS3(url: String, key: String, file: File) {
+    fun uploadImageToS3(url: String, key: String, file: File,onFailure: () -> Unit ={},onSuccess: () -> Unit={}) {
         viewModelScope.launch {
             s3DataState.value = RequestState.Loading
             Log.d("S3 Upload", "s3upload loading...")
@@ -173,6 +175,7 @@ class ImageUploadViewModel @Inject constructor(
                 dropProfileModel.value?.let { dropProfile(it) }
                 Log.d("S3 Upload", "s3upload success")
             } else {
+                onFailure()
                 s3DataState.value = RequestState.Error(Exception("Upload failed"))
                 s3Response.value = false // Upload failed
                 Log.d("S3 Upload", "s3upload failed")

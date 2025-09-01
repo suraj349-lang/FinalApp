@@ -83,6 +83,8 @@ sealed class SCREENS(val route:String){
 
     //--------------------------------------
     object BUGS_AND_SUGGESTION:SCREENS("bugs")
+    object FEATURES_SCREEN:SCREENS("features_list_screen")
+    object BUG_EXPLANATION_SCREEN:SCREENS("bug_explanation_screen")
     object SAFETY_AND_PRIVACY:SCREENS("safety")
     object HELP_CENTRE:SCREENS("help_centre")
     //--------------------------------------

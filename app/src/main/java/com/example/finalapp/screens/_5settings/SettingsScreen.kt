@@ -1,6 +1,7 @@
 package com.example.finalapp.screens._5settings
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -46,6 +47,9 @@ import com.example.finalapp.viewmodels.AuthViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.view.WindowCompat
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -56,17 +60,42 @@ fun SettingsScreenUI(navController: NavHostController,authViewModel: AuthViewMod
     var showSheet by remember {
         mutableStateOf(false)
     }
+
+    val context= LocalContext.current
+    val window = (context as Activity).window
+    WindowCompat.setDecorFitsSystemWindows(window, false)
+    window.statusBarColor = Color.DarkGray.toArgb()
+    window.navigationBarColor = Color.DarkGray.toArgb()
     val list= listOf(
          MyAccount("Name", user.name,SCREENS.EDIT_NAME.route) ,
          MyAccount("Username", user.userName,SCREENS.EDIT_USER_NAME.route) ,
          MyAccount("Phone Number", user.number,SCREENS.PHONE_NUMBER.route) ,
          MyAccount("Password","",SCREENS.PASSWORD.route) ,
-         MyAccount("Delete Account","",SCREENS.DELETE_ACCOUNT.route)
+        // TODO later enable it
+        // MyAccount("Delete Account","",SCREENS.DELETE_ACCOUNT.route)
     )
-    val listSupportAndFeedback= listOf(SupportAndFeedBack("Bugs and Suggestions",SCREENS.BUGS_AND_SUGGESTION.route),SupportAndFeedBack("Safety and Privacy",SCREENS.SAFETY_AND_PRIVACY.route), SupportAndFeedBack("Help Centre",SCREENS.HELP_CENTRE.route))
+    val listSupportAndFeedback = listOf(
+        SupportAndFeedBack("Bugs and Suggestions", SCREENS.BUGS_AND_SUGGESTION.route),
+        SupportAndFeedBack("Safety and Privacy", SCREENS.SAFETY_AND_PRIVACY.route),
+       // SupportAndFeedBack("Help Centre", SCREENS.HELP_CENTRE.route)
+    )
 
-    val moreInformation= listOf(MoreInformation("Privacy Policy",SCREENS.PRIVACY_POLICY.route),MoreInformation("Safety Centre",SCREENS.SAFETY_CENTRE.route),MoreInformation("Terms of Service",SCREENS.TERMS_OF_SERVICE.route),MoreInformation("Other legal",SCREENS.OTHER_LEGAL.route))
-    val accountActions= listOf(AccountAction("Clear Search History",SCREENS.CLEAR_SEARCH_HISTORY.route),AccountAction("Permissions",SCREENS.PERMISSIONS.route),AccountAction("Blocked Users",SCREENS.BLOCKED_USERS.route),AccountAction("Saved Login Info",SCREENS.SAVED_LOGIN_INFO.route),AccountAction("My Data",SCREENS.MY_DATA.route)/*,AccountAction("Log Out",SCREENS.LOG_OUT.route)*/)
+    val moreInformation = listOf(
+        MoreInformation("Privacy Policy", SCREENS.PRIVACY_POLICY.route),
+        MoreInformation("Safety Centre", SCREENS.SAFETY_CENTRE.route),
+        MoreInformation("Terms of Service", SCREENS.TERMS_OF_SERVICE.route),
+        MoreInformation("Other legal", SCREENS.OTHER_LEGAL.route)
+    )
+    val accountActions = listOf(
+        AccountAction("Clear Search History", SCREENS.CLEAR_SEARCH_HISTORY.route),
+        AccountAction("Permissions", SCREENS.PERMISSIONS.route),
+        AccountAction("Blocked Users", SCREENS.BLOCKED_USERS.route),
+        AccountAction("Saved Login Info", SCREENS.SAVED_LOGIN_INFO.route),
+        AccountAction(
+            "My Data",
+            SCREENS.MY_DATA.route
+        )/*,AccountAction("Log Out",SCREENS.LOG_OUT.route)*/
+    )
 
     Scaffold(
         topBar = { SettingsTopBar { navController.navigate(SCREENS.HOME.route) } },
@@ -89,9 +118,9 @@ fun SettingsScreenUI(navController: NavHostController,authViewModel: AuthViewMod
                 .fillMaxSize()
                 .navigationBarsPadding()
                 .verticalScroll(rememberScrollState())) {
-                MyAccount(list as List<MyAccount>,navController)
+                MyAccount(list,navController)
                 SupportAndFeedback(list = listSupportAndFeedback,navController)
-                AccountActions(list = accountActions,navController)
+               // AccountActions(list = accountActions,navController)
             }
 
         }
@@ -115,7 +144,7 @@ fun SettingsTopBar(onBackClicked: () -> Unit) {
                 fontSize = 20.sp,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier,
-                color = homeTopBarIconsColor,
+                color = Color(0xFF121212),
                 fontFamily = Constants.FONT_MEDIUM
             )
         },
@@ -131,30 +160,35 @@ fun MyAccount(list: List<MyAccount>,navController: NavHostController) {
         modifier = Modifier
             .fillMaxWidth()
     ) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(40.dp),
-            shape = RoundedCornerShape(0.dp),
-            colors = CardDefaults.cardColors(containerColor = LIGHT_GREY_BG_COLOR),
-            border = BorderStroke(width = 0.25.dp, color = Color.LightGray)
-        ) {
-            Column(modifier = Modifier
-                .fillMaxSize()
-                .padding(start = 16.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.Start) {
-                Text(
-                    text = "MY ACCOUNT",
-                    color = LIGHT_GREEN,
-                    fontFamily = DONGLE_BOLD,
-                    fontSize = 20.sp,
-                    modifier = Modifier
-                )
-            }
-        }
+        SettingsTitleCommonTextUI("MY ACCOUNT")
         list.forEach { 
             MyAccountUI(item = it, navController)
         }
     }
+}
+
+@Composable
+fun SettingsTitleCommonTextUI(title:String) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(40.dp),
+        shape = RoundedCornerShape(0.dp),
+        colors = CardDefaults.cardColors(containerColor = LIGHT_GREY_BG_COLOR),
+        border = BorderStroke(width = 0.25.dp, color = Color.LightGray)
+    ) {
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .padding(start = 16.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.Start) {
+            Text(
+                text = title,
+                color = LIGHT_GREEN,
+                fontFamily = Constants.FONT_LIGHT,
+                fontSize = 14.sp
+            )
+        }
+    }
+    
 }
 
 @Composable
@@ -172,12 +206,12 @@ fun MyAccountUI(item:MyAccount,navController: NavHostController) {
             modifier = Modifier
                 .fillMaxWidth()
                 .height(45.dp)
-                .padding(start = 16.dp, end = 16.dp),
+                .padding(horizontal = 16.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(text = item.key, fontFamily = DONGLE_BOLD, fontSize = 18.sp)
-            Text(text = item.value, fontFamily = DONGLE_BOLD, fontSize = 22.sp)
+            Text(text = item.key, fontFamily = Constants.FONT_LIGHT, fontSize = 13.sp, color = Color(0xFF121212), fontWeight = FontWeight.Bold)
+            Text(text = item.value, fontFamily = Constants.FONT_MEDIUM, fontSize = 12.sp, color = Color.DarkGray)
         }
     }
     
@@ -187,21 +221,7 @@ fun MyAccountUI(item:MyAccount,navController: NavHostController) {
 fun SupportAndFeedback(list: List<SupportAndFeedBack>,navController: NavHostController) {
 
     Column(modifier = Modifier.fillMaxWidth()) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(45.dp),
-            shape = RoundedCornerShape(0.dp),
-            colors = CardDefaults.cardColors(containerColor = LIGHT_GREY_BG_COLOR),
-            border = BorderStroke(width = 0.25.dp, color = Color.LightGray)
-        ) {
-            Column(modifier = Modifier
-                .fillMaxSize()
-                .padding(start = 16.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.Start) {
-                Text(text = "SUPPORT AND FEEDBACK", color = Color(0xFF5BBB07), fontFamily = DONGLE_BOLD, fontSize = 20.sp)
-            }
-
-        }
+        SettingsTitleCommonTextUI(title = "SUPPORT AND FEEDBACK")
         list.forEach { item ->
             Card(
                 modifier = Modifier
@@ -219,7 +239,7 @@ fun SupportAndFeedback(list: List<SupportAndFeedBack>,navController: NavHostCont
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(text = item.key, fontFamily = DONGLE_BOLD, fontSize = 18.sp)
+                    Text(text = item.key, fontFamily = Constants.FONT_LIGHT, fontSize = 13.sp, color = Color(0xFF121212), fontWeight = FontWeight.Bold)
                 }
             }
         }
@@ -229,21 +249,7 @@ fun SupportAndFeedback(list: List<SupportAndFeedBack>,navController: NavHostCont
 fun MoreInformation(list: List<MoreInformation>, navController: NavHostController) {
 
     Column(modifier = Modifier.fillMaxWidth()) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(45.dp),
-            shape = RoundedCornerShape(0.dp),
-            colors = CardDefaults.cardColors(containerColor = LIGHT_GREY_BG_COLOR),
-            border = BorderStroke(width = 0.25.dp, color = Color.LightGray)
-        ) {
-            Column(modifier = Modifier
-                .fillMaxSize()
-                .padding(start = 16.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.Start) {
-                Text(text = "MORE INFORMATION", color = Color(0xFF5BBB07), fontFamily = DONGLE_BOLD, fontSize = 20.sp)
-            }
-
-        }
+        SettingsTitleCommonTextUI(title = "MORE INFORMATION")
         list.forEach { item ->
             Card(
                 modifier = Modifier
@@ -275,21 +281,7 @@ fun MoreInformation(list: List<MoreInformation>, navController: NavHostControlle
 fun AccountActions(list: List<AccountAction>, navController: NavHostController) {
 
     Column(modifier = Modifier.fillMaxWidth()) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(45.dp),
-            shape = RoundedCornerShape(0.dp),
-            colors = CardDefaults.cardColors(containerColor = LIGHT_GREY_BG_COLOR),
-            border = BorderStroke(width = 0.25.dp, color = Color.LightGray)
-        ) {
-            Column(modifier = Modifier
-                .fillMaxSize()
-                .padding(start = 16.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.Start) {
-                Text(text = "ACCOUNT ACTIONS", color = Color(0xFF5BBB07), fontFamily = DONGLE_BOLD, fontSize = 20.sp)
-            }
-
-        }
+        SettingsTitleCommonTextUI(title = "ACCOUNT ACTIONS")
         list.forEach { item ->
             Card(
                 modifier = Modifier
@@ -307,7 +299,7 @@ fun AccountActions(list: List<AccountAction>, navController: NavHostController) 
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(text = item.key, fontFamily = DONGLE_BOLD, fontSize = 18.sp)
+                    Text(text = item.key, fontFamily = Constants.FONT_LIGHT, fontSize = 13.sp, color = Color(0xFF121212), fontWeight = FontWeight.Bold)
                 }
             }
         }

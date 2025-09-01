@@ -55,7 +55,11 @@ fun PingItem3(item: PingResponse) {
             .padding(10.dp)
             .fillMaxWidth()
             .clip(shape = RoundedCornerShape(16.dp))
-            .border(width = 0.25.dp, color = Color.White.copy(alpha = 0.5f), shape = RoundedCornerShape(16.dp))
+            .border(
+                width = 0.25.dp,
+                color = Color.White.copy(alpha = 0.5f),
+                shape = RoundedCornerShape(16.dp)
+            )
             .background(
                 shape = RoundedCornerShape(16.dp),
                 color = Color(0xFF01011A)
@@ -65,7 +69,8 @@ fun PingItem3(item: PingResponse) {
         Column(modifier = Modifier.padding(1.dp)) {
             Card(modifier = Modifier
                 .fillMaxWidth()
-                .height(300.dp).shadow(elevation = 10.dp, spotColor = Color.White, ambientColor = Color.White), shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)) {
+                .height(300.dp)
+                .shadow(elevation = 10.dp, spotColor = Color.White, ambientColor = Color.White), shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)) {
                 AsyncImage(
                     model = imagePrefix+item.image,
                     contentDescription = "",
@@ -259,24 +264,26 @@ fun PingItem3(item: PingResponse) {
                         modifier = Modifier
                             .fillMaxWidth(),
                         shape = RoundedCornerShape(12.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color.Transparent)//0xFF1E1E1E
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFF121233))//0xFF1E1E1E
                     ) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 12.dp, vertical = 10.dp),
+                                .padding(horizontal = 12.dp)
+                                .padding(top = 10.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Button(
                                 onClick = {},
-                                colors=ButtonDefaults.buttonColors(backgroundColor = Color.White),
+                                colors=ButtonDefaults.buttonColors(backgroundColor = Color.Transparent),
+                                elevation=ButtonDefaults.elevation(0.dp),
                                 //border = BorderStroke(2.dp, Color(0xFF00D26A)),
                                 shape = RoundedCornerShape(12.dp)
                             ) {
                                 Row(
-                                    modifier = Modifier.wrapContentSize(),
-                                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                    modifier = Modifier.fillMaxWidth(0.5f),
+                                    horizontalArrangement = Arrangement.spacedBy(16.dp)
                                 ) {
                                     Image(
                                         painter = painterResource(id = R.drawable.join_blue),
@@ -285,7 +292,7 @@ fun PingItem3(item: PingResponse) {
                                     )
                                     Text(
                                         "Join",
-                                        color = Color.Black,
+                                        color = Color.White,
                                         fontFamily = Constants.FONT_MEDIUM,
                                         fontWeight = FontWeight.Bold
                                     )
@@ -295,24 +302,25 @@ fun PingItem3(item: PingResponse) {
                             Button(
                                 onClick = {},
                                // border = BorderStroke(2.dp, Color.White),
-                                colors=ButtonDefaults.buttonColors(backgroundColor = Color.White),
+                                colors=ButtonDefaults.buttonColors(backgroundColor = Color.Transparent),
+                                elevation=ButtonDefaults.elevation(0.dp),
                                 shape = RoundedCornerShape(12.dp)
                             ) {
                                 Row(
-                                    modifier = Modifier.wrapContentSize(),
-                                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                    modifier = Modifier.fillMaxWidth(1f),
+                                    horizontalArrangement = Arrangement.spacedBy(16.dp)
                                 ) {
                                     Image(
                                         painter = painterResource(id = R.drawable.chat_new),
                                         contentDescription = "",
                                         modifier = Modifier.size(18.dp),
                                         colorFilter = ColorFilter.tint(
-                                            Color.Black
+                                            Color.White
                                         )
                                     )
                                     Text(
                                         "Chat",
-                                        color = Color.Black,
+                                        color = Color.White,
                                         fontFamily = Constants.FONT_MEDIUM
                                     )
                                 }

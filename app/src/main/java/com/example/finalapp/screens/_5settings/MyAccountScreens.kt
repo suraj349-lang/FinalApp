@@ -1,17 +1,21 @@
 package com.example.finalapp.screens._5settings
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,14 +27,20 @@ import androidx.navigation.NavHostController
 import com.example.finalapp.utils.UserObject
 import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
+import com.example.finalapp.navigation.SCREENS
+import com.example.finalapp.screens.common.CommonLoadingScreen
 import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.utils.RequestState
 import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.utils.constants.Constants.DONGLE_NORMAL
 import com.example.finalapp.viewmodels.SettingsViewModel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 @Composable
 fun EditName(navController: NavHostController,settingsViewModel: SettingsViewModel) {
@@ -40,9 +50,6 @@ fun EditName(navController: NavHostController,settingsViewModel: SettingsViewMod
     }
     val updateName by settingsViewModel.updateName.collectAsState()
     when(updateName){
-        is RequestState.Loading->{
-            LinearProgressIndicator()
-        }
         is RequestState.Error ->{
             settingsViewModel.resetNameStateToIdle()
             Toast.makeText(context,"Error updating name, Try again!",Toast.LENGTH_SHORT).show()
@@ -50,6 +57,7 @@ fun EditName(navController: NavHostController,settingsViewModel: SettingsViewMod
         is RequestState.Success ->{
             settingsViewModel.resetNameStateToIdle()
             Toast.makeText(context,"Name updated successfully.",Toast.LENGTH_SHORT).show()
+            navController.navigate(SCREENS.SETTINGS.route)
         }
         else ->{
 
@@ -61,17 +69,22 @@ fun EditName(navController: NavHostController,settingsViewModel: SettingsViewMod
         }
     },
         content = { padding ->
+            Column(modifier = Modifier
+                .fillMaxSize()
+                .padding(padding),) {
+                if(updateName==RequestState.Loading){
+                    LinearProgressIndicator()
+                }
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding),
+                    .fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(text = "Update Your Name", fontSize = 24.sp, fontFamily = Constants.FONT_MEDIUM)
+                Text(text = "update", fontSize = 24.sp, fontFamily = Constants.FONT_MEDIUM)
                 OutlinedTextField(value = name, onValueChange = { name = it })
                 Button(
-                    onClick = {if(name.trim().isNotEmpty()) settingsViewModel.updateName(name)},
+                    onClick = { if (name.trim().isNotEmpty()) settingsViewModel.updateName(name) },
                     colors = ButtonDefaults.buttonColors(containerColor = floatingActionBtnColor)
                 ) {
                     Text(
@@ -80,75 +93,100 @@ fun EditName(navController: NavHostController,settingsViewModel: SettingsViewMod
                         fontSize = 14.sp,
                         color = Color.White
                     )
-
                 }
-
-
+            }
             }
         }
     )
-
 }
-
 @Composable
-fun EditUserName(navController: NavHostController,settingsViewModel: SettingsViewModel) {
-    val savedUsername=UserObject.user.collectAsState()
-    var userName by remember {
-        mutableStateOf("")
-    }
-    val context= LocalContext.current
-    val updateUserName by settingsViewModel.updateUserName.collectAsState()
-    when(updateUserName){
-        is RequestState.Loading->{
-            LinearProgressIndicator()
-        }
-        is RequestState.Error ->{
-            Toast.makeText(context,"Error updating name, Try again!",Toast.LENGTH_SHORT).show()
-            settingsViewModel.resetUserNameStateToIdle()
-        }
-        is RequestState.Success ->{
-            userName=savedUsername.value.name
-            Toast.makeText(context,"Name updated successfully.",Toast.LENGTH_SHORT).show()
-            settingsViewModel.resetUserNameStateToIdle()
-        }
-        else ->{
+fun EditUserName(
+    navController: NavHostController,
+    settingsViewModel: SettingsViewModel
+) {
+    val savedUsername = UserObject.user.collectAsState()
+    var userName by remember { mutableStateOf("") }
 
+    val context = LocalContext.current
+    val updateUserNameState = settingsViewModel.updateUserName.collectAsState()
+
+    val currentState = updateUserNameState.value
+
+    LaunchedEffect(currentState) {
+        when (currentState) {
+            is RequestState.Success -> {
+                Toast.makeText(context, "Username updated successfully.", Toast.LENGTH_SHORT).show()
+                settingsViewModel.resetUserNameStateToIdle()
+                navController.navigate(SCREENS.SETTINGS.route)
+            }
+            is RequestState.Error -> {
+                Toast.makeText(context, "Error updating name, Try again!", Toast.LENGTH_SHORT).show()
+                settingsViewModel.resetUserNameStateToIdle()
+            }
+            else -> {}
         }
     }
-    Scaffold(topBar = {
-        CommonTopBar(title = "Your UserName") {
-            navController.navigateUp()
-        }
-    },
+
+    Scaffold(
+        topBar = {
+            CommonTopBar(title = "Your UserName") {
+                navController.navigateUp()
+            }
+        },
         content = { padding ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(text = "Update Your UserName", fontSize = 30.sp, fontFamily = DONGLE_BOLD)
-                OutlinedTextField(value = userName.ifEmpty { savedUsername.value.userName }, onValueChange = { userName = it })
-                Button(
-                    onClick = {if(userName.trim().isNotEmpty()) { settingsViewModel.updateUserName(userName) }  },
-                    colors = ButtonDefaults.buttonColors(containerColor = floatingActionBtnColor)
+            Column(modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)) {
+                if (currentState is RequestState.Loading) {
+                    LinearProgressIndicator(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                    )
+                }
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text(
-                        text = "Update UserName",
-                        fontFamily = DONGLE_NORMAL,
-                        fontSize = 20.sp,
-                        color = Color.White
+                    OutlinedTextField(
+                        value = userName.ifEmpty { savedUsername.value.userName },
+                        onValueChange = { userName = it },
+                        textStyle = TextStyle(fontFamily = Constants.FONT_MEDIUM),
+                        label = { Text("Username", fontFamily = Constants.FONT_MEDIUM) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 8.dp)
                     )
 
+                    Button(
+                        onClick = {
+                            if (userName.trim().isNotEmpty()) {
+                                settingsViewModel.updateUserName(userName.trim())
+                            }
+                        },
+                        enabled = savedUsername.value.userName != userName && userName.trim()
+                            .isNotEmpty(),
+                        colors = ButtonDefaults.buttonColors(containerColor = floatingActionBtnColor),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp)
+                    ) {
+                        Text(
+                            text = "Update userName",
+                            fontFamily = Constants.FONT_MEDIUM,
+                            fontSize = 20.sp,
+                            color = Color.White
+                        )
+                    }
                 }
-
-
             }
         }
     )
-
 }
+
 
 @Composable
 fun EditPhoneNumber(navController: NavHostController) {

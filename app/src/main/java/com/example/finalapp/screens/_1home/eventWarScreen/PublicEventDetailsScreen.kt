@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,17 +20,19 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
@@ -39,6 +41,8 @@ import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -61,16 +65,22 @@ import com.example.finalapp.utils.constants.Constants
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import com.example.finalapp.model.DropProfileResponse
 import com.example.finalapp.model.EventResponse
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens._1home.DirectChatScreen
+import com.example.finalapp.screens._1home.EventAndPingDesigns.events.EventTags
+import com.example.finalapp.screens._1home.EventAndPingDesigns.events.MicroPosts
 import com.example.finalapp.screens.dialogBox.DialogError
 import com.example.finalapp.screens.dialogBox.DialogLoading
 import com.example.finalapp.testing.TabItem
@@ -98,7 +108,7 @@ fun PublicEventDetailsScreenWrapper(id:String,navController: NavHostController,e
                 is RequestState.Success ->{
                     Surface(modifier = Modifier
                         .padding(it)
-                        .fillMaxSize()) {
+                        .fillMaxSize(), color = Color.Black) {
                         PublicEventDetailsScreen(response.data, authViewModel ,eventsViewModel, navController,{ navController.navigateUp() }) {
                             navController.navigate(SCREENS.COMMENT.route)
                         }
@@ -131,7 +141,16 @@ fun PublicEventDetailsScreenWrapper(id:String,navController: NavHostController,e
     )
 }
 
-
+@Composable
+fun EventTagsDetailsScreen() {
+    Card(modifier = Modifier
+        .padding(start = 4.dp)
+        .wrapContentSize(), colors = CardDefaults.cardColors(containerColor = Color.Transparent)) {
+        Text(text = "#SSC protest", fontFamily = Constants.FONT_MEDIUM, fontWeight = FontWeight.SemiBold, color = Color(
+            0xFF5466D3
+        ), fontSize = 18.sp, modifier = Modifier.padding(4.dp))
+    }
+}
 @Composable
 fun PublicEventDetailsScreen(
     response: EventResponse,
@@ -141,65 +160,140 @@ fun PublicEventDetailsScreen(
     onBackClicked: () -> Unit,
     onCommentClicked: () -> Unit
 ) {
-    Box(modifier = Modifier
+    Surface(modifier = Modifier
         .fillMaxSize()
-        .background(color = Color(0xFF24056F))) {
-        Image(
-            painter = painterResource(id = R.drawable.baseline_arrow_back_24),
-            contentDescription = "",
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .shadow(elevation = 10.dp, spotColor = Color.White)
-                .zIndex(10f)
-                .size(30.dp)
-                .clickable { onBackClicked() },
-            colorFilter = ColorFilter.tint(Color.White)
-        )
+        .background(color = Color(0xFF000000))) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight()
-                .verticalScroll(rememberScrollState())
-        ) {
-            Box(
-                modifier = Modifier
-                    .shadow(elevation = 30.dp, ambientColor = Color.White, spotColor = Color.White)
-                    .zIndex(6f)
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-            ) {
-                AsyncImage(
-                    model = imagePrefix + response.image,
-                    contentDescription = "",
+            Modifier
+                .background(Color.Black)
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())) {
+                Row(modifier = Modifier.shadow(elevation = 20.dp, spotColor = Color.White).zIndex(5f).background(Color.Black).fillMaxWidth().padding(vertical = 4.dp),verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp))  {
+                    Image(
+                        painter = painterResource(id = R.drawable.baseline_arrow_back_24),
+                        contentDescription = "",
+                        modifier = Modifier.padding(start = 8.dp)
+                            .shadow(elevation = 2.dp)
+                            .zIndex(2f)
+                            .size(24.dp)
+                            .clickable { onBackClicked() },
+                        colorFilter = ColorFilter.tint(Color.White)
+                    )
+                    Card(Modifier.size(36.dp).shadow(elevation = 10.dp, spotColor = Color.White), shape = CircleShape, elevation = CardDefaults.cardElevation(20.dp)) {
+                        AsyncImage(model = imagePrefix+response.user.profileImage, contentDescription ="", modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop )
+                    }
+                    Text(text = response.user.name, color = Color.White, modifier = Modifier.shadow(elevation = 10.dp, spotColor = Color.White))
+                }
+
+                Box(
                     modifier = Modifier
-                        .padding(horizontal = 2.dp)
-                        .padding(bottom = 2.dp)
                         .fillMaxWidth()
                         .wrapContentHeight()
-                        .shadow(elevation = 10.dp, spotColor = Color.White)
-                        .zIndex(10f),
-                    contentScale = ContentScale.FillBounds
-                )
-            }
-            PeopleCommentWar(
-                response.upvoted,
-                response.downvoted,
-                response.totalUpVotes,
-                response.totalDownVotes,
-                response.totalComments,
-                response.totalJoined,
-                onUpVoteClicked = {},
-                onDownVoteClicked = {},
-                onShareClicked = {},
-                onCommentClicked = { onCommentClicked() }
-            )
+                ) {
+                    AsyncImage(
+                        model = imagePrefix + response.image,
+                        contentDescription = "",
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .fillMaxWidth()
+                            .heightIn(200.dp, 600.dp),
+                        contentScale = ContentScale.Crop
+                    )
+                    Box(modifier = Modifier.align(Alignment.BottomEnd)) {
+                        PeopleCommentWar(
+                            response.upvoted,
+                            response.downvoted,
+                            response.totalUpVotes,
+                            response.totalDownVotes,
+                            response.totalComments,
+                            response.totalJoined,
+                            onUpVoteClicked = {},
+                            onDownVoteClicked = {},
+                            onShareClicked = {},
+                            onCommentClicked = { onCommentClicked() }
+                        )
+                    }
+                }
+
+
+//            Column(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .fillMaxHeight()
+//                    .verticalScroll(rememberScrollState())
+//            ) {
+            EventTagsDetailsScreen()
             EventTitleAndDescriptionWar(
-                eventTitle = response.title,
-                eventDescription = response.description
+                    eventTitle = response.title,
+                    eventDescription = response.description
+            )
+            //----------------------------------------------------------------------------------------------------------//
+            Divider(modifier = Modifier.fillMaxWidth(), thickness = 0.5.dp, color = Color.LightGray.copy(alpha = 0.8f))
+
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 4.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+                Text(text = "Nearby users:", modifier = Modifier, fontWeight = FontWeight.Bold, fontSize = 18.sp, fontFamily = Constants.FONT_MEDIUM, color = Color.White)
+                Text(text = "see all", modifier = Modifier, fontWeight = FontWeight.Bold, fontSize = 13.sp, style = TextStyle(textDecoration = TextDecoration.Underline),fontFamily = Constants.FONT_MEDIUM, color = Color.White)
+            }
+            Spacer(modifier = Modifier.height(10.dp))
+            ChildMicroNearByUsersInDetailsScreen(
+                users = response.childNearByUsers ?: emptyList(),
+                onAddChildPostClicked = { /*TODO*/ },
+                onProfileClicked = {//navController.navigate(SCREENS.DROP_PROFILE_USER_PROFILE.createRoute())
+                }
+            )
+            //----------------------------------------------------------------------------------------------------------//
+            Divider(modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 10.dp), thickness = 0.5.dp, color = Color.LightGray.copy(alpha = 0.8f))
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 4.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+                Text(text = "Dropped profiles:", modifier = Modifier, fontWeight = FontWeight.SemiBold, fontFamily = Constants.FONT_MEDIUM, color = Color.White)
+                Text(text = "see all", modifier = Modifier, fontWeight = FontWeight.Bold, fontSize = 13.sp, style = TextStyle(textDecoration = TextDecoration.Underline),fontFamily = Constants.FONT_MEDIUM, color = Color.White)     }
+            ChildMicroDropProfilesInDetailsScreen(
+                    dropProfiles = response.childDropProfiles ?: emptyList(),
+                    onAddChildPostClicked = { /*TODO*/ },
+                    onChildPostClicked ={}
             )
 
-            ThreeOptions(events = response.childPosts ?: listOf(), authViewModel, eventsViewModel , navController )
+            //----------------------------------------------------------------------------------------------------------//
+            Divider(modifier = Modifier.fillMaxWidth(), thickness = 0.5.dp, color = Color.LightGray.copy(alpha = 0.8f))
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 4.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+                Text(text = "Child posts:", modifier = Modifier, fontWeight = FontWeight.SemiBold, fontFamily = Constants.FONT_MEDIUM, color = Color.White)
+                Text(text = "see all", modifier = Modifier, fontWeight = FontWeight.Bold, fontSize = 13.sp, style = TextStyle(textDecoration = TextDecoration.Underline),fontFamily = Constants.FONT_MEDIUM, color = Color.White)            }
+            ChildMicroPostsInDetailsScreen(
+                    events = response.childPosts ?: emptyList(),
+                    onAddChildPostClicked = { /*TODO*/ },
+                    onChildPostClicked ={}
+            )
+            //----------------------------------------------------------------------------------------------------------//
+            Divider(modifier = Modifier.fillMaxWidth(), thickness = 0.5.dp, color = Color.LightGray.copy(alpha = 0.8f))
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 4.dp), horizontalArrangement = Arrangement.SpaceBetween) {
+                Text(text = "Event pings:", modifier = Modifier, fontWeight = FontWeight.SemiBold, fontFamily = Constants.FONT_MEDIUM, color = Color.White)
+                Text(text = "see all", modifier = Modifier, fontWeight = FontWeight.Bold, fontSize = 13.sp, style = TextStyle(textDecoration = TextDecoration.Underline),fontFamily = Constants.FONT_MEDIUM, color = Color.White)           }
+            ChildMicroPingsInDetailsScreen(
+                    events = response.childPings ?: emptyList(),
+                    onAddChildPostClicked = { /*TODO*/ },
+                    onChildPostClicked ={}
+            )
+            //----------------------------------------------------------------------------------------------------------//
 
+//                ThreeOptions(
+//                    events = response.childPosts ?: listOf(),
+//                    authViewModel,
+//                    eventsViewModel,
+//                    navController
+//                )
+
+
+
+           // }
         }
     }
 }
@@ -232,19 +326,17 @@ fun PeopleCommentWar(
 
 
     Box(modifier = Modifier
-        .shadow(elevation = 1.dp, spotColor = Color.White)
         .zIndex(4f)
-        .fillMaxWidth()
-        .height(50.dp)
+        .shadow(elevation = 20.dp)
+        .width(50.dp)
+        .wrapContentHeight()
         .clip(shape = RoundedCornerShape(2.dp))
-        .background(Color(0xFF03061F)))
+        .background(Color.Transparent))
     {
-        Row(
+        Column(
             modifier = Modifier
                 .padding(start = 4.dp)
-                .fillMaxSize(),
-            verticalAlignment = Alignment.Bottom,
-            horizontalArrangement = Arrangement.spacedBy(30.dp)
+                .fillMaxSize()
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -258,12 +350,12 @@ fun PeopleCommentWar(
                 Image(
                     painter = painterResource(id = if (upVotedIcon) R.drawable.upvote else R.drawable.upvote_empty),
                     contentDescription = "",
-                    modifier = Modifier.size(20.dp),
+                    modifier = Modifier.size(24.dp),
                     colorFilter = ColorFilter.tint(Color.White)
                 )
                 Text(
                     text = totalUpVotes.toString(),
-                    fontSize = 10.sp,
+                    fontSize = 12.sp,
                     fontFamily = Constants.FONT_LIGHT,
                     color = Color.White
                 )
@@ -281,12 +373,12 @@ fun PeopleCommentWar(
                 Image(
                     painter = painterResource(id = if (downVotedIcon) R.drawable.downvote_empty else R.drawable.arrow_down),
                     contentDescription = "",
-                    modifier = Modifier.size(20.dp),
+                    modifier = Modifier.size(24.dp),
                     colorFilter = ColorFilter.tint(Color.White)
                 )
                 Text(
                     text = totalDownVotes.toString(),
-                    fontSize = 10.sp,
+                    fontSize = 12.sp,
                     fontFamily = Constants.FONT_LIGHT,
                     color = Color.White
                 )
@@ -329,9 +421,9 @@ fun PeopleCommentWar(
 ////                Image(painter = painterResource(id = R.drawable.share), contentDescription ="", modifier = Modifier.size(20.dp),colorFilter = ColorFilter.tint(Color.White) )
 ////
 //            }
-            Button(onClick = { onContributeClicked() }, colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF062442))) {
-                Text(text= "+Contribute" , fontSize = 14.sp, color = Color.White, fontFamily = Constants.FONT_MEDIUM)
-            }
+//            Button(onClick = { onContributeClicked() }, colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF062442))) {
+//                Text(text= "+Contribute" , fontSize = 14.sp, color = Color.White, fontFamily = Constants.FONT_MEDIUM)
+//            }
 //            Column( horizontalAlignment = Alignment.CenterHorizontally) {
 //
 //            }

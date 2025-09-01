@@ -29,7 +29,7 @@ sealed class DirectChatPagerPages(
     )
     object Fourth : DirectChatPagerPages(
         image = R.drawable.privacy,
-        title = "Privacy with intrigue.",
+        title = "Privacy first.",
         description = "Your privacy is protected."
     )
 }

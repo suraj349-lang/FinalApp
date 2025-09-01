@@ -1,4 +1,17 @@
-<paths>
-    <cache-path name="cache" path="." />
-</paths>
+<?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- For internal cacheDir -->
+    <cache-path
+        name="cache"
+        path="." />
 
+    <!-- For external cache dir (matches /storage/emulated/0/Android/data/.../cache/) -->
+    <external-cache-path
+        name="external_cache"
+        path="." />
+
+    <!-- Optional: external files directory if you want pictures there -->
+    <external-path
+        name="external_files"
+        path="." />
+</paths>

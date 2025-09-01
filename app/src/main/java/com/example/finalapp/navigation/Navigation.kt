@@ -45,6 +45,7 @@ import com.example.finalapp.screens._4profile.UserPublicProfile
 import com.example.finalapp.screens._4profile.dropProfileUserProfile.DropProfileUserProfile
 import com.example.finalapp.screens._4profile.privateUsername.PrivateUserNameScreenWrapper
 import com.example.finalapp.screens._5settings.BlockedUsers
+import com.example.finalapp.screens._5settings.BugExplanationScreen
 import com.example.finalapp.screens._5settings.BugsAndSuggestion
 import com.example.finalapp.screens._5settings.ClearSearchHistory
 import com.example.finalapp.screens._5settings.DeleteAccount
@@ -52,6 +53,7 @@ import com.example.finalapp.screens._5settings.EditName
 import com.example.finalapp.screens._5settings.EditPassword
 import com.example.finalapp.screens._5settings.EditPhoneNumber
 import com.example.finalapp.screens._5settings.EditUserName
+import com.example.finalapp.screens._5settings.FeaturesListScreen
 import com.example.finalapp.screens._5settings.HelpCentre
 import com.example.finalapp.screens._5settings.Logout
 import com.example.finalapp.screens._5settings.MyData
@@ -266,7 +268,19 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
             DeleteAccount(navController = navController)
         }
         composable(SCREENS.BUGS_AND_SUGGESTION.route){
-            BugsAndSuggestion(navController = navController)
+            BugsAndSuggestion(navController = navController){
+
+            }
+        }
+        composable(SCREENS.FEATURES_SCREEN.route){
+            FeaturesListScreen({navController.navigate(SCREENS.BUG_EXPLANATION_SCREEN.route)}){
+                navController.navigateUp()
+            }
+        }
+        composable(SCREENS.BUG_EXPLANATION_SCREEN.route){
+            BugExplanationScreen(){
+                navController.navigateUp()
+            }
         }
         composable(SCREENS.SAFETY_AND_PRIVACY.route){
             SafetyAndPrivacy(navController = navController)

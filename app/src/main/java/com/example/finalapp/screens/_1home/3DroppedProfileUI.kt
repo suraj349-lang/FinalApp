@@ -190,7 +190,7 @@ fun DroppedProfilesUI(
                                     Image(painter = painterResource(id = R.drawable.edit_new), contentDescription ="", modifier = Modifier
                                         .size(12.dp), colorFilter = ColorFilter.tint(Color.White) )
                                     Text(
-                                        text = "Change location",
+                                        text = "Search location",
                                         fontWeight = FontWeight.Medium,
                                         fontSize = 10.sp,
                                         color = Color.White,

@@ -64,7 +64,8 @@ fun ShowQRDialog(navController: NavHostController, onDismiss: () -> Unit) {
 //                    )
                     brush = Brush.verticalGradient(
                         colors = listOf(
-                            Color(0xFFFBC02D), Color(0xFFFFA000)
+                            Color(0xFFFBC02D), Color(0xFF4559DA)
+                           // Color(0xFFFBC02D), Color(0xFFFFA000)
                         )
                     )
                 )

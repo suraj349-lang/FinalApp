@@ -31,15 +31,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Surface
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
 import androidx.compose.material.TabRowDefaults
@@ -48,7 +45,8 @@ import androidx.compose.material.Text
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
-import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -61,7 +59,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -70,6 +67,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -87,7 +85,6 @@ import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens._3createEventOrPing.CreateEventOrPingBottomSheet
 import com.example.finalapp.screens._4profile.myPings.MyPings
 import com.example.finalapp.screens._4profile.privateUsername.PasswordForPrivateUsername
-import com.example.finalapp.screens.common.CommonErrorScreen
 import com.example.finalapp.screens.dialogBox.DropProfileDialog
 import com.example.finalapp.screens.dialogBox.uriToFile
 import com.example.finalapp.ui.imagePrefix
@@ -108,12 +105,13 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
     var showPasswordDialog by remember {
         mutableStateOf(false)
     }
-    val tabs = listOf("Events", "Pings")
+    var expanded by remember { mutableStateOf(false) }
+    val tabs = listOf("Posts", "Pings")
     var selectedTabIndex by remember { mutableStateOf(0) }
     val lazyListState = rememberLazyListState()
     val user by UserObject.user.collectAsState()
 
-    var showCustomDialog by remember { mutableStateOf(false) }
+    var showDropProfileDialog by remember { mutableStateOf(false) }
     var showSheetForImageUpdate by remember { mutableStateOf(false) }
     var showSheet by remember { mutableStateOf(false) }
     val startProfileImageUpload=imageUploadViewModel.startProfileImageUpload.collectAsState()
@@ -173,7 +171,7 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
         }
     }
     val systemUiController = rememberSystemUiController()
-    val backgroundColor = Color(0xFF040A36)
+    val backgroundColor = Color(0xFF90941D)//0xFF040A36 0xFFC7A246
     val upperCardColor= Color.Black
     val navColor=Color.DarkGray
 
@@ -193,8 +191,8 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
     }
 
 
-    if (showCustomDialog) {
-        DropProfileDialog(authViewModel ,eventsViewModel , imageUploadViewModel ,navController ) { showCustomDialog = !showCustomDialog }
+    if (showDropProfileDialog) {
+        DropProfileDialog(authViewModel ,eventsViewModel , imageUploadViewModel ,navController ) { showDropProfileDialog = !showDropProfileDialog }
     }
     if(showPasswordDialog){
         PasswordForPrivateUsername(onDismiss = {showPasswordDialog=false}, onEnterClicked = {navController.navigate(SCREENS.PRIVATE_PROFILE.route)})
@@ -244,7 +242,7 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(200.dp)
+                        .height(250.dp)
                         .background(color = upperCardColor)
                 ) { // 0xFF1B1A1A
                     AsyncImage(
@@ -269,15 +267,16 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                     Row(modifier = Modifier
                         .wrapContentWidth()
                         .align(Alignment.TopEnd)
-                        .clickable {
-                            pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
-                        },
+                        .padding(end = 16.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Text(
                             text = "Add Background image",
                             fontSize = 8.sp,
+                            modifier=Modifier.clickable {
+                                pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                            },
                             fontFamily = Constants.FONT_MEDIUM,
                             color = Color.White
                         )
@@ -285,13 +284,87 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                             painterResource(id = R.drawable.edit_new),
                             contentDescription = "",
                             modifier = Modifier
+                                .clickable {
+                                    pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                                }
                                 .padding(16.dp)
                                 .size(30.dp),
                             contentScale = ContentScale.Crop,
-                            colorFilter = ColorFilter.tint(Color.White)
+                            colorFilter = ColorFilter.tint(Color.White.copy(alpha = 0.9f))
                         )
+                        Box {
+                            Image(
+                                painterResource(id = R.drawable.settings_new),
+                                contentDescription = "Menu",
+                                modifier = Modifier
+                                    .clickable { expanded = true }
+                                    .padding(16.dp)
+                                    .size(30.dp),
+                                contentScale = ContentScale.Crop,
+                                colorFilter = ColorFilter.tint(Color.White.copy(alpha = 0.9f))
+                            )
+
+                            DropdownMenu(
+                                expanded = expanded,
+                                modifier = Modifier.wrapContentSize(),
+                                onDismissRequest = { expanded = false }
+                            ) {
+                                DropdownMenuItem(
+                                    text = { Text(
+                                        "Logout",
+                                        fontSize = 16.sp,
+                                        fontFamily = Constants.FONT_MEDIUM,
+                                        color = Color.Black
+                                    ) },
+                                    modifier = Modifier.wrapContentSize(),
+                                    leadingIcon = {
+                                        Image(
+                                            painterResource(id = R.drawable.logout),
+                                            contentDescription = "Logout",
+                                            modifier = Modifier
+                                                .size(20.dp),
+                                            contentScale = ContentScale.Crop,
+                                        )
+                                    },
+                                    onClick = {
+                                        expanded = false
+                                        authViewModel.logout {
+                                            navController.navigate(SCREENS.LOGIN.route) {
+                                                popUpTo(0) {
+                                                    inclusive = true
+                                                } // This clears the entire back stack
+                                                launchSingleTop = true
+                                            }
+                                        }
+                                    }
+                                )
+                                DropdownMenuItem(
+                                    text = { Text(
+                                        "Settings",
+                                        fontSize = 16.sp,
+                                        fontFamily = Constants.FONT_MEDIUM,
+                                        color = Color.Black
+                                    ) },
+                                    modifier = Modifier.wrapContentSize(),
+                                    leadingIcon = {
+                                        Image(
+                                            painterResource(id = R.drawable.settings_new),
+                                            contentDescription = "settings",
+                                            modifier = Modifier
+                                                .size(20.dp),
+                                            contentScale = ContentScale.Crop,
+                                        )
+                                    },
+                                    onClick = {
+                                        expanded = false
+                                        navController.navigate(SCREENS.SETTINGS.route)
+                                    }
+                                )
+                            }
+                        }
 
                     }
+
 
 
                     Column(
@@ -398,7 +471,7 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                                         Text(
                                             text = "Edit account",
                                             color = Color.White,
-                                            fontWeight = FontWeight.Bold
+                                            fontFamily = Constants.FONT_LIGHT
                                         )
                                     }
 
@@ -418,7 +491,7 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                                         Text(
                                             text = "Private profile",
                                             color = Color.White,
-                                            fontWeight = FontWeight.Bold
+                                            fontFamily = Constants.FONT_LIGHT
                                         )
                                     }
 
@@ -443,14 +516,27 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
 
                     when (val response = userDropProfilesList) {
                         is RequestState.Loading -> CircularProgressIndicator()
-                        is RequestState.Error -> CommonErrorScreen(error = "Error getting events!") {
-                            eventsViewModel.getUserDropProfiles(user.user)
+                        is RequestState.Error -> {
+                            //Toast.makeText(context,"error getting recent drops",Toast.LENGTH_SHORT).show()
+                            //Log.e("Error", "ProfileScreenNew: ${response.error.printStackTrace()}",response.error )
+                            RecentDrops(
+                                emptyList(),
+                                onDropProfileClicked = { showDropProfileDialog = !showDropProfileDialog },
+                                onItemClicked = {
+                                    val route = SCREENS.DROP_PROFILE_USER_PROFILE.createRoute(it)
+                                    navController.navigate(route)
+                                }
+                            )
                         }
+
+//                            NoEventsFoundScreen(backgroundColor,error = "No profiles found!") {
+//                            eventsViewModel.getUserDropProfiles(user.user)
+//                        }
 
                         is RequestState.Success -> {
                             RecentDrops(
                                 response.data.data,
-                                onDropProfileClicked = { showCustomDialog = !showCustomDialog },
+                                onDropProfileClicked = { showDropProfileDialog = !showDropProfileDialog },
                                 onItemClicked = {
                                     val route = SCREENS.DROP_PROFILE_USER_PROFILE.createRoute(it)
                                     navController.navigate(route)
@@ -469,20 +555,22 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                             indicator = { tabPositions ->
                                 TabRowDefaults.Indicator(
                                     Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
-                                    color = Constants.TAB_ROW_INDICATOR_COLOR,
-                                    height = 2.dp
+                                    color = Color.LightGray.copy(alpha =1f),
+                                    height = 8.dp
                                 )
                             },
                             selectedTabIndex = selectedTabIndex,
                             modifier = Modifier.fillMaxWidth(),
-                            backgroundColor = Color.Black,
-                            contentColor = Color.White
+                            backgroundColor = backgroundColor,
+                            contentColor = Color.Black
                         ) {
                             tabs.forEachIndexed { index, title ->
                                 Tab(
                                     selected = selectedTabIndex == index,
                                     onClick = { selectedTabIndex = index },
-                                    text = { Text(title, fontFamily = Constants.FONT_LIGHT, fontSize = 14.sp) }
+                                    selectedContentColor = Color.White,
+                                    unselectedContentColor = Color.LightGray,
+                                    text = { Text(title, fontFamily = Constants.FONT_MEDIUM, fontSize = 14.sp) }
                                 )
                             }
                         }
@@ -492,13 +580,14 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                                 when (val response = userEventsList) {
                                     is RequestState.Loading -> CircularProgressIndicator()
                                     is RequestState.Error ->
-                                        CommonErrorScreen(
-                                            error = "Error getting events!",
-                                            onRetryClicked = { eventsViewModel.getUserEvents(user.user) }
-                                        )
+                                        MyPosts(emptyList()) {}
+//                                        CommonErrorScreen(
+//                                            error = "Error getting events!",
+//                                            onRetryClicked = { eventsViewModel.getUserEvents(user.user) }
+//                                        )
 
                                     is RequestState.Success -> {
-                                        MyEvents(response.data) {
+                                        MyPosts(response.data) {
                                             navController.navigate(SCREENS.CREATE_EVENT.route)
                                         }
                                     }
@@ -510,9 +599,7 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                             1 -> {
                                 when (val response = userPingsList) {
                                     is RequestState.Loading -> CircularProgressIndicator()
-                                    is RequestState.Error -> CommonErrorScreen(error = "Error getting pings!") {
-                                        eventsViewModel.getUserPings(user.user)
-                                    }
+                                    is RequestState.Error -> MyPings(emptyList()) {  }
 
                                     is RequestState.Success -> {
                                         MyPings(response.data) {
@@ -533,14 +620,7 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                 //UserStatsScreen(12,12,34)
                 LogoutUser(
                     onLogoutClicked = {
-                        authViewModel.logout {
-                            navController.navigate(SCREENS.LOGIN.route) {
-                                popUpTo(0) {
-                                    inclusive = true
-                                } // This clears the entire back stack
-                                launchSingleTop = true
-                            }
-                        }
+
                     })
             }
         }
@@ -560,54 +640,131 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
 }
 
 
-
-
+@Preview(showBackground = true)
 @Composable
-fun MyEvents(items: List<EventResponse>, onAddEventClicked:()->Unit) {
-    val eventsList=remember{ items}
-    Column() {
-        LazyRow{
-            items(eventsList){item->
-                MyEventItem(item)
-
-            }
-        }
-        Card(modifier = Modifier
-            .clickable { onAddEventClicked() }
-            .padding(top = 8.dp)
-            .fillMaxWidth()
-            .height(40.dp),
-            backgroundColor = Color(0xFF121212),
-            border = BorderStroke(width = 1.dp, brush = Brush.linearGradient(colors = listOf(Color(0xFFF7B206), Color(0xFF540575)))))
-        {
-            Row(
+fun MyPosts(
+    items: List<EventResponse> = emptyList(),
+    onAddEventClicked: () -> Unit = {}
+) {
+    val eventsList = remember { items }
+    Column(modifier = Modifier.fillMaxSize()) {
+        if (items.isEmpty()) {
+            Card(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start
+                    .clickable { onAddEventClicked() }
+                    .padding(16.dp)
+                    .fillMaxWidth()
+                    .height(200.dp),
+                shape = RoundedCornerShape(16.dp),
+                backgroundColor = Color(0xFFEAF3FF) // light blue-ish for events
             ) {
-                Image(
-                    painterResource(id = R.drawable.add),
-                    contentDescription = "",
-                    colorFilter = ColorFilter.tint(Color(0xFF033666)),
-                    modifier = Modifier.size(30.dp)
-                )
-                Text(
-                    text = "Create new Event",
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    fontFamily = Constants.FONT_MEDIUM,
-                    color = Color.White
-                )
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(120.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.event), // add event icon
+                            contentDescription = "",
+                            modifier = Modifier.size(80.dp),
+                            contentScale = ContentScale.Crop
+                        )
 
+                        Spacer(modifier = Modifier.width(12.dp))
+
+                        Column(modifier = Modifier.fillMaxSize()) {
+                            Text(
+                                text = "🎉 No Posts Yet!",
+                                fontFamily = Constants.FONT_MEDIUM,
+                                fontSize = 14.sp,
+                                color = Color(0xFF121212)
+                            )
+                            Text(
+                                text = "Create your first Post",
+                                fontFamily = Constants.FONT_MEDIUM,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 18.sp,
+                                color = Color(0xFF121212)
+                            )
+                            Text(
+                                text = "Create a live post that nearby users can see. Let others drop their profile, join the conversation with child posts, or even raise a Ping linked to your post.",
+                                fontFamily = Constants.FONT_LIGHT,
+                                fontSize = 12.sp,
+                                lineHeight = 14.sp,
+                                color = Color.DarkGray,
+                                maxLines = 5,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp)
+                            .padding(horizontal = 8.dp),
+                        shape = RoundedCornerShape(50),
+                        backgroundColor = Color(0xFF121212)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxSize(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
+                        ) {
+                            Text(
+                                text = "➕ Create Event",
+                                fontSize = 16.sp,
+                                fontFamily = Constants.FONT_LIGHT,
+                                color = Color.White
+                            )
+                        }
+                    }
+                }
             }
-            
+        } else {
+            LazyRow {
+                items(eventsList) { item ->
+                    MyEventItem(item)
+                }
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // CTA for adding event even when list exists
+            Card(
+                modifier = Modifier
+                    .clickable { onAddEventClicked() }
+                    .padding(horizontal = 16.dp)
+                    .fillMaxWidth()
+                    .height(45.dp),
+                shape = RoundedCornerShape(50),
+                backgroundColor = Color(0xFF121212)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxSize(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "➕ Create Event",
+                        fontSize = 14.sp,
+                        fontFamily = Constants.FONT_MEDIUM,
+                        color = Color.White
+                    )
+                }
+            }
         }
     }
-
-
 }
+
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
@@ -642,7 +799,9 @@ fun RecentDrops(
     onItemClicked: (DropProfileResponse) -> Unit
 ) {
     val droppedProfilesList=remember{userDropProfilesList}
-        Column() {
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -653,9 +812,8 @@ fun RecentDrops(
                 Text(
                     text = "Recent Profile Drops",
                     color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                    fontSize=18.sp,
-                    fontFamily = Constants.FONT_MEDIUM
+                    fontSize=13.sp,
+                    fontFamily = Constants.FONT_LIGHT
                 )
                 Image(
                     painter = painterResource(id = R.drawable.showall),
@@ -668,40 +826,56 @@ fun RecentDrops(
                     modifier = Modifier.size(20.dp)
                 )
             }
-            Card(modifier = Modifier
+            Divider(modifier = Modifier
                 .fillMaxWidth()
-                .wrapContentHeight(), elevation = 40.dp, backgroundColor = Color(0xFF040A36)
+                .padding(bottom = 4.dp), thickness = 0.5.dp, color = Color.LightGray)
+            Card(modifier = Modifier
+                .padding(bottom = 16.dp)
+                .width(120.dp)
+                .height(180.dp)
+                ,  backgroundColor = Color(0xFF343435)
             ) {
-                Column(modifier = Modifier.padding(bottom = 16.dp)) {
-                    LazyRow(modifier = Modifier.padding(vertical = 8.dp).padding(start = 8.dp)) {
-                        items(droppedProfilesList) { item ->
-                            RecentProfileDropItem(item) { onItemClicked(item) }
-                        }
-                    }
-
-                        Row(
+                if(droppedProfilesList.isEmpty()){
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(end = 8.dp)
+                            .clip(shape = RoundedCornerShape(6.dp))
+                    ) {
+                        Column(
                             modifier = Modifier
                                 .clickable { onDropProfileClicked() }
                                 .fillMaxSize()
                                 .padding(8.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
                         ) {
                             Image(
-                                painterResource(id = R.drawable.drop_profile_filled_rounded),
+                                painterResource(id = R.drawable.add),
                                 contentDescription = "",
-                                colorFilter = ColorFilter.tint(Color(0xFFE1E9F1)),
+                                colorFilter = ColorFilter.tint(Color(0xFFE1E9F1).copy(alpha = 0.8f)),
                                 modifier = Modifier
-                                    .size(30.dp)
+                                    .size(24.dp)
                             )
                             Text(
                                 text = "Drop your profile",
                                 modifier = Modifier,
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.Bold,
-                                fontFamily = Constants.FONT_MEDIUM,
+                                fontSize = 10.sp,
+                                fontFamily = Constants.FONT_LIGHT,
                                 color = Color.White
                             )
+                        }
+                    }
+
+                }else {
+                    LazyRow(
+                        modifier = Modifier
+                            .padding(vertical = 8.dp)
+                            .padding(start = 8.dp)
+                    ) {
+                        items(droppedProfilesList) { item ->
+                            RecentProfileDropItem(item) { onItemClicked(item) }
+                        }
                     }
                 }
             }
@@ -720,11 +894,7 @@ fun RecentProfileDropItem(item: DropProfileResponse,onItemClicked:(DropProfileRe
                 .padding(end = 8.dp)
                 .clip(shape = RoundedCornerShape(6.dp))
         ) {
-            Column(modifier = Modifier.background(brush = Brush.verticalGradient(colors = listOf(Color(
-                0xFF4D056B
-            ),
-                Color(0xFF9E0642)
-            )))) {
+            Column(modifier = Modifier.background(brush = Brush.verticalGradient(colors = listOf(Color(0xFF4D056B), Color(0xFF9E0642))))) {
 //                Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(0.dp),backgroundColor = Color(
 //                    0xFFF1EDE3
 //                )
@@ -762,34 +932,21 @@ fun LogoutUser(onLogoutClicked:()->Unit={}) {
     Column(modifier = Modifier
         .wrapContentSize()
         .padding(bottom = 20.dp)) {
-        Divider(modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 16.dp), thickness = 0.5.dp, color = Color.LightGray)
-        OutlinedButton(onClick = { onLogoutClicked()  }, modifier = Modifier
+        Spacer(modifier = Modifier.height(10.dp))
+        Box(modifier = Modifier
+            .clickable { onLogoutClicked() }
             .wrapContentWidth()
-            .height(40.dp), shape = RoundedCornerShape(12.dp), border = BorderStroke(width = 1.dp, color = Color(
-            0xFF990707
-        )
-        )) { //0xFF45065F
+            .height(40.dp)
+        ) { //0xFF45065F
             Row(
                 modifier = Modifier.wrapContentWidth() ,horizontalArrangement = Arrangement.Start
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.logout),
-                    contentDescription = "",
-                    modifier = Modifier.size(24.dp)
-                )
-                Spacer(modifier = Modifier.width(10.dp))
-                Text(
-                    text = "Logout",
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 16.sp,
-                    fontFamily = Constants.FONT_MEDIUM,
-                    modifier = Modifier,
-                    color = Color.White
-                )
+
             }
         }
+        Divider(modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 16.dp), thickness = 0.5.dp, color = Color.Gray)
     }
 
 }
