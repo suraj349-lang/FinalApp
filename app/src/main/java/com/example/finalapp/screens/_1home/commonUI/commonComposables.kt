@@ -161,7 +161,7 @@ fun HomeTopBar(
                             contentDescription = "",
                             colorFilter = ColorFilter.tint(color = iconAndTextColor),
                             modifier = Modifier
-                                .padding(end = 8.dp)
+                                .padding(end = 20.dp)
                                 .size(20.dp)
                                 .clickable {
                                     navController.navigate(SCREENS.CHAT_LIST.route)

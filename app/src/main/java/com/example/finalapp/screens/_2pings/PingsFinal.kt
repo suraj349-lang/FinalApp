@@ -37,7 +37,7 @@ import com.example.finalapp.screens.common.CommonErrorScreen
 import com.example.finalapp.utils.UserLocationObject
 import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.viewmodels.EventsViewModel
-
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 
 @Composable
@@ -77,12 +77,26 @@ fun PingScreenFinal(
     LaunchedEffect(key1 = Unit){
         eventsViewModel.getAllPings(userLocation.address.toString())
     }
+
+    val systemUiController = rememberSystemUiController()
+    val navBarColor = Color(0xFF121212)
+
+    SideEffect {
+        systemUiController.setNavigationBarColor(
+            color = navBarColor,
+            darkIcons = false
+        )
+        systemUiController.setStatusBarColor(
+            color = navBarColor,     // Your desired color
+            darkIcons = false        // true = dark icons (for light backgrounds)
+        )
+    }
     Scaffold(
-        topBar = {
-            PingsTopBar(backgroundColor = Constants.HOME_TOP_BAR_COLOR, false,{navController.navigateUp()}) {
-                searchOn = !searchOn
-            }
-        },
+//        topBar = {
+//            PingsTopBar(backgroundColor = Constants.HOME_TOP_BAR_COLOR, false,{navController.navigateUp()}) {
+//                searchOn = !searchOn
+//            }
+//        },
         content = {
             Surface(modifier = Modifier.fillMaxSize().padding(it)) {
                 LazyColumn(

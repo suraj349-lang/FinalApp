@@ -11,6 +11,7 @@ import java.io.IOException
 
 class DirectChatUsersPagingSource(
     private val eventsRepository: EventsRepository,
+    private val userId:String,
     private val lat: Double,
     private val long: Double,
 ) : PagingSource<Int, DirectChat>() {
@@ -24,7 +25,7 @@ class DirectChatUsersPagingSource(
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int,DirectChat  > {
         val page = params.key ?: 1
         return try {
-            val response = eventsRepository.getAllDirectChatUsers(lat, long, page)
+            val response = eventsRepository.getAllDirectChatUsers(userId,lat, long, page)
 
             if (response.isSuccessful) {
                 val body = response.body()?.data ?: emptyList() // 🔹 Ensure `body.data` is used

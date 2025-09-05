@@ -15,6 +15,7 @@ import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.example.finalapp.enums.ImageUploadScreens
 import com.example.finalapp.model.DropProfileResponse
+import com.example.finalapp.model.pings.PingResponse
 import com.example.finalapp.viewmodels.ChatViewModel
 import com.example.finalapp.viewmodels.AuthViewModel
 import com.example.finalapp.screens.auth.util.EnterOTPScreenUI
@@ -38,6 +39,7 @@ import com.example.finalapp.screens._5settings.SettingsScreenUI
 import com.example.finalapp.testing.TabView
 import com.example.finalapp.screens._3createEventOrPing.PastRaisedOffer
 import com.example.finalapp.screens._1home.eventWarScreen.PublicEventDetailsScreenWrapper
+import com.example.finalapp.screens._2pings.PingDetailsScreen
 import com.example.finalapp.screens._2pings.PingScreenFinal
 import com.example.finalapp.screens._3createEventOrPing.createPing.CreatePingWrapper
 import com.example.finalapp.screens._4profile.ProfileScreenNew
@@ -192,6 +194,12 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
             val json=navBackStackEntry.arguments?.getString("dropProfileResponse")
             val dropProfileResponse=json?.let { Json.decodeFromString<DropProfileResponse>(it) }
             DropProfileUserProfile(navController,dropProfileResponse)
+
+        }
+        composable(route=SCREENS.PING_DETAILS.route, arguments = listOf(navArgument("pingResponse"){ type= NavType.StringType })){navBackStackEntry ->
+            val json=navBackStackEntry.arguments?.getString("pingResponse")
+            val pingResponse=json?.let { Json.decodeFromString<PingResponse>(it) }
+            PingDetailsScreen(navController,pingResponse)
 
         }
         composable("camerax/{screen}"){backStackEntry->

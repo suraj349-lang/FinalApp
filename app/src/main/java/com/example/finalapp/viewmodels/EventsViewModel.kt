@@ -18,7 +18,6 @@ import com.example.finalapp.model.DirectChatRequest
 import com.example.finalapp.model.DropProfileResponse
 import com.example.finalapp.model.Event
 import com.example.finalapp.model.EventResponse
-import com.example.finalapp.model.EventResponseDTO
 import com.example.finalapp.model.GetDropProfileResponseModel
 import com.example.finalapp.model.PremiumEventResponseDTO
 import com.example.finalapp.model.User
@@ -29,7 +28,6 @@ import com.example.finalapp.paging.DropProfilePagingSource
 import com.example.finalapp.repository.ChatDatabaseRepository
 import com.example.finalapp.repository.EventsRepository
 import com.example.finalapp.repository.ProfileRepository
-import com.example.finalapp.repository.Resource
 import com.example.finalapp.screens._2pings.PingsPagingSource
 import com.example.finalapp.utils.UserObject
 import com.example.finalapp.utils.RequestState
@@ -39,13 +37,11 @@ import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRe
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
@@ -169,15 +165,15 @@ class EventsViewModel @Inject constructor(
             .collect { response ->
                 _directChatResponse.value = RequestState.Success(response.data)
                 // Fetch nearby users after successful chat request
-                loadDirectChatUsers(data.lat, data.long)
+                loadDirectChatUsers(data.userId,data.lat, data.long)
             }
     }
 
-    fun loadDirectChatUsers(lat: Double, long: Double) {
+    fun loadDirectChatUsers(userId: String, lat: Double, long: Double) {
         viewModelScope.launch {
             Pager(
                 config = PagingConfig(pageSize = 10, prefetchDistance = 5),
-                pagingSourceFactory = { DirectChatUsersPagingSource(eventsRepository, lat, long) }
+                pagingSourceFactory = { DirectChatUsersPagingSource(eventsRepository, userId,lat, long) }
             ).flow
                 .cachedIn(viewModelScope)
                 .onStart {

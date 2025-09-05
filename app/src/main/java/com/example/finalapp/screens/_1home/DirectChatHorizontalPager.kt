@@ -45,6 +45,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.*
+import com.example.finalapp.ui.theme.floatingActionBtnColor
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalPagerApi::class)
@@ -77,7 +78,9 @@ fun DirectChatHorizontalPager() {
         Spacer(modifier = Modifier.height(16.dp))
         HorizontalPagerIndicator(
             modifier = Modifier.align(Alignment.CenterHorizontally),
-            pagerState = pagerState
+            pagerState = pagerState,
+            activeColor = floatingActionBtnColor,
+            inactiveColor = Color.LightGray
         )
     }
 }
@@ -100,16 +103,15 @@ fun PagerScreenDirectChat(directChatHorizontalPager: DirectChatPagerPages) {
         )
         Text(
             text = directChatHorizontalPager.title,
-            fontFamily = Constants.FONT_MEDIUM,
-            color = Color(0xFF520772),
-            fontWeight = FontWeight.ExtraBold,
+            fontFamily = Constants.FONT_LIGHT,
+            color = Color(0xFFEEEBF0),
             fontSize = 24.sp
         )
         Text(
             text = directChatHorizontalPager.description,
             style = TextStyle(textDecoration = TextDecoration.Underline),
             fontFamily = Constants.FONT_MEDIUM,
-            color = Color(0xFF280636),
+            color = Color(0xFFB7AEBB),
             fontSize = 14.sp
         )
     }

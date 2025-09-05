@@ -36,8 +36,8 @@ class EventsRepository @Inject constructor(private val api: ApiService) {
     fun setLocationForDirectChat(directChat: DirectChatRequest):Flow<ApiResponse<DirectChat>> = flow {
         emit(api.setLocationForDirectChat(directChat))
     }.flowOn(Dispatchers.IO)
-    suspend fun getAllDirectChatUsers(lat:Double, long:Double, page:Int): Response<DirectChatApiResponse> {
-        return api.getDirectChatUsers(lat,long,page)
+    suspend fun getAllDirectChatUsers(userId:String,lat:Double, long:Double, page:Int): Response<DirectChatApiResponse> {
+        return api.getDirectChatUsers(userId,lat,long,page)
     }
 
     fun removeUserFromDirectChat(id: String):Flow<ApiResponse<String>> = flow {

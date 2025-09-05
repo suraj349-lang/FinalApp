@@ -61,6 +61,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
@@ -189,7 +190,9 @@ fun SingleChatScreenUI(
         bottomBar = {
             // Input row with text field and mic button
             Row(
-                modifier = Modifier.navigationBarsPadding().imePadding()
+                modifier = Modifier
+                    .navigationBarsPadding()
+                    .imePadding()
                     .padding(horizontal = 16.dp, vertical = 8.dp)
                     .fillMaxWidth()
                     .heightIn(min = 56.dp, max = 150.dp),
@@ -292,7 +295,9 @@ fun SingleChatScreenUI(
             }
         }
     ) {
-        Column(modifier = Modifier.padding(it).imePadding()) {
+        Column(modifier = Modifier
+            .padding(it)
+            .imePadding()) {
             if (showLinearIndicator) {
                 LinearProgressIndicator(
                     modifier = Modifier
@@ -653,40 +658,31 @@ fun SingleChatTopBar(title: String,profileImage:String?, navController: NavHostC
     TopAppBar(
         title = {
             Text(
-                title,textAlign= TextAlign.Start, modifier = Modifier.fillMaxWidth(0.6f), fontFamily = DONGLE_BOLD,color = floatingActionBtnColor, fontSize = 30.sp
+                title,textAlign= TextAlign.Start, modifier = Modifier.fillMaxWidth(0.6f), fontFamily = Constants.FONT_LIGHT,color = Color.Black, fontSize = 20.sp
             )
         },
         navigationIcon = {
             Row(modifier = Modifier.fillMaxWidth(0.2f)) {
-                Card(
-                    modifier = Modifier.size(30.dp),
-                    shape = CircleShape,
-                    colors = CardDefaults.cardColors(containerColor = Color.White)
-                ) {
-                    Image(
-                        painterResource(id = R.drawable.back),
-                        contentDescription = "",
-                        colorFilter = ColorFilter.tint(Color.DarkGray),
-                        modifier = Modifier
-                            .clickable { navController.navigateUp() }
-                            .padding(2.dp)
+                Image(
+                    painterResource(id = R.drawable.baseline_arrow_back_24),
+                    contentDescription = "",
+                    colorFilter = ColorFilter.tint(Color.DarkGray),
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clickable { navController.navigateUp() }
 
-                    )
-                }
+                )
                 Spacer(modifier = Modifier.width(16.dp))
-                Card(
-                    modifier = Modifier.size(30.dp),
-                    shape = CircleShape,
-                    colors = CardDefaults.cardColors(containerColor = Color.White)
-                ) {
-                    GlideImage(
-                        model =  imagePrefix + profileImage ,
-                        contentDescription = "",
-                        contentScale=ContentScale.Crop,
-                        modifier = Modifier.clickable { navController.navigate(SCREENS.PROFILE.route) }
-                    )
+                GlideImage(
+                    model =  imagePrefix + profileImage ,
+                    contentDescription = "",
+                    contentScale=ContentScale.Crop,
+                    modifier = Modifier.clip(shape = CircleShape).size(30.dp).clickable { navController.navigate(SCREENS.PROFILE.route) }
+                )
+
+
                     Log.i("IMagePrefix", "SingleChatTopBar: $imagePrefix + $profileImage")
-                }
+
             }
         }, actions = {
             // TODO we will make this later on

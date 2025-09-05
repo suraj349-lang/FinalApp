@@ -52,7 +52,7 @@ interface ApiService {
 
     //------------------------- Direct chat --------------------------------------------//
     @GET("/api/v1/directChat/")
-    suspend fun getDirectChatUsers(@Query("lat") lat:Double,@Query("long") long:Double,@Query("page") page:Int): Response<DirectChatApiResponse>
+    suspend fun getDirectChatUsers(@Query("userId") userId: String,@Query("lat") lat:Double,@Query("long") long:Double,@Query("page") page:Int): Response<DirectChatApiResponse>
     @POST("/api/v1/directChat/")
     suspend fun setLocationForDirectChat(@Body data:DirectChatRequest):ApiResponse<DirectChat>
 

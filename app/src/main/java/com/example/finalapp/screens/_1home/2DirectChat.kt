@@ -157,7 +157,7 @@ fun DirectChatScreen(
                                 colors = SwitchDefaults.colors(
                                     checkedThumbColor = floatingActionBtnColor,// MaterialTheme.colorScheme.primary,
                                     checkedTrackColor = Color(0xFFF0E3C5),
-                                    uncheckedThumbColor = Color(0xFFE9AB10),
+                                    uncheckedThumbColor = Color(0xFFFFFFFF),
                                     uncheckedTrackColor = Color(0xFFF0E3C5),
                                 ),
                                 modifier = Modifier
@@ -169,10 +169,15 @@ fun DirectChatScreen(
                             Column(modifier = Modifier
                                 .align(Alignment.TopEnd)
                                 .padding(end = 16.dp, top = 16.dp), verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text(text = "Range : 500 m",fontFamily = Constants.FONT_LIGHT, color = Color(0xFF280636), fontSize = 12.sp, style = TextStyle(textDecoration = TextDecoration.Underline))
+                                Text(text = "Range : 500 m",fontFamily = Constants.FONT_LIGHT, color = Color(
+                                    0xFFEBE5EE
+                                ), fontSize = 12.sp, style = TextStyle(textDecoration = TextDecoration.Underline))
                                 Row(modifier = Modifier, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                                    Image(painter = painterResource(id = R.drawable.edit_new), contentDescription ="", modifier = Modifier.size(12.dp) )
-                                    Text(text = "Edit",fontFamily = Constants.FONT_LIGHT, color = Color(0xFF280636), fontSize = 9.sp)
+                                    Image(painter = painterResource(id = R.drawable.edit_new), contentDescription ="", modifier = Modifier.size(12.dp), colorFilter = ColorFilter.tint(
+                                        Color.White) )
+                                    Text(text = "Edit",fontFamily = Constants.FONT_LIGHT, color = Color(
+                                        0xFFF5EDF8
+                                    ), fontSize = 9.sp)
                                 }
                             }
                             Column(modifier = Modifier
@@ -256,7 +261,8 @@ fun DirectChatProfiles(
             CommonErrorScreen(error = "Unable to get users.")
         }
         is RequestState.Success -> {
-            LazyColumn(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)) {
+            LazyColumn( //modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
+            ) {
                 items(directChatObjectList) {directChatObject->
                     if(directChatObject != null) {
 
@@ -403,7 +409,7 @@ fun ShareProfileForDirectChat(user:User,address:String,onShareProfileClicked: ()
                         overflow = TextOverflow.Ellipsis,
                         fontFamily = Constants.FONT_LIGHT,
                         fontSize = 18.sp,
-                        color= Color(0xFF520772),
+                        color= Color(0xFFFFFFFF),
                         fontWeight = FontWeight.ExtraBold
                     )
                     //0xFF2CA832  0xFF045708 0xFF77209C
@@ -446,6 +452,18 @@ fun ShareProfileForDirectChat(user:User,address:String,onShareProfileClicked: ()
                             fontFamily = Constants.FONT_LIGHT,
                             color = Color.White
                         )
+                    }
+                    Row(modifier = Modifier
+                        .fillMaxWidth()
+                        .height(60.dp)) {
+                        Image(painter = painterResource(id = androidx.core.R.drawable.ic_call_answer_video), contentDescription = "", modifier = Modifier.size(24.dp))
+                        Text(
+                            text = "+ Omegle",
+                            fontSize = 16.sp,
+                            fontFamily = Constants.FONT_LIGHT,
+                            color = Color.White
+                        )
+
                     }
                 }
             }

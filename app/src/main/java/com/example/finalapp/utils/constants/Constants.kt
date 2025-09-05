@@ -7,10 +7,10 @@ import com.example.finalapp.R
 
 object Constants {
 
-    const val IP_ADD ="3.108.55.84" //"192.168.1.19"//"192.168.1.2" //"3.108.55.84"
-    const val SOCKET_CHAT_BASE_URL = "http://${IP_ADD}/chat/"
-    const val TEMP_SOCKET_URL = "http://3.108.55.84:5001/"
-    const val BASE_URL = "http://${IP_ADD}/"
+    const val IP_ADD ="192.168.29.95"//"3.108.55.84" //"192.168.1.19"//"192.168.1.2" //"3.108.55.84"
+    const val SOCKET_CHAT_BASE_URL = "http://${IP_ADD}:5001/chat/"
+    const val TEMP_SOCKET_URL = "http://${IP_ADD}:5001/"
+    const val BASE_URL = "http://${IP_ADD}:5000/"
 
 
     const val APP_NAME="Spint"
@@ -38,20 +38,20 @@ object Constants {
     // home screen---------------------------------
 
     val HOME_TOP_BAR_TITLE_COLOR= Color(0xFF0682F1)
-    val HOME_TOP_BAR_COLOR= Color(0xFFFFFFFF)//0xFF260235
-    val HOME_TOP_BAR_ICON_COLOR= Color.Black
+    val HOME_TOP_BAR_COLOR= Color(0xFF121212)//0xFF260235
+    val HOME_TOP_BAR_ICON_COLOR= Color.White
 
     val HOME_STATUS_BAR_COLOR= HOME_TOP_BAR_COLOR
     val HOME_NAV_BAR_COLOR= HOME_TOP_BAR_COLOR
 
     val TAB_ROW_BACKGROUND_COLOR=HOME_TOP_BAR_COLOR
-    val TAB_ROW_ACTIVE_TEXT_COLOR=Color.Black
+    val TAB_ROW_ACTIVE_TEXT_COLOR=Color.White
     val TAB_ROW_INACTIVE_COLOR= Color.DarkGray
-    val TAB_ROW_INDICATOR_COLOR=Color.Red
+    val TAB_ROW_INDICATOR_COLOR=Color.White
 
-    val HOME_BOTTOM_BAR_COLOR= HOME_TOP_BAR_COLOR
-    val BOTTOM_BAR_ACTIVE_TEXT_COLOR= Color.Black
+    val HOME_BOTTOM_BAR_COLOR= Color(0xFF121212)
+    val BOTTOM_BAR_ACTIVE_TEXT_COLOR= Color.White
 
-    val BOTTOM_BAR_INACTIVE_ICON_COLOR= Color.Black
-    val BOTTOM_BAR_INACTIVE_TEXT_COLOR= Color.Black
+    val BOTTOM_BAR_INACTIVE_ICON_COLOR= Color.LightGray
+    val BOTTOM_BAR_INACTIVE_TEXT_COLOR= Color.LightGray
 }

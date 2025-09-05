@@ -52,12 +52,14 @@ import com.example.finalapp.R
 import com.example.finalapp.viewmodels.AuthViewModel
 import com.example.finalapp.screens._1home.commonUI.HomeFloatingActionButton
 import com.example.finalapp.screens._1home.commonUI.HomeTopBar
+import com.example.finalapp.screens._2pings.PingScreenFinal
 import com.example.finalapp.screens._3createEventOrPing.CreateEventOrPingBottomSheet
 import com.example.finalapp.viewmodels.EventsViewModel
 import com.example.finalapp.screens.dialogBox.ShowQRDialog
 import com.example.finalapp.screens.dialogBox.ShowDialog
 import com.example.finalapp.ui.TAB_ITEMS
 import com.example.finalapp.utils.UserLocationObject
+import com.example.finalapp.utils.UserObject
 import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.viewmodels.ImageUploadViewModel
 import kotlinx.coroutines.delay
@@ -75,6 +77,7 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
     var showQR: ShowDialog by remember { mutableStateOf(ShowDialog.CLOSE) }
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val userLocation by UserLocationObject.userLocation.collectAsState()
+    val user by  UserObject.user.collectAsState()
 
 
     if (showQR == ShowDialog.OPEN) {
@@ -92,13 +95,17 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
     LaunchedEffect(isRefreshing) {
         if (isRefreshing && pagerState.currentPage==0) {
             delay(1000L)
-            eventsViewModel.getAllEvents()
+            eventsViewModel.getAllPings("")
             delay(500L)
             isRefreshing = false
         }
         else if (isRefreshing && pagerState.currentPage==1) {
             delay(1000L)
-            eventsViewModel.loadDirectChatUsers(userLocation.latitude ?: 0.0,userLocation.longitude ?: 0.0)
+            eventsViewModel.loadDirectChatUsers(
+                user.user,
+                userLocation.latitude ?: 0.0,
+                userLocation.longitude ?: 0.0
+            )
             delay(500L)
             isRefreshing = false
         }
@@ -204,7 +211,7 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
                                 .imePadding()
                         ) { page ->
                             when (page) {
-                                0 -> EventScreenWrapper(eventsViewModel = eventsViewModel, navController = navController, onRetryCalled = {eventsViewModel.getAllEvents()})
+                                0 -> PingScreenFinal(navController = navController, eventsViewModel =eventsViewModel )//EventScreenWrapper(eventsViewModel = eventsViewModel, navController = navController, onRetryCalled = {eventsViewModel.getAllEvents()})
                                 1 -> DirectChatScreen(scrollBehavior, authViewModel, eventsViewModel, navController)
                                 2 -> DroppedProfilesUI(pagerState,scrollBehavior, navController, eventsViewModel)
                             }

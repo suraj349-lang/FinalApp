@@ -2,6 +2,7 @@ package com.example.finalapp.navigation
 
 import android.net.Uri
 import com.example.finalapp.model.DropProfileResponse
+import com.example.finalapp.model.pings.PingResponse
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -56,6 +57,12 @@ sealed class SCREENS(val route:String){
         fun createRoute(dropProfileResponse: DropProfileResponse):String{
             val profileJson= Uri.encode(Json.encodeToString(dropProfileResponse))
             return "drop_profile_user_profile/$profileJson"
+        }
+    }
+    object PING_DETAILS:SCREENS("ping_details/{pingResponse}"){
+        fun createRoute(pingResponse: PingResponse):String{
+            val ping= Uri.encode(Json.encodeToString(pingResponse))
+            return "ping_details/$ping"
         }
     }
     object USER_PUBLIC_PROFILE:SCREENS("user_public_profile/{userId}"){
