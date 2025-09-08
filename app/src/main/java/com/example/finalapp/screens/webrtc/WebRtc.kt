@@ -140,7 +140,7 @@ fun OmegleScreen() {
         bottomBar = {
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxWidth().background(color = Color.Black)
                     .padding(16.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
@@ -157,12 +157,17 @@ fun OmegleScreen() {
                     Text(
                         if (isConnected) "Disconnect" else "Connect",
                         fontFamily = Constants.FONT_LIGHT,
-                        fontSize = 24.sp,
+                        fontSize = 18.sp,
                         color = Color.White
                     )
                 }
                 Button(onClick = { /* TODO: Next random user */ }) {
-                    Text("Next")
+                    Text(
+                        "Next",
+                        fontFamily = Constants.FONT_LIGHT,
+                        fontSize = 14.sp,
+                        color = Color.White
+                    )
                 }
             }
         }
