@@ -41,6 +41,7 @@ import com.example.finalapp.utils.constants.Constants
 import org.webrtc.EglBase
 import org.webrtc.SurfaceViewRenderer
 
+
 @Composable
 fun OmegleScreen() {
     val context = LocalContext.current
@@ -58,24 +59,16 @@ fun OmegleScreen() {
     val localView = remember { SurfaceViewRenderer(context) }
     val remoteView = remember { SurfaceViewRenderer(context) }
 
-    // Init + release localView safely
+    // Initialize renderers safely
     DisposableEffect(localView) {
         localView.init(eglBase.eglBaseContext, null)
         localView.setMirror(true)
-
-        onDispose {
-            localView.release()
-        }
+        onDispose { localView.release() }
     }
-
-    // Init + release remoteView safely
     DisposableEffect(remoteView) {
         remoteView.init(eglBase.eglBaseContext, null)
         remoteView.setMirror(false)
-
-        onDispose {
-            remoteView.release()
-        }
+        onDispose { remoteView.release() }
     }
 
     val webRTCManager = remember { WebRTCManager(context, localView, remoteView, eglBase) }
@@ -85,8 +78,9 @@ fun OmegleScreen() {
     ) { permissions ->
         val granted = permissions[cameraPermission] == true && permissions[micPermission] == true
         permissionsGranted = granted
-
         if (granted) {
+            webRTCManager.initFactoryAndLocalTracks()
+            webRTCManager.setupLocalVideo()
             webRTCManager.startLocalPreview()
         } else {
             Toast.makeText(context, "Camera and mic permissions are required.", Toast.LENGTH_LONG).show()
@@ -99,48 +93,26 @@ fun OmegleScreen() {
         val hasMic = ContextCompat.checkSelfPermission(context, micPermission) == PackageManager.PERMISSION_GRANTED
         if (hasCamera && hasMic) {
             permissionsGranted = true
+            webRTCManager.initFactoryAndLocalTracks()
+            webRTCManager.setupLocalVideo()
             webRTCManager.startLocalPreview()
         } else {
             permissionLauncher.launch(arrayOf(cameraPermission, micPermission))
         }
     }
 
-    // Handle connection lifecycle
-    LaunchedEffect(permissionsGranted) {
-        if (permissionsGranted) {
-            webRTCManager.init()             // create PeerConnectionFactory
-            webRTCManager.setupLocalVideo()  // ✅ prepare capturer + track + bind to localRenderer
-            webRTCManager.startLocalPreview()// ✅ preview starts immediately
-        }
-    }
-    LaunchedEffect(isConnected) {
-        if (isConnected && permissionsGranted) {
-            webRTCManager.setupSocket() // new method that only does setupSocket()
-        } else {
-            webRTCManager.release()
-        }
-    }
-
-
-
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {
-                    Text(
-                        "Random connect on mood",
-                        fontFamily = Constants.FONT_MEDIUM,
-                        fontSize = 24.sp,
-                        color = Color.White
-                    )
-                },
+                title = { Text("Random Connect on Mood", fontSize = 24.sp, color = Color.White) },
                 backgroundColor = Color.Black
             )
         },
         bottomBar = {
             Row(
                 modifier = Modifier
-                    .fillMaxWidth().background(color = Color.Black)
+                    .fillMaxWidth()
+                    .background(Color.Black)
                     .padding(16.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
@@ -148,26 +120,22 @@ fun OmegleScreen() {
                     onClick = {
                         if (permissionsGranted) {
                             isConnected = !isConnected
+                            if (isConnected) {
+                                webRTCManager.setupSocket()
+                            } else {
+                                webRTCManager.release()
+                            }
                         } else {
                             permissionLauncher.launch(arrayOf(cameraPermission, micPermission))
                         }
                     },
-                    colors = ButtonDefaults.buttonColors(backgroundColor = floatingActionBtnColor)
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color.Red)
                 ) {
-                    Text(
-                        if (isConnected) "Disconnect" else "Connect",
-                        fontFamily = Constants.FONT_LIGHT,
-                        fontSize = 18.sp,
-                        color = Color.White
-                    )
+                    Text(if (isConnected) "Disconnect" else "Connect", color = Color.White)
                 }
+
                 Button(onClick = { /* TODO: Next random user */ }) {
-                    Text(
-                        "Next",
-                        fontFamily = Constants.FONT_LIGHT,
-                        fontSize = 14.sp,
-                        color = Color.White
-                    )
+                    Text("Next", color = Color.White)
                 }
             }
         }
@@ -185,11 +153,13 @@ fun OmegleScreen() {
                 }
 
                 isConnected -> {
+                    // Remote full screen
                     AndroidView(factory = {
                         (remoteView.parent as? ViewGroup)?.removeView(remoteView)
                         remoteView
                     }, modifier = Modifier.fillMaxSize())
 
+                    // Local preview small overlay
                     Box(
                         modifier = Modifier
                             .align(Alignment.BottomEnd)
@@ -204,7 +174,7 @@ fun OmegleScreen() {
                 }
 
                 else -> {
-                    // Show local preview even when not connected
+                    // Show only local preview
                     Box(
                         modifier = Modifier
                             .size(240.dp, 320.dp)
