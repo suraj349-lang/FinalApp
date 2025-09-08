@@ -68,6 +68,7 @@ import com.example.finalapp.screens.onboarding.screen.WelcomeScreen
 import com.example.finalapp.screens.pings.EditScreen
 import com.example.finalapp.screens.pings.templates.PingTemplateSelector
 import com.example.finalapp.screens.pings.templates.visualPingTemplates
+import com.example.finalapp.screens.webrtc.OmegleScreen
 import com.example.finalapp.viewmodels.ImageUploadViewModel
 import com.example.finalapp.viewmodels.SettingsViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
@@ -256,6 +257,9 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
 
         composable(SCREENS.COMMENT.route){
             CommentsScreen()
+        }
+        composable(SCREENS.OMEGLE.route){
+            OmegleScreen()
         }
 
 

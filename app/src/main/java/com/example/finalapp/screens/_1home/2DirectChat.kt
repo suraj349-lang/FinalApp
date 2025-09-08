@@ -193,7 +193,8 @@ fun DirectChatScreen(
                         scrollBehavior,
                         eventsViewModel,
                         navController,
-                        checked
+                        checked,
+                        onOmegleClicked = {navController.navigate(SCREENS.OMEGLE.route)}
                     ) {
                         eventsViewModel.shareProfileClicked.value = true
                     }
@@ -212,10 +213,11 @@ fun DirectChatUI(
     eventsViewModel: EventsViewModel,
     navController: NavHostController,
     checked: Boolean,
+    onOmegleClicked:()->Unit,
     onShareProfileClicked: () -> Unit
 ) {
     if (!checked ) {
-        ShareProfileForDirectChat(user, address = address,onShareProfileClicked)
+        ShareProfileForDirectChat(user, address = address,onOmegleClicked,onShareProfileClicked)
     } else {
         DirectChatProfiles(scrollBehavior,navController, eventsViewModel )
     }
@@ -352,7 +354,7 @@ fun DirectChatItem(
 
 
 @Composable
-fun ShareProfileForDirectChat(user:User,address:String,onShareProfileClicked: () -> Unit) {
+fun ShareProfileForDirectChat(user:User,address:String,onOmegleClicked:()->Unit,onShareProfileClicked: () -> Unit) {
     val shimmerColors = listOf(
         Color.White.copy(alpha = 0.1f),
         Color.White.copy(alpha = 0.4f),
@@ -453,7 +455,7 @@ fun ShareProfileForDirectChat(user:User,address:String,onShareProfileClicked: ()
                             color = Color.White
                         )
                     }
-                    Row(modifier = Modifier
+                    Row(modifier = Modifier.clickable { onOmegleClicked() }
                         .fillMaxWidth()
                         .height(60.dp)) {
                         Image(painter = painterResource(id = androidx.core.R.drawable.ic_call_answer_video), contentDescription = "", modifier = Modifier.size(24.dp))

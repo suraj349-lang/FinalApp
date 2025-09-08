@@ -72,6 +72,8 @@ sealed class SCREENS(val route:String){
     }
 
     object COMMENT:SCREENS("comment")
+
+    object OMEGLE:SCREENS("omegle")
     object IMAGE_CROPPER:SCREENS("auto_image_cropper")
 
     object CAMERAX_SCREEN:SCREENS("camerax_screen")

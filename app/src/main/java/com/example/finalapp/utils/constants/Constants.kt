@@ -7,7 +7,7 @@ import com.example.finalapp.R
 
 object Constants {
 
-    const val IP_ADD ="192.168.29.95"//"3.108.55.84" //"192.168.1.19"//"192.168.1.2" //"3.108.55.84"
+    const val IP_ADD ="192.168.1.9"//"3.108.55.84" //"192.168.1.19"//"192.168.1.2" //"3.108.55.84"
     const val SOCKET_CHAT_BASE_URL = "http://${IP_ADD}:5001/chat/"
     const val TEMP_SOCKET_URL = "http://${IP_ADD}:5001/"
     const val BASE_URL = "http://${IP_ADD}:5000/"
