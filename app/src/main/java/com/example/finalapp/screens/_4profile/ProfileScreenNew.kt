@@ -2,6 +2,7 @@ package com.example.finalapp.screens._4profile
 
 import android.net.Uri
 import android.util.Log
+import android.widget.GridLayout
 import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -29,8 +31,12 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
@@ -171,7 +177,7 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
         }
     }
     val systemUiController = rememberSystemUiController()
-    val backgroundColor = Color(0xFF90941D)//0xFF040A36 0xFFC7A246
+    val backgroundColor = Constants.HOME_TOP_BAR_COLOR//0xFF040A36 0xFFC7A246 0xFF90941D
     val upperCardColor= Color.Black
     val navColor=Color.DarkGray
 
@@ -254,7 +260,7 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                         contentScale = ContentScale.Crop
                     )
                     Image(
-                        painterResource(id = R.drawable.back),
+                        painterResource(id = R.drawable.baseline_arrow_back_24),
                         contentDescription = "",
                         modifier = Modifier
                             .padding(16.dp)
@@ -393,7 +399,7 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                                                 true;/*showImageCropper = true*/
                                         },
                                     shape = CircleShape,
-                                    border = BorderStroke(1.dp, color = Color.LightGray),
+                                   // border = BorderStroke(1.dp, color = Color.LightGray),
                                     elevation = 20.dp
                                 ) {
                                     //user dp
@@ -458,9 +464,9 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                                 Card(
                                     modifier = Modifier
                                         .fillMaxWidth(0.5f)
-                                        .height(30.dp),
-                                    backgroundColor = Color(0xFFFFFFFF).copy(alpha = 0.2f),
-                                    border = BorderStroke(width = 2.dp, color = Color.White),
+                                        .height(36.dp),
+                                    backgroundColor = Color.LightGray,
+                                   // border = BorderStroke(width = 2.dp, color = Color.White),
                                     shape = RoundedCornerShape(30.dp)
                                 ) {
                                     Column(
@@ -470,7 +476,7 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                                     ) {
                                         Text(
                                             text = "Edit account",
-                                            color = Color.White,
+                                            color = Color.Black,
                                             fontFamily = Constants.FONT_LIGHT
                                         )
                                     }
@@ -480,8 +486,8 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                                 Card(modifier = Modifier
                                     .clickable { showPasswordDialog = true }
                                     .fillMaxWidth(1f)
-                                    .height(30.dp),
-                                    backgroundColor = Color.White.copy(alpha = 0.5f),
+                                    .height(36.dp),
+                                    backgroundColor = Color.DarkGray,
                                     shape = RoundedCornerShape(30.dp)) {
                                     Column(
                                         Modifier.fillMaxSize(),
@@ -508,8 +514,7 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
             }
             item {
                 Column(
-                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 10.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 10.dp, bottom = 16.dp)
                 ) {
 
                     //--------------------------------------------------------------------------------
@@ -550,18 +555,22 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
             }
                     //--------------------------------------------------------------------------------
                 item {
-                    Column(modifier = Modifier) {
+                    Column(modifier = Modifier
+                        .fillMaxWidth()
+                        .height(800.dp)) {
                         TabRow(
                             indicator = { tabPositions ->
                                 TabRowDefaults.Indicator(
                                     Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
                                     color = Color.LightGray.copy(alpha =1f),
-                                    height = 8.dp
+                                    height = 2.dp
                                 )
                             },
                             selectedTabIndex = selectedTabIndex,
-                            modifier = Modifier.fillMaxWidth(),
-                            backgroundColor = backgroundColor,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 10.dp),
+                            backgroundColor = Color(0xFF1C1C1D),
                             contentColor = Color.Black
                         ) {
                             tabs.forEachIndexed { index, title ->
@@ -569,7 +578,7 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                                     selected = selectedTabIndex == index,
                                     onClick = { selectedTabIndex = index },
                                     selectedContentColor = Color.White,
-                                    unselectedContentColor = Color.LightGray,
+                                    unselectedContentColor = Color.Gray,
                                     text = { Text(title, fontFamily = Constants.FONT_MEDIUM, fontSize = 14.sp) }
                                 )
                             }
@@ -730,7 +739,11 @@ fun MyPosts(
                 }
             }
         } else {
-            LazyRow {
+            LazyVerticalStaggeredGrid(
+                columns = StaggeredGridCells.Fixed(3),
+                verticalItemSpacing = 4.dp,
+                horizontalArrangement = Arrangement.spacedBy(1.dp)
+            ) {
                 items(eventsList) { item ->
                     MyEventItem(item)
                 }
@@ -739,28 +752,28 @@ fun MyPosts(
             Spacer(modifier = Modifier.height(12.dp))
 
             // CTA for adding event even when list exists
-            Card(
-                modifier = Modifier
-                    .clickable { onAddEventClicked() }
-                    .padding(horizontal = 16.dp)
-                    .fillMaxWidth()
-                    .height(45.dp),
-                shape = RoundedCornerShape(50),
-                backgroundColor = Color(0xFF121212)
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxSize(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = "➕ Create Event",
-                        fontSize = 14.sp,
-                        fontFamily = Constants.FONT_MEDIUM,
-                        color = Color.White
-                    )
-                }
-            }
+//            Card(
+//                modifier = Modifier
+//                    .clickable { onAddEventClicked() }
+//                    .padding(horizontal = 16.dp)
+//                    .fillMaxWidth()
+//                    .height(45.dp),
+//                shape = RoundedCornerShape(50),
+//                backgroundColor = Color(0xFF121212)
+//            ) {
+//                Row(
+//                    modifier = Modifier.fillMaxSize(),
+//                    verticalAlignment = Alignment.CenterVertically,
+//                    horizontalArrangement = Arrangement.Center
+//                ) {
+//                    Text(
+//                        text = "➕ Create Event",
+//                        fontSize = 14.sp,
+//                        fontFamily = Constants.FONT_MEDIUM,
+//                        color = Color.White
+//                    )
+//                }
+//            }
         }
     }
 }
@@ -770,8 +783,7 @@ fun MyPosts(
 @Composable
 fun MyEventItem(item: EventResponse) {
     Box(modifier = Modifier
-        .size(180.dp) //120 earlier
-        .padding(end = 8.dp, top = 8.dp)
+        .aspectRatio(9f/12f) //120 earlier
         .clip(shape = RoundedCornerShape(6.dp))) {
         GlideImage(model=  imagePrefix+item.image/*R.drawable.profile_image_1*/ , contentDescription = "", contentScale = ContentScale.Crop) //todo add imagePrefix when upload is happening
 //        Row(modifier = Modifier
@@ -829,24 +841,20 @@ fun RecentDrops(
             Divider(modifier = Modifier
                 .fillMaxWidth()
                 .padding(bottom = 4.dp), thickness = 0.5.dp, color = Color.LightGray)
-            Card(modifier = Modifier
-                .padding(bottom = 16.dp)
-                .width(120.dp)
-                .height(180.dp)
-                ,  backgroundColor = Color(0xFF343435)
-            ) {
                 if(droppedProfilesList.isEmpty()){
+                    Card(modifier = Modifier
+                        .padding(bottom = 16.dp)
+                        .width(120.dp)
+                        .height(180.dp)
+                        ,  backgroundColor = Color(0xFF343435)
+                    ) {
                     Box(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .padding(end = 8.dp)
-                            .clip(shape = RoundedCornerShape(6.dp))
-                    ) {
+                            .fillMaxSize()) {
                         Column(
                             modifier = Modifier
                                 .clickable { onDropProfileClicked() }
-                                .fillMaxSize()
-                                .padding(8.dp),
+                                .fillMaxSize(),
                             verticalArrangement = Arrangement.Center,
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
@@ -867,20 +875,16 @@ fun RecentDrops(
                         }
                     }
 
-                }else {
-                    LazyRow(
-                        modifier = Modifier
-                            .padding(vertical = 8.dp)
-                            .padding(start = 8.dp)
-                    ) {
+                }}else {
+                    LazyRow(modifier = Modifier) {
                         items(droppedProfilesList) { item ->
                             RecentProfileDropItem(item) { onItemClicked(item) }
+                            Spacer(modifier = Modifier.width(8.dp))
                         }
                     }
                 }
             }
 
-        }
 }
 
 @OptIn(ExperimentalGlideComposeApi::class)
@@ -889,23 +893,15 @@ fun RecentProfileDropItem(item: DropProfileResponse,onItemClicked:(DropProfileRe
         Box(
             modifier = Modifier
                 .clickable { onItemClicked(item) }
-                .width(100.dp)
-                .height(140.dp)
-                .padding(end = 8.dp)
-                .clip(shape = RoundedCornerShape(6.dp))
+                .width(120.dp)
+                .height(180.dp)
         ) {
             Column(modifier = Modifier.background(brush = Brush.verticalGradient(colors = listOf(Color(0xFF4D056B), Color(0xFF9E0642))))) {
-//                Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(0.dp),backgroundColor = Color(
-//                    0xFFF1EDE3
-//                )
-//                ) {
-//                    Text(text = item.location.take(10), fontWeight = FontWeight.SemiBold,color = Color(0xFF072747),
-//                        modifier = Modifier.padding(start=4.dp,top=2.dp), fontSize = 8.sp)
-//                }
                 GlideImage(
                     model= imagePrefix+item.image,
                     contentDescription = "",
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
                 )
 
         }

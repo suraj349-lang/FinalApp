@@ -82,6 +82,7 @@ import com.example.finalapp.model.DropProfileResponse
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.ui.imagePrefix
 import com.example.finalapp.screens.common.CommonErrorScreen
+import com.example.finalapp.screens.common.NoProfilesFoundScreen
 import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.utils.UserObject
 import com.example.finalapp.utils.UserLocation
@@ -334,14 +335,9 @@ fun DroppedProfilesUI(
                                     val error = (loadState.refresh as LoadState.Error).error
                                     item {
                                         Log.e("Error in dropped profiles", "DroppedProfilesUI: $error ", )
-                                        Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-                                            CommonErrorScreen(
-                                                error = "Error getting profiles.",
-                                                true
-                                            ) {
+                                            NoProfilesFoundScreen(error = "Error getting profiles.",) {
                                                 eventsViewModel.getDefaultDropProfiles("")
                                             }
-                                        }
                                     }
                                 }
                             }
@@ -349,9 +345,7 @@ fun DroppedProfilesUI(
                     }
                 }
             }
-
         }
-
     }
 }
 

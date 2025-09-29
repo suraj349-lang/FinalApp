@@ -2,24 +2,27 @@ package com.example.finalapp.screens._4profile
 
 
 import BottomBar
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
 import androidx.compose.material.Scaffold
@@ -50,17 +53,19 @@ import com.example.finalapp.viewmodels.EventsViewModel
 import androidx.compose.runtime.getValue
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.utils.RequestState
+import com.example.finalapp.utils.UserObject
 import com.example.finalapp.utils.constants.Constants
 
 // when the dropped profile is clicked then it is shown
 @Composable
 fun UserPublicProfile(eventsViewModel: EventsViewModel,navController:NavHostController,userId: String?) {
     val buttonsVisible = remember { mutableStateOf(false) }
-    val user by  eventsViewModel.userProfileResponse.collectAsState()
+    val directChatUser by  eventsViewModel.userProfileResponse.collectAsState()
+    val user by UserObject.user.collectAsState()
     LaunchedEffect(key1 = Unit ){
       eventsViewModel.getUserData(userId!!)
     }
-    when(val response=user){
+    when(val response=directChatUser){
         is RequestState.Loading -> {
             Box(modifier = Modifier.fillMaxSize()){
                 CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
@@ -68,13 +73,19 @@ fun UserPublicProfile(eventsViewModel: EventsViewModel,navController:NavHostCont
         }
         is RequestState.Success -> {
             Scaffold(
-                bottomBar = {BottomBar(navController = navController, state = buttonsVisible)},
+               // bottomBar = {BottomBar(navController = navController, state = buttonsVisible)},
                 content = {
                     UserPublicProfileUI(
+                        eventsViewModel,
+                        navController,
                         paddingValues = it,
                         user = response.data,
                         onSendMessageClicked = {
-                                               navController.navigate(SCREENS.SINGLE_CHAT.createPath(response.data.userName,response.data.user))
+                            eventsViewModel.saveUserToChatList(
+                                currentUserId = user.user,
+                                otherUserUserId = response.data.user
+                            )
+
                         },
                         onBackPressed = { navController.navigateUp() }
                     )
@@ -94,33 +105,59 @@ fun UserPublicProfile(eventsViewModel: EventsViewModel,navController:NavHostCont
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun UserPublicProfileUI(paddingValues: PaddingValues, user: User?,onSendMessageClicked:()->Unit,onBackPressed:()->Unit) {
+fun UserPublicProfileUI(eventsViewModel: EventsViewModel,navController: NavHostController,paddingValues: PaddingValues, user: User?,onSendMessageClicked:()->Unit,onBackPressed:()->Unit) {
+    val saveToChatListSuccess by eventsViewModel.saveUserToChatListResponseState.collectAsState()
+    val userObject by UserObject.user.collectAsState()
+    when(val response=saveToChatListSuccess){
+        is RequestState.Error ->  {
+            androidx.compose.material3.Text(text = response.error.toString())
+        }
+        is RequestState.Success ->{
+            Log.i("Userr", "DirectChatProfiles: ${response.data.withUserId.userName} other user id ${response.data.withUserId._id}")
+            navController.navigate(
+                SCREENS.SINGLE_CHAT.createPath(
+                    userName = response.data.withUserId.userName,
+                    chatListUserId = response.data.withUserId._id
+                )
+            )
+            eventsViewModel.resetSaveToChatListSuccessToIdle()
+        }
+        is RequestState.Loading ->{
+            CircularProgressIndicator()
+        }
+        else  ->{}
+    }
     if (user!=null) {
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier = Modifier
+                    .verticalScroll(rememberScrollState())
                     .fillMaxSize()
                     .padding(top = paddingValues.calculateTopPadding()),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                Box(modifier = Modifier.padding( top= paddingValues.calculateTopPadding())
-                        .fillMaxWidth()
-                        .height(400.dp)) {
-                        GlideImage(model =  imagePrefix+user.profileImage,
-                            contentDescription ="" , contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
-                        Card(modifier = Modifier
-                            .wrapContentSize()
+                Box(modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()) {
+                    GlideImage(
+                        model = imagePrefix + user.profileImage,
+                        contentDescription = "",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(700.dp)
+                    )
+                    Image(
+                        painter = painterResource(id = R.drawable.baseline_arrow_back_24),
+                        contentDescription = "Back",
+                        modifier = Modifier
                             .align(Alignment.TopStart)
-                            .padding(8.dp), shape = CircleShape, elevation = 20.dp, backgroundColor = Color.White.copy(alpha = 0.8f)) {
-                            Image(painter = painterResource(id = R.drawable.back), contentDescription ="", modifier = Modifier
-                                .clickable { onBackPressed() }
-                                .padding(4.dp)
-                                .size(30.dp), colorFilter = ColorFilter.tint(Color.Black)
-                            )
-
-                        }
-
+                            .padding(16.dp) // add padding for breathing space
+                            .clickable { onBackPressed() }
+                            .size(32.dp), // small icon size
+                        colorFilter = ColorFilter.tint(Color.White)
+                    )
                     }
                 Row(modifier = Modifier
                     .padding(start = 16.dp, end = 16.dp)
@@ -128,39 +165,35 @@ fun UserPublicProfileUI(paddingValues: PaddingValues, user: User?,onSendMessageC
                     .wrapContentHeight(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically) {
-                    Text(
+                    Column(modifier = Modifier
+                        .wrapContentHeight()
+                        .wrapContentWidth()) {
+                        Text(
                             text = user.name,
                             fontFamily = Constants.FONT_MEDIUM,
-                            fontSize = 24.sp
-                    )
+                            fontSize = 22.sp
+                        )
+                        Text(
+                            text = user.address,
+                            maxLines = 3, color = Color.Gray,
+                            fontFamily = Constants.FONT_LIGHT,
+                            fontSize = 12.sp,
+                            lineHeight = 12.sp
+                        )
+
+                    }
+
                     Image(painter = painterResource(id = R.drawable.share), contentDescription ="", modifier = Modifier
                         .size(20.dp), colorFilter = ColorFilter.tint(Color.DarkGray)
                     )
 
                     Button(onClick = { onSendMessageClicked() }, colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF96053E))) {
-                        Text(text = "Send Message", color = Color.White, fontFamily = DONGLE_LIGHT, fontSize = 20.sp)
+                        Text(text = "Send Message", color = Color.White, fontFamily = Constants.FONT_LIGHT, fontSize = 12.sp)
                     }
 
 
                 }
-                Row(modifier = Modifier
-                    .fillMaxWidth()
-                    .height(60.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically) {
-                    Image(painter = painterResource(id = R.drawable.drop_profile_filled_rounded), contentDescription ="", modifier = Modifier
-                        .padding(start = 16.dp)
-                        .size(20.dp), colorFilter = ColorFilter.tint(floatingActionBtnColor) )
-                    Text(
-                        text = user.address,
-                        maxLines = 3, color = Color.Black,
-                        fontFamily = DONGLE_NORMAL,
-                        fontSize = 20.sp,
-                        lineHeight = 12.sp
-                    )
-
-                }
-                Divider(Modifier.fillMaxWidth(), thickness = 1.dp, color = Color.LightGray)
+                Divider(Modifier.fillMaxWidth(), thickness = 0.5.dp, color = Color.Gray)
 
             }
 

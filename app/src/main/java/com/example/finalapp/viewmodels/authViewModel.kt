@@ -106,9 +106,8 @@ class AuthViewModel @Inject constructor(
 
        var key = mutableStateOf(0)
        var keyForFinalUserCreation: MutableState<RESPONSE> = mutableStateOf(RESPONSE.KEY_OFF)
-       var name = mutableStateOf("")
        var profileName: MutableState<String> = mutableStateOf("")
-       var otp = " "
+       var otp = mutableStateOf("")
 
 
        private val _loginState = MutableStateFlow<LoginState<User>>(LoginState.Idle)
@@ -164,9 +163,15 @@ class AuthViewModel @Inject constructor(
            _loginState.value = LoginState.Error(message)
        }
    //-----------------------------------------------------------------------------------------------------------------------//
+       val name= mutableStateOf("")
+       val username= mutableStateOf("")
+       val phoneNumber= mutableStateOf("")
+
+       val password= mutableStateOf("")
+       val confirmPassword= mutableStateOf("")
 
     val mySignupResponse: MutableState<RequestState<SignupAPIResponse>> = mutableStateOf(RequestState.Idle)
-    fun RegisterUser(registerUserModel : RegisterUserModel)=viewModelScope.launch(Dispatchers.IO) {
+    fun registerUser(registerUserModel : RegisterUserModel)=viewModelScope.launch(Dispatchers.IO) {
         registerUserModel.password=hashPassword(registerUserModel.password)
         repository.sendSignupData(registerUserModel)
             .onStart {
@@ -203,5 +208,7 @@ class AuthViewModel @Inject constructor(
         val hashedBytes = digest.digest(bytes)
         return hashedBytes.joinToString("") { "%02x".format(it) }
     }
+
+
     }
 

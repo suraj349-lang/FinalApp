@@ -61,6 +61,7 @@ import androidx.lifecycle.LifecycleOwner
 import com.example.finalapp.datastore.StoreUserState
 import com.example.finalapp.locationHelper.enableLocationSettings
 import com.example.finalapp.locationHelper.getLocation
+import com.example.finalapp.screens._8notification.pushNotificationService.createNotificationChannels
 import com.example.finalapp.viewmodels.SplashViewModel
 import com.example.finalapp.ui.API_KEY
 import com.example.finalapp.utils.UserLocation
@@ -84,6 +85,7 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         super.onCreate(savedInstanceState)
+        createNotificationChannels(this)
         handleDeepLink(intent)
         installSplashScreen().setKeepOnScreenCondition {
             !splashViewModel.isLoading.value

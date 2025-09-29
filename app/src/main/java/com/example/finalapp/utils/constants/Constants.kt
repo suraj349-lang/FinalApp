@@ -8,7 +8,7 @@ import com.example.finalapp.R
 object Constants {
 
     const val IP_ADD ="192.168.1.9"//"3.108.55.84" //"192.168.1.19"//"192.168.1.2" //"3.108.55.84"
-    const val SOCKET_CHAT_BASE_URL = "http://${IP_ADD}:5001/chat/"
+    const val SOCKET_CHAT_BASE_URL = "http://${IP_ADD}/chat/5001/"
     const val TEMP_SOCKET_URL = "http://${IP_ADD}:5001/"
     const val BASE_URL = "http://${IP_ADD}:5000/"
 
@@ -38,7 +38,7 @@ object Constants {
     // home screen---------------------------------
 
     val HOME_TOP_BAR_TITLE_COLOR= Color(0xFF0682F1)
-    val HOME_TOP_BAR_COLOR= Color(0xFF121212)//0xFF260235
+    val HOME_TOP_BAR_COLOR= Color(0xFF1A1919)//0xFF260235
     val HOME_TOP_BAR_ICON_COLOR= Color.White
 
     val HOME_STATUS_BAR_COLOR= HOME_TOP_BAR_COLOR
@@ -46,10 +46,10 @@ object Constants {
 
     val TAB_ROW_BACKGROUND_COLOR=HOME_TOP_BAR_COLOR
     val TAB_ROW_ACTIVE_TEXT_COLOR=Color.White
-    val TAB_ROW_INACTIVE_COLOR= Color.DarkGray
+    val TAB_ROW_INACTIVE_COLOR= Color.LightGray
     val TAB_ROW_INDICATOR_COLOR=Color.White
 
-    val HOME_BOTTOM_BAR_COLOR= Color(0xFF121212)
+    val HOME_BOTTOM_BAR_COLOR= Color(0xFF1A1919)
     val BOTTOM_BAR_ACTIVE_TEXT_COLOR= Color.White
 
     val BOTTOM_BAR_INACTIVE_ICON_COLOR= Color.LightGray

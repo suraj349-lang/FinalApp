@@ -15,25 +15,25 @@ import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.example.finalapp.enums.ImageUploadScreens
 import com.example.finalapp.model.DropProfileResponse
+import com.example.finalapp.model.RegisterUserModel
 import com.example.finalapp.model.pings.PingResponse
 import com.example.finalapp.viewmodels.ChatViewModel
 import com.example.finalapp.viewmodels.AuthViewModel
-import com.example.finalapp.screens.auth.util.EnterOTPScreenUI
+import com.example.finalapp.screens.auth.EnterOTPScreenUI
 
-import com.example.finalapp.screens.auth.LoginScreenUI
-import com.example.finalapp.screens.auth.SignupScreenUI
 import com.example.finalapp.screens.auth.SplashScreenUI
 import com.example.finalapp.screens.auth.util.OtpBox
 import com.example.finalapp.screens._6chat.SingleChatScreenUI
 import com.example.finalapp.screens.auth.FinalUserCreation
 import com.example.finalapp.qrScanning.QRScannerScreen
+import com.example.finalapp.screens._1home.EventScreenWrapper
 import com.example.finalapp.screens.pings.CameraPingScreen
 import com.example.finalapp.viewmodels.EventsViewModel
 import com.example.finalapp.screens._6chat.ChatListScreen
 import com.example.finalapp.screens._4profile.GalleryPicker
 import com.example.finalapp.screens._1home.HomeScreenUI
 import com.example.finalapp.screens._1home.eventWarScreen.CommentsScreen
-import com.example.finalapp.screens._8notification.TimeLineScreenUI
+import com.example.finalapp.screens._8notification.NotificationScreenUI
 import com.example.finalapp.screens._3createEventOrPing.createEvent.CreateEventMainScreen
 import com.example.finalapp.screens._5settings.SettingsScreenUI
 import com.example.finalapp.testing.TabView
@@ -62,6 +62,8 @@ import com.example.finalapp.screens._5settings.MyData
 import com.example.finalapp.screens._5settings.PermissionsUI
 import com.example.finalapp.screens._5settings.SafetyAndPrivacy
 import com.example.finalapp.screens._5settings.SavedLoginInfo
+import com.example.finalapp.screens.auth.LoginScreenWrapperNewUI
+import com.example.finalapp.screens.auth.SignupScreenNewUI
 import com.example.finalapp.screens.common.CameraXScreen
 import com.example.finalapp.screens.common.ImagePreviewScreen
 import com.example.finalapp.screens.onboarding.screen.WelcomeScreen
@@ -70,6 +72,7 @@ import com.example.finalapp.screens.pings.templates.PingTemplateSelector
 import com.example.finalapp.screens.pings.templates.visualPingTemplates
 import com.example.finalapp.screens.webrtc.OmegleScreen
 import com.example.finalapp.viewmodels.ImageUploadViewModel
+import com.example.finalapp.viewmodels.NotificationViewModel
 import com.example.finalapp.viewmodels.SettingsViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import kotlinx.serialization.decodeFromString
@@ -85,28 +88,42 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
     val settingsViewModel = hiltViewModel<SettingsViewModel>()
     val eventsViewModel= hiltViewModel<EventsViewModel>()
     val chatViewModel= hiltViewModel<ChatViewModel>()
+    val notificationViewModel= hiltViewModel<NotificationViewModel>()
 
     NavHost(navController = navController, startDestination =SCREENS.SPLASH.route){
-        composable("ping"){
-            CameraPingScreen(navController)
-        }
-        composable("edit"){
-            EditScreen(navController)
-        }
-        composable("template"){
-            PingTemplateSelector(templates = visualPingTemplates, onTemplateSelected ={} )
-        }
+
         composable(SCREENS.SPLASH.route){
             SplashScreenUI(navController,screen)
         }
         composable(SCREENS.LOGIN.route){
-            LoginScreenUI(navController,authViewModel)
+            //LoginScreenUI(navController,authViewModel)
+            LoginScreenWrapperNewUI(authViewModel, navController)
         }
         composable(SCREENS.SIGNUP.route){
-            SignupScreenUI(navController)
+           // SignupScreenUI(navController)
+            SignupScreenNewUI(
+                name = authViewModel.name.value,
+                onNameChange = {authViewModel.name.value=it},
+                password = authViewModel.password.value,
+                onPasswordChange = {authViewModel.password.value=it},
+                confirmPassword = authViewModel.confirmPassword.value,
+                onConfirmPasswordChange = {authViewModel.confirmPassword.value=it},
+                onBackClicked = {navController.navigate(SCREENS.LOGIN.route)},
+                onSignInClicked = {navController.navigate(SCREENS.LOGIN.route)},
+                onNextClicked = { navController.navigate(SCREENS.OTP.route)}
+            )
         }
         composable(SCREENS.OTP.route){
-           EnterOTPScreenUI(navController)
+           EnterOTPScreenUI(
+               navController = navController,
+               userName = authViewModel.username.value,
+               onUserNameChange = {authViewModel.username.value=it},
+               phoneNumber = authViewModel.phoneNumber.value,
+               onPhoneNumberChange = {authViewModel.phoneNumber.value=it},
+               otp = authViewModel.otp.value,
+               onOtpChange = {authViewModel.otp.value=it},
+               onSignUpClicked = {authViewModel.registerUser(RegisterUserModel.empty())}
+           )
         }
         composable(SCREENS.FINALUSERCREATION.route){
             FinalUserCreation(authViewModel,navController)
@@ -122,7 +139,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
             SettingsScreenUI(navController,authViewModel)
         }
         composable(SCREENS.NOTIFICATIONS.route){
-            TimeLineScreenUI(navController)
+            NotificationScreenUI(navController,notificationViewModel)
         }
         composable(SCREENS.CHAT_LIST.route){
             ChatListScreen(navController, chatViewModel)
@@ -152,6 +169,11 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
         composable(SCREENS.PINGS.route){
             //PingsScreenUI(navController,eventsViewModel)
             PingScreenFinal(navController,eventsViewModel)
+        }
+        composable(SCREENS.BETA.route){
+            EventScreenWrapper(eventsViewModel = eventsViewModel, navController = navController) {
+                eventsViewModel.getAllEvents()
+            }
         }
 
         composable(SCREENS.PAST_OFFERS.route){
@@ -248,6 +270,15 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
             val userId=navBackStackEntry.arguments?.getString("userId")
             UserPublicProfile(eventsViewModel,navController,userId)
 
+        }
+        composable("ping"){
+            CameraPingScreen(navController)
+        }
+        composable("edit"){
+            EditScreen(navController)
+        }
+        composable("template"){
+            PingTemplateSelector(templates = visualPingTemplates, onTemplateSelected ={} )
         }
 
         composable("qrcode"){

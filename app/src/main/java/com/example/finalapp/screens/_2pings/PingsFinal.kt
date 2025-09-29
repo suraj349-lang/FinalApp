@@ -1,6 +1,8 @@
 package com.example.finalapp.screens._2pings
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -31,22 +33,26 @@ import androidx.navigation.NavHostController
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.finalapp.R
+import com.example.finalapp.screens._1home.EventAndPingDesigns.pings.PingItem1
 import com.example.finalapp.screens._1home.EventAndPingDesigns.pings.PingItem3
+import com.example.finalapp.screens._1home.EventAndPingDesigns.pings.PingsTinderScreen
 import com.example.finalapp.screens._3createEventOrPing.CreateEventOrPingBottomSheet
 import com.example.finalapp.screens.common.CommonErrorScreen
+import com.example.finalapp.screens.common.NoPingsFoundScreen
 import com.example.finalapp.utils.UserLocationObject
 import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.viewmodels.EventsViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun PingScreenFinal(
     navController: NavHostController,
     eventsViewModel: EventsViewModel,
 ) {
     val selectedCategory = remember { mutableStateOf("All") }
-    val categories = listOf("All", "Dating", "Personal", "Sports", "Politics", "Adventure")
+   // val categories = listOf("All", "Dating", "Personal", "Sports", "Politics", "Adventure")
     val gridItems = listOf("Alpha-1", "Pari Chowk")
     val shorts = listOf("Ending in hours", "Today's pings", "Ending this week")
     val staggeredItems = listOf("Music", "Travel", "Education", "Gaming", "Art", "Food")
@@ -79,7 +85,7 @@ fun PingScreenFinal(
     }
 
     val systemUiController = rememberSystemUiController()
-    val navBarColor = Color(0xFF121212)
+    val navBarColor = Constants.HOME_NAV_BAR_COLOR
 
     SideEffect {
         systemUiController.setNavigationBarColor(
@@ -98,11 +104,13 @@ fun PingScreenFinal(
 //            }
 //        },
         content = {
-            Surface(modifier = Modifier.fillMaxSize().padding(it)) {
+            Surface(modifier = Modifier
+                .fillMaxSize()
+                .padding(it)) {
                 LazyColumn(
                     //state = listState,
                     modifier= Modifier
-                        .background(color = Color.Black),
+                        .background(color = Constants.HOME_TOP_BAR_COLOR),
                     contentPadding = PaddingValues(top = 0.dp, bottom = 16.dp))
                 {
 
@@ -113,35 +121,36 @@ fun PingScreenFinal(
 //                        .fillMaxSize()
 //                        .background(Color.Black)
 //                ) {
-                    item {
-                        LazyRow {
-                            items(categories.size) { index ->
-                                val category = categories[index]
-                                val isSelected = category == selectedCategory.value
-                                Box(
-                                    modifier = Modifier
-                                        .padding(horizontal = 4.dp, vertical = 8.dp)
-                                        .clip(RoundedCornerShape(15.dp))
-                                        .wrapContentSize()
-                                        .background(if (isSelected) Color(0xFF065F0A) else Color.Gray)
-                                        .clickable { selectedCategory.value = category }
-                                ) {
-                                    Text(
-                                        category,
-                                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-                                        color = Color.White,
-                                        fontFamily = Constants.FONT_MEDIUM,
-                                        fontSize = 12.sp
-                                    )
-                                }
-                            }
-                        }
-                    }
+//                    item {
+//                        LazyRow {
+//                            items(categories.size) { index ->
+//                                val category = categories[index]
+//                                val isSelected = category == selectedCategory.value
+//                                Box(
+//                                    modifier = Modifier
+//                                        .padding(horizontal = 4.dp, vertical = 8.dp)
+//                                        .clip(RoundedCornerShape(15.dp))
+//                                        .wrapContentSize()
+//                                        .background(if (isSelected) Color(0xFF065F0A) else Color.Gray)
+//                                        .clickable { selectedCategory.value = category }
+//                                ) {
+//                                    Text(
+//                                        category,
+//                                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+//                                        color = Color.White,
+//                                        fontFamily = Constants.FONT_MEDIUM,
+//                                        fontSize = 12.sp
+//                                    )
+//                                }
+//                            }
+//                        }
+//                    }
 
                     item {
                         if (searchOn) {
                             Box(
-                                modifier = Modifier.padding(8.dp)
+                                modifier = Modifier
+                                    .padding(8.dp)
                                     .fillMaxWidth()
                                     .background(Color.DarkGray, shape = MaterialTheme.shapes.medium)
                                     .padding(16.dp)
@@ -320,16 +329,11 @@ fun PingScreenFinal(
                                     // PingItem2(item = item)
 
 
-                                    PingItem3(item)
-
-
-
-
-                                    Divider(
-                                        modifier = Modifier.fillMaxWidth(),
-                                        thickness = 0.5.dp,
-                                        color = Color.LightGray.copy(alpha = 0.2f)
-                                    )
+                                  //  PingItem3(item)
+                                  //  PingItem1()
+                                    PingsTinderScreen(item)
+                                    Spacer(modifier = Modifier.height(6.dp))
+                                 //  Divider(modifier = Modifier.fillMaxWidth(), thickness = 0.5.dp, color = Color.Gray.copy(alpha = 0.6f))
                                 }
                             }
                         }
@@ -352,8 +356,8 @@ fun PingScreenFinal(
                                     val error = (loadState.refresh as LoadState.Error).error
                                     item {
                                         Log.e("Error in getting pings", "PingsScreenUI: $error ")
-                                        CommonErrorScreen(error = "Error getting pings.", true) {
-                                            // eventsViewModel.getAllPings("")
+                                        NoPingsFoundScreen(error = "Error getting pings.") {
+                                             eventsViewModel.getAllPings("")
                                         }
                                     }
                                 }

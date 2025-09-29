@@ -10,7 +10,20 @@ data class RegisterUserModel(
     var password:String,
     val token:String,
     val address:String
-)
+){
+    companion object{
+        fun empty():RegisterUserModel{
+            return RegisterUserModel(
+                name="",
+                number = "",
+                username ="",
+                password = "",
+                token="",
+                address = ""
+            )
+        }
+    }
+}
 
 @Serializable
 data class User(

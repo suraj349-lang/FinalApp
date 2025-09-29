@@ -138,7 +138,7 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                 Box(modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp)
-                    .background(color = Color.Black))
+                    .background(color = Color.White))
                 {
                         Row(
                             modifier = Modifier
@@ -152,13 +152,13 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                                 modifier = Modifier
                                     .size(40.dp)
                                     .padding(start = 8.dp, end = 8.dp),
-                                colorFilter = ColorFilter.tint(Color.White)
+                                colorFilter = ColorFilter.tint(Color.Black)
                             )
                             Column(modifier = Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.Start) {
                                 Text(
                                     text = "Drop Profile",
                                     modifier = Modifier.fillMaxWidth(),
-                                    color = Color.White,
+                                    color = Color.Black,
                                     fontSize = 18.sp,
                                     textAlign = TextAlign.Start,
                                     fontFamily = Constants.FONT_MEDIUM,
@@ -169,7 +169,7 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                                     modifier = Modifier.fillMaxWidth(),
                                     maxLines=1,
                                     overflow = TextOverflow.Ellipsis,
-                                    color = Color(0xFFF7ECD3),
+                                    color = Color.Black.copy(alpha = 0.8f),//Color(0xFFF7ECD3),
                                     fontSize = 10.sp,
                                     textAlign = TextAlign.Start,
                                     fontFamily = Constants.FONT_LIGHT,

@@ -1,17 +1,23 @@
 package com.example.finalapp.screens._1home.EventAndPingDesigns.pings
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
@@ -22,36 +28,64 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.finalapp.R
+import com.example.finalapp.model.User
+import com.example.finalapp.model.pings.CommentData
 import com.example.finalapp.model.pings.PingResponse
 import com.example.finalapp.ui.imagePrefix
 import com.example.finalapp.utils.constants.Constants
+import com.example.finalapp.utils.formatDateTime
 
 
+@RequiresApi(Build.VERSION_CODES.O)
+@Preview
 @Composable
-fun PingItem1(item: PingResponse) {
+fun PingItem1() {
+    val item = PingResponse(
+        _id = "12345",
+        user = User( ),
+        title = "Special Offer!",
+        description = "Get 50% off on all items.",
+        image = "https://picsum.photos/200/300",
+        category = "Shopping",
+        location = "New Delhi, India",
+        offer = "Flat 50% discount",
+        topPostsList = listOf("p1", "p2", "p3"),
+        expirationTime = "2025-12-31T23:59:59Z",
+        peopleJoined = 42,
+        totalComments = 10,
+        topComments = listOf(
+            CommentData("c1", "Looks great!", "Alice"),
+            CommentData("c2", "I’m in!", "Bob")
+        ),
+        totalChildPosts = 5,
+        totalViews = 120,
+        totalUpVotes = 35
+    )
+
     Card(
         modifier = Modifier
-            .padding(vertical = 4.dp)
-            .fillMaxWidth(),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.Black), // Dark background //0xFF1A1A1A
+            .fillMaxWidth().padding(vertical = 10.dp),
+        shape = RoundedCornerShape(0.dp),
+        colors = CardDefaults.cardColors(containerColor = Constants.HOME_TOP_BAR_COLOR), // Dark background //0xFF1A1A1A
         elevation = CardDefaults.cardElevation(defaultElevation = 200.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Column(modifier = Modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            /*Row(verticalAlignment = Alignment.CenterVertically) {
                 Image(painter = painterResource(id = R.drawable.profile_image_1), contentDescription ="" ,modifier = Modifier
-                    .size(100.dp)
+                    .size(40.dp)
                     .clip(CircleShape), contentScale = ContentScale.Crop)
                 Spacer(Modifier.width(8.dp))
                 Column {
@@ -113,16 +147,24 @@ fun PingItem1(item: PingResponse) {
                         fontSize = 12.sp
                     )
                 }
+            }*/
+            Column(modifier = Modifier.fillMaxWidth().wrapContentHeight()) {
+                Box(modifier = Modifier.wrapContentWidth().height(30.dp).background(brush = Brush.linearGradient(colors = listOf(
+                    Color(0xFF121212), Color(0xFF121212)
+                )))) {
+                   Text("Dating", color = Color.White,fontFamily = Constants.FONT_MEDIUM, fontSize = 16.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp))
+                }
+                Image(
+                    painter = painterResource( R.drawable.profile_image_2),//todo imagePrefix+ item.image,
+                    contentDescription = "Ping Image",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                        .clip(RoundedCornerShape(0.dp)),
+                    contentScale = ContentScale.Crop
+                )
             }
-            AsyncImage(
-                model = imagePrefix + item.image,
-                contentDescription = "Ping Image",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .clip(RoundedCornerShape(14.dp)),
-                contentScale = ContentScale.Crop
-            )
+
             Row(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
                 modifier = Modifier.fillMaxWidth()
@@ -192,7 +234,7 @@ fun PingItem1(item: PingResponse) {
                             )
                         )
                         Text(
-                            item.expirationTime + " hrs left",
+                            formatDateTime(item.expirationTime) + " hrs left",
                             color = Color.White,
                             fontFamily = Constants.FONT_LIGHT
                         )

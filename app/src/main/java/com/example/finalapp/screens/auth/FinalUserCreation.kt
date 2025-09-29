@@ -96,7 +96,7 @@ fun FinalUserCreation(authViewModel: AuthViewModel, navController: NavHostContro
             scope.launch(Dispatchers.IO) {
                 // TODO("the code to save data in SQLITE should be once the response have been returned from api")TODO("the code to save data in SQLITE should be once the response have been returned from api")
                 try {
-                    authViewModel.RegisterUser(RegisterUserModel(name.trim(), number,username,password,token,address))
+                    authViewModel.registerUser(RegisterUserModel(name.trim(), number,username,password,token,address))
                 }catch (e:Exception){
                     Log.d("FinalUserCreation",e.message.toString())
                 }

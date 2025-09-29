@@ -1,4 +1,4 @@
-package com.example.finalapp.screens._2pings
+package com.example.finalapp.screens._2pings.old
 
 import BottomBar
 import android.util.Log
@@ -51,10 +51,13 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.finalapp.model.DropProfileResponse
 import com.example.finalapp.screens._1home.EventAndPingDesigns.pings.PingItem3
+import com.example.finalapp.screens._2pings.Category
+import com.example.finalapp.screens._2pings.PingsTopBar
+import com.example.finalapp.screens._2pings.SearchBar
+import com.example.finalapp.screens._2pings.categories
 import com.example.finalapp.screens._3createEventOrPing.CreateEventOrPingBottomSheet
-import com.example.finalapp.screens.common.CommonErrorScreen
+import com.example.finalapp.screens.common.NoPingsFoundScreen
 import com.example.finalapp.ui.theme.floatingActionBtnColor
-import com.example.finalapp.utils.UserLocation
 import com.example.finalapp.utils.UserLocationObject
 import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
 import com.example.finalapp.viewmodels.EventsViewModel
@@ -228,8 +231,8 @@ fun PingsScreenUI(navController:NavHostController,eventsViewModel: EventsViewMod
                                     val error = (loadState.refresh as LoadState.Error).error
                                     item {
                                         Log.e("Error in getting pings", "PingsScreenUI: $error ")
-                                        CommonErrorScreen(error = "Error getting pings.", true) {
-                                            // eventsViewModel.getAllPings("")
+                                        NoPingsFoundScreen(error = "Error getting pings.") {
+                                             eventsViewModel.getAllPings("")
                                         }
                                     }
                                 }

@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -20,6 +21,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Text
@@ -46,7 +50,7 @@ import com.example.finalapp.model.pings.PingResponse
 import com.example.finalapp.ui.imagePrefix
 import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.utils.constants.Constants
-@Preview(showBackground = true)
+
 @Composable
 fun MyPings(
     items: List<PingResponse> = emptyList(),
@@ -136,7 +140,11 @@ fun MyPings(
                 }
             }
         } else {
-            LazyRow {
+            LazyVerticalStaggeredGrid(
+                columns = StaggeredGridCells.Fixed(3),
+                verticalItemSpacing = 2.dp,
+                horizontalArrangement = Arrangement.spacedBy(1.dp)
+            ) {
                 items(pingsList) { item ->
                     MyPingItem(item)
                 }
@@ -149,12 +157,10 @@ fun MyPings(
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun MyPingItem(item: PingResponse) {
-    Log.i("CALLAPI", "LiveEventItem:$item ")
     Box(modifier = Modifier
-        .size(180.dp) //120 earlier
-        .padding(end = 8.dp, top = 8.dp)
-        .clip(shape = RoundedCornerShape(6.dp))) {
-        GlideImage(model=  imagePrefix +item.image/*R.drawable.profile_image_1*/ , contentDescription = "", contentScale = ContentScale.Crop) //todo add imagePrefix when upload is happening
+        .aspectRatio(9f/13f) //120 earlier
+        .clip(shape = RoundedCornerShape(2.dp))) {
+        GlideImage(model=  imagePrefix +item.image/*R.drawable.profile_image_1*/ , contentDescription = "", modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop) //todo add imagePrefix when upload is happening
 //        Row(modifier = Modifier
 //            .align(Alignment.BottomStart)
 //            .padding(4.dp)

@@ -178,6 +178,8 @@ dependencies {
 
     implementation("io.getstream:stream-webrtc-android:1.1.1")
 
+    //remote config
+
 
 
 

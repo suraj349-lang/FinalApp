@@ -23,7 +23,9 @@ import javax.inject.Singleton
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.datastore.preferences.core.Preferences
+import com.example.finalapp.database.dao.NotificationDao
 import com.example.finalapp.datastore.StoreLoginState
+import com.example.finalapp.repository.NotificationRepository
 import com.example.finalapp.viewmodels.S3Uploader
 import com.example.finalapp.viewmodels.S3UploaderImpl
 import dagger.Binds
@@ -90,6 +92,13 @@ class AppModule {
     @Singleton
     @Provides
     fun chatDao(database: FrisbeeDatabase) = database.chatDao()
+    @Singleton
+    @Provides
+    fun notificationDao(database: FrisbeeDatabase) = database.NotificationDao()
+    @Provides
+    fun provideNotificationRepository(dao: NotificationDao): NotificationRepository {
+        return NotificationRepository(dao)
+    }
 
     @Provides
     @Singleton

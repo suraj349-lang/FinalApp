@@ -141,8 +141,8 @@ fun DirectChatScreen(
                             Text(
                                 text = "Verified users near you",
                                 fontFamily = Constants.FONT_MEDIUM,
-                                color = floatingActionBtnColor,
-                                fontWeight = FontWeight.ExtraBold,
+                                color = Constants.HOME_TOP_BAR_ICON_COLOR,
+                                fontWeight = FontWeight.Normal,
                                 fontSize = 20.sp,
                                 modifier = Modifier
                                     .align(Alignment.TopStart)
@@ -156,9 +156,9 @@ fun DirectChatScreen(
                                 },
                                 colors = SwitchDefaults.colors(
                                     checkedThumbColor = floatingActionBtnColor,// MaterialTheme.colorScheme.primary,
-                                    checkedTrackColor = Color(0xFFF0E3C5),
+                                    checkedTrackColor = Color(0xFFFFFFFF),
                                     uncheckedThumbColor = Color(0xFFFFFFFF),
-                                    uncheckedTrackColor = Color(0xFFF0E3C5),
+                                    uncheckedTrackColor = Color(0xFFFFFFFF),
                                 ),
                                 modifier = Modifier
                                     .align(Alignment.TopEnd)
@@ -310,7 +310,7 @@ fun DirectChatItem(
                 .wrapContentWidth()
                 .height(300.dp),
             shape = RoundedCornerShape(8.dp),
-            border = BorderStroke(width = 1.dp, color = Color.LightGray)
+          //  border = BorderStroke(width = 0.5.dp, color = Color.Gray)
         ) {
             GlideImage(
                 model = if(directChatObject?.userId?.profileImage?.isNotEmpty()==true) imagePrefix+directChatObject.userId.profileImage else "",
@@ -319,34 +319,64 @@ fun DirectChatItem(
             )
         }
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = if(directChatObject?.userId?.name?.isNotEmpty()==true) directChatObject.userId.name.capitalize() else "...",
-                fontSize = 20.sp,
-                fontFamily = Constants.USER_NAME_FONT, fontWeight = FontWeight.Bold
-            )
-        }
-
-        Button(
-            onClick = { onSendMessageClicked() },
-            shape = RoundedCornerShape(6.dp),
             modifier = Modifier
-                .fillMaxWidth(0.5f) //.wrapContentHeight().fillMaxWidth(0.8f)
-                .align(Alignment.CenterHorizontally),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Black,
-            )
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 10.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.Top
         ) {
-            Row(modifier = Modifier.wrapContentWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Image(painter = painterResource(id = R.drawable.chat_new), contentDescription ="", modifier = Modifier.size(16.dp), colorFilter = ColorFilter.tint(Color.White) )
-                Text(text = "Send Message", color = Color.White,fontFamily = Constants.FONT_LIGHT)
+            Column(modifier = Modifier.wrapContentSize()) {
+                directChatObject?.userId?.name?.capitalize()?.let {
+                    Text(
+                        text = it,
+                        fontSize = 24.sp,lineHeight=8.sp,
+                        color = Color.White,
+                        fontFamily = Constants.FONT_MEDIUM, fontWeight = FontWeight.SemiBold
+                    )
+                }
+                directChatObject?.userId?.userName?.capitalize()?.let {
+                    Text(
+                        text = "@$it",
+                        fontSize = 12.sp,lineHeight=8.sp,
+                        color = Color.Gray,
+                        fontFamily = Constants.FONT_LIGHT, fontWeight = FontWeight.Normal
+                    )
+                }
+
             }
 
+
+            Button(
+                onClick = { onSendMessageClicked() },
+                shape = RoundedCornerShape(6.dp),
+                modifier = Modifier
+                    .wrapContentWidth() //.wrapContentHeight().fillMaxWidth(0.8f)
+                    //.align(Alignment.CenterHorizontally),
+                ,colors = ButtonDefaults.buttonColors(
+                    containerColor = Color.White,
+                )
+            ) {
+                Row(
+                    modifier = Modifier.wrapContentWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.chat_new),
+                        contentDescription = "",
+                        modifier = Modifier.size(16.dp),
+                        colorFilter = ColorFilter.tint(Color.Black)
+                    )
+                    Text(
+                        text = "Send Message",
+                        color = Color.Black,
+                        fontFamily = Constants.FONT_LIGHT
+                    )
+                }
+
+            }
         }
-        Divider(color = floatingActionBtnColor, thickness = 0.5.dp)
+        Divider(color = floatingActionBtnColor.copy(alpha = 0.23f), thickness = 0.18.dp)
 
     }
 }
@@ -391,7 +421,7 @@ fun ShareProfileForDirectChat(user:User,address:String,onOmegleClicked:()->Unit,
                     contentDescription = "",
                     filterQuality = FilterQuality.High,
                     modifier = Modifier
-                        .padding(1.dp)
+                       // .padding(1.dp)
                         .clip(shape = CircleShape)
                         .fillMaxSize(),
                     contentScale = ContentScale.Crop,
@@ -455,7 +485,8 @@ fun ShareProfileForDirectChat(user:User,address:String,onOmegleClicked:()->Unit,
                             color = Color.White
                         )
                     }
-                    Row(modifier = Modifier.clickable { onOmegleClicked() }
+                    Row(modifier = Modifier
+                        .clickable { onOmegleClicked() }
                         .fillMaxWidth()
                         .height(60.dp)) {
                         Image(painter = painterResource(id = androidx.core.R.drawable.ic_call_answer_video), contentDescription = "", modifier = Modifier.size(24.dp))

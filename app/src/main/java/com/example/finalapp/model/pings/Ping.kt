@@ -35,7 +35,7 @@ data class PingRequestDto(
 
 
 data class PingResponse(
-    val _id:String,
+    val _id:String="",
     val user: User? = null,
     val title: String? = null,
     val description: String? = null,

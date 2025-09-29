@@ -49,9 +49,9 @@ fun EventScreenWrapper(
     navController: NavHostController,
     onRetryCalled:()->Unit
 ) {
-//    LaunchedEffect(key1 = true){
-//        eventsViewModel.getAllEvents()
-//    }
+    LaunchedEffect(key1 = true){
+        eventsViewModel.getAllEvents()
+    }
     val pagerState = rememberPagerState(
         initialPage = initialPage ?: 0,
         pageCount = { (eventsViewModel.eventsListResponse.value as? RequestState.Success<List<Event>>)?.data?.size ?: 0 }

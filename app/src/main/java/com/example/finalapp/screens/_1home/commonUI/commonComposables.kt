@@ -12,6 +12,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -43,6 +44,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
@@ -137,12 +139,11 @@ fun HomeTopBar(
         },
         actions = {
             if(actionIcon) {
-                Row(modifier = Modifier.fillMaxHeight(), verticalAlignment = Alignment.CenterVertically) {
+                Row(modifier = Modifier.fillMaxHeight(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(24.dp)) {
                     Image(painter = painterResource(id = R.drawable.new_qr),
                         contentDescription = "",
                         colorFilter = ColorFilter.tint(color = iconAndTextColor),
                         modifier = Modifier
-                            .padding(end = 20.dp)
                             .size(20.dp)
                             .clickable {
                                 onQRClicked()
@@ -153,7 +154,6 @@ fun HomeTopBar(
                         colorFilter = ColorFilter.tint(color = iconAndTextColor),
                         modifier = Modifier
                             .clickable { navController.navigate(SCREENS.NOTIFICATIONS.route) }
-                            .padding(end = 20.dp)
                             .size(20.dp)
                     )
                     icon?.let { painterResource(id = it) }?.let {
@@ -161,7 +161,6 @@ fun HomeTopBar(
                             contentDescription = "",
                             colorFilter = ColorFilter.tint(color = iconAndTextColor),
                             modifier = Modifier
-                                .padding(end = 20.dp)
                                 .size(20.dp)
                                 .clickable {
                                     navController.navigate(SCREENS.CHAT_LIST.route)
@@ -287,34 +286,42 @@ fun HomeFloatingActionButton(authViewModel: AuthViewModel, eventsViewModel: Even
         }
     }
     if (showCustomDialog) {
-        DropProfileDialog(authViewModel ,eventsViewModel , imageUploadViewModel ,navController ) { showCustomDialog = !showCustomDialog;eventsViewModel.showDropDialog.value=false }
-        Log.d("Suraj", "HomeFloatingActionButton:entered to drop profile dialog ")
+        DropProfileDialog(
+            authViewModel,
+            eventsViewModel,
+            imageUploadViewModel,
+            navController
+        ) { showCustomDialog = !showCustomDialog;eventsViewModel.showDropDialog.value = false }
     }
+
 }
 
 
 @Composable
-fun OfferResponseDataAndAction(eventsViewModel: EventsViewModel, navController: NavHostController){
-    val context= LocalContext.current
-    Log.d("Data received","Into the function")
-    when (val result=eventsViewModel.premiumCreateEventResponse.value){
-        is RequestState.Success->{
-            eventsViewModel.premiumCreateEventKey.value=0;
-            Log.d("Suraj",result.data.toString())
-            Toast.makeText(context,"${result.data}", Toast.LENGTH_SHORT).show()
-            navController.navigate(SCREENS.HOME.route){
+fun OfferResponseDataAndAction(eventsViewModel: EventsViewModel, navController: NavHostController) {
+    val context = LocalContext.current
+    Log.d("Data received", "Into the function")
+    when (val result = eventsViewModel.premiumCreateEventResponse.value) {
+        is RequestState.Success -> {
+            eventsViewModel.premiumCreateEventKey.value = 0;
+            Log.d("Suraj", result.data.toString())
+            Toast.makeText(context, "${result.data}", Toast.LENGTH_SHORT).show()
+            navController.navigate(SCREENS.HOME.route) {
                 popUpTo(0)
             }
 
         }
-        is RequestState.Error->{
-            Log.d("Data received","error final found")
-            Toast.makeText(context,"$result", Toast.LENGTH_SHORT).show()
+
+        is RequestState.Error -> {
+            Log.d("Data received", "error final found")
+            Toast.makeText(context, "$result", Toast.LENGTH_SHORT).show()
         }
-        RequestState.Loading->{
-         //   CircularProgressIndicator(color = Color(0xFF1289BE))
+
+        RequestState.Loading -> {
+            //   CircularProgressIndicator(color = Color(0xFF1289BE))
         }
-        RequestState.Idle->{
+
+        RequestState.Idle -> {
 
         }
 
@@ -322,5 +329,4 @@ fun OfferResponseDataAndAction(eventsViewModel: EventsViewModel, navController: 
 
 
 }
-
 

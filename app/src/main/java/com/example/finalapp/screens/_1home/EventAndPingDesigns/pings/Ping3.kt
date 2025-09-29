@@ -31,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
@@ -61,16 +62,21 @@ fun PingItem3(item: PingResponse) {
                 shape = RoundedCornerShape(16.dp)
             )
             .background(
-                shape = RoundedCornerShape(16.dp),
-                color = Color(0xFF01011A)
-            ),
+                brush = Brush.verticalGradient(colors = listOf(Color(0xFF142902), Color(0xFF050303)))
+            )
+//            .background(
+//                shape = RoundedCornerShape(16.dp),
+//                color = Color(0xFFAFB42B) //0xFFAFB42B
+//            ),
     ) {
 
         Column(modifier = Modifier.padding(1.dp)) {
             Card(modifier = Modifier
                 .fillMaxWidth()
-                .height(300.dp)
-                .shadow(elevation = 10.dp, spotColor = Color.White, ambientColor = Color.White), shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)) {
+                .height(500.dp)
+               // .shadow(elevation = 10.dp, spotColor = Color.White, ambientColor = Color.White)
+                ,
+                shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)) {
                 AsyncImage(
                     model = imagePrefix+item.image,
                     contentDescription = "",
@@ -260,11 +266,14 @@ fun PingItem3(item: PingResponse) {
                     }
 
                     // Response Buttons
-                    Card(
+                    Box(
                         modifier = Modifier
-                            .fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFF121233))//0xFF1E1E1E
+                            .fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(brush = Brush.verticalGradient(colors = listOf(Color(
+                                0xFF7B1FA2
+                            ),
+                                Color(0xFF1976D2)
+                            ))),
+
                     ) {
                         Row(
                             modifier = Modifier
@@ -293,6 +302,7 @@ fun PingItem3(item: PingResponse) {
                                     Text(
                                         "Join",
                                         color = Color.White,
+                                        fontSize=16.sp,
                                         fontFamily = Constants.FONT_MEDIUM,
                                         fontWeight = FontWeight.Bold
                                     )
@@ -321,6 +331,7 @@ fun PingItem3(item: PingResponse) {
                                     Text(
                                         "Chat",
                                         color = Color.White,
+                                        fontSize=16.sp,
                                         fontFamily = Constants.FONT_MEDIUM
                                     )
                                 }

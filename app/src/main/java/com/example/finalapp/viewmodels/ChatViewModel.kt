@@ -22,31 +22,37 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
-
 @HiltViewModel
 class ChatViewModel @Inject constructor(
     private val chatDatabaseRepository: ChatDatabaseRepository
-    ): ViewModel() {
+) : ViewModel() {
 
-
-    val canFetch= mutableStateOf(true)
+    val canFetch = mutableStateOf(true)
     private val _messagesFromDB = MutableStateFlow<List<Chat>>(emptyList())
     val messagesFromDB: StateFlow<List<Chat>> = _messagesFromDB
+
     private val _messagesFromServer = MutableStateFlow<RequestState<List<Message>>>(RequestState.Idle)
     val messagesFromServer: StateFlow<RequestState<List<Message>>> = _messagesFromServer
-    val profileImage= MutableStateFlow<String?>(null)
 
-    private val socketManager by lazy { SocketManager()}
+    val profileImage = MutableStateFlow<String?>(null)
+
+    private val socketManager by lazy { SocketManager() }
+
+    private var isSocketConnected = false
+
     fun connectSocket() {
-        socketManager.connect(UserObject.user.value.user) { receivedMessage ->
-            Log.d("Messageschat", "connectSocket:${receivedMessage} ")
+        val userId = UserObject.user.value.user
+        if (isSocketConnected) {
+            Log.d("SocketManager", "Socket already connected, skipping connect.")
+            return
+        }
+
+        socketManager.connect(userId) { receivedMessage ->
+            Log.d("Messageschat", "connectSocket: $receivedMessage")
+
             _messagesFromServer.update { oldState ->
                 when (oldState) {
                     is RequestState.Success -> {
-//                        val existingPendingMessage = oldState.data.find {
-//                            it.message == receivedMessage.message && it.senderId == receivedMessage.receiverId
-//                        }
                         val existingPendingMessage = oldState.data.find {
                             it.message == receivedMessage.message &&
                                     it.senderId == receivedMessage.receiverId &&
@@ -55,42 +61,40 @@ class ChatViewModel @Inject constructor(
                         }
 
                         if (existingPendingMessage != null) {
-                            // Match found: update the sent/received status
                             val updatedChats = oldState.data.map { chat ->
-                                if (chat.message == receivedMessage.message && chat.senderId == receivedMessage.receiverId ) {
-                                    chat.copy(sent =  1, received = true, timestamp = receivedMessage.timestamp)
+                                if (chat.message == receivedMessage.message &&
+                                    chat.senderId == receivedMessage.receiverId
+                                ) {
+                                    chat.copy(
+                                        sent = 1,
+                                        received = true,
+                                        timestamp = receivedMessage.timestamp
+                                    )
                                 } else chat
                             }
                             RequestState.Success(updatedChats)
                         } else {
-                            // No pending message found: it's a fresh incoming message
                             RequestState.Success(oldState.data + receivedMessage)
                         }
                     }
-                    else -> oldState
+                    else -> RequestState.Success(listOf(receivedMessage))
                 }
             }
         }
+
+        isSocketConnected = true
     }
 
-
-    //        socketManager.connect(ProfileObject.profile?.userId!!) { newChat ->
-//
-//            val currentState = _messagesFromServer.value
-//
-//            if (currentState is RequestState.Success) {
-//                val updatedList = currentState.data.toMutableList().apply {
-//                    add(newChat)
-//                }
-//                _messagesFromServer.value = RequestState.Success(updatedList)
-//            } else {
-//                _messagesFromServer.value = RequestState.Success(listOf(newChat))
-//            }
-//
-//        }
+    fun disconnectSocket() {
+        socketManager.disconnect()
+        isSocketConnected = false
+    }
 
     fun sendMessage(newChatItem: ChatItem) {
-        Log.d("SocketManager", "sendMessage in viewmodel:called ${newChatItem.sentFrom},${newChatItem.sentTo},${newChatItem.message} ")
+        Log.d(
+            "SocketManager",
+            "sendMessage in viewmodel: ${newChatItem.sentFrom}, ${newChatItem.sentTo}, ${newChatItem.message}"
+        )
         socketManager.sendMessage(newChatItem)
     }
 
@@ -99,28 +103,24 @@ class ChatViewModel @Inject constructor(
         chatDatabaseRepository.getMessages(userID, otherUserID)
             .onStart {
                 _messagesFromServer.value = RequestState.Loading
-            }.catch {
-                Log.e("Messageschat", "getAllMessages:${it.message} ",it )
+            }
+            .catch {
+                Log.e("Messageschat", "getAllMessages:${it.message}", it)
                 _messagesFromServer.value = RequestState.Error(it)
-            }.collect { response ->
-                Log.d("Messageschat ", "getAllMessages: $response")
+            }
+            .collect { response ->
+                Log.d("Messageschat", "getAllMessages: $response")
                 _messagesFromServer.update { oldState ->
                     when (oldState) {
                         is RequestState.Success -> {
-                            val combined =
-                                (oldState.data + response.data).distinctBy { it.timestamp }
+                            val combined = (oldState.data + response.data).distinctBy { it.timestamp }
                             RequestState.Success(combined)
                         }
-
-                        else -> {
-                            RequestState.Success(response.data)
-                        }
+                        else -> RequestState.Success(response.data)
                     }
                 }
-
             }
     }
-
 
     fun resetProfileImage(){
         profileImage.value=""
@@ -210,9 +210,6 @@ class ChatViewModel @Inject constructor(
 
     //-------------------------------------------------------------------------------------------//
 
-    fun disconnectSocket() {
-        socketManager.disconnect()
-    }
 
     override fun onCleared() {
         super.onCleared()

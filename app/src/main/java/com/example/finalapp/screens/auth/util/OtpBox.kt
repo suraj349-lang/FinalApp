@@ -78,20 +78,11 @@ fun OtpBox(){
         }
     }
     if(otp1!="" && otp2!="" && otp3!="" && otp4!="" && otp5!="" && otp6!=""  ) {
-        authViewModel.otp = otp1 + otp2 + otp3 + otp4+otp5+otp6
-        Log.d("OTP",authViewModel.otp)
+        authViewModel.otp.value = otp1 + otp2 + otp3 + otp4+otp5+otp6
+        Log.d("OTP",authViewModel.otp.value)
     }
-
-
-
-
-
-
 }
 
-
-
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun OutlinedBox(otp:String,onChange:(String)->Unit){
     val focusManager = LocalFocusManager.current

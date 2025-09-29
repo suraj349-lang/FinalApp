@@ -6,9 +6,11 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.drawable.Drawable.ConstantState
 import android.media.MediaRecorder
 import android.os.Build
 import android.os.Bundle
+import android.provider.CalendarContract.Colors
 import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
@@ -26,6 +28,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -48,11 +51,14 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -72,6 +78,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
@@ -90,6 +97,7 @@ import com.example.finalapp.utils.RequestState
 import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.utils.constants.Constants.DONGLE_BOLD
 import com.example.finalapp.viewmodels.ChatViewModel
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.launch
 import java.io.File
 import java.util.Locale
@@ -184,6 +192,19 @@ fun SingleChatScreenUI(
             }
         }
     }
+    val systemUiController = rememberSystemUiController()
+
+
+    SideEffect {
+        systemUiController.setNavigationBarColor(
+            color = Color.White,
+            darkIcons = false
+        )
+        systemUiController.setStatusBarColor(
+            color = Constants.HOME_BOTTOM_BAR_COLOR,     // Your desired color
+            darkIcons = false        // true = dark icons (for light backgrounds)
+        )
+    }
 
     Scaffold(
         topBar = { SingleChatTopBar(title = sentTo, chatUserImage, navController) },
@@ -207,15 +228,17 @@ fun SingleChatScreenUI(
                         .defaultMinSize(minHeight = 48.dp)
                         .heightIn(min = 48.dp, max = 150.dp),
                     placeholder = {
-                        Text(text = "Type message....", fontSize = 14.sp)
+                        Text(text = "Type message....", fontSize = 14.sp, fontFamily = Constants.FONT_LIGHT, color = Color.Gray)
                     },
                     maxLines = 10,
-                    textStyle = TextStyle(fontSize = 14.sp),
+                    textStyle = TextStyle(fontSize = 14.sp, fontFamily = Constants.FONT_MEDIUM),
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color.DarkGray,
-                        unfocusedBorderColor = Color.DarkGray,
-                        cursorColor = Color.Red
+                        focusedBorderColor = Color.LightGray,
+                        unfocusedBorderColor = Color.LightGray,
+                        cursorColor = Color.Red,
+                        focusedContainerColor = Color.LightGray, unfocusedContainerColor = Color.LightGray.copy(alpha = 0.7f),
+                        focusedTextColor = Color.Black
                     ),trailingIcon = {
                         Row(
                             modifier = Modifier
@@ -253,10 +276,10 @@ fun SingleChatScreenUI(
                                 Image(
                                     painter = painterResource(id = R.drawable.cameranew),
                                     contentDescription = "Camera",
-                                    colorFilter = ColorFilter.tint(color = Color.DarkGray),
+                                    colorFilter = ColorFilter.tint(color = Color.Black),
                                     alignment = Alignment.Center,
                                     modifier = Modifier
-                                        .size(28.dp)
+                                        .size(26.dp)
                                         .clickable {
                                             navController.navigate("camerax/singleChat")
                                         }
@@ -283,8 +306,8 @@ fun SingleChatScreenUI(
                                             }
                                         }
                                     },
-                                    fontFamily = DONGLE_BOLD,
-                                    fontSize = 24.sp,
+                                    fontFamily = Constants.FONT_MEDIUM,
+                                    fontSize = 14.sp,
                                     color = Color.DarkGray
                                 )
                             }
@@ -295,51 +318,59 @@ fun SingleChatScreenUI(
             }
         }
     ) {
-        Column(modifier = Modifier
-            .padding(it)
-            .imePadding()) {
-            if (showLinearIndicator) {
-                LinearProgressIndicator(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(2.dp),
-                    color = floatingActionBtnColor
-                )
-            }
+        Box(modifier = Modifier.fillMaxSize()) {
+            Image(painter = painterResource(id = R.drawable.whatsapp), contentDescription ="", modifier = Modifier.fillMaxSize(),contentScale = ContentScale.Crop  )
+            Column(
+                modifier = Modifier
+                    .padding(it)
+                    .imePadding()
+            ) {
+                if (showLinearIndicator) {
+                    LinearProgressIndicator(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(2.dp),
+                        color = floatingActionBtnColor
+                    )
+                }
 
-            if (showError) {
-                NoMessagesScreen(Modifier.weight(1f,true),"Error connecting to server")
-            }
+                if (showError) {
+                    NoMessagesScreen(Modifier.weight(1f, true), "Error connecting to server")
+                }
 
-            when (messages) {
-                is RequestState.Success -> {
-                    showLinearIndicator = false
-                    val messageList = (messages as RequestState.Success<List<Message>>).data
-                    if (messageList.isNotEmpty()) {
-                        LazyColumn(state = listState, modifier = Modifier.weight(1f,true)) {
-                            items(messageList) { message ->
-                                MessageItemUI(
-                                    msg = message.message,
-                                    sent = message.sent,
-                                    received = message.received,
-                                    timestamp = message.timestamp,
-                                    isSentByLoggedInUser = message.senderId == UserObject.user.value.user
-                                )
+                when (messages) {
+                    is RequestState.Success -> {
+                        showLinearIndicator = false
+                        val messageList = (messages as RequestState.Success<List<Message>>).data
+                        if (messageList.isNotEmpty()) {
+                            LazyColumn(state = listState, modifier = Modifier.weight(1f, true)) {
+                                items(messageList) { message ->
+                                    MessageItemUI(
+                                        msg = message.message,
+                                        sent = message.sent,
+                                        received = message.received,
+                                        timestamp = message.timestamp,
+                                        isSentByLoggedInUser = message.senderId == UserObject.user.value.user
+                                    )
+                                }
                             }
+                        } else {
+                            NoMessagesScreen(Modifier.weight(1f, true), "Say hi!")
                         }
-                    } else {
-                        NoMessagesScreen(Modifier.weight(1f,true),"Say hi!")
                     }
-                }
-                is RequestState.Loading -> {
-                    showLinearIndicator = true
-                }
-                is RequestState.Error -> {
-                    showLinearIndicator = false
-                    showError = true
-                }
-                else -> {
-                    Box(modifier = Modifier.weight(1f)) {}
+
+                    is RequestState.Loading -> {
+                        showLinearIndicator = true
+                    }
+
+                    is RequestState.Error -> {
+                        showLinearIndicator = false
+                        showError = true
+                    }
+
+                    else -> {
+                        Box(modifier = Modifier.weight(1f)) {}
+                    }
                 }
             }
         }
@@ -658,26 +689,28 @@ fun SingleChatTopBar(title: String,profileImage:String?, navController: NavHostC
     TopAppBar(
         title = {
             Text(
-                title,textAlign= TextAlign.Start, modifier = Modifier.fillMaxWidth(0.6f), fontFamily = Constants.FONT_LIGHT,color = Color.Black, fontSize = 20.sp
+                title,textAlign= TextAlign.Start, overflow= TextOverflow.Ellipsis, fontFamily = Constants.FONT_LIGHT,color = Color.White.copy(alpha = 0.8f), fontSize = 20.sp
             )
         },
         navigationIcon = {
-            Row(modifier = Modifier.fillMaxWidth(0.2f)) {
+            Row(modifier = Modifier.fillMaxWidth(0.23f), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 Image(
                     painterResource(id = R.drawable.baseline_arrow_back_24),
                     contentDescription = "",
-                    colorFilter = ColorFilter.tint(Color.DarkGray),
+                    colorFilter = ColorFilter.tint(Color.White.copy(alpha = 0.8f)),
                     modifier = Modifier
                         .size(24.dp)
                         .clickable { navController.navigateUp() }
 
                 )
-                Spacer(modifier = Modifier.width(16.dp))
                 GlideImage(
                     model =  imagePrefix + profileImage ,
                     contentDescription = "",
                     contentScale=ContentScale.Crop,
-                    modifier = Modifier.clip(shape = CircleShape).size(30.dp).clickable { navController.navigate(SCREENS.PROFILE.route) }
+                    modifier = Modifier
+                        .clip(shape = CircleShape)
+                        .size(40.dp)
+                        .clickable { navController.navigate(SCREENS.PROFILE.route) }
                 )
 
 
@@ -685,25 +718,25 @@ fun SingleChatTopBar(title: String,profileImage:String?, navController: NavHostC
 
             }
         }, actions = {
-            // TODO we will make this later on
-//            Card(
-//                modifier = Modifier.size(30.dp),
-//                shape = CircleShape,
-//                colors = CardDefaults.cardColors(containerColor = Color.White)
-//            ) {
-//                Image(
-//                    painterResource(id = R.drawable.menu),
-//                    contentDescription = "",
-//                    colorFilter = ColorFilter.tint(Color.DarkGray),
-//                    modifier = Modifier
-//                        .clickable {  }
-//                        .padding(8.dp)
-//
-//                )
-//            }
+            Row(modifier = Modifier.wrapContentSize().padding(end=20.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(26.dp)) {
+
+                Image(
+                    painter = painterResource(id = androidx.core.R.drawable.ic_call_answer_video),
+                    contentDescription = "",
+                    modifier = Modifier.size(24.dp),
+                    colorFilter = ColorFilter.tint(Constants.HOME_TOP_BAR_ICON_COLOR)
+                )
+                Image(
+                    painter = painterResource(id = androidx.core.R.drawable.ic_call_answer),
+                    contentDescription = "",
+                    modifier = Modifier.size(20.dp),
+                    colorFilter = ColorFilter.tint(Constants.HOME_TOP_BAR_ICON_COLOR)
+                )
+            }
 
         },
-        modifier = Modifier.shadow(elevation = 10.dp, spotColor = Color.White)
+        modifier = Modifier.shadow(elevation = 10.dp, spotColor = Color.White),
+        colors = TopAppBarDefaults.mediumTopAppBarColors(containerColor = Constants.HOME_BOTTOM_BAR_COLOR)
     )
 }
 
@@ -883,8 +916,8 @@ fun MicButton(
         Image(
             painter = painterResource(id = R.drawable.mic),
             contentDescription = "Mic",
-            colorFilter = ColorFilter.tint(if (isRecording || isListening) Color.Red else Color.DarkGray),
-            modifier = Modifier.size(32.dp)
+            colorFilter = ColorFilter.tint(if (isRecording || isListening) Color.Red else Color.Black),
+            modifier = Modifier.size(28.dp)
         )
 
         if (isListening) {

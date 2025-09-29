@@ -120,11 +120,9 @@ class FCMViewModel: ViewModel() {
             try {
                 api.sendMessage(message)
             }catch (e:Exception){
-                Log.d("Error in sending message", e.message.toString())
+                Log.d("Notification", e.message.toString())
             }
 
         }
-
-
     }
 }

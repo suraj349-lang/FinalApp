@@ -81,6 +81,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
 
@@ -114,7 +115,7 @@ fun CreatePingWrapper(navController: NavHostController, eventsViewModel: EventsV
             Log.d("PhotoPicker", "No media selected")
         }
     }
-
+    val expirationIso = calculateExpirationIso(expiration)
 
 
 
@@ -127,6 +128,7 @@ fun CreatePingWrapper(navController: NavHostController, eventsViewModel: EventsV
             navController.navigate(SCREENS.HOME.route){
                 popUpTo(0)
             }
+            eventsViewModel.resetCreatePingResponseState()
         }
         is RequestState.Success->{
 
@@ -134,6 +136,7 @@ fun CreatePingWrapper(navController: NavHostController, eventsViewModel: EventsV
             navController.navigate(SCREENS.HOME.route){
                 popUpTo(0)
             }
+            eventsViewModel.resetCreatePingResponseState()
         }
         is RequestState.Loading->{
             CircularProgressIndicator()
@@ -162,7 +165,7 @@ fun CreatePingWrapper(navController: NavHostController, eventsViewModel: EventsV
                                     image = imageKey,
                                     location = userLocation.address.toString(),
                                     description = description,
-                                    expirationTime = expiration.toString()
+                                    expirationTime = expirationIso
                                 )
                             )
                         }
@@ -193,6 +196,14 @@ fun CreatePingWrapper(navController: NavHostController, eventsViewModel: EventsV
     )
 }
 
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun calculateExpirationIso(hoursToAdd: Int): String {
+    val expirationInstant = Instant.now().plusSeconds(hoursToAdd * 3600L)
+    return DateTimeFormatter.ISO_INSTANT
+        .withZone(ZoneOffset.UTC)
+        .format(expirationInstant)
+}
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable

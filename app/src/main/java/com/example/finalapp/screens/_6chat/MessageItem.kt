@@ -3,9 +3,6 @@ package com.example.finalapp.screens._6chat
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -28,16 +25,12 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.zIndex
 import com.example.finalapp.R
-import com.example.finalapp.utils.constants.Constants.DONGLE_LIGHT
+import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.utils.convertToIST
-import java.net.ResponseCache
+
 
 //
 //@RequiresApi(Build.VERSION_CODES.O)
@@ -117,7 +110,6 @@ import java.net.ResponseCache
 //}
 
 @RequiresApi(Build.VERSION_CODES.O)
-@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun MessageItemUI(
     msg: String,
@@ -126,7 +118,10 @@ fun MessageItemUI(
     timestamp: String?,
     isSentByLoggedInUser: Boolean
 ) {
-    val backgroundColor = if (isSentByLoggedInUser) Color(0xFF797676) else Color(0xFFCF5630)
+    val backgroundColor = if (isSentByLoggedInUser){
+        Color(0xFF797676)
+    } else{ Color(0xFFCF5630)
+       }     ///    0xFF797676            0xFFCF5630
     val textColor = Color.White
     var time = ""
     if (timestamp != null) time = convertToIST(timestamp)
@@ -146,19 +141,22 @@ fun MessageItemUI(
         ) {
             Text(
                 text = msg,
-                fontSize = 14.sp,
+                fontSize = 16.sp,
                 color = textColor,
-                lineHeight = 18.sp,
+                lineHeight = 16.sp,
+                fontFamily = Constants.FONT_LIGHT
             )
 
             Row(
                 verticalAlignment = Alignment.Top,
-                modifier = Modifier.padding(start = 12.dp).align(Alignment.End) // ⬅️ align time and tick to the end inside bubble only
+                modifier = Modifier
+                    .padding(start = 12.dp)
+                    .align(Alignment.End)
             ) {
                 Text(
                     text = time,
-                    fontSize = 10.sp,
-                    color = Color.LightGray
+                    fontSize = 9.sp,
+                    color = Color.LightGray, lineHeight = 2.sp, fontFamily = Constants.FONT_LIGHT
                 )
                 if (isSentByLoggedInUser) {
                     Spacer(modifier = Modifier.width(4.dp))
@@ -208,10 +206,10 @@ class BubbleShape(private val isSentByUser: Boolean) : Shape {
                     size.width - tailWidth, cornerRadius
                 )
 
-                // Tail
-                path.lineTo(size.width - tailWidth, tailYOffset)
-                path.lineTo(size.width, tailYOffset - tailHeight / 2)
-                path.lineTo(size.width - tailWidth, tailYOffset + tailHeight)
+//                // Tail
+//                path.lineTo(size.width - tailWidth, tailYOffset)
+//                path.lineTo(size.width, tailYOffset - tailHeight / 2)
+//                path.lineTo(size.width - tailWidth, tailYOffset + tailHeight)
 
                 // Right side
                 path.lineTo(size.width - tailWidth, size.height - cornerRadius)
@@ -240,10 +238,10 @@ class BubbleShape(private val isSentByUser: Boolean) : Shape {
                 path.lineTo(tailWidth + cornerRadius, size.height)
                 path.quadraticBezierTo(tailWidth, size.height, tailWidth, size.height - cornerRadius)
 
-                // Tail
-                path.lineTo(tailWidth, tailYOffset + tailHeight)
-                path.lineTo(0f, tailYOffset - tailHeight / 2)
-                path.lineTo(tailWidth, tailYOffset)
+//                // Tail
+//                path.lineTo(tailWidth, tailYOffset + tailHeight)
+//                path.lineTo(0f, tailYOffset - tailHeight / 2)
+//                path.lineTo(tailWidth, tailYOffset)
 
                 // Left side
                 path.lineTo(tailWidth, cornerRadius)

@@ -76,7 +76,7 @@ class EventsViewModel @Inject constructor(
             }
         }
         viewModelScope.launch {
-            getAllEvents()
+            //getAllEvents()
         }
     }
 
@@ -466,6 +466,10 @@ class EventsViewModel @Inject constructor(
                 }
 
             }
+    }
+
+    fun resetCreatePingResponseState(){
+        _createPingResponse.value=RequestState.Idle
     }
 
 //--------------------------------------------------------------------------------------------------------------------//

@@ -47,10 +47,7 @@ import com.example.finalapp.utils.testdata.DynamicText
 fun ShowQRDialog(navController: NavHostController, onDismiss: () -> Unit) {
     val context= LocalContext.current
     val user by UserObject.user.collectAsState()
-    Dialog(onDismissRequest = { onDismiss() }, properties = DialogProperties(
-        dismissOnBackPress = true,dismissOnClickOutside = true
-    )
-    ) {
+    Dialog(onDismissRequest = { onDismiss() }, properties = DialogProperties(dismissOnBackPress = true,dismissOnClickOutside = true)) {
         Box(
             modifier = Modifier
                 .wrapContentSize()
@@ -64,7 +61,8 @@ fun ShowQRDialog(navController: NavHostController, onDismiss: () -> Unit) {
 //                    )
                     brush = Brush.verticalGradient(
                         colors = listOf(
-                            Color(0xFFFBC02D), Color(0xFF4559DA)
+                            Color(0xFF0288D1), Color(0xFF310842)//0xFF7B1FA2
+                          //  Color(0xFFFBC02D), Color(0xFF4559DA)
                            // Color(0xFFFBC02D), Color(0xFFFFA000)
                         )
                     )
@@ -79,7 +77,7 @@ fun ShowQRDialog(navController: NavHostController, onDismiss: () -> Unit) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 8.dp),
-                    color = floatingActionBtnColor,
+                    color = Color.White,
                     fontSize = 20.sp,
                     fontFamily = Constants.APP_NAME_FONT
                 )
@@ -88,7 +86,7 @@ fun ShowQRDialog(navController: NavHostController, onDismiss: () -> Unit) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 8.dp),
-                    color = floatingActionBtnColor,
+                    color = Color.White,
                     fontSize =11.sp,
                     fontFamily = Constants.FONT_EXTRA_LIGHT
                 )

@@ -182,7 +182,7 @@ fun SignupScreenUI(navController: NavController = NavController(LocalContext.cur
                 OtpBox()
                 Button(
                     onClick = {
-                        if (TextUtils.isEmpty(authViewModel.otp)) {
+                        if (TextUtils.isEmpty(authViewModel.otp.value)) {
                             Toast.makeText(context, "Please enter otp..", Toast.LENGTH_SHORT).show()
                             scope.launch {
                                 keyboardController?.hide()
@@ -196,7 +196,7 @@ fun SignupScreenUI(navController: NavController = NavController(LocalContext.cur
                             }
 
                             val credential: PhoneAuthCredential =
-                                PhoneAuthProvider.getCredential(verificationID.value, authViewModel.otp)
+                                PhoneAuthProvider.getCredential(verificationID.value, authViewModel.otp.value)
 
                             // on below line signing within credentials.
                             signUpAuthRepo.signInWithPhoneAuthCredential(
