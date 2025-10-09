@@ -88,6 +88,7 @@ import com.example.finalapp.utils.RequestState
 import com.example.finalapp.utils.UserLocationObject
 import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.viewmodels.AuthViewModel
+import com.example.finalapp.viewmodels.ChatViewModel
 import com.example.finalapp.viewmodels.EventsViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 
@@ -98,6 +99,7 @@ fun DirectChatScreen(
     scrollBehavior: TopAppBarScrollBehavior,
     authViewModel: AuthViewModel,
     eventsViewModel: EventsViewModel,
+    chatViewModel: ChatViewModel,
     navController: NavHostController
 ) {
 
@@ -188,10 +190,10 @@ fun DirectChatScreen(
                         }
                     }
                     DirectChatUI(
-                        user,
                         address = userLocation.address ?: "",
                         scrollBehavior,
                         eventsViewModel,
+                        chatViewModel ,
                         navController,
                         checked,
                         onOmegleClicked = {navController.navigate(SCREENS.OMEGLE.route)}
@@ -207,19 +209,19 @@ fun DirectChatScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DirectChatUI(
-    user: User,
     address:String,
     scrollBehavior: TopAppBarScrollBehavior,
     eventsViewModel: EventsViewModel,
+    chatViewModel: ChatViewModel,
     navController: NavHostController,
     checked: Boolean,
     onOmegleClicked:()->Unit,
     onShareProfileClicked: () -> Unit
 ) {
     if (!checked ) {
-        ShareProfileForDirectChat(user, address = address,onOmegleClicked,onShareProfileClicked)
+        ShareProfileForDirectChat(address = address,onOmegleClicked,onShareProfileClicked)
     } else {
-        DirectChatProfiles(scrollBehavior,navController, eventsViewModel )
+        DirectChatProfiles(scrollBehavior,navController, eventsViewModel,chatViewModel )
     }
 
 
@@ -230,6 +232,7 @@ fun DirectChatProfiles(
     scrollBehavior: TopAppBarScrollBehavior,
     navController: NavHostController,
     eventsViewModel: EventsViewModel,
+    chatViewModel:ChatViewModel,
 ) {
     val chatState by eventsViewModel.directChatResponse.collectAsState()
     val directChatObjectList = eventsViewModel.nearByUsersList.collectAsLazyPagingItems()
@@ -241,6 +244,7 @@ fun DirectChatProfiles(
         }
         is RequestState.Success ->{
             Log.i("Userr", "DirectChatProfiles: ${response.data.withUserId.userName} other user id ${response.data.withUserId._id}")
+            chatViewModel.profileImage.value = response.data.withUserId.profileImage
             navController.navigate(
                 SCREENS.SINGLE_CHAT.createPath(
                     userName = response.data.withUserId.userName,
@@ -384,12 +388,13 @@ fun DirectChatItem(
 
 
 @Composable
-fun ShareProfileForDirectChat(user:User,address:String,onOmegleClicked:()->Unit,onShareProfileClicked: () -> Unit) {
+fun ShareProfileForDirectChat(address:String,onOmegleClicked:()->Unit,onShareProfileClicked: () -> Unit) {
     val shimmerColors = listOf(
         Color.White.copy(alpha = 0.1f),
         Color.White.copy(alpha = 0.4f),
         Color.White.copy(alpha = 0.1f)
     )
+    val user by UserObject.user.collectAsState()
 
     val transition = rememberInfiniteTransition(label = "shimmer")
     val translateAnim by transition.animateFloat(
@@ -421,7 +426,7 @@ fun ShareProfileForDirectChat(user:User,address:String,onOmegleClicked:()->Unit,
                     contentDescription = "",
                     filterQuality = FilterQuality.High,
                     modifier = Modifier
-                       // .padding(1.dp)
+                        // .padding(1.dp)
                         .clip(shape = CircleShape)
                         .fillMaxSize(),
                     contentScale = ContentScale.Crop,

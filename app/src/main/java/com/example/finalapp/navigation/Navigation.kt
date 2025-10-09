@@ -26,7 +26,9 @@ import com.example.finalapp.screens.auth.util.OtpBox
 import com.example.finalapp.screens._6chat.SingleChatScreenUI
 import com.example.finalapp.screens.auth.FinalUserCreation
 import com.example.finalapp.qrScanning.QRScannerScreen
-import com.example.finalapp.screens._1home.EventScreenWrapper
+import com.example.finalapp.screens._1home.EventAndPingDesigns.events.EventsDetailsVerticalWrapper
+import com.example.finalapp.screens._1home.EventAndPingDesigns.events.EventScreenVerticalWrapper
+import com.example.finalapp.screens._1home.EventAndPingDesigns.events.templates.xhmaslive.XHamsLiveScreenWrapper
 import com.example.finalapp.screens.pings.CameraPingScreen
 import com.example.finalapp.viewmodels.EventsViewModel
 import com.example.finalapp.screens._6chat.ChatListScreen
@@ -38,7 +40,6 @@ import com.example.finalapp.screens._3createEventOrPing.createEvent.CreateEventM
 import com.example.finalapp.screens._5settings.SettingsScreenUI
 import com.example.finalapp.testing.TabView
 import com.example.finalapp.screens._3createEventOrPing.PastRaisedOffer
-import com.example.finalapp.screens._1home.eventWarScreen.PublicEventDetailsScreenWrapper
 import com.example.finalapp.screens._2pings.PingDetailsScreen
 import com.example.finalapp.screens._2pings.PingScreenFinal
 import com.example.finalapp.screens._3createEventOrPing.createPing.CreatePingWrapper
@@ -129,7 +130,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
             FinalUserCreation(authViewModel,navController)
         }
         composable(SCREENS.HOME.route){
-            HomeScreenUI( navController,eventsViewModel,imageUploadViewModel,authViewModel)
+            HomeScreenUI( navController,eventsViewModel,imageUploadViewModel,authViewModel,chatViewModel)
         }
         composable(SCREENS.PROFILE.route){
            // ProfileScreenUI(navController,imageUploadViewModel,authViewModel)
@@ -171,7 +172,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
             PingScreenFinal(navController,eventsViewModel)
         }
         composable(SCREENS.BETA.route){
-            EventScreenWrapper(eventsViewModel = eventsViewModel, navController = navController) {
+            EventScreenVerticalWrapper(eventsViewModel = eventsViewModel, navController = navController) {
                 eventsViewModel.getAllEvents()
             }
         }
@@ -203,7 +204,8 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
             }
         )){navBackStackEntry->
             val id=navBackStackEntry.arguments?.getString("id") ?: ""
-            PublicEventDetailsScreenWrapper(id, navController,eventsViewModel,authViewModel)
+           // PublicEventDetailsScreenWrapper(id, navController,eventsViewModel,authViewModel)
+            EventsDetailsVerticalWrapper(id, navController,eventsViewModel,authViewModel)
         }
         composable(SCREENS.PRIVATE_PROFILE.route){
             PrivateUserNameScreenWrapper(navController = navController)

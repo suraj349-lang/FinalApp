@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.MaterialTheme
@@ -81,7 +82,7 @@ fun BottomBar(
         Destinations.HomeScreen, Destinations.Beta,Destinations.CreateEvent,Destinations.ProfileScreen,Destinations.Settings
     )
 //0xFFE4E4F1   0xFFF9F9FF -> screen color
-    NavigationBar(containerColor = containerColor, modifier = Modifier.fillMaxWidth().height(50.dp)){
+    NavigationBar(containerColor = containerColor, modifier = Modifier.navigationBarsPadding().fillMaxWidth().height(50.dp)){
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route
         screens.forEach { screen ->

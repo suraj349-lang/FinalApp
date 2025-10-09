@@ -87,6 +87,7 @@ import com.example.finalapp.testing.TabItem
 import com.example.finalapp.ui.imagePrefix
 import com.example.finalapp.utils.RequestState
 import com.example.finalapp.viewmodels.AuthViewModel
+import com.example.finalapp.viewmodels.ChatViewModel
 import com.example.finalapp.viewmodels.EventsViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -470,7 +471,7 @@ fun EventTitleAndDescriptionWar(eventTitle:String,eventDescription:String?) {
     ExperimentalMaterial3Api::class
 )
 @Composable
-fun ThreeOptions(events:List<EventResponse>,authViewModel:AuthViewModel,eventsViewModel:EventsViewModel,navController:NavHostController) {
+fun ThreeOptions(events:List<EventResponse>,authViewModel:AuthViewModel,eventsViewModel:EventsViewModel,chatViewModel: ChatViewModel,navController:NavHostController) {
     val pagerState = rememberPagerState(0, pageCount = { 3 })
     val scope= rememberCoroutineScope()
     val scrollBehavior =TopAppBarDefaults.enterAlwaysScrollBehavior()
@@ -551,7 +552,7 @@ fun ThreeOptions(events:List<EventResponse>,authViewModel:AuthViewModel,eventsVi
         ) { page ->
             when (page) {
                 0 -> ChildPosts(events =events )
-                1 -> DirectChatScreen(scrollBehavior, authViewModel, eventsViewModel, navController)
+                1 -> DirectChatScreen(scrollBehavior, authViewModel, eventsViewModel, chatViewModel , navController)
                 2 -> GeneralPosts()
             }
         }

@@ -596,6 +596,8 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
 //                                        )
 
                                     is RequestState.Success -> {
+                                        Log.i("USER EVENTS", "ProfileScreenNew: ${response.data}")
+
                                         MyPosts(response.data) {
                                             navController.navigate(SCREENS.CREATE_EVENT.route)
                                         }
@@ -649,18 +651,17 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
 }
 
 
-@Preview(showBackground = true)
+
 @Composable
 fun MyPosts(
     items: List<EventResponse> = emptyList(),
-    onAddEventClicked: () -> Unit = {}
+    onAddEventClicked: () -> Unit
 ) {
     val eventsList = remember { items }
     Column(modifier = Modifier.fillMaxSize()) {
         if (items.isEmpty()) {
             Card(
                 modifier = Modifier
-                    .clickable { onAddEventClicked() }
                     .padding(16.dp)
                     .fillMaxWidth()
                     .height(200.dp),
@@ -719,7 +720,8 @@ fun MyPosts(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(50.dp)
-                            .padding(horizontal = 8.dp),
+                            .padding(horizontal = 8.dp)
+                            .clickable { onAddEventClicked() },
                         shape = RoundedCornerShape(50),
                         backgroundColor = Color(0xFF121212)
                     ) {
@@ -783,7 +785,7 @@ fun MyPosts(
 @Composable
 fun MyEventItem(item: EventResponse) {
     Box(modifier = Modifier
-        .aspectRatio(9f/12f) //120 earlier
+        .aspectRatio(9f / 12f) //120 earlier
         .clip(shape = RoundedCornerShape(6.dp))) {
         GlideImage(model=  imagePrefix+item.image/*R.drawable.profile_image_1*/ , contentDescription = "", contentScale = ContentScale.Crop) //todo add imagePrefix when upload is happening
 //        Row(modifier = Modifier

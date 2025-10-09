@@ -64,6 +64,7 @@ import com.example.finalapp.ui.TAB_ITEMS
 import com.example.finalapp.utils.UserLocationObject
 import com.example.finalapp.utils.UserObject
 import com.example.finalapp.utils.constants.Constants
+import com.example.finalapp.viewmodels.ChatViewModel
 import com.example.finalapp.viewmodels.ImageUploadViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -74,7 +75,7 @@ import kotlinx.coroutines.launch
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
-fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewModel, imageUploadViewModel: ImageUploadViewModel, authViewModel: AuthViewModel) {
+fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewModel, imageUploadViewModel: ImageUploadViewModel, authViewModel: AuthViewModel,chatViewModel: ChatViewModel) {
     val buttonsVisible = remember { mutableStateOf(true) }
     val scope = rememberCoroutineScope()
     var showQR: ShowDialog by remember { mutableStateOf(ShowDialog.CLOSE) }
@@ -235,6 +236,7 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
                                 scrollBehavior,
                                 authViewModel,
                                 eventsViewModel,
+                                chatViewModel ,
                                 navController
                             )
 

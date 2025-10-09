@@ -1,20 +1,22 @@
-package com.example.finalapp.screens._1home
+package com.example.finalapp.screens._1home.EventAndPingDesigns.events
 
+
+import BottomBar
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.pager.PageSize
+import androidx.compose.foundation.pager.VerticalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -26,6 +28,7 @@ import androidx.navigation.NavHostController
 import com.example.finalapp.R
 import com.example.finalapp.model.Event
 import com.example.finalapp.model.EventResponse
+import com.example.finalapp.screens._1home.EventAndPingDesigns.events.templates.databased.DataBasedUIWrapper
 import com.example.finalapp.screens.common.NoDataFound
 import com.example.finalapp.screens.common.CommonErrorScreen
 import com.example.finalapp.screens.loadingAndErrorScreen.loadingScreen.EventLoadingScreen
@@ -38,7 +41,7 @@ import com.example.finalapp.viewmodels.EventsViewModel
 @OptIn(ExperimentalFoundationApi::class)
 @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 @Composable
-fun EventScreenWrapper(
+fun EventScreenVerticalWrapper(
     eventsViewModel: EventsViewModel,
     modifier: Modifier = Modifier,
     initialPage: Int? = 0,
@@ -57,7 +60,7 @@ fun EventScreenWrapper(
     when (eventsState) {
         is RequestState.Loading -> {
             EventLoadingScreen{navController.navigateUp()}
-           // DialogLoading(){navController.navigateUp()}
+            // DialogLoading(){navController.navigateUp()}
         }
         is RequestState.Error -> {
             Column(modifier=Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
@@ -70,34 +73,22 @@ fun EventScreenWrapper(
         is RequestState.Success -> {
             val eventList = (eventsState as RequestState.Success<List<EventResponse>>).data
             if(eventList.isNotEmpty()) {
-//                Column(modifier = Modifier.fillMaxSize()) {
-//                    VerticalPager(
-//                        pageSize = PageSize.Fill,
-//                        state = pagerState,
-//                        beyondBoundsPageCount = 1,
-//                        modifier = modifier.weight(1f)
-//                    ) { page ->
-//                        val event = eventList[page]
-//                        EventScreen(
-//                            event=event,
-//                            navController=navController,
-//                            onUpVotesClicked ={eventsViewModel.upvoteEvent(it)}
-//                        )
-//                    }
-//                }
-                Surface(modifier = Modifier.fillMaxSize().background(color = Color.White)) {
-                    LazyColumn(modifier = Modifier.fillMaxSize().background(color = Color.White)){
-                        items(eventList){event->
-//                            EventScreen(
-//                                event =event,
-//                                navController = navController,
-//                                onUpVotesClicked = { eventsViewModel.upvoteEvent(it) }
-//                            )
-//                            ClassicEventUI(
-//                                event =event,
-//                                navController = navController,
-//                                onUpVotesClicked = { eventsViewModel.upvoteEvent(it) }
-//                            )
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    bottomBar = { BottomBar(navController = navController, containerColor = Constants.HOME_BOTTOM_BAR_COLOR, highlightedTextColor = Constants.BOTTOM_BAR_ACTIVE_TEXT_COLOR, inactiveTextColor = Constants.BOTTOM_BAR_INACTIVE_TEXT_COLOR, inactiveIconColor = Constants.BOTTOM_BAR_INACTIVE_ICON_COLOR) }) {
+                    Column(modifier = Modifier.fillMaxSize().padding(it)) {
+                        VerticalPager(
+                            pageSize = PageSize.Fill,
+                            state = pagerState,
+                            beyondBoundsPageCount = 1,
+                            modifier = modifier.weight(1f)
+                        ) { page ->
+                            val event = eventList[page]
+                            DataBasedUIWrapper(
+                                event = event,
+                                navController = navController,
+                                onUpVotesClicked = { eventsViewModel.upvoteEvent(it) }
+                            )
                         }
                     }
                 }

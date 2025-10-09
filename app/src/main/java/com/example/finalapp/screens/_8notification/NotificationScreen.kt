@@ -82,7 +82,7 @@ fun NotificationScreenUI(navController: NavHostController, viewModel:Notificatio
 
     SwipeRefresh(state = SwipeRefreshState(isRefreshing), onRefresh = { isRefreshing=true }) {
         Scaffold(
-            topBar = { NotificationTopBar { navController.navigateUp() } },
+            topBar = { NotificationTopBar(onDeleteAllClicked = {viewModel.clearAll()}) { navController.navigateUp() } },
             bottomBar = {
                 BottomBar(
                     navController = navController,
@@ -121,14 +121,14 @@ fun NotificationScreenUI(navController: NavHostController, viewModel:Notificatio
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NotificationTopBar(title:String="Notifications",onBackClicked:()->Unit) {
+fun NotificationTopBar(title:String="Notifications",onDeleteAllClicked:()->Unit,onBackClicked:()->Unit) {
     TopAppBar(
         title = {Text(title, fontFamily = Constants.FONT_MEDIUM, color = Color.Black)},
-        actions = {},
+        actions = { Image(painter = painterResource(id = R.drawable.delete), contentDescription ="", modifier = Modifier.size(24.dp).clickable { onDeleteAllClicked() } )},
         navigationIcon = { Image(painter = painterResource(id = R.drawable.baseline_arrow_back_24), contentDescription ="", modifier = Modifier.clickable { onBackClicked() } )},
-        modifier = Modifier
+        modifier = Modifier.padding(end=16.dp)
             .shadow(elevation = 60.dp,)
             .zIndex(2f),
-        colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = Color(0xFFEEEBE4))
+        colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = Color(0xFFEEEBE4)),
     )
 }
