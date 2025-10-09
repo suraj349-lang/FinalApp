@@ -2,7 +2,6 @@ package com.example.finalapp.screens._1home.EventAndPingDesigns.events.templates
 
 import android.app.Activity
 import android.os.Build
-import androidx.annotation.ColorLong
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -12,7 +11,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -49,7 +47,6 @@ import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
-import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.example.finalapp.R
 import com.example.finalapp.model.EventResponse
 import com.example.finalapp.navigation.SCREENS
@@ -57,7 +54,6 @@ import com.example.finalapp.screens._1home.EventAndPingDesigns.events.UserReacti
 import com.example.finalapp.screens._1home.EventAndPingDesigns.events.templates.IconWithTextVertical2
 import com.example.finalapp.screens._1home.EventAndPingDesigns.events.templates.databased.util.ChildMicroPostsDataBasedNew
 import com.example.finalapp.screens._1home.EventAndPingDesigns.events.templates.databased.util.FunctionsAndStatsDataBased
-import com.example.finalapp.screens._1home.EventAndPingDesigns.events.utils.EventDescriptionVertical
 import com.example.finalapp.screens._1home.EventAndPingDesigns.events.utils.FollowButtonVertical
 import com.example.finalapp.ui.imagePrefix
 import com.example.finalapp.utils.constants.Constants
@@ -65,7 +61,7 @@ import com.example.finalapp.utils.constants.Constants
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun DataBasedUIWrapper(event: EventResponse, navController: NavHostController, onUpVotesClicked: (String) -> Unit) {
+fun EventsAndChildPostsParent(event: EventResponse, navController: NavHostController, onUpVotesClicked: (String) -> Unit) {
     val context= LocalContext.current
     val window = (context as Activity).window
     val backgroundColor= Constants.HOME_TOP_BAR_COLOR
@@ -78,7 +74,7 @@ fun DataBasedUIWrapper(event: EventResponse, navController: NavHostController, o
         color = backgroundColor
     ) {
 
-        DataBasedUI(
+        EventAndChildPostUI(
             event=event,
             navController,
             backgroundColor,
@@ -94,7 +90,7 @@ fun DataBasedUIWrapper(event: EventResponse, navController: NavHostController, o
 
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun DataBasedUI(
+fun EventAndChildPostUI(
     event: EventResponse,
     navController: NavHostController,
     backgroundColor:Color,

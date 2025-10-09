@@ -49,7 +49,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.view.WindowCompat
@@ -59,10 +58,7 @@ import com.example.finalapp.R
 import com.example.finalapp.model.Event
 import com.example.finalapp.model.EventResponse
 import com.example.finalapp.screens._1home.EventAndPingDesigns.events.RetryButton
-import com.example.finalapp.screens._1home.EventAndPingDesigns.events.templates.databased.DataBasedUIWrapper
 import com.example.finalapp.screens._1home.EventAndPingDesigns.events.utils.FollowButtonVertical
-import com.example.finalapp.screens._1home.commentBottomSheet.CommentBottomSheet
-import com.example.finalapp.screens._1home.eventWarScreen.CommentsScreen
 import com.example.finalapp.screens.common.CommonErrorScreen
 import com.example.finalapp.screens.common.NoDataFound
 import com.example.finalapp.screens.loadingAndErrorScreen.loadingScreen.EventLoadingScreen

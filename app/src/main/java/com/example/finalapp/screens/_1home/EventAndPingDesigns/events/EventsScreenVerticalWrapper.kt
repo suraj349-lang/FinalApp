@@ -28,7 +28,7 @@ import androidx.navigation.NavHostController
 import com.example.finalapp.R
 import com.example.finalapp.model.Event
 import com.example.finalapp.model.EventResponse
-import com.example.finalapp.screens._1home.EventAndPingDesigns.events.templates.databased.DataBasedUIWrapper
+import com.example.finalapp.screens._1home.EventAndPingDesigns.events.templates.databased.EventsAndChildPostsParent
 import com.example.finalapp.screens.common.NoDataFound
 import com.example.finalapp.screens.common.CommonErrorScreen
 import com.example.finalapp.screens.loadingAndErrorScreen.loadingScreen.EventLoadingScreen
@@ -41,7 +41,7 @@ import com.example.finalapp.viewmodels.EventsViewModel
 @OptIn(ExperimentalFoundationApi::class)
 @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 @Composable
-fun EventScreenVerticalWrapper(
+fun EventAndChildPostWrapper(
     eventsViewModel: EventsViewModel,
     modifier: Modifier = Modifier,
     initialPage: Int? = 0,
@@ -84,7 +84,7 @@ fun EventScreenVerticalWrapper(
                             modifier = modifier.weight(1f)
                         ) { page ->
                             val event = eventList[page]
-                            DataBasedUIWrapper(
+                            EventsAndChildPostsParent(
                                 event = event,
                                 navController = navController,
                                 onUpVotesClicked = { eventsViewModel.upvoteEvent(it) }
