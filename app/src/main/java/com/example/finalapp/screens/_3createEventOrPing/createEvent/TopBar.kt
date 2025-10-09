@@ -37,11 +37,11 @@ import com.example.finalapp.utils.constants.Constants
 @Composable
 fun CreateEventTopBar2(isActive:Boolean,onBackClicked:()->Unit, onNext: () -> Unit) {
     TopAppBar(
-        title = { Text(text = "Create Event", fontFamily = Constants.FONT_MEDIUM, color = Color.Black) },
-        colors = TopAppBarDefaults.mediumTopAppBarColors(containerColor = Constants.HOME_TOP_BAR_COLOR),
+        title = { Text(text = "Create Event", fontFamily = Constants.FONT_MEDIUM, color = Constants.HOME_TOP_BAR_COLOR, fontSize = 18.sp) },
+        colors = TopAppBarDefaults.mediumTopAppBarColors(containerColor = Constants.HOME_TOP_BAR_ICON_COLOR),
         actions = {
             Card(
-                modifier = Modifier
+                modifier = Modifier.padding(end = 16.dp)
                     .wrapContentSize()
                     .clickable {
                         if (isActive) {
@@ -53,15 +53,15 @@ fun CreateEventTopBar2(isActive:Boolean,onBackClicked:()->Unit, onNext: () -> Un
             ) {
                 Text(
                     text = "Upload",
-                    fontFamily = Constants.FONT_MEDIUM,
+                    fontFamily = Constants.FONT_LIGHT,
                     color = if(isActive ) Color.White else Color.DarkGray,
-                    modifier = Modifier.padding(10.dp),
-                    fontSize = 18.sp
+                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                    fontSize = 16.sp
                 )
             }
             },
         navigationIcon = {
-            Image(painter = painterResource(id = R.drawable.baseline_arrow_back_24), contentDescription ="", modifier = Modifier.size(30.dp).clickable { onBackClicked() }, colorFilter = ColorFilter.tint(Color.Black))
+            Image(painter = painterResource(id = R.drawable.baseline_arrow_back_24), contentDescription ="", modifier = Modifier.size(24.dp).clickable { onBackClicked() }, colorFilter = ColorFilter.tint(Color.Black))
         },
         modifier = Modifier.shadow(elevation = 10.dp)
     )

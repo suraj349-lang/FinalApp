@@ -167,7 +167,6 @@ fun CreateEventMainScreen(parentEventId:String ?= null,navController: NavHostCon
                 if(uri != Uri.EMPTY) imageFile = uriToFile(uri!!, context )
                 imageFile?.let {
                     eventsViewModel.uploadImageAndThenCreateEvent( user.user , it){ imageKey->
-                        Log.i("TAG", "CreateEventMainScreen: ${user.userName}")
                         eventsViewModel.createEvent(
                             Event(
                                 user = user.user ,
@@ -231,11 +230,11 @@ fun CreateEvent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = 16.dp, vertical = 20.dp),
         verticalArrangement = Arrangement.spacedBy(4.dp),
         horizontalAlignment = Alignment.Start
     ) {
-        Text(text = "Add media", fontFamily = Constants.FONT_MEDIUM, fontSize = 14.sp, color = Color.Black)
+        Text(text = "Add media", fontFamily = Constants.ROBOTO_CONDENSED, fontSize = 14.sp, color = Color.Black)
         MediaAddition(onGalleryClicked,onCameraClicked)
         TitleTextSpace("Title", title) { onTitleChange(it) }
         Divider(modifier = Modifier.fillMaxWidth(), thickness = 0.5.dp)
@@ -385,7 +384,7 @@ fun Deadline(
         Text(
             text = "Active till:",
             fontSize = 16.sp,
-            fontFamily = Constants.FONT_MEDIUM,
+            fontFamily = Constants.ROBOTO_CONDENSED,
             fontWeight = FontWeight.Bold,
             color = Color(0xFF06146B)
         )

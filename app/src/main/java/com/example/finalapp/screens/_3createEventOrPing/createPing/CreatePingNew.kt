@@ -27,8 +27,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Divider
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
@@ -57,6 +59,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -219,7 +222,8 @@ fun CreatePing(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp),
+            .padding(horizontal = 16.dp, vertical = 20.dp)
+            .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(4.dp),
         horizontalAlignment = Alignment.Start
     ) {
@@ -239,8 +243,8 @@ fun CreatePing(
 @Composable
 fun SelectedImage(imageUri:Uri?) {
     AsyncImage(model =imageUri , contentDescription = "", modifier = Modifier
-        .width(100.dp)
-        .aspectRatio(9f / 16f), contentScale = ContentScale.Fit)
+        .fillMaxWidth()
+        .wrapContentHeight(), contentScale = ContentScale.Crop)
 }
 
 
@@ -506,19 +510,20 @@ fun DatePickerDialog(onDateSelected: (LocalDate) -> Unit, onDismiss: () -> Unit)
 @Composable
 fun CreatePingTopNew(isActive:Boolean, onNext: () -> Unit) {
     Box(modifier = Modifier
+        .shadow(elevation = 4.dp)
         .statusBarsPadding()
         .fillMaxWidth()
         .height(60.dp)
-        .background(color = Constants.HOME_TOP_BAR_COLOR)){
+        .background(color = Constants.HOME_TOP_BAR_ICON_COLOR)){
         Row(modifier= Modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
             Image(
                 painterResource(id = R.drawable.baseline_arrow_back_24),
-                contentDescription = null,
+                contentDescription = "back arrow on create ping",
                 modifier = Modifier.size(24.dp)
             )
-            Text(text = "Create ping")
+            Text(text = "Create ping", fontFamily = Constants.FONT_MEDIUM, fontSize = 18.sp, color = Constants.HOME_TOP_BAR_COLOR)
             Card(
                 modifier = Modifier
                     .wrapContentSize()
@@ -532,10 +537,10 @@ fun CreatePingTopNew(isActive:Boolean, onNext: () -> Unit) {
             ) {
                 Text(
                     text = "Next ->",
-                    fontFamily = Constants.FONT_MEDIUM,
+                    fontFamily = Constants.ROBOTO_CONDENSED,
                     color = if(isActive ) Color.White else Color.DarkGray,
-                    modifier = Modifier.padding(10.dp),
-                    fontSize = 18.sp
+                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                    fontSize = 14.sp
                 )
             }
         }

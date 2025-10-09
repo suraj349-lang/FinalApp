@@ -1,4 +1,4 @@
-package com.example.finalapp.screens._3createEventOrPing.createPing
+package com.example.finalapp.screens._3createEventOrPing.createPing.unused
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.size

@@ -21,6 +21,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -29,6 +32,7 @@ import com.example.finalapp.R
 import com.example.finalapp.model.Event
 import com.example.finalapp.model.EventResponse
 import com.example.finalapp.screens._1home.EventAndPingDesigns.events.templates.databased.EventsAndChildPostsParent
+import com.example.finalapp.screens._3createEventOrPing.CreateEventOrPingBottomSheet
 import com.example.finalapp.screens.common.NoDataFound
 import com.example.finalapp.screens.common.CommonErrorScreen
 import com.example.finalapp.screens.loadingAndErrorScreen.loadingScreen.EventLoadingScreen
@@ -50,6 +54,9 @@ fun EventAndChildPostWrapper(
 ) {
     LaunchedEffect(key1 = true){
         eventsViewModel.getAllEvents()
+    }
+    var showSheet by remember {
+        mutableStateOf(false)
     }
     val pagerState = rememberPagerState(
         initialPage = initialPage ?: 0,
@@ -75,8 +82,10 @@ fun EventAndChildPostWrapper(
             if(eventList.isNotEmpty()) {
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
-                    bottomBar = { BottomBar(navController = navController, containerColor = Constants.HOME_BOTTOM_BAR_COLOR, highlightedTextColor = Constants.BOTTOM_BAR_ACTIVE_TEXT_COLOR, inactiveTextColor = Constants.BOTTOM_BAR_INACTIVE_TEXT_COLOR, inactiveIconColor = Constants.BOTTOM_BAR_INACTIVE_ICON_COLOR) }) {
-                    Column(modifier = Modifier.fillMaxSize().padding(it)) {
+                    bottomBar = { BottomBar(navController = navController, containerColor = Constants.HOME_BOTTOM_BAR_COLOR, highlightedTextColor = Constants.BOTTOM_BAR_ACTIVE_TEXT_COLOR, inactiveTextColor = Constants.BOTTOM_BAR_INACTIVE_TEXT_COLOR, inactiveIconColor = Constants.BOTTOM_BAR_INACTIVE_ICON_COLOR, onCreateEventClick = {showSheet=true}) }) {
+                    Column(modifier = Modifier
+                        .fillMaxSize()
+                        .padding(it)) {
                         VerticalPager(
                             pageSize = PageSize.Fill,
                             state = pagerState,
@@ -100,6 +109,11 @@ fun EventAndChildPostWrapper(
         }
         else -> {}
     }
+    CreateEventOrPingBottomSheet(
+        showSheet = showSheet,
+        onDismiss = {showSheet=false },
+        navHostController = navController
+    )
 }
 
 @Composable
