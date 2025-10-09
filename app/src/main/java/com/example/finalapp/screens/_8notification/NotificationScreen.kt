@@ -124,9 +124,9 @@ fun NotificationScreenUI(navController: NavHostController, viewModel:Notificatio
 fun NotificationTopBar(title:String="Notifications",onDeleteAllClicked:()->Unit,onBackClicked:()->Unit) {
     TopAppBar(
         title = {Text(title, fontFamily = Constants.FONT_MEDIUM, color = Color.Black)},
-        actions = { Image(painter = painterResource(id = R.drawable.delete), contentDescription ="", modifier = Modifier.size(24.dp).clickable { onDeleteAllClicked() } )},
+        actions = { Image(painter = painterResource(id = R.drawable.delete), contentDescription ="", modifier = Modifier.padding(end=16.dp).size(24.dp).clickable { onDeleteAllClicked() } )},
         navigationIcon = { Image(painter = painterResource(id = R.drawable.baseline_arrow_back_24), contentDescription ="", modifier = Modifier.clickable { onBackClicked() } )},
-        modifier = Modifier.padding(end=16.dp)
+        modifier = Modifier
             .shadow(elevation = 60.dp,)
             .zIndex(2f),
         colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = Color(0xFFEEEBE4)),

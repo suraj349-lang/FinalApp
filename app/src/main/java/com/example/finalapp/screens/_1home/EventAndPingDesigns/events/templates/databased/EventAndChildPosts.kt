@@ -111,7 +111,7 @@ fun EventAndChildPostUI(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .fillMaxHeight(0.755f)
+                    .fillMaxHeight()
                     .background(color = backgroundColor)
             ) {
                 AsyncImage(
@@ -121,15 +121,17 @@ fun EventAndChildPostUI(
                 )
                 FunctionsAndStatsDataBased(
                     Modifier
-                        .align(Alignment.BottomEnd)
+                        .align(Alignment.CenterEnd)
                         .padding(end = 16.dp, bottom = 16.dp)
                         .wrapContentWidth()
                         .wrapContentHeight(),totalUpVotes = event.totalUpVotes, totalComments = event.totalComments, totalViews = event.totalViews,{},{},{}
                 )
+
                 Column(modifier = Modifier
                     .fillMaxWidth()
                     .wrapContentHeight()
                     .align(Alignment.BottomStart), horizontalAlignment = Alignment.Start, verticalArrangement = Arrangement.Top) {
+
                     Row(
                         modifier = Modifier.padding(start = 8.dp)
                             .wrapContentWidth()
@@ -179,6 +181,14 @@ fun EventAndChildPostUI(
                         Text(text = event.description ?: "", fontSize = 12.sp, fontFamily = Constants.FONT_LIGHT, color = Color.LightGray, lineHeight = 12.sp)
 
                     }
+                    event.childPosts?.let {
+                        ChildMicroPostsDataBasedNew(modifier= Modifier
+                            //  .align(Alignment.BottomStart)
+                            .fillMaxWidth()
+                            .height(150.dp)
+                            .padding(start = 4.dp, bottom = 8.dp, top = 4.dp),
+                            it,onAddChildPostClicked,onChildPostClicked)
+                    }
 
                     //  EventDescriptionVertical(event.description ?: "",Modifier.padding(horizontal = 4.dp))
 
@@ -195,14 +205,7 @@ fun EventAndChildPostUI(
 //                    .padding(start = 4.dp, bottom = 8.dp, top = 4.dp),
 //                it,onAddChildPostClicked,onChildPostClicked)
 //            }
-            event.childPosts?.let {
-                ChildMicroPostsDataBasedNew(modifier= Modifier
-                    .align(Alignment.BottomStart)
-                    .fillMaxWidth()
-                    .height(100.dp)
-                    .padding(start = 4.dp, bottom = 8.dp, top = 4.dp),
-                    it,onAddChildPostClicked,onChildPostClicked)
-            }
+
 
 
         }

@@ -26,6 +26,7 @@ import com.example.finalapp.screens.auth.util.OtpBox
 import com.example.finalapp.screens._6chat.SingleChatScreenUI
 import com.example.finalapp.screens.auth.FinalUserCreation
 import com.example.finalapp.qrScanning.QRScannerScreen
+import com.example.finalapp.screens._1home.EventAndPingDesigns.events.EventAndChildPostWrapper
 import com.example.finalapp.screens._1home.EventAndPingDesigns.events.EventsDetailsVerticalWrapper
 import com.example.finalapp.screens._1home.EventAndPingDesigns.events.templates.xhmaslive.XHamsLiveScreenWrapper
 import com.example.finalapp.screens.pings.CameraPingScreen
@@ -171,7 +172,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
             PingScreenFinal(navController,eventsViewModel)
         }
         composable(SCREENS.BETA.route){
-            XHamsLiveScreenWrapper(eventsViewModel = eventsViewModel, navController = navController) {
+            EventAndChildPostWrapper(eventsViewModel = eventsViewModel, navController = navController) {
                 eventsViewModel.getAllEvents()
             }
         }

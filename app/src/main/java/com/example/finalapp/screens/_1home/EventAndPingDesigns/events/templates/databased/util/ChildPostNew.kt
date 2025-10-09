@@ -87,7 +87,7 @@ fun ChildMicroPostsDataBasedNew(modifier: Modifier, events: List<EventResponse>,
             Box(
                 modifier = Modifier
                     .fillMaxHeight()
-                    .width(200.dp)
+                    .width(140.dp)
                     .clip(RoundedCornerShape(8.dp))
             ) {
                 AsyncImage(
