@@ -14,7 +14,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -68,6 +71,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.example.finalapp.R
@@ -97,6 +101,9 @@ fun CreatePingWrapper(navController: NavHostController, eventsViewModel: EventsV
     }
     var description by remember {
         mutableStateOf("")
+    }
+    var isPrivate by remember {
+        mutableStateOf(false)
     }
     var imageUri by remember {
         mutableStateOf(Uri.EMPTY)
@@ -147,23 +154,37 @@ fun CreatePingWrapper(navController: NavHostController, eventsViewModel: EventsV
     }
 
     Scaffold(
+        //                    imageFile?.let {file->
+//                        eventsViewModel.uploadImageAndThenCreateEvent(user.user , file) { imageKey ->
+//                            eventsViewModel.createPing(
+//                                PingRequestDto(
+//                                    user = user.user,
+//                                    userName = user.userName ,
+//                                    title = title,
+//                                    image = imageKey,
+//                                    location = userLocation.address.toString(),
+//                                    description = description,
+//                                    expirationTime = expirationIso
+//                                )
+//                            )
+//                        }
+//                    }
         topBar = {
             CreatePingTopNew(isActive) {
-                if (title.isNotEmpty()) {
-                    val uri = imageUri
-                    var imageFile by mutableStateOf<File?>(null)
-                    if (uri != Uri.EMPTY) {
-                        imageFile = uriToFile(uri!!, context)
-                    } else return@CreatePingTopNew
-                    imageFile?.let {
-                        eventsViewModel.uploadImageAndThenCreateEvent(
-                            user.user ,
-                            it
-                        ) { imageKey ->
+                if (title.isNotEmpty()) {val uri = imageUri
+                    val imageFile: File? = if (uri != null && uri.toString().isNotBlank()) {
+                        uriToFile(uri, context)
+                    } else {
+                        null
+                    }
+
+                    if (imageFile != null) {
+                        // Upload image first, then create ping with the image key
+                        eventsViewModel.uploadImageAndThenCreateEvent(user.user, imageFile) { imageKey ->
                             eventsViewModel.createPing(
                                 PingRequestDto(
                                     user = user.user,
-                                    userName = user.userName ,
+                                    userName = user.userName,
                                     title = title,
                                     image = imageKey,
                                     location = userLocation.address.toString(),
@@ -172,7 +193,22 @@ fun CreatePingWrapper(navController: NavHostController, eventsViewModel: EventsV
                                 )
                             )
                         }
+                    } else {
+                        // No image -> create ping directly
+                        eventsViewModel.createPing(
+                            PingRequestDto(
+                                user = user.user,
+                                userName = user.userName,
+                                title = title,
+                                image = null, // or "" if your backend expects empty
+                                location = userLocation.address.toString(),
+                                description = description,
+                                expirationTime = expirationIso
+                            )
+                        )
                     }
+
+
 
                 }
             }
@@ -219,6 +255,8 @@ fun CreatePing(
     onGalleryClicked:()->Unit,
     onCameraClicked:()->Unit
 ) {
+    var showCategoryDialog by remember { mutableStateOf(false) }
+    var selectedCategory by remember { mutableStateOf<String?>(null) }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -231,12 +269,24 @@ fun CreatePing(
         MediaAddition(onGalleryClicked,onCameraClicked)
         TitleTextSpace("Title", title) { onTitleChange(it) }
         Divider(modifier = Modifier.fillMaxWidth(), thickness = 0.5.dp)
-        AddCategory()
+        AddCategory(selectedCategory) {
+            showCategoryDialog = true
+        }
         AddTag()
         DescriptionTextSpace("description", description) { onDescriptionChange(it) }
         Divider(modifier = Modifier.fillMaxWidth(), thickness = 0.5.dp)
         Deadline()
         SelectedImage(imageUri)
+        if (showCategoryDialog) {
+            CategorySelectionDialog(
+                categories = listOf("Food", "Event", "Music", "Study", "Travel", "Gaming", "News", "Workout", "Shopping"),
+                onCategorySelected = {
+                    selectedCategory = it
+                    showCategoryDialog = false
+                },
+                onDismiss = { showCategoryDialog = false }
+            )
+        }
     }
 }
 
@@ -309,21 +359,109 @@ fun AddTag() {
         
     }
 }
+//@Composable
+//fun AddCategory(onSelectCategoryClicked:()->Unit) {
+//    Card(modifier = Modifier.clickable { onSelectCategoryClicked() }
+//        .wrapContentWidth()
+//        .height(30.dp), colors = CardDefaults.cardColors(containerColor = Color.LightGray)) {
+//        Row(modifier = Modifier
+//            .wrapContentWidth()
+//            .fillMaxHeight()
+//            .padding(horizontal = 4.dp), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
+//            Image(painter = painterResource(id = R.drawable.category), contentDescription ="", modifier = Modifier.size(20.dp))
+//            Text(text = "Select a category ", fontFamily = Constants.USER_NAME_FONT, fontSize = 10.sp, fontWeight = FontWeight.Bold,color= Color.Black)
+//            Image(painter = painterResource(id = R.drawable.unfold), contentDescription ="", modifier = Modifier.size(20.dp))
+//        }
+//
+//
+//    }
+//}
+
 @Composable
-fun AddCategory() {
-    Card(modifier = Modifier
-        .wrapContentWidth()
-        .height(30.dp), colors = CardDefaults.cardColors(containerColor = Color.LightGray)) {
-        Row(modifier = Modifier
+fun AddCategory(selectedCategory: String?, onSelectCategoryClicked: () -> Unit) {
+    Card(
+        modifier = Modifier
+            .clickable { onSelectCategoryClicked() }
             .wrapContentWidth()
-            .fillMaxHeight()
-            .padding(horizontal = 4.dp), horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
-            Image(painter = painterResource(id = R.drawable.category), contentDescription ="", modifier = Modifier.size(20.dp))
-            Text(text = "Select a category ", fontFamily = Constants.USER_NAME_FONT, fontSize = 10.sp, fontWeight = FontWeight.Bold,color= Color.Black)
-            Image(painter = painterResource(id = R.drawable.unfold), contentDescription ="", modifier = Modifier.size(20.dp))
+            .height(30.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.LightGray)
+    ) {
+        Row(
+            modifier = Modifier
+                .wrapContentWidth()
+                .fillMaxHeight()
+                .padding(horizontal = 4.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Image(painter = painterResource(id = R.drawable.category), contentDescription = "", modifier = Modifier.size(20.dp))
+            Text(
+                text = selectedCategory ?: "Select a category",
+                fontFamily = Constants.USER_NAME_FONT,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Black
+            )
+            Image(painter = painterResource(id = R.drawable.unfold), contentDescription = "", modifier = Modifier.size(20.dp))
         }
+    }
+}
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun CategorySelectionDialog(
+    categories: List<String>,
+    onCategorySelected: (String) -> Unit,
+    onDismiss: () -> Unit
+) {
+    Dialog(onDismissRequest = onDismiss) {
+        Surface(
+            shape = RoundedCornerShape(12.dp),
+            color = Color.White,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                Text("Select a Category", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                Spacer(modifier = Modifier.height(16.dp))
 
+                FlowRow(
+//                    mainAxisSpacing = 10.dp,
+//                    crossAxisSpacing = 10.dp,
+                ) {
+                    categories.forEach { category ->
+                        Card(
+                            modifier = Modifier
+                                .clickable { onCategorySelected(category) }
+                                .padding(4.dp),
+                            shape = RoundedCornerShape(50),
+                            colors = CardDefaults.cardColors(containerColor = Color(0xFFF1F1F1))
+                        ) {
+                            Text(
+                                text = category,
+                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                                fontSize = 12.sp,
+                                fontFamily = Constants.FONT_MEDIUM
+                            )
+                        }
+                    }
+                }
 
+                Spacer(modifier = Modifier.height(20.dp))
+                Text(
+                    "Cancel",
+                    modifier = Modifier
+                        .align(Alignment.End)
+                        .clickable { onDismiss() },
+                    color = Color.Gray,
+                    fontSize = 14.sp
+                )
+            }
+        }
     }
 }
 

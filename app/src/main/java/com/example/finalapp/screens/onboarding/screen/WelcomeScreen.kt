@@ -19,7 +19,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.finalapp.navigation.SCREENS
+import com.example.finalapp.screens._4profile.privateUsername.dynamicText
 import com.example.finalapp.screens.onboarding.util.OnBoardingPage
+import com.example.finalapp.ui.theme.floatingActionBtnColor
+import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.viewmodels.WelcomeViewModel
 import com.google.accompanist.pager.*
 
@@ -51,7 +54,9 @@ fun WelcomeScreen(
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
                 .weight(1f),
-            pagerState = pagerState
+            pagerState = pagerState,
+            activeColor = Constants.HOME_TOP_BAR_ICON_COLOR,
+            inactiveColor = Color.Gray.copy(alpha = 0.8f)
         )
         FinishButton(
             modifier = Modifier.weight(1f),
@@ -85,6 +90,7 @@ fun PagerScreen(onBoardingPage: OnBoardingPage) {
             text = onBoardingPage.title,
             fontSize = MaterialTheme.typography.h4.fontSize,
             fontWeight = FontWeight.Bold,
+            color=Constants.HOME_TOP_BAR_ICON_COLOR,
             textAlign = TextAlign.Center
         )
         Text(
@@ -95,6 +101,7 @@ fun PagerScreen(onBoardingPage: OnBoardingPage) {
             text = onBoardingPage.description,
             fontSize = MaterialTheme.typography.subtitle1.fontSize,
             fontWeight = FontWeight.Medium,
+            color=Constants.HOME_TOP_BAR_ICON_COLOR.copy(alpha = 0.8f),
             textAlign = TextAlign.Center
         )
     }
@@ -121,10 +128,11 @@ fun FinishButton(
             Button(
                 onClick = onClick,
                 colors = ButtonDefaults.buttonColors(
-                    contentColor = Color.White
-                )
+                    contentColor = Color.White,
+                    backgroundColor = floatingActionBtnColor
+                ), modifier = Modifier.fillMaxWidth(0.9f).height(50.dp)
             ) {
-                Text(text = "Finish")
+                dynamicText(text = "Finish", fontSize = 16)
             }
         }
     }

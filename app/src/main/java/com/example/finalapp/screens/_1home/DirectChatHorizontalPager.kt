@@ -41,6 +41,7 @@ import com.google.accompanist.pager.rememberPagerState
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -75,12 +76,14 @@ fun DirectChatHorizontalPager() {
         ) { position ->
             PagerScreenDirectChat(directChatHorizontalPager = pages[position])
         }
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(10.dp))
         HorizontalPagerIndicator(
             modifier = Modifier.align(Alignment.CenterHorizontally),
             pagerState = pagerState,
             activeColor = floatingActionBtnColor,
-            inactiveColor = Color.LightGray
+            inactiveColor = Color.LightGray,
+            indicatorHeight = 6.dp,
+            indicatorWidth = 6.dp
         )
     }
 }
@@ -90,29 +93,35 @@ fun DirectChatHorizontalPager() {
 fun PagerScreenDirectChat(directChatHorizontalPager: DirectChatPagerPages) {
     Column(
         modifier = Modifier
-            .fillMaxWidth()
+            .padding(top = 20.dp).fillMaxWidth()
             .wrapContentSize(),
         verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.Start
     ) {
-        Image(
-            painter = painterResource(id = directChatHorizontalPager.image),
-            contentDescription = null,
-            modifier = Modifier
-                .size(100.dp)
-        )
-        Text(
-            text = directChatHorizontalPager.title,
-            fontFamily = Constants.FONT_LIGHT,
-            color = Color(0xFFEEEBF0),
-            fontSize = 24.sp
-        )
-        Text(
-            text = directChatHorizontalPager.description,
-            style = TextStyle(textDecoration = TextDecoration.Underline),
-            fontFamily = Constants.FONT_MEDIUM,
-            color = Color(0xFFB7AEBB),
-            fontSize = 14.sp
-        )
+        Row(modifier = Modifier.wrapContentSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Image(
+                painter = painterResource(id = directChatHorizontalPager.image),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(40.dp)
+            )
+            Column(modifier = Modifier.wrapContentSize()) {
+                Text(
+                    text = directChatHorizontalPager.title,
+                    fontFamily = Constants.FONT_LIGHT,
+                    color = Color(0xFFEEEBF0),
+                    fontSize = 18.sp
+                )
+                Text(
+                    text = directChatHorizontalPager.description,
+                   // style = TextStyle(textDecoration = TextDecoration.Underline),
+                    fontFamily = Constants.ROBOTO_CONDENSED,
+                    color = Color.LightGray,
+                    fontSize = 10.sp
+                )
+            }
+
+        }
+
     }
 }

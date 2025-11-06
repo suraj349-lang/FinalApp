@@ -16,12 +16,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.finalapp.R
+import com.example.finalapp.utils.constants.Constants
 
 
 @Composable
@@ -47,20 +49,19 @@ fun ActiveButton() {
     Card(
         modifier = Modifier
             .wrapContentSize()
-            //.graphicsLayer(scaleX = scale, scaleY = scale),
-            .alpha(alpha),
+           // .graphicsLayer(scaleX = scale, scaleY = scale)
+            .alpha(alpha)
+        ,
         shape = RoundedCornerShape(8.dp),
-        backgroundColor = Color(
-            0xFFA52C06
-        ).copy(alpha = 0.9f), elevation = 0.dp
+        backgroundColor = Color(0xFF6C6F1E).copy(alpha = 0.9f), elevation = 0.dp
     ) {
         Text(
-            text = "ACTIVE",
-            fontFamily = FontFamily(Font(R.font.dongle_bold)),
-            fontSize = 20.sp,
+            text = "Active",
+            fontFamily = Constants.USER_NAME_FONT,
+            fontSize = 10.sp,
             color = Color.White,
             textAlign = TextAlign.Start,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 2.dp)
         )
     }
 }

@@ -50,7 +50,7 @@ import androidx.navigation.NavHostController
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.finalapp.model.DropProfileResponse
-import com.example.finalapp.screens._1home.EventAndPingDesigns.pings.PingItem3
+import com.example.finalapp.screens._1home.EventAndPingDesigns.flashPosts.PingItem3
 import com.example.finalapp.screens._2pings.Category
 import com.example.finalapp.screens._2pings.PingsTopBar
 import com.example.finalapp.screens._2pings.SearchBar

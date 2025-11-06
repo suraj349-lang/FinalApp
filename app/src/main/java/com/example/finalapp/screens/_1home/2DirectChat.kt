@@ -9,7 +9,6 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,12 +16,14 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -59,12 +60,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -77,7 +75,6 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
 import com.example.finalapp.model.DirectChat
 import com.example.finalapp.model.DirectChatRequest
-import com.example.finalapp.model.User
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens.dialogBox.DialogLoading
 import com.example.finalapp.ui.imagePrefix
@@ -168,23 +165,23 @@ fun DirectChatScreen(
                             )
                         }else{
 
-                            Column(modifier = Modifier
-                                .align(Alignment.TopEnd)
-                                .padding(end = 16.dp, top = 16.dp), verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text(text = "Range : 500 m",fontFamily = Constants.FONT_LIGHT, color = Color(
-                                    0xFFEBE5EE
-                                ), fontSize = 12.sp, style = TextStyle(textDecoration = TextDecoration.Underline))
-                                Row(modifier = Modifier, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                                    Image(painter = painterResource(id = R.drawable.edit_new), contentDescription ="", modifier = Modifier.size(12.dp), colorFilter = ColorFilter.tint(
-                                        Color.White) )
-                                    Text(text = "Edit",fontFamily = Constants.FONT_LIGHT, color = Color(
-                                        0xFFF5EDF8
-                                    ), fontSize = 9.sp)
-                                }
-                            }
+//                            Column(modifier = Modifier
+//                                .align(Alignment.TopEnd)
+//                                .padding(end = 16.dp, top = 16.dp), verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally) {
+//                                Text(text = "Range : 500 m",fontFamily = Constants.FONT_LIGHT, color = Color(
+//                                    0xFFEBE5EE
+//                                ), fontSize = 12.sp, style = TextStyle(textDecoration = TextDecoration.Underline))
+//                                Row(modifier = Modifier, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+//                                    Image(painter = painterResource(id = R.drawable.edit_new), contentDescription ="", modifier = Modifier.size(12.dp), colorFilter = ColorFilter.tint(
+//                                        Color.White) )
+//                                    Text(text = "Edit",fontFamily = Constants.FONT_LIGHT, color = Color(
+//                                        0xFFF5EDF8
+//                                    ), fontSize = 9.sp)
+//                                }
+//                            }
                             Column(modifier = Modifier
                                 .wrapContentSize()
-                                .align(Alignment.TopCenter)) {
+                                .align(Alignment.TopStart)) {
                                 DirectChatHorizontalPager()
                             }
                         }
@@ -196,7 +193,7 @@ fun DirectChatScreen(
                         chatViewModel ,
                         navController,
                         checked,
-                        onOmegleClicked = {navController.navigate(SCREENS.OMEGLE.route)}
+                        onOmegleClicked = {navController.navigate(SCREENS.DUEL.route)}
                     ) {
                         eventsViewModel.shareProfileClicked.value = true
                     }
@@ -243,6 +240,7 @@ fun DirectChatProfiles(
             Text(text = response.error.toString())
         }
         is RequestState.Success ->{
+            chatViewModel.connectSocket()
             Log.i("Userr", "DirectChatProfiles: ${response.data.withUserId.userName} other user id ${response.data.withUserId._id}")
             chatViewModel.profileImage.value = response.data.withUserId.profileImage
             navController.navigate(
@@ -457,6 +455,7 @@ fun ShareProfileForDirectChat(address:String,onOmegleClicked:()->Unit,onSharePro
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(40.dp)
+                            .clip(shape = RoundedCornerShape(12.dp))
                             .graphicsLayer { clip = true }
                             .drawWithCache {
                                 val shimmerBrush = Brush.linearGradient(
@@ -490,18 +489,46 @@ fun ShareProfileForDirectChat(address:String,onOmegleClicked:()->Unit,onSharePro
                             color = Color.White
                         )
                     }
-                    Row(modifier = Modifier
-                        .clickable { onOmegleClicked() }
+                    Divider(Modifier.fillMaxWidth().padding(top = 20.dp), thickness = 0.5.dp, color = Color.Gray)
+                    Text(
+                        text = "or",
+                        fontSize = 12.sp,
+                        fontFamily = Constants.FONT_LIGHT,
+                        color = Color.White
+                    )
+                    Box(modifier = Modifier
                         .fillMaxWidth()
-                        .height(60.dp)) {
-                        Image(painter = painterResource(id = androidx.core.R.drawable.ic_call_answer_video), contentDescription = "", modifier = Modifier.size(24.dp))
-                        Text(
-                            text = "+ Omegle",
-                            fontSize = 16.sp,
-                            fontFamily = Constants.FONT_LIGHT,
-                            color = Color.White
-                        )
+                        .wrapContentHeight()
+                        .clip(shape = RoundedCornerShape(12.dp))
+                        .background(
+                            brush = Brush.linearGradient(
+                                colors = listOf(
+                                    Color(0xFF1976D2), Color(0xFF460761)
+                                )
+                            )
+                        )) {
 
+                        Row(modifier = Modifier
+                            .clickable { onOmegleClicked() }
+                            .fillMaxWidth()
+                            .height(50.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center) {
+                            Image(
+                                painter = painterResource(id = androidx.core.R.drawable.ic_call_answer_video),
+                                contentDescription = "",
+                                modifier = Modifier.size(40.dp),
+                                colorFilter = ColorFilter.tint(Color.White)
+                            )
+                            Spacer(modifier = Modifier.width(20.dp))
+                            Text(
+                                text = "Join a Duel",
+                                fontSize = 16.sp,
+                                fontFamily = Constants.FONT_LIGHT,
+                                color = Color.White
+                            )
+
+                        }
                     }
                 }
             }

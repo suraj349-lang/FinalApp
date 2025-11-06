@@ -31,7 +31,7 @@ import com.example.finalapp.R
 import com.example.finalapp.model.EventResponse
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens._1home.commentBottomSheet.CommentBottomSheet
-import com.example.finalapp.screens._1home.commonUI.shareDeepLink
+import com.example.finalapp.screens._1home.commonUI.shareEventDeepLink
 import com.example.finalapp.ui.imagePrefix
 import com.example.finalapp.utils.constants.Constants.DONGLE_NORMAL
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -134,7 +134,7 @@ fun PublicEvent(  //currently in use
                     shape = CircleShape, elevation = 0.dp
                 ) {
                     ShareIcon(){
-                        shareDeepLink(context,event._id) // TODO postId to be mended again
+                        shareEventDeepLink(context,event._id) // TODO postId to be mended again
                     }
                 }
                 Card(

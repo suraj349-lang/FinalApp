@@ -49,7 +49,7 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
 import com.example.finalapp.model.DropProfileResponse
 import com.example.finalapp.navigation.SCREENS
-import com.example.finalapp.screens._1home.commonUI.shareDeepLink
+import com.example.finalapp.screens._1home.commonUI.shareEventDeepLink
 import com.example.finalapp.ui.imagePrefix
 import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.utils.constants.Constants
@@ -161,7 +161,7 @@ fun DropProfileUserProfileUI(dropProfileResponse: DropProfileResponse?,onSendMes
                             modifier = Modifier
                                 .padding(end = 30.dp, bottom = 26.dp)
                                 .align(Alignment.BottomEnd)
-                                .clickable { shareDeepLink(context, dropProfileResponse.id ?: "") }
+                                .clickable { shareEventDeepLink(context, dropProfileResponse.id ?: "") }
                                 .size(20.dp),
                             colorFilter = ColorFilter.tint(Color.White))
 

@@ -178,6 +178,9 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                             }
                         }
                 }
+                Divider(modifier = Modifier
+                    .fillMaxWidth(), thickness = 0.3.dp,color= floatingActionBtnColor
+                )
 
                 Card(
                     shape=RoundedCornerShape(8.dp),
@@ -278,9 +281,7 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                 Divider(modifier = Modifier
                     .fillMaxWidth(), thickness = 1.dp,color=Color(0xFFDCD6DD)
                 )
-                Text("Caption",fontFamily = DONGLE_BOLD,modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 15.dp), fontSize = 20.sp, color = Color.DarkGray, textAlign = TextAlign.Start)
+                Text("Caption",fontFamily = Constants.FONT_LIGHT,modifier = Modifier.fillMaxWidth().padding(start = 15.dp), fontSize = 14.sp, color = Color.DarkGray, textAlign = TextAlign.Start)
                 OutlinedTextField(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -304,7 +305,7 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                     .wrapContentHeight()
                     .padding(start = 16.dp, end = 16.dp, top = 8.dp)
                     , horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(text = "Availability Time :", color = Color.DarkGray, modifier = Modifier.fillMaxWidth(), fontFamily = DONGLE_BOLD , fontSize = 20.sp, textAlign = TextAlign.Start)
+                    Text(text = "Availability Time :", color = Color.DarkGray, modifier = Modifier.fillMaxWidth(), fontFamily = Constants.FONT_LIGHT, fontSize = 14.sp, textAlign = TextAlign.Start)
                     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceEvenly) {
                         Button(
                             onClick = { activeBtnKey=0 },
@@ -316,7 +317,7 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                                 else Color.DarkGray
                         )
                         ) {
-                            Text(text = "12 hrs", fontFamily = DONGLE_BOLD, fontSize = 18.sp)
+                            Text(text = "12 hrs", fontFamily = Constants.ROBOTO_CONDENSED, fontSize = 12.sp)
                         }
                         Button(onClick = {activeBtnKey=1 },
                             shape = RoundedCornerShape(6.dp),
@@ -327,7 +328,7 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                                 else Color.DarkGray
                             )
                         ) {
-                            Text(text = "1 Day", fontFamily = DONGLE_BOLD, fontSize = 18.sp)
+                            Text(text = "1 Day", fontFamily = Constants.ROBOTO_CONDENSED, fontSize = 12.sp)
                         }
                         Button(onClick = { activeBtnKey=2 },
                             shape = RoundedCornerShape(6.dp),
@@ -338,7 +339,7 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                                 else Color.DarkGray
                             )
                         ) {
-                            Text(text = "1 week", fontFamily = DONGLE_BOLD, fontSize = 18.sp)
+                            Text(text = "1 week", fontFamily = Constants.ROBOTO_CONDENSED, fontSize = 12.sp)
                         }
                     }
                 }
@@ -365,9 +366,9 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                                 imageUploadViewModel.s3ImageUploadFunction(user.user,it)
                                 }
                         },
-                        shape= RoundedCornerShape(0.dp),
+                        shape= RoundedCornerShape(12.dp),
                         modifier= Modifier
-                            .fillMaxWidth(1f),
+                            .fillMaxWidth(1f).padding(2.dp),
                         enabled= uri !=Uri.EMPTY,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = floatingActionBtnColor, //statusAndTopAppBarColor,
@@ -376,7 +377,8 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                             disabledContentColor= Color.DarkGray
                         )
                     ) {
-                        Text(text = "Drop Profile", fontFamily = DONGLE_BOLD, fontSize = 22.sp)
+                     //   Text(text = "Click to:     ", fontFamily = Constants.FONT_EXTRA_LIGHT, fontSize = 8.sp)
+                        Text(text = "Drop Profile", fontFamily = Constants.FONT_LIGHT, fontSize = 16.sp)
 
                     }
 

@@ -8,6 +8,7 @@ import com.example.finalapp.database.Chat
 import com.example.finalapp.database.ChatItem
 import com.example.finalapp.model.ChatList
 import com.example.finalapp.model.Message
+import com.example.finalapp.model.User
 import com.example.finalapp.repository.ChatDatabaseRepository
 import com.example.finalapp.screens._6chat.SocketManager
 import com.example.finalapp.utils.UserObject
@@ -15,9 +16,12 @@ import com.example.finalapp.utils.RequestState
 import com.example.finalapp.utils.constants.Constants.TAG
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -41,13 +45,25 @@ class ChatViewModel @Inject constructor(
     private var isSocketConnected = false
 
     fun connectSocket() {
-        val userId = UserObject.user.value.user
+         val userId = UserObject.user.value.user
+
+//        var user=User()
+//        viewModelScope.async {
+//            user = UserObject.user
+//                .filter { it.user != null } // wait until user is non-null
+//                .first() // suspend until first valid user is emitted
+//        }
+//
+//        val userId = user.user
+
+
+
         if (isSocketConnected) {
             Log.d("SocketManager", "Socket already connected, skipping connect.")
             return
         }
 
-        socketManager.connect(userId) { receivedMessage ->
+        socketManager.connect(userId ) { receivedMessage ->
             Log.d("Messageschat", "connectSocket: $receivedMessage")
 
             _messagesFromServer.update { oldState ->

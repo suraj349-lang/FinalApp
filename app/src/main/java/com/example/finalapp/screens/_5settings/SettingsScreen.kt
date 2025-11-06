@@ -3,6 +3,7 @@ package com.example.finalapp.screens._5settings
 import android.annotation.SuppressLint
 import android.app.Activity
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -23,6 +24,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
@@ -114,7 +116,7 @@ fun SettingsScreenUI(navController: NavHostController,authViewModel: AuthViewMod
             Modifier
                 .fillMaxSize()
                 .padding(it)) {
-            Column(modifier = Modifier
+            Column(modifier = Modifier.background(Color.White.copy(alpha = 0.7f))
                 .fillMaxSize()
                 .navigationBarsPadding()
                 .verticalScroll(rememberScrollState())) {
@@ -144,10 +146,11 @@ fun SettingsTopBar(onBackClicked: () -> Unit) {
                 fontSize = 20.sp,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier,
-                color = Color(0xFF121212),
+                color = Constants.HOME_TOP_BAR_COLOR,
                 fontFamily = Constants.FONT_MEDIUM
             )
         },
+        colors=TopAppBarDefaults.mediumTopAppBarColors(containerColor = Constants.HOME_TOP_BAR_ICON_COLOR),
         modifier = Modifier
             .shadow(elevation = 10.dp)
             .statusBarsPadding(),

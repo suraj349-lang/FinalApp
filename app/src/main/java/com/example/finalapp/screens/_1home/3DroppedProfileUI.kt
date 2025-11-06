@@ -32,6 +32,9 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.Divider
 import androidx.compose.material.Surface
 import androidx.compose.ui.Alignment
 import androidx.compose.material.Text
@@ -89,6 +92,7 @@ import com.example.finalapp.utils.UserLocation
 import com.example.finalapp.utils.UserLocationObject
 import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.utils.formatDateTime
+import com.example.finalapp.utils.getFormattedTimeAndFlag
 import com.example.finalapp.utils.testdata.Item
 import kotlinx.coroutines.launch
 
@@ -109,6 +113,7 @@ fun DroppedProfilesUI(
         mutableStateOf(false)
     }
     var query by remember { mutableStateOf("") }
+    var name by remember { mutableStateOf("") }
     var showPredictionBoxForSearch by remember {
         mutableStateOf(false)
     }
@@ -209,6 +214,42 @@ fun DroppedProfilesUI(
                         }
                     }
                     if(changeLocation) {
+                        OutlinedTextField(
+                            value = name,
+                            onValueChange = {
+                                name = it
+                            },
+                            label = {
+                                Text(
+                                    text = "Search by name",
+                                    fontSize = 14.sp,
+                                    color = Color.LightGray,
+                                    fontFamily = Constants.FONT_MEDIUM
+                                )
+                            },
+//                            trailingIcon = {
+//                                Text(
+//                                    text = "Search",
+//                                    fontSize = 16.sp,
+//                                    fontFamily = Constants.FONT_MEDIUM,
+//                                    color = Color.LightGray,
+//                                    modifier = Modifier
+//                                        .padding(end = 8.dp)
+//                                        .clickable {
+//                                            scope.launch {
+//                                                eventsViewModel.getDefaultDropProfiles("")
+//                                            }
+//                                        })
+//                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(4.dp),
+                            shape = RoundedCornerShape(20.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedContainerColor = Color.Gray,
+                                unfocusedContainerColor = Color.Gray
+                            )
+                        )
 
                         OutlinedTextField(
                             value = query,
@@ -220,32 +261,31 @@ fun DroppedProfilesUI(
                                 Text(
                                     text = "Enter location",
                                     fontSize = 14.sp,
-                                    color = Color.LightGray,
+                                    color = Color.Black,
                                     fontFamily = Constants.FONT_MEDIUM
                                 )
                             },
-                            trailingIcon = {
-                                Text(
-                                    text = "Search",
-                                    fontSize = 16.sp,
-                                    fontFamily = Constants.FONT_MEDIUM,
-                                    color = Color.LightGray,
-                                    modifier = Modifier
-                                        .padding(end = 8.dp)
-                                        .clickable {
-                                            scope.launch {
-                                                eventsViewModel.getDefaultDropProfiles("")
-                                            }
-                                        })
-                            },
+//                            trailingIcon = {
+//                                Text(
+//                                    text = "Search",
+//                                    fontSize = 16.sp,
+//                                    fontFamily = Constants.FONT_MEDIUM,
+//                                    color = Color.LightGray,
+//                                    modifier = Modifier
+//                                        .padding(end = 8.dp)
+//                                        .clickable {
+//                                            scope.launch {
+//                                                eventsViewModel.getDefaultDropProfiles("")
+//                                            }
+//                                        })
+//                            },
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(4.dp),
                             shape = RoundedCornerShape(20.dp),
                             colors = OutlinedTextFieldDefaults.colors(
-                                focusedContainerColor = Color.DarkGray.copy(
-                                    alpha = 0.8f
-                                )
+                                focusedContainerColor = Color.Gray,
+                                unfocusedContainerColor = Color.Gray
                             )
                         )
                         if (showPredictionBoxForSearch) {
@@ -273,6 +313,14 @@ fun DroppedProfilesUI(
                                 }
                             }
                         }
+
+                        Button(
+                            onClick = { scope.launch { eventsViewModel.getDefaultDropProfiles("") } },
+                            colors = ButtonDefaults.buttonColors(backgroundColor = Constants.HOME_TOP_BAR_TITLE_COLOR)) {
+                            Text(text = "Search", fontFamily = Constants.FONT_LIGHT, fontSize = 14.sp, color = Color.White)
+
+                        }
+                        Divider(modifier = Modifier.fillMaxWidth(), thickness = 0.5.dp, color = Color.Gray)
                     }
             }
 
@@ -381,46 +429,51 @@ fun LazyRowItem(item: Item) {
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DroppedProfileItem(profile: DropProfileResponse, onProfileClicked:()->Unit) {
-    Box(
-        modifier = Modifier
-            .shadow(elevation = 10.dp)
-            .zIndex(4f)
-            .clickable { onProfileClicked() }
-            .padding(2.dp)
-            .fillMaxWidth()
-            .height(300.dp)
-            .clip(shape = RoundedCornerShape(10.dp))
-            .background(color = Color.Black))
-    {
-        AsyncImage(model = imagePrefix + profile.image, // Replace with your image resource
-            contentDescription = "Background Image",
-            contentScale = ContentScale.Crop, // Crop to fill the space
-            filterQuality = FilterQuality.High,
-            modifier = Modifier
-                .clickable {
-                    onProfileClicked()
-                }
-                .fillMaxSize())
-        Text(
-            text = profile.expirationTime + " hrs left",
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(end = 4.dp)
-                .shadow(elevation = 20.dp, spotColor = Color.White),
-            fontFamily = Constants.FONT_MEDIUM,
-            style = TextStyle(color = Color.White, fontSize =9.sp)
-        )
-
-
-        // Multiple texts
+    Column(modifier = Modifier
+        .wrapContentSize()
+        .padding(vertical = 8.dp)) {
         Box(
             modifier = Modifier
-                .wrapContentSize()
-                .align(Alignment.BottomCenter)
-                .background(color = Color.Transparent) //0xFF2C2A2A  0xFFAFB42B  0xFF290438
-                .clip(shape = RoundedCornerShape(10.dp))
-        ) {
-            Column(
+                .zIndex(4f)
+                .clickable { onProfileClicked() }
+                .padding(2.dp)
+                .fillMaxWidth()
+                .height(300.dp)
+                .clip(shape = RoundedCornerShape(topEnd = 10.dp, topStart = 10.dp))
+                .background(color = Color.LightGray))
+        {
+            AsyncImage(model = imagePrefix + profile.image, // Replace with your image resource
+                contentDescription = "Background Image",
+                contentScale = ContentScale.Crop, // Crop to fill the space
+                filterQuality = FilterQuality.High,
+                modifier = Modifier
+                    .clickable {
+                        onProfileClicked()
+                    }
+                    .fillMaxSize())
+            Text(
+                text = getFormattedTimeAndFlag(profile.expirationTime).toString() + " hrs left",
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(end = 4.dp)
+                    .shadow(elevation = 20.dp, spotColor = Color.White),
+                fontFamily = Constants.FONT_MEDIUM,
+                style = TextStyle(color = Color.White, fontSize = 9.sp)
+            )
+
+
+
+        }
+        Box(modifier = Modifier.wrapContentSize()){
+            // Multiple texts
+            Box(
+                modifier = Modifier
+                    .wrapContentSize()
+                    .align(Alignment.BottomCenter)
+                    .background(color = Constants.HOME_TOP_BAR_COLOR) //0xFF2C2A2A  0xFFAFB42B  0xFF290438
+                    .clip(shape = RoundedCornerShape(10.dp))
+            ) {
+                Column(
                     modifier = Modifier
                         .padding(horizontal = 8.dp)
                         .padding(bottom = 4.dp),
@@ -437,7 +490,7 @@ fun DroppedProfileItem(profile: DropProfileResponse, onProfileClicked:()->Unit) 
                         Text(
                             text = profile.createdBy.name ?: "",
                             modifier = Modifier
-                                .shadow(elevation = 10.dp, spotColor = Color.White)
+                               // .shadow(elevation = 10.dp, spotColor = Color.White)
                                 .fillMaxWidth(0.6f),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -451,17 +504,20 @@ fun DroppedProfileItem(profile: DropProfileResponse, onProfileClicked:()->Unit) 
                             fontFamily = Constants.FONT_LIGHT,
                             fontWeight = FontWeight.Bold,
                             fontSize = 10.sp,
-                            modifier= Modifier
-                                .shadow(elevation = 60.dp)
+                            modifier = Modifier
+                              //  .shadow(elevation = 60.dp)
                                 .zIndex(2f),
                             color = Color.White
                         )
 
 
                     }
-                    Card(modifier = Modifier
-                        .fillMaxWidth()
-                        .shadow(elevation = 10.dp, spotColor = Color.White), colors = CardDefaults.cardColors(containerColor = Color.Transparent)) {
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                           // .shadow(elevation = 2.dp, spotColor = Color.White),
+                       , colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+                    ) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically,
@@ -478,10 +534,10 @@ fun DroppedProfileItem(profile: DropProfileResponse, onProfileClicked:()->Unit) 
 //                        )
                             Text(
                                 text = profile.location,
-                                fontFamily = Constants.FONT_MEDIUM,
-                                fontSize =10.sp,
+                                fontFamily = Constants.ROBOTO_CONDENSED,
+                                fontSize = 10.sp,
                                 maxLines = 1,
-                                color = Color.White,
+                                color = Color.LightGray,
                                 overflow = TextOverflow.Ellipsis
                             )
 
@@ -490,6 +546,8 @@ fun DroppedProfileItem(profile: DropProfileResponse, onProfileClicked:()->Unit) 
                 }
             }
         }
+
+    }
 }
 
 

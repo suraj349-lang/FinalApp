@@ -8,7 +8,7 @@ const val imagePrefix="https://vector-app-bucket-v2.s3.ap-south-1.amazonaws.com/
 
 
 val TAB_ITEMS = listOf(
-    TabItem("Pings"),
+    TabItem("Flash Posts"),
     TabItem("Nearby"),
     TabItem("Dropzone")
 )

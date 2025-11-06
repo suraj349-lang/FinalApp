@@ -32,6 +32,7 @@ import com.example.finalapp.R
 import com.example.finalapp.model.Event
 import com.example.finalapp.model.EventResponse
 import com.example.finalapp.screens._1home.EventAndPingDesigns.events.templates.databased.EventsAndChildPostsParent
+import com.example.finalapp.screens._1home.EventAndPingDesigns.events.templates.xhmaslive.XHamLive
 import com.example.finalapp.screens._3createEventOrPing.CreateEventOrPingBottomSheet
 import com.example.finalapp.screens.common.NoDataFound
 import com.example.finalapp.screens.common.CommonErrorScreen
@@ -63,29 +64,40 @@ fun EventAndChildPostWrapper(
         pageCount = { (eventsViewModel.eventsListResponse.value as? RequestState.Success<List<Event>>)?.data?.size ?: 0 }
     )
     val eventsState by eventsViewModel.eventsListResponse.collectAsState()
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        bottomBar = { BottomBar(navController = navController, containerColor = Constants.HOME_BOTTOM_BAR_COLOR, highlightedTextColor = Constants.BOTTOM_BAR_ACTIVE_TEXT_COLOR, inactiveTextColor = Constants.BOTTOM_BAR_INACTIVE_TEXT_COLOR, inactiveIconColor = Constants.BOTTOM_BAR_INACTIVE_ICON_COLOR, onCreateEventClick = {showSheet=true}) }) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(it)
+        ) {
 
-    when (eventsState) {
-        is RequestState.Loading -> {
-            EventLoadingScreen{navController.navigateUp()}
-            // DialogLoading(){navController.navigateUp()}
-        }
-        is RequestState.Error -> {
-            Column(modifier=Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-                Log.e("Events", "EventsScreen:${(eventsState as RequestState.Error).error} ", )
-                CommonErrorScreen(error = "Unable to fetch events.",true){
-                    eventsViewModel.getAllEvents()
+            when (eventsState) {
+                is RequestState.Loading -> {
+                    EventLoadingScreen { navController.navigateUp() }
+                    // DialogLoading(){navController.navigateUp()}
                 }
-            }
-        }
-        is RequestState.Success -> {
-            val eventList = (eventsState as RequestState.Success<List<EventResponse>>).data
-            if(eventList.isNotEmpty()) {
-                Scaffold(
-                    modifier = Modifier.fillMaxSize(),
-                    bottomBar = { BottomBar(navController = navController, containerColor = Constants.HOME_BOTTOM_BAR_COLOR, highlightedTextColor = Constants.BOTTOM_BAR_ACTIVE_TEXT_COLOR, inactiveTextColor = Constants.BOTTOM_BAR_INACTIVE_TEXT_COLOR, inactiveIconColor = Constants.BOTTOM_BAR_INACTIVE_ICON_COLOR, onCreateEventClick = {showSheet=true}) }) {
-                    Column(modifier = Modifier
-                        .fillMaxSize()
-                        .padding(it)) {
+
+                is RequestState.Error -> {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Log.e(
+                            "Events",
+                            "EventsScreen:${(eventsState as RequestState.Error).error} ",
+                        )
+                        CommonErrorScreen(error = "Unable to fetch events.", true) {
+                            eventsViewModel.getAllEvents()
+                        }
+                    }
+                }
+
+                is RequestState.Success -> {
+                    val eventList = (eventsState as RequestState.Success<List<EventResponse>>).data
+                    if (eventList.isNotEmpty()) {
                         VerticalPager(
                             pageSize = PageSize.Fill,
                             state = pagerState,
@@ -93,27 +105,37 @@ fun EventAndChildPostWrapper(
                             modifier = modifier.weight(1f)
                         ) { page ->
                             val event = eventList[page]
-                            EventsAndChildPostsParent(
-                                event = event,
-                                navController = navController,
-                                onUpVotesClicked = { eventsViewModel.upvoteEvent(it) }
-                            )
+//                            EventsAndChildPostsParent(
+//                                event = event,
+//                                navController = navController,
+//                                onUpVotesClicked = { eventsViewModel.upvoteEvent(it) }
+//                            )
+                            XHamLive(eventResponse = event)
+                        }
+
+                    } else {
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            NoDataFound(
+                                "No Events Found!",
+                                R.drawable.search,
+                                content = { RetryButton(onRetryCalled = onRetryCalled) })
                         }
                     }
                 }
-            }else{
-                Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-                    NoDataFound("No Events Found!", R.drawable.search, content ={ RetryButton(onRetryCalled=onRetryCalled)})
-                }
+
+                else -> {}
             }
+            CreateEventOrPingBottomSheet(
+                showSheet = showSheet,
+                onDismiss = { showSheet = false },
+                navHostController = navController
+            )
         }
-        else -> {}
     }
-    CreateEventOrPingBottomSheet(
-        showSheet = showSheet,
-        onDismiss = {showSheet=false },
-        navHostController = navController
-    )
 }
 
 @Composable

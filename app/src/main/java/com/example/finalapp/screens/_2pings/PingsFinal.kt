@@ -4,7 +4,6 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -23,7 +22,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -33,11 +31,10 @@ import androidx.navigation.NavHostController
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.example.finalapp.R
-import com.example.finalapp.screens._1home.EventAndPingDesigns.pings.PingItem1
-import com.example.finalapp.screens._1home.EventAndPingDesigns.pings.PingItem3
-import com.example.finalapp.screens._1home.EventAndPingDesigns.pings.PingsTinderScreen
+import com.example.finalapp.screens._1home.EventAndPingDesigns.flashPosts.NoImageFlashPosts
+import com.example.finalapp.screens._1home.EventAndPingDesigns.flashPosts.FlashPostWithImageScreen
+import com.example.finalapp.screens._1home.EventAndPingDesigns.flashPosts.PrivateFlashPostScreen
 import com.example.finalapp.screens._3createEventOrPing.CreateEventOrPingBottomSheet
-import com.example.finalapp.screens.common.CommonErrorScreen
 import com.example.finalapp.screens.common.NoPingsFoundScreen
 import com.example.finalapp.utils.UserLocationObject
 import com.example.finalapp.utils.constants.Constants
@@ -331,7 +328,16 @@ fun PingScreenFinal(
 
                                   //  PingItem3(item)
                                   //  PingItem1()
-                                    PingsTinderScreen(item)
+                                   
+                                    if(item.image.isNotEmpty() && !item.isPrivate){
+                                        FlashPostWithImageScreen(item)
+                                    }else if (item.image.isEmpty() && !item.isPrivate ){
+                                       NoImageFlashPosts(pingResponse = item)
+                                    }else{
+                                        PrivateFlashPostScreen(item)
+                                    }
+                                  
+
                                     Spacer(modifier = Modifier.height(6.dp))
                                  //  Divider(modifier = Modifier.fillMaxWidth(), thickness = 0.5.dp, color = Color.Gray.copy(alpha = 0.6f))
                                 }

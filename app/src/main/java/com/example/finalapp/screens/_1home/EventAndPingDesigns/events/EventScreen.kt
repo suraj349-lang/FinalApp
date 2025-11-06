@@ -51,7 +51,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -63,7 +62,7 @@ import com.example.finalapp.R
 import com.example.finalapp.model.EventResponse
 import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens.VideoPlayerComposable
-import com.example.finalapp.screens._1home.commonUI.shareDeepLink
+import com.example.finalapp.screens._1home.commonUI.shareEventDeepLink
 import com.example.finalapp.ui.imagePrefix
 import com.example.finalapp.utils.constants.Constants
 
@@ -193,7 +192,7 @@ fun EventScreenUI(
                         event.totalComments,
                         event.totalViews,
                         { onUpVotesClicked(event._id) },
-                        { shareDeepLink(context, event._id) },
+                        { shareEventDeepLink(context, event._id) },
                         onContributeClicked
                     )
                 }

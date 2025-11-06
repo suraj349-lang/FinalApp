@@ -93,7 +93,9 @@ import com.example.finalapp.screens._4profile.myPings.MyPings
 import com.example.finalapp.screens._4profile.privateUsername.PasswordForPrivateUsername
 import com.example.finalapp.screens.dialogBox.DropProfileDialog
 import com.example.finalapp.screens.dialogBox.uriToFile
+import com.example.finalapp.testing.PostItem2
 import com.example.finalapp.ui.imagePrefix
+import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.utils.UserObject
 import com.example.finalapp.utils.RequestState
 import com.example.finalapp.utils.constants.Constants
@@ -516,11 +518,56 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                 Column(
                     modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 10.dp, bottom = 16.dp)
                 ) {
+                    Column(modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight()) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(30.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = "Recent Profile Drops",
+                                color = Color.White,
+                                fontSize=13.sp,
+                                fontFamily = Constants.FONT_LIGHT
+                            )
+                            Image(
+                                painter = painterResource(id = R.drawable.showall),
+                                contentDescription = "",
+                                colorFilter = ColorFilter.tint(
+                                    Color(
+                                        0xFF041372
+                                    )
+                                ),
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                        Divider(modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp), thickness = 0.5.dp, color = Color.LightGray)
 
                     //--------------------------------------------------------------------------------
 
                     when (val response = userDropProfilesList) {
-                        is RequestState.Loading -> CircularProgressIndicator()
+                        is RequestState.Loading -> {
+                            LazyRow(Modifier.fillMaxWidth()) {
+                                items(3){
+                                    Box(modifier = Modifier
+                                        .padding(2.dp)
+                                        .width(120.dp)
+                                        .height(180.dp)
+                                        .background(color = Color.DarkGray)){
+                                        Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                                            CircularProgressIndicator(Modifier.size(20.dp), backgroundColor = floatingActionBtnColor)
+
+                                        }
+
+                                    }
+                                }
+
+                            }
+                        }
                         is RequestState.Error -> {
                             //Toast.makeText(context,"error getting recent drops",Toast.LENGTH_SHORT).show()
                             //Log.e("Error", "ProfileScreenNew: ${response.error.printStackTrace()}",response.error )
@@ -551,7 +598,7 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
 
                         else -> {}
                     }
-                }
+                }}
             }
                     //--------------------------------------------------------------------------------
                 item {
@@ -587,7 +634,24 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                         when (selectedTabIndex) {
                             0 -> {
                                 when (val response = userEventsList) {
-                                    is RequestState.Loading -> CircularProgressIndicator()
+                                    is RequestState.Loading -> {
+                                        LazyRow(Modifier.fillMaxWidth()) {
+                                            items(3){
+                                               Box(modifier = Modifier
+                                                   .padding(2.dp)
+                                                   .width(120.dp)
+                                                   .height(170.dp)
+                                                   .background(color = Color.DarkGray)){
+                                                   Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                                                       CircularProgressIndicator(Modifier.size(20.dp), backgroundColor = floatingActionBtnColor)
+
+                                                   }
+
+                                               }
+                                            }
+
+                                        }
+                                    }
                                     is RequestState.Error ->
                                         MyPosts(emptyList()) {}
 //                                        CommonErrorScreen(
@@ -609,7 +673,24 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
 
                             1 -> {
                                 when (val response = userPingsList) {
-                                    is RequestState.Loading -> CircularProgressIndicator()
+                                    is RequestState.Loading ->{
+                                        LazyRow(Modifier.fillMaxWidth()) {
+                                            items(3){
+                                                Box(modifier = Modifier
+                                                    .padding(2.dp)
+                                                    .width(120.dp)
+                                                    .height(170.dp)
+                                                    .background(color = Color.DarkGray)){
+                                                    Column(Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                                                        CircularProgressIndicator(Modifier.size(20.dp), backgroundColor = floatingActionBtnColor)
+
+                                                    }
+
+                                                }
+                                            }
+
+                                        }
+                                    }
                                     is RequestState.Error -> MyPings(emptyList()) {  }
 
                                     is RequestState.Success -> {
@@ -812,81 +893,52 @@ fun RecentDrops(
     onDropProfileClicked: () -> Unit,
     onItemClicked: (DropProfileResponse) -> Unit
 ) {
-    val droppedProfilesList=remember{userDropProfilesList}
-        Column(modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(30.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "Recent Profile Drops",
-                    color = Color.White,
-                    fontSize=13.sp,
-                    fontFamily = Constants.FONT_LIGHT
-                )
-                Image(
-                    painter = painterResource(id = R.drawable.showall),
-                    contentDescription = "",
-                    colorFilter = ColorFilter.tint(
-                        Color(
-                            0xFF041372
-                        )
-                    ),
-                    modifier = Modifier.size(20.dp)
-                )
-            }
-            Divider(modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 4.dp), thickness = 0.5.dp, color = Color.LightGray)
-                if(droppedProfilesList.isEmpty()){
-                    Card(modifier = Modifier
-                        .padding(bottom = 16.dp)
-                        .width(120.dp)
-                        .height(180.dp)
-                        ,  backgroundColor = Color(0xFF343435)
-                    ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()) {
-                        Column(
-                            modifier = Modifier
-                                .clickable { onDropProfileClicked() }
-                                .fillMaxSize(),
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Image(
-                                painterResource(id = R.drawable.add),
-                                contentDescription = "",
-                                colorFilter = ColorFilter.tint(Color(0xFFE1E9F1).copy(alpha = 0.8f)),
-                                modifier = Modifier
-                                    .size(24.dp)
-                            )
-                            Text(
-                                text = "Drop your profile",
-                                modifier = Modifier,
-                                fontSize = 10.sp,
-                                fontFamily = Constants.FONT_LIGHT,
-                                color = Color.White
-                            )
-                        }
-                    }
+    val droppedProfilesList = remember { userDropProfilesList }
 
-                }}else {
-                    LazyRow(modifier = Modifier) {
-                        items(droppedProfilesList) { item ->
-                            RecentProfileDropItem(item) { onItemClicked(item) }
-                            Spacer(modifier = Modifier.width(8.dp))
-                        }
-                    }
+    if (droppedProfilesList.isEmpty()) {
+        Card(
+            modifier = Modifier
+                .padding(bottom = 16.dp)
+                .width(120.dp)
+                .height(180.dp), backgroundColor = Color(0xFF343435)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
+                Column(
+                    modifier = Modifier
+                        .clickable { onDropProfileClicked() }
+                        .fillMaxSize(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Image(
+                        painterResource(id = R.drawable.add),
+                        contentDescription = "",
+                        colorFilter = ColorFilter.tint(Color(0xFFE1E9F1).copy(alpha = 0.8f)),
+                        modifier = Modifier
+                            .size(24.dp)
+                    )
+                    Text(
+                        text = "Drop your profile",
+                        modifier = Modifier,
+                        fontSize = 10.sp,
+                        fontFamily = Constants.FONT_LIGHT,
+                        color = Color.White
+                    )
                 }
             }
 
+        }
+    } else {
+        LazyRow(modifier = Modifier) {
+            items(droppedProfilesList) { item ->
+                RecentProfileDropItem(item) { onItemClicked(item) }
+                Spacer(modifier = Modifier.width(8.dp))
+            }
+        }
+    }
 }
 
 @OptIn(ExperimentalGlideComposeApi::class)

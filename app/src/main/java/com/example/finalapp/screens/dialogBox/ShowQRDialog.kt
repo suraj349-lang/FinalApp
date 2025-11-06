@@ -35,7 +35,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import com.example.finalapp.R
-import com.example.finalapp.screens._1home.commonUI.shareDeepLink
+import com.example.finalapp.screens._1home.commonUI.shareEventDeepLink
 import com.example.finalapp.screens.qrcode.QRCode
 import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.utils.UserObject
@@ -79,6 +79,7 @@ fun ShowQRDialog(navController: NavHostController, onDismiss: () -> Unit) {
                         .padding(start = 8.dp),
                     color = Color.White,
                     fontSize = 20.sp,
+                    lineHeight=12.sp,
                     fontFamily = Constants.APP_NAME_FONT
                 )
                 Text(
@@ -88,6 +89,7 @@ fun ShowQRDialog(navController: NavHostController, onDismiss: () -> Unit) {
                         .padding(start = 8.dp),
                     color = Color.White,
                     fontSize =11.sp,
+                    lineHeight=12.sp,
                     fontFamily = Constants.FONT_EXTRA_LIGHT
                 )
 
@@ -126,7 +128,7 @@ fun ShowQRDialog(navController: NavHostController, onDismiss: () -> Unit) {
                     }
                     Column(modifier = Modifier
                         .clickable {
-                            shareDeepLink(context, user.user)
+                            shareEventDeepLink(context, user.user)
                         }
                         .wrapContentSize(), verticalArrangement = Arrangement.Bottom, horizontalAlignment = Alignment.CenterHorizontally) {
                         Image(painter = painterResource(id = R.drawable.share), contentDescription ="", modifier = Modifier.size(20.dp), colorFilter = ColorFilter.tint(Color.White) )

@@ -1,4 +1,4 @@
-package com.example.finalapp.screens._1home.EventAndPingDesigns.pings
+package com.example.finalapp.screens._1home.EventAndPingDesigns.flashPosts
 
 
 import androidx.compose.foundation.BorderStroke
@@ -26,7 +26,6 @@ import androidx.compose.material.Text
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -46,7 +45,6 @@ import com.example.finalapp.R
 import com.example.finalapp.model.pings.PingResponse
 import com.example.finalapp.ui.imagePrefix
 import com.example.finalapp.utils.constants.Constants
-import kotlin.random.Random
 
 
 @Composable

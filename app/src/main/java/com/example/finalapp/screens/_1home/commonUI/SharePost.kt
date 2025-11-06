@@ -8,6 +8,7 @@ import androidx.core.content.FileProvider
 import coil.imageLoader
 import coil.request.ImageRequest
 import coil.request.SuccessResult
+import com.example.finalapp.utils.constants.Constants
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -46,14 +47,30 @@ suspend fun shareImageFromUrl(context: Context, imageUrl: String, postTitle: Str
     }
 }
 
-fun shareDeepLink(context: Context, postId: String) {
-    val deepLink = "social://post/$postId"
+fun shareEventDeepLink(context: Context, postId: String) {
+    val deepLink = "${Constants.APP_NAME}://event/$postId"
     val intent = Intent(Intent.ACTION_SEND).apply {
         type = "text/plain"
-        putExtra(Intent.EXTRA_TEXT, "Check out this post: $deepLink")
+        putExtra(Intent.EXTRA_TEXT, "Check out this event: $deepLink")
     }
-    context.startActivity(Intent.createChooser(intent, "Share Post via"))
+    context.startActivity(Intent.createChooser(intent, "Share Event via"))
 }
+fun sharePingDeepLink(context: Context, deepLink: String) {
+    val sendIntent = Intent(Intent.ACTION_SEND).apply {
+        type = "text/plain"
+        putExtra(Intent.EXTRA_TEXT, deepLink)
+    }
+    val shareIntent = Intent.createChooser(sendIntent, "Share Ping")
+    context.startActivity(shareIntent)
+}
+//fun sharePingDeepLink(context: Context, pingId: String) {
+//    val deepLink = "${Constants.APP_NAME}://ping/$pingId"
+//    val intent = Intent(Intent.ACTION_SEND).apply {
+//        type = "text/plain"
+//        putExtra(Intent.EXTRA_TEXT, "Check out this ping: $deepLink")
+//    }
+//    context.startActivity(Intent.createChooser(intent, "Share Ping via"))
+//}
 
 fun sharePostUrl(context: Context, postUrl: String, postTitle: String) {
     val intent = Intent(Intent.ACTION_SEND).apply {

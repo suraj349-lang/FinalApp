@@ -51,6 +51,7 @@ import java.io.IOException
 import java.util.Locale
 import android.location.LocationManager
 import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.platform.LocalContext
@@ -58,13 +59,17 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.finalapp.datastore.StoreUserState
 import com.example.finalapp.locationHelper.enableLocationSettings
 import com.example.finalapp.locationHelper.getLocation
+import com.example.finalapp.navigation.SCREENS
 import com.example.finalapp.screens._8notification.pushNotificationService.createNotificationChannels
 import com.example.finalapp.viewmodels.SplashViewModel
 import com.example.finalapp.ui.API_KEY
 import com.example.finalapp.utils.UserLocation
+import com.example.finalapp.viewmodels.ChatViewModel
 import com.google.android.libraries.places.api.Places
 import io.socket.client.Socket
 import javax.inject.Inject
@@ -77,6 +82,8 @@ class MainActivity : ComponentActivity() {
         Manifest.permission.ACCESS_FINE_LOCATION,
         Manifest.permission.POST_NOTIFICATIONS
     )
+    private val authViewModel:AuthViewModel by viewModels()
+    private val chatViewModel:ChatViewModel by viewModels()
     @Inject
     lateinit var splashViewModel: SplashViewModel
      @Inject
@@ -86,21 +93,34 @@ class MainActivity : ComponentActivity() {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         super.onCreate(savedInstanceState)
         createNotificationChannels(this)
-        handleDeepLink(intent)
         installSplashScreen().setKeepOnScreenCondition {
             !splashViewModel.isLoading.value
         }
         Places.initialize(applicationContext, API_KEY)
+     //   chatViewModel.connectSocket()
         setContent {
             FinalAppTheme {
-                val authViewModel= hiltViewModel<AuthViewModel>()
                 val locationSettingsLauncher = rememberLauncherForActivityResult(
                     contract = ActivityResultContracts.StartActivityForResult()
                 ) { result ->
                     // Handle the activity result here
                 }
+
                 LaunchedEffect(key1 = true){
                     enableLocationSettings(this@MainActivity, launcher = locationSettingsLauncher, authViewModel)
+                }
+                val navController = rememberNavController()
+
+                // Listen for new deep links emitted by ViewModel
+                LaunchedEffect(Unit) {
+                    authViewModel.deepLinkUri.collect { uri ->
+                        handleDeepLink(uri, navController)
+                    }
+                }
+
+                // Handle deep link if app opened directly by link
+                LaunchedEffect(Unit) {
+                    handleDeepLink(intent?.data, navController)
                 }
 
                 if (authViewModel.permission.value) {
@@ -167,23 +187,32 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
-        intent?.let { handleDeepLink(it) }
+        authViewModel.sendDeepLink(intent?.data)
     }
 
-    private fun handleDeepLink(intent: Intent) {
-        val data = intent.data
-        data?.let {
-            val path = it.path
-            val queryParams = it.query
-            val id = it.getQueryParameter("id")
-            Log.d("DeepLink", "Path: $path, ID: $id")
-            // Navigate or take action based on the data
-        }
+    override fun onDestroy() {
+        super.onDestroy()
+        chatViewModel.disconnectSocket()
     }
 
 }
+fun handleDeepLink(uri: Uri?, navController: NavHostController) {
+    uri ?: return
+    val pathSegments = uri.pathSegments
+
+    if (pathSegments.isEmpty()) return
+
+    when (pathSegments.firstOrNull()) {
+        "chat" -> navController.navigate("chat/${pathSegments.lastOrNull()}")
+        "ping" -> navController.navigate(SCREENS.PINGS.route)
+        "profile" -> navController.navigate("profile/${pathSegments.lastOrNull()}")
+        "qr" -> navController.navigate("qr/${pathSegments.lastOrNull()}")
+    }
+}
+
 
 
 

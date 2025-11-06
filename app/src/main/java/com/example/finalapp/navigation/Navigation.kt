@@ -28,7 +28,6 @@ import com.example.finalapp.screens.auth.FinalUserCreation
 import com.example.finalapp.qrScanning.QRScannerScreen
 import com.example.finalapp.screens._1home.EventAndPingDesigns.events.EventAndChildPostWrapper
 import com.example.finalapp.screens._1home.EventAndPingDesigns.events.EventsDetailsVerticalWrapper
-import com.example.finalapp.screens._1home.EventAndPingDesigns.events.templates.xhmaslive.XHamsLiveScreenWrapper
 import com.example.finalapp.screens.pings.CameraPingScreen
 import com.example.finalapp.viewmodels.EventsViewModel
 import com.example.finalapp.screens._6chat.ChatListScreen
@@ -46,7 +45,7 @@ import com.example.finalapp.screens._3createEventOrPing.createPing.CreatePingWra
 import com.example.finalapp.screens._4profile.ProfileScreenNew
 import com.example.finalapp.screens._4profile.UserPublicProfile
 import com.example.finalapp.screens._4profile.dropProfileUserProfile.DropProfileUserProfile
-import com.example.finalapp.screens._4profile.privateUsername.PrivateUserNameScreenWrapper
+import com.example.finalapp.screens._4profile.privateUsername.PrivateProfileScreenWrapper
 import com.example.finalapp.screens._5settings.BlockedUsers
 import com.example.finalapp.screens._5settings.BugExplanationScreen
 import com.example.finalapp.screens._5settings.BugsAndSuggestion
@@ -71,7 +70,7 @@ import com.example.finalapp.screens.onboarding.screen.WelcomeScreen
 import com.example.finalapp.screens.pings.EditScreen
 import com.example.finalapp.screens.pings.templates.PingTemplateSelector
 import com.example.finalapp.screens.pings.templates.visualPingTemplates
-import com.example.finalapp.screens.webrtc.OmegleScreen
+import com.example.finalapp.screens.webrtc.DuelScreen
 import com.example.finalapp.viewmodels.ImageUploadViewModel
 import com.example.finalapp.viewmodels.NotificationViewModel
 import com.example.finalapp.viewmodels.SettingsViewModel
@@ -91,7 +90,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
     val chatViewModel= hiltViewModel<ChatViewModel>()
     val notificationViewModel= hiltViewModel<NotificationViewModel>()
 
-    NavHost(navController = navController, startDestination =SCREENS.SPLASH.route){
+    NavHost(navController = navController, startDestination =SCREENS.HOME.route){
 
         composable(SCREENS.SPLASH.route){
             SplashScreenUI(navController,screen)
@@ -208,7 +207,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
             EventsDetailsVerticalWrapper(id, navController,eventsViewModel,authViewModel)
         }
         composable(SCREENS.PRIVATE_PROFILE.route){
-            PrivateUserNameScreenWrapper(navController = navController)
+            PrivateProfileScreenWrapper(navController = navController)
         }
 //        composable(SCREENS.TIKTOK.route){
 //            val list= listOf<String>("1","2","3","4","5","6")
@@ -291,8 +290,8 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
         composable(SCREENS.COMMENT.route){
             CommentsScreen()
         }
-        composable(SCREENS.OMEGLE.route){
-            OmegleScreen()
+        composable(SCREENS.DUEL.route){
+            DuelScreen()
         }
 
 

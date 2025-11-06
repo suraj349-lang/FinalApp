@@ -3,6 +3,7 @@ package com.example.finalapp.viewmodels
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -30,8 +31,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
@@ -47,6 +50,15 @@ class AuthViewModel @Inject constructor(
     private val storeUserState: StoreUserState,
     @ApplicationContext private val context: Context): ViewModel()
    {
+
+       private val _deepLinkUri = MutableSharedFlow<Uri?>(extraBufferCapacity = 1)
+       val deepLinkUri = _deepLinkUri.asSharedFlow()
+
+       fun sendDeepLink(uri: Uri?) {
+           viewModelScope.launch {
+               _deepLinkUri.emit(uri)
+           }
+       }
 
        //get user data from room------------------------------------------------------------------------------
        private var _userFromDb:MutableStateFlow<RequestState<Profile>> = MutableStateFlow(RequestState.Idle)

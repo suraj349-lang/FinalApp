@@ -25,12 +25,8 @@ import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
 import androidx.compose.material.Text
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -47,10 +43,9 @@ import androidx.navigation.NavHostController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.example.finalapp.R
-import com.example.finalapp.model.DropProfileResponse
 import com.example.finalapp.model.pings.PingResponse
 import com.example.finalapp.navigation.SCREENS
-import com.example.finalapp.screens._1home.commonUI.shareDeepLink
+import com.example.finalapp.screens._1home.commonUI.shareEventDeepLink
 import com.example.finalapp.testing.CommonTopBar
 import com.example.finalapp.ui.imagePrefix
 import com.example.finalapp.ui.theme.floatingActionBtnColor
@@ -170,7 +165,7 @@ fun PingDetailsScreenUI(pingResponse: PingResponse?, onSendMessageClicked:()->Un
                             modifier = Modifier
                                 .padding(end = 30.dp, bottom = 26.dp)
                                 .align(Alignment.BottomEnd)
-                                .clickable { shareDeepLink(context, pingResponse.user?.user ?: "") }
+                                .clickable { shareEventDeepLink(context, pingResponse.user?.user ?: "") }
                                 .size(20.dp),
                             colorFilter = ColorFilter.tint(Color.White))
 

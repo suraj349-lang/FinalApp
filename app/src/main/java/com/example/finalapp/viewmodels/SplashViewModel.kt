@@ -13,6 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -31,12 +32,12 @@ class SplashViewModel @Inject constructor(
 
     init {
         viewModelScope.launch(Dispatchers.Main) {
-            val onBoardingState=   loginState.getOnBoardingState.first()
-            val isLoggedIn=  loginState.getLoginState.first()
+            val onBoardingState = loginState.getOnBoardingState.firstOrNull() ?: false
+            val isLoggedIn = loginState.getLoginState.firstOrNull() ?: false
             Log.i("LOGIN", "$onBoardingState,, $isLoggedIn ")
             _startDestination.value = when {
-                !onBoardingState!! -> SCREENS.WELCOME.route
-                !isLoggedIn!! -> SCREENS.LOGIN.route
+                !onBoardingState -> SCREENS.WELCOME.route
+                !isLoggedIn -> SCREENS.LOGIN.route
                 else -> SCREENS.HOME.route
             }
                 _isLoading.value = false
