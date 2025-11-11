@@ -1,0 +1,110 @@
+package com.spint.app.repository
+
+import android.content.Context
+import android.net.Uri
+import com.spint.app.model.DirectChat
+import com.spint.app.model.DirectChatApiResponse
+import com.spint.app.model.DirectChatRequest
+import com.spint.app.model.GetDropProfileResponseModel
+import com.spint.app.model.Event
+import com.spint.app.model.EventResponseDTO
+import com.spint.app.model.ImageUploadResponse
+import com.spint.app.model.AllEventsResponseDTO
+import com.spint.app.model.AllPingsResponseDTO
+import com.spint.app.model.CreatePingResponse
+import com.spint.app.model.EventDetailsResponse
+import com.spint.app.model.PremiumEventResponseDTO
+import com.spint.app.model.pings.PingRequestDto
+import com.spint.app.model.pings.PingResponse
+import com.spint.app.network.ApiService
+import com.spint.app.screens._4profile.uriToMultipart
+import com.spint.app.utils.AllPingsResponse
+import com.spint.app.utils.ApiResponse
+import dagger.hilt.android.scopes.ViewModelScoped
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.withContext
+import retrofit2.Response
+import javax.inject.Inject
+
+@ViewModelScoped
+class EventsRepository @Inject constructor(private val api: ApiService) {
+
+    fun setLocationForDirectChat(directChat: DirectChatRequest):Flow<ApiResponse<DirectChat>> = flow {
+        emit(api.setLocationForDirectChat(directChat))
+    }.flowOn(Dispatchers.IO)
+    suspend fun getAllDirectChatUsers(userId:String,lat:Double, long:Double, page:Int): Response<DirectChatApiResponse> {
+        return api.getDirectChatUsers(userId,lat,long,page)
+    }
+
+    fun removeUserFromDirectChat(id: String):Flow<ApiResponse<String>> = flow {
+        emit(api.removeUserFromDirectChat(id))
+    }.flowOn(Dispatchers.IO)
+
+    fun sendPremiumCreateEventData(event: Event): Flow<PremiumEventResponseDTO> = flow  {
+        emit(api.premiumCreateEvent(event))
+    }.flowOn(Dispatchers.IO)
+
+    suspend fun getAllDropProfiles(page:Int): Response<GetDropProfileResponseModel> {
+        return api.getAllDropProfiles(page)
+    }
+
+   suspend fun createEvent(data:Event):Flow<EventResponseDTO> = flow {
+       emit(api.createEvent(data))
+   }.flowOn(Dispatchers.IO)
+    fun getAllEvents(): Flow<AllEventsResponseDTO> = flow {
+        emit(api.getAllEvents())
+    }.flowOn(Dispatchers.IO)
+
+    fun getUserEvents(id:String): Flow<AllEventsResponseDTO> = flow {
+        emit(api.getUserEvents(id))
+    }.flowOn(Dispatchers.IO)
+
+    fun getEventDetails(id: String): Flow<EventDetailsResponse> = flow {
+        emit(api.getEventDetails(id))
+    }.flowOn(Dispatchers.IO)
+
+    fun upvoteEvent(id: String): Flow<String> = flow {
+        emit(api.upvoteEvent(id))
+    }.flowOn(Dispatchers.IO)
+
+    fun getUserPings(id:String): Flow<AllPingsResponseDTO> = flow {
+        emit(api.getUserPings(id))
+    }.flowOn(Dispatchers.IO)
+    fun getUserDropProfiles(id:String): Flow<GetDropProfileResponseModel> = flow {
+        emit(api.getUserDropProfiles(id))
+    }.flowOn(Dispatchers.IO)
+
+
+    suspend fun uploadImage(imageUri: Uri, context: Context): Flow<ImageUploadResponse> = flow {
+        emit(withContext(Dispatchers.IO) {
+            val filePart = uriToMultipart(imageUri, context)
+            api.uploadImage(filePart) })
+    }.flowOn(Dispatchers.IO)
+
+    suspend fun createPing(data:PingRequestDto):Flow<CreatePingResponse> = flow {
+        emit(api.createPing(data))
+    }.flowOn(Dispatchers.IO)
+
+    suspend fun getAllPings(page:Int): AllPingsResponse<List<PingResponse>> {
+        return api.getAllPings(page)
+    }
+
+
+}
+
+//data class DataOrException<T,Boolean,E:Exception>(
+//    var data:T?=null,
+//    var loading:Boolean?=null,
+//    var e:E?=null
+//)
+
+sealed class Resource<T>(val data:T?=null,val message:String?=null){
+    class Empty<T> : Resource<T>()
+    class Success<T>(data:T):Resource<T>(data)
+    class Error<T>(message:String?,data: T?=null):Resource<T>(data,message)
+    class Loading<T>(data:T):Resource<T>(data)
+
+}

@@ -10,11 +10,11 @@ plugins {
 }
 
 android {
-    namespace 'com.example.finalapp'
+    namespace 'com.spint.app'
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.example.finalapp"
+        applicationId "com.spint.app"
         minSdk 24
         targetSdk 34
         versionCode 1

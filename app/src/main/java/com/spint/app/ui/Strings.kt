@@ -1,0 +1,15 @@
+package com.spint.app.ui
+
+import com.spint.app.testing.TabItem
+
+const val API_KEY="AIzaSyDSYQOpx5KWQilelGSNJdideUwj53VxAKI"
+
+const val imagePrefix="https://vector-app-bucket-v2.s3.ap-south-1.amazonaws.com/";
+
+
+val TAB_ITEMS = listOf(
+    TabItem("Flash Posts"),
+    TabItem("Nearby"),
+    TabItem("Dropzone")
+)
+const val imagePickerText="Click to capture or choose an image!"
