@@ -117,7 +117,7 @@ fun XHamsLiveScreenWrapper(
                             modifier = modifier.weight(1f)
                         ) { page ->
                             val event = eventList[page]
-                            XHamLive(eventResponse = event)
+                            PingsDetailsScreen(eventResponse = event)
                         }
                     }
                 }
@@ -131,7 +131,7 @@ fun XHamsLiveScreenWrapper(
     }
 }
 @Composable
-fun XHamLive(eventResponse: EventResponse) {
+fun PingsDetailsScreen(eventResponse: EventResponse) {
     val context = LocalContext.current
     val window = (context as Activity).window
     WindowCompat.setDecorFitsSystemWindows(window, false)

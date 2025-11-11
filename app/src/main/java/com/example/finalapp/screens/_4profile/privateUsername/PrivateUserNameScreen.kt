@@ -346,6 +346,7 @@ fun PrivatePingRowItem(title:String,des:String) {
 }
 
 @Composable
-fun dynamicText(text:String,fontSize:Int=14,fontFamily: FontFamily=Constants.FONT_MEDIUM,color: Color= Color.White) {
-    Text(text = text, fontSize = fontSize.sp, fontFamily = fontFamily, color = color)
+fun dynamicText(text:String,fontSize:Int=14,fontFamily: FontFamily=Constants.FONT_MEDIUM,color: Color= Color.White,lineHeight:Int=18) {
+    Text(text = text, fontSize = fontSize.sp, fontFamily = fontFamily, color = color, lineHeight = lineHeight.sp)
 }
+

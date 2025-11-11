@@ -65,12 +65,12 @@ fun NoEventsFoundScreen(backgroundColor:Color,error:String,showButton:Boolean=fa
 
 
 @Composable
-fun NoPingsFoundScreen(backgroundColor:Color=Constants.HOME_TOP_BAR_COLOR,error:String="Error getting pings",showButton:Boolean=false,onRetryClicked:()->Unit ={}) {
+fun NoPingsFoundScreen(backgroundColor:Color=Constants.HOME_TOP_BAR_COLOR,error:String="Something went wrong!",showButton:Boolean=false,onRetryClicked:()->Unit ={}) {
     Surface(modifier = Modifier.fillMaxSize(), color = backgroundColor) {
-        Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.spacedBy(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
 
-
-                    Text(text = "Error getting pings!", fontFamily = Constants.FONT_MEDIUM, fontSize = 16.sp, color = Color.LightGray)
+                   Image(painter = painterResource(id = R.drawable.no_internet), contentDescription ="", modifier = Modifier.size(100.dp) )
+                    Text(text = error, fontFamily = Constants.FONT_MEDIUM, fontSize = 16.sp, color = Color.LightGray)
                     Button(onClick = { onRetryClicked() }, colors = ButtonDefaults.buttonColors(backgroundColor= Color.White, contentColor = Color.DarkGray)) {
                         Text(text = "Retry", fontFamily = Constants.FONT_MEDIUM, fontWeight = FontWeight.SemiBold, fontSize = 12.sp)
                     }

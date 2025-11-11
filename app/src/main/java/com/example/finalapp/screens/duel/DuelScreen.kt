@@ -1,10 +1,11 @@
-package com.example.finalapp.screens.webrtc
+package com.example.finalapp.screens.duel
 
 import android.Manifest
 import android.app.Activity
 import android.content.pm.PackageManager
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -24,8 +25,10 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
@@ -58,6 +61,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.example.finalapp.R
 import com.example.finalapp.utils.constants.Constants
 import kotlinx.coroutines.delay
@@ -66,7 +71,7 @@ import org.webrtc.SurfaceViewRenderer
 
 
 @Composable
-fun DuelScreen() {
+fun DuelScreen(navController: NavHostController) {
     val context = LocalContext.current
     val activity = context as Activity
 
@@ -128,7 +133,7 @@ fun DuelScreen() {
     var isVisible by remember { mutableStateOf(true) }
 
     // Used to trigger the 5s countdown when visible changes
-    LaunchedEffect(isVisible) {
+    LaunchedEffect(key1=isVisible , key2 = isConnected) {
         if (isVisible) {
             // wait 5 seconds, then hide
             delay(5000)
@@ -159,13 +164,15 @@ fun DuelScreen() {
                 navigationIcon = {
                     Image(painterResource(id = R.drawable.app_icon_dynamic), contentDescription = "", modifier = Modifier.size(44.dp))
                    // Image(painter = painterResource(id = R.drawable.baseline_arrow_back_24), contentDescription ="", modifier = Modifier.size(24.dp) , colorFilter = ColorFilter.tint(Color.White) )
-                }
+                },
+                modifier = Modifier.statusBarsPadding()
             )
         }},
         bottomBar = {
             if (!isConnected){
             Column(
                 modifier = Modifier
+                    .navigationBarsPadding()
                     .fillMaxWidth()
                     .height(90.dp)
                     .background(Color.Black.copy(alpha = 0.9f))
@@ -235,9 +242,9 @@ fun DuelScreen() {
             }
         }, floatingActionButton = {
             if(isConnected){
-                DuelOptions(isVisible) { isVisible = true }
-
-            }}, floatingActionButtonPosition = androidx.compose.material.FabPosition.Center
+                DuelOptions(isVisible, onCloseClicked ={webRTCManager.release();navController.navigateUp()}) { isVisible = true }
+            }
+                                  }, floatingActionButtonPosition = androidx.compose.material.FabPosition.Center
     ) { padding ->
         Box(
             modifier = Modifier
@@ -247,18 +254,25 @@ fun DuelScreen() {
                 .background(Constants.HOME_TOP_BAR_COLOR),
             contentAlignment = Alignment.Center
         ) {
+            BackHandler(true) {
+                webRTCManager.release()
+                navController.navigateUp()
+            }
             when {
                 !permissionsGranted -> {
                     Text("Please grant camera and mic permissions to continue.", color = Color.White)
                 }
 
                 isConnected -> {
-                    // Remote full screen
+
+                    // Remote user view screen
                     AndroidView(factory = {
                         (remoteView.parent as? ViewGroup)?.removeView(remoteView)
                         remoteView
                     }, modifier = Modifier.fillMaxSize())
-                    Box(modifier = Modifier.align(Alignment.CenterEnd).wrapContentSize()){
+                    Box(modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .wrapContentSize()){
                         ScreenOptions(){
                             currentScreen=it
                         }
@@ -266,14 +280,11 @@ fun DuelScreen() {
                     
 
 
-                    // lower preview
+                    // current user screen
+
                     Box(
                         modifier = Modifier
                             .clickable { isVisible = true }
-//                            .graphicsLayer {
-//                                shape = RoundedCornerShape(50.dp)
-//                                clip = true
-//                            }
                             .align(Alignment.BottomEnd)
                             .fillMaxWidth()
                             .fillMaxHeight(currentScreen.flo.toFloat())
@@ -288,12 +299,7 @@ fun DuelScreen() {
                         } , modifier = Modifier.fillMaxSize())
                         AnimatedVisibility(
                             visible = isVisible,
-                            enter = fadeIn(
-                                animationSpec = tween(
-                                    durationMillis = 500, // fade-in duration
-                                    easing = LinearEasing
-                                )
-                            ),
+                            enter = fadeIn(animationSpec = tween(durationMillis = 500, easing = LinearEasing)),
                             exit = fadeOut(
                                 animationSpec = tween(
                                     durationMillis = 700, // fade-out duration
@@ -322,76 +328,80 @@ fun DuelScreen() {
                 }
 
                 else -> {
-                    // Show only local preview
-                    Column(modifier = Modifier.fillMaxSize()) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .fillMaxHeight(0.7f)
-                                // .size(240.dp, 320.dp)
-                                .background(Color.DarkGray),
-                            contentAlignment = Alignment.TopCenter
-                        ) {
-                            AndroidView(
-                                factory = {
-                                    (localView.parent as? ViewGroup)?.removeView(localView)
-                                    localView
-                                },
-                                modifier = Modifier.fillMaxSize()
-                            )
-
-                            // 🟢 2. Overlay icons on top-right
-                            Column(
-                                modifier = Modifier
-                                    .align(Alignment.BottomEnd)
-                                    // .fillMaxHeight()
-                                    .width(60.dp)
-                                    .padding(8.dp), // optional
-                                verticalArrangement = Arrangement.spacedBy(30.dp),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                DuelCameraEdit(R.drawable.edit_new)
-                                DuelCameraEdit(R.drawable.camera)
-                                DuelCameraEdit(R.drawable.filter)
-                                DuelCameraEdit(R.drawable.menu,false,20)
-
-                            }
-                        }
-                        Box(modifier = Modifier
-                            .padding(10.dp)
-                            .fillMaxWidth()
-                            .wrapContentHeight()) {
-                            Column(
-                                Modifier
-                                    .fillMaxWidth()
-                                    .wrapContentHeight(), horizontalAlignment = Alignment.Start, verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                                Text(text = "Looking For:", fontFamily = Constants.FONT_LIGHT, fontSize = 14.sp,color= Color.White)
-                                Row(
-                                    Modifier
-                                        .fillMaxWidth()
-                                        .wrapContentHeight(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(20.dp)) {
-                                    val listOfTypes= listOf<String>("Male","Female","Others","Random")
-                                    listOfTypes.forEach {
-                                        Card(Modifier.wrapContentSize(), backgroundColor = Color.DarkGray, contentColor = Color.White) {
-                                            Text(text = it, fontFamily = Constants.FONT_LIGHT, fontSize = 18.sp,color= Color.White, modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp))
-                                        }
-                                    }
-                                }
-                                Spacer(modifier = Modifier.height(3.dp))
-                                Text(text = "Select a Mood!", fontFamily = Constants.FONT_LIGHT, fontSize = 16.sp,color= Color.White)
-                                MoodSelector()
-
-                            }
-
-                        }
-
-                    }
+                    DuelFirstScreenLocal(localView)
                 }
             }
         }
     }
 }
 
+@Composable
+fun DuelFirstScreenLocal(localView: SurfaceViewRenderer) {
+
+    Column(modifier = Modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.7f)
+                // .size(240.dp, 320.dp)
+                .background(Color.DarkGray),
+            contentAlignment = Alignment.TopCenter
+        ) {
+            AndroidView(
+                factory = {
+                    (localView.parent as? ViewGroup)?.removeView(localView)
+                    localView
+                },
+                modifier = Modifier.fillMaxSize()
+            )
+
+            // 🟢 2. Overlay icons on top-right
+            Column(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    // .fillMaxHeight()
+                    .width(60.dp)
+                    .padding(8.dp), // optional
+                verticalArrangement = Arrangement.spacedBy(30.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                DuelCameraEdit(R.drawable.edit_new)
+                DuelCameraEdit(R.drawable.camera)
+                DuelCameraEdit(R.drawable.filter)
+                DuelCameraEdit(R.drawable.menu,false,20)
+
+            }
+        }
+        Box(modifier = Modifier
+            .padding(10.dp)
+            .fillMaxWidth()
+            .wrapContentHeight()) {
+            Column(
+                Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight(), horizontalAlignment = Alignment.Start, verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text(text = "Looking For:", fontFamily = Constants.FONT_LIGHT, fontSize = 14.sp,color= Color.White)
+                Row(
+                    Modifier
+                        .fillMaxWidth()
+                        .wrapContentHeight(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+                    val listOfTypes= listOf<String>("Male","Female","Others","Random")
+                    listOfTypes.forEach {
+                        Card(Modifier.wrapContentSize(), backgroundColor = Color.DarkGray, contentColor = Color.White) {
+                            Text(text = it, fontFamily = Constants.FONT_LIGHT, fontSize = 18.sp,color= Color.White, modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp))
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(3.dp))
+                Text(text = "Select a Mood!", fontFamily = Constants.FONT_LIGHT, fontSize = 16.sp,color= Color.White)
+                MoodSelector()
+
+            }
+
+        }
+
+    }
+}
 @Composable
 fun ScreenOptions(onScreenClicked: (screen:SCREEN) -> Unit) {
     val listOfScreenOrientation= listOf<ScreenOrientation>(
@@ -405,7 +415,10 @@ fun ScreenOptions(onScreenClicked: (screen:SCREEN) -> Unit) {
         .width(60.dp), verticalArrangement = Arrangement.spacedBy(20.dp), horizontalAlignment = Alignment.CenterHorizontally) {
         listOfScreenOrientation.forEach {
             Column(modifier = Modifier.wrapContentSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-                Image(painter = painterResource(id = it.image), contentDescription = "", Modifier.size(30.dp).clickable { onScreenClicked(it.screen) }, colorFilter = ColorFilter.tint(Color.LightGray))
+                Image(painter = painterResource(id = it.image), contentDescription = "",
+                    Modifier
+                        .size(30.dp)
+                        .clickable { onScreenClicked(it.screen) }, colorFilter = ColorFilter.tint(Color.LightGray))
                 Text(text = it.screen.screen_name, fontFamily = Constants.FONT_MEDIUM, fontSize =10.sp,color= Color.LightGray.copy(alpha = 0.9f))
             }
         }
@@ -422,7 +435,7 @@ data class DualScreenOptions(
     val name:String
 )
 @Composable
-fun DuelOptions(isVisible:Boolean,onScreenClicked:()->Unit) {
+fun DuelOptions(isVisible:Boolean,onCloseClicked:()->Unit,onScreenClicked:()->Unit) {
     val listOfImages= listOf<DualScreenOptions>(DualScreenOptions(R.drawable.cross,"end"),
         DualScreenOptions(R.drawable.add,"+friend"),
         DualScreenOptions(R.drawable.flip_camera_android_24,"flip"),
@@ -453,6 +466,11 @@ fun DuelOptions(isVisible:Boolean,onScreenClicked:()->Unit) {
             Column(modifier = Modifier.wrapContentSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
                 Image(painter = painterResource(id =it.id), contentDescription = "", modifier = Modifier
                     .padding(horizontal = 10.dp)
+                    .clickable {
+                        if (it.name == "end") {
+                            onCloseClicked()
+                        }
+                    }
                     .size(36.dp), colorFilter = ColorFilter.tint(Color.White))
                 Text(text = it.name, fontFamily = Constants.FONT_LIGHT, fontSize = 9.sp,color= Color.White)
             }

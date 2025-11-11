@@ -76,6 +76,7 @@ import com.example.finalapp.R
 import com.example.finalapp.model.DirectChat
 import com.example.finalapp.model.DirectChatRequest
 import com.example.finalapp.navigation.SCREENS
+import com.example.finalapp.screens._4profile.privateUsername.dynamicText
 import com.example.finalapp.screens.dialogBox.DialogLoading
 import com.example.finalapp.ui.imagePrefix
 import com.example.finalapp.screens.common.CommonErrorScreen
@@ -136,34 +137,7 @@ fun DirectChatScreen(
                     Box(modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentHeight()){
-                        if(checked) {
-                            Text(
-                                text = "Verified users near you",
-                                fontFamily = Constants.FONT_MEDIUM,
-                                color = Constants.HOME_TOP_BAR_ICON_COLOR,
-                                fontWeight = FontWeight.Normal,
-                                fontSize = 20.sp,
-                                modifier = Modifier
-                                    .align(Alignment.TopStart)
-                                    .padding(top = 10.dp, start = 10.dp)
-                            )
-                            Switch(
-                                checked = checked,
-                                onCheckedChange = {
-                                    eventsViewModel.shareProfileClicked.value = !eventsViewModel.shareProfileClicked.value
-                                    remove=!remove
-                                },
-                                colors = SwitchDefaults.colors(
-                                    checkedThumbColor = floatingActionBtnColor,// MaterialTheme.colorScheme.primary,
-                                    checkedTrackColor = Color(0xFFFFFFFF),
-                                    uncheckedThumbColor = Color(0xFFFFFFFF),
-                                    uncheckedTrackColor = Color(0xFFFFFFFF),
-                                ),
-                                modifier = Modifier
-                                    .align(Alignment.TopEnd)
-                                    .padding(end = 16.dp)
-                            )
-                        }else{
+                        if(!checked) {
 
 //                            Column(modifier = Modifier
 //                                .align(Alignment.TopEnd)
@@ -193,7 +167,12 @@ fun DirectChatScreen(
                         chatViewModel ,
                         navController,
                         checked,
-                        onOmegleClicked = {navController.navigate(SCREENS.DUEL.route)}
+                        remove,
+                        onCheckedChange = {
+                            eventsViewModel.shareProfileClicked.value = !eventsViewModel.shareProfileClicked.value
+                            remove=!remove
+                        },
+                        onJoinDuelClicked = {navController.navigate(SCREENS.DUEL.route)}
                     ) {
                         eventsViewModel.shareProfileClicked.value = true
                     }
@@ -212,13 +191,15 @@ fun DirectChatUI(
     chatViewModel: ChatViewModel,
     navController: NavHostController,
     checked: Boolean,
-    onOmegleClicked:()->Unit,
+    remove:Boolean,
+    onCheckedChange: () -> Unit,
+    onJoinDuelClicked:()->Unit,
     onShareProfileClicked: () -> Unit
 ) {
     if (!checked ) {
-        ShareProfileForDirectChat(address = address,onOmegleClicked,onShareProfileClicked)
+        ShareProfileForDirectChat(address = address,onJoinDuelClicked,onShareProfileClicked)
     } else {
-        DirectChatProfiles(scrollBehavior,navController, eventsViewModel,chatViewModel )
+        DirectChatProfiles(scrollBehavior,navController, eventsViewModel,chatViewModel, onJoinDuelClicked = onJoinDuelClicked, onCheckedChange = onCheckedChange )
     }
 
 
@@ -230,6 +211,8 @@ fun DirectChatProfiles(
     navController: NavHostController,
     eventsViewModel: EventsViewModel,
     chatViewModel:ChatViewModel,
+    onJoinDuelClicked:()->Unit,
+    onCheckedChange:()->Unit
 ) {
     val chatState by eventsViewModel.directChatResponse.collectAsState()
     val directChatObjectList = eventsViewModel.nearByUsersList.collectAsLazyPagingItems()
@@ -267,6 +250,40 @@ fun DirectChatProfiles(
         is RequestState.Success -> {
             LazyColumn( //modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
             ) {
+                item {
+                    Row(
+                        Modifier
+                            .padding(horizontal = 10.dp)
+                            .fillMaxWidth()
+                            .wrapContentHeight(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+                        Text(
+                            text = if(directChatObjectList.itemCount !=0) "Verified users near you" else  "",
+                            fontFamily = Constants.FONT_LIGHT,
+                            color = Constants.HOME_TOP_BAR_ICON_COLOR,
+                            fontWeight = FontWeight.Normal,
+                            fontSize = 20.sp,
+                            modifier = Modifier
+                               // .padding(top = 10.dp, start = 10.dp)
+                        )
+                        Switch(
+                            checked = true,
+                            onCheckedChange = {onCheckedChange()},
+                            colors = SwitchDefaults.colors(
+                                checkedThumbColor = floatingActionBtnColor,// MaterialTheme.colorScheme.primary,
+                                checkedTrackColor = Color(0xFFFFFFFF),
+                                uncheckedThumbColor = Color(0xFFFFFFFF),
+                                uncheckedTrackColor = Color(0xFFFFFFFF),
+                            ),
+                            modifier = Modifier.size(80.dp)
+                        )
+
+                    }
+                }
+                item {
+                    if(directChatObjectList.itemCount ==0){
+                        NoDirectChatUsersFound(onJoinDuelClicked)
+                    }
+                }
                 items(directChatObjectList) {directChatObject->
                     if(directChatObject != null) {
 
@@ -290,6 +307,8 @@ fun DirectChatProfiles(
         else -> {}
     }
 }
+
+
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
@@ -489,7 +508,10 @@ fun ShareProfileForDirectChat(address:String,onOmegleClicked:()->Unit,onSharePro
                             color = Color.White
                         )
                     }
-                    Divider(Modifier.fillMaxWidth().padding(top = 20.dp), thickness = 0.5.dp, color = Color.Gray)
+                    Divider(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(top = 20.dp), thickness = 0.5.dp, color = Color.Gray)
                     Text(
                         text = "or",
                         fontSize = 12.sp,
@@ -535,3 +557,51 @@ fun ShareProfileForDirectChat(address:String,onOmegleClicked:()->Unit,onSharePro
 
     }
 }
+
+@Composable
+fun NoDirectChatUsersFound(onJoinDuelClicked:()->Unit) {
+    Box(modifier = Modifier
+        .fillMaxWidth()
+        .wrapContentHeight()){
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight(), verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally) {
+            Image(painter = painterResource(id = R.drawable.smiley), contentDescription ="", modifier = Modifier.size(100.dp).padding(bottom = 20.dp) )
+        dynamicText(text = "No users found near you!", fontSize = 20, fontFamily = Constants.FONT_MEDIUM, lineHeight = 12)
+        dynamicText(text = "Try the Duel instead",fontSize = 16, fontFamily = Constants.FONT_LIGHT)
+            Spacer(modifier = Modifier.height(30.dp))
+        Box(modifier = Modifier
+            .fillMaxWidth(0.6f)
+            .wrapContentHeight()
+            .clip(shape = RoundedCornerShape(12.dp))
+            .background(
+                brush = Brush.linearGradient(
+                    colors = listOf(
+                        Color(0xFF1976D2), Color(0xFF460761)
+                    )
+                )
+            )) {
+
+            Row(modifier = Modifier
+                .clickable { onJoinDuelClicked() }
+                .fillMaxWidth()
+                .height(50.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center) {
+                Image(
+                    painter = painterResource(id = androidx.core.R.drawable.ic_call_answer_video),
+                    contentDescription = "",
+                    modifier = Modifier.size(40.dp),
+                    colorFilter = ColorFilter.tint(Color.White)
+                )
+                Spacer(modifier = Modifier.width(20.dp))
+                Text(
+                    text = "Join a Duel",
+                    fontSize = 16.sp,
+                    fontFamily = Constants.FONT_LIGHT,
+                    color = Color.White
+                )
+
+            }
+    }
+}}}

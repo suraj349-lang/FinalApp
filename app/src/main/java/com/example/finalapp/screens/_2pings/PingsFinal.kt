@@ -23,6 +23,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -36,6 +37,7 @@ import com.example.finalapp.screens._1home.EventAndPingDesigns.flashPosts.FlashP
 import com.example.finalapp.screens._1home.EventAndPingDesigns.flashPosts.PrivateFlashPostScreen
 import com.example.finalapp.screens._3createEventOrPing.CreateEventOrPingBottomSheet
 import com.example.finalapp.screens.common.NoPingsFoundScreen
+import com.example.finalapp.ui.theme.floatingActionBtnColor
 import com.example.finalapp.utils.UserLocationObject
 import com.example.finalapp.utils.constants.Constants
 import com.example.finalapp.viewmodels.EventsViewModel
@@ -95,11 +97,6 @@ fun PingScreenFinal(
         )
     }
     Scaffold(
-//        topBar = {
-//            PingsTopBar(backgroundColor = Constants.HOME_TOP_BAR_COLOR, false,{navController.navigateUp()}) {
-//                searchOn = !searchOn
-//            }
-//        },
         content = {
             Surface(modifier = Modifier
                 .fillMaxSize()
@@ -313,6 +310,61 @@ fun PingScreenFinal(
                         //PingsScreenUI(navController = navController, eventsViewModel = eventsViewModel)
 
                         // val number=Random.nextInt()
+                    allPingsState?.apply {
+                        when {
+                            loadState.refresh is LoadState.Loading -> {
+                                item {
+                                    Surface(Modifier.fillMaxSize()) {
+                                        Column(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .fillMaxHeight(0.9f)
+                                                .padding(top = 2.dp),
+                                            horizontalAlignment = Alignment.CenterHorizontally
+                                        ) {
+                                            LinearProgressIndicator(modifier = Modifier.fillMaxWidth(), color = floatingActionBtnColor, strokeCap = StrokeCap.Round, trackColor = Color.Yellow)
+                                        }
+                                        showLoader = true
+                                    }
+                                }
+                            }
+
+                            loadState.append is LoadState.Loading -> {
+                                item {
+                                    Surface(Modifier.fillMaxSize()) {
+                                        Column(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .fillMaxHeight(0.9f)
+                                                .padding(top = 2.dp),
+                                            horizontalAlignment = Alignment.CenterHorizontally
+                                        ) {
+                                            LinearProgressIndicator(modifier = Modifier.fillMaxWidth(), color = floatingActionBtnColor, strokeCap = StrokeCap.Round, trackColor = Color.Yellow)
+                                        }
+                                        showLoader = true
+                                    }
+                                }
+                            }
+
+                            loadState.refresh is LoadState.Error -> {
+                                showLoader = false
+                                val error = (loadState.refresh as LoadState.Error).error
+                                item {
+                                    Log.e("Error in getting pings", "PingsScreenUI: $error ")
+                                    Column(
+                                        Modifier
+                                            .padding(top = 200.dp)
+                                            .fillMaxWidth()
+                                            .fillMaxHeight(0.9f), verticalArrangement = Arrangement.Center) {
+                                        NoPingsFoundScreen(error = "Error getting pings.") {
+                                            eventsViewModel.getAllPings("")
+                                        }
+                                    }
+
+                                }
+                            }
+                        }
+                    }
                         allPingsState?.itemCount?.let {count->
                             items(count) { index ->
                                 val item = allPingsState[index]
@@ -340,32 +392,6 @@ fun PingScreenFinal(
 
                                     Spacer(modifier = Modifier.height(6.dp))
                                  //  Divider(modifier = Modifier.fillMaxWidth(), thickness = 0.5.dp, color = Color.Gray.copy(alpha = 0.6f))
-                                }
-                            }
-                        }
-                        allPingsState?.apply {
-                            when {
-                                loadState.refresh is LoadState.Loading -> {
-                                    item {
-                                        showLoader = true
-                                    }
-                                }
-
-                                loadState.append is LoadState.Loading -> {
-                                    item {
-                                        showLoader = true
-                                    }
-                                }
-
-                                loadState.refresh is LoadState.Error -> {
-                                    showLoader = false
-                                    val error = (loadState.refresh as LoadState.Error).error
-                                    item {
-                                        Log.e("Error in getting pings", "PingsScreenUI: $error ")
-                                        NoPingsFoundScreen(error = "Error getting pings.") {
-                                             eventsViewModel.getAllPings("")
-                                        }
-                                    }
                                 }
                             }
                         }

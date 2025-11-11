@@ -31,8 +31,7 @@ import androidx.navigation.NavHostController
 import com.example.finalapp.R
 import com.example.finalapp.model.Event
 import com.example.finalapp.model.EventResponse
-import com.example.finalapp.screens._1home.EventAndPingDesigns.events.templates.databased.EventsAndChildPostsParent
-import com.example.finalapp.screens._1home.EventAndPingDesigns.events.templates.xhmaslive.XHamLive
+import com.example.finalapp.screens._1home.EventAndPingDesigns.events.templates.xhmaslive.PingsDetailsScreen
 import com.example.finalapp.screens._3createEventOrPing.CreateEventOrPingBottomSheet
 import com.example.finalapp.screens.common.NoDataFound
 import com.example.finalapp.screens.common.CommonErrorScreen
@@ -110,7 +109,7 @@ fun EventAndChildPostWrapper(
 //                                navController = navController,
 //                                onUpVotesClicked = { eventsViewModel.upvoteEvent(it) }
 //                            )
-                            XHamLive(eventResponse = event)
+                            PingsDetailsScreen(eventResponse = event)
                         }
 
                     } else {

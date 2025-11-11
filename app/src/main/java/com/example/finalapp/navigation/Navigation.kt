@@ -70,7 +70,7 @@ import com.example.finalapp.screens.onboarding.screen.WelcomeScreen
 import com.example.finalapp.screens.pings.EditScreen
 import com.example.finalapp.screens.pings.templates.PingTemplateSelector
 import com.example.finalapp.screens.pings.templates.visualPingTemplates
-import com.example.finalapp.screens.webrtc.DuelScreen
+import com.example.finalapp.screens.duel.DuelScreen
 import com.example.finalapp.viewmodels.ImageUploadViewModel
 import com.example.finalapp.viewmodels.NotificationViewModel
 import com.example.finalapp.viewmodels.SettingsViewModel
@@ -291,7 +291,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
             CommentsScreen()
         }
         composable(SCREENS.DUEL.route){
-            DuelScreen()
+            DuelScreen(navController)
         }
 
 

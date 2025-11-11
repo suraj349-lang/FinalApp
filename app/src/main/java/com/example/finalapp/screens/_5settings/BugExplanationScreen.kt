@@ -154,7 +154,7 @@ fun PrivacyPolicyText() {
         append("To give us more context about your report, it'll include some information about your device and ${Constants.APP_NAME} account. To learn what info we use and how, ")
 
         // Mark the "Privacy policy" part as clickable with a tag
-        pushStringAnnotation(tag = "privacy_policy", annotation = "https://www.yourprivacyurl.com")
+        pushStringAnnotation(tag = "privacy_policy", annotation = "") /*TODO*/
         pushStyle(style = SpanStyle(color = floatingActionBtnColor, fontWeight = FontWeight.Bold))
         // Style the clickable "Privacy policy" text as blue and bold
         append("Privacy policy")

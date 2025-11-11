@@ -1,4 +1,4 @@
-package com.example.finalapp.screens.webrtc
+package com.example.finalapp.screens.duel
 
 import android.content.Context
 import android.os.Handler
@@ -28,6 +28,11 @@ class WebRTCManager(
     private var remoteVideoTrack: VideoTrack? = null
     private var audioSource: AudioSource? = null
     private var partnerId: String? = null
+
+    // inside class
+    private val pendingRemoteCandidates = mutableListOf<IceCandidate>()
+    private var isRemoteDescriptionSet = false
+
 
     /** Initialize factory + local tracks */
     fun initFactoryAndLocalTracks() {
@@ -63,35 +68,104 @@ class WebRTCManager(
 
     /** Socket signaling */
     fun setupSocket() {
-        socket = IO.socket("http://192.168.1.9:5002")
+        socket = IO.socket("http://${Constants.IP_ADD}:5002")
         socket.connect()
 
         socket.on(Socket.EVENT_CONNECT) { Log.d(tag, "Connected to server") }
 
         socket.on("matched") { args ->
-            val partnerJson = args[0] as JSONObject
-            partnerId = partnerJson.getString("partnerId")
-            Log.d(tag, "Matched with $partnerId")
+            val data = args[0] as JSONObject
+            partnerId = data.getString("partnerId")
+            val shouldOffer = data.optBoolean("shouldOffer", false)
+
             runOnMainThread {
                 createPeerConnection()
-                createAndSendOffer()
+                if (shouldOffer) {
+                    createAndSendOffer()
+                }
             }
         }
 
+//        socket.on("offer") { args ->
+//            val data = args[0] as JSONObject
+//            val offer = data.getJSONObject("offer")
+//            val sdp = offer.getString("sdp")
+//            val type = offer.getString("type")
+//            runOnMainThread {
+//                if (peerConnection == null) createPeerConnection()
+//                peerConnection?.setRemoteDescription(
+//                    SdpObserverAdapter(),
+//                    SessionDescription(SessionDescription.Type.fromCanonicalForm(type), sdp)
+//                )
+//                createAndSendAnswer()
+//            }
+//        }
+//        socket.on("offer") { args ->
+//            val data = args[0] as JSONObject
+//            val offer = data.getJSONObject("offer")
+//            val sdp = offer.getString("sdp")
+//            val type = offer.getString("type")
+//
+//            runOnMainThread {
+//                if (peerConnection == null) {
+//                    createPeerConnection()
+//                    // ✅ Make sure local tracks are attached
+//                    localVideoTrack?.let { peerConnection?.addTrack(it) }
+//                    localAudioTrack?.let { peerConnection?.addTrack(it) }
+//                }
+//
+//                val remoteDesc = SessionDescription(SessionDescription.Type.fromCanonicalForm(type), sdp)
+//                peerConnection?.setRemoteDescription(SdpObserverAdapter(), remoteDesc)
+//
+//                // ✅ Wait until remote description is set before answering
+//                createAndSendAnswer()
+//            }
+//        }
         socket.on("offer") { args ->
             val data = args[0] as JSONObject
             val offer = data.getJSONObject("offer")
             val sdp = offer.getString("sdp")
             val type = offer.getString("type")
+
             runOnMainThread {
-                if (peerConnection == null) createPeerConnection()
-                peerConnection?.setRemoteDescription(
-                    SdpObserverAdapter(),
-                    SessionDescription(SessionDescription.Type.fromCanonicalForm(type), sdp)
-                )
-                createAndSendAnswer()
+                if (peerConnection == null) {
+                    createPeerConnection()
+                    // ensure local tracks are attached
+                    localVideoTrack?.let { peerConnection?.addTrack(it) }
+                    localAudioTrack?.let { peerConnection?.addTrack(it) }
+                }
+
+                // reset candidate buffer and flag for this negotiation
+                pendingRemoteCandidates.clear()
+                isRemoteDescriptionSet = false
+
+                val remoteDesc = SessionDescription(SessionDescription.Type.fromCanonicalForm(type), sdp)
+                // Use a SdpObserverAdapter which calls createAndSendAnswer() only onSetSuccess
+                peerConnection?.setRemoteDescription(object : SdpObserverAdapter() {
+                    override fun onSetSuccess() {
+                        super.onSetSuccess()
+                        Log.d(tag, "Remote description set successfully — creating answer")
+                        isRemoteDescriptionSet = true
+                        // flush any queued remote candidates
+                        pendingRemoteCandidates.forEach { candidate ->
+                            Log.d(tag, "Flushing queued remote candidate: $candidate")
+                            peerConnection?.addIceCandidate(candidate)
+                        }
+                        pendingRemoteCandidates.clear()
+
+                        // Now create and send the answer
+                        createAndSendAnswer()
+                    }
+
+                    override fun onSetFailure(error: String) {
+                        super.onSetFailure(error)
+                        Log.e(tag, "Failed to set remote description: $error")
+                    }
+                }, remoteDesc)
             }
         }
+
+
 
         socket.on("answer") { args ->
             val data = args[0] as JSONObject

@@ -23,12 +23,12 @@ sealed class DirectChatPagerPages(
     )
 
     object Third : DirectChatPagerPages(
-        image = R.drawable.ephermal,
+        image = R.drawable.ephemeral,
         title = "Ephemeral Chat.",
         description = "Chat will expire after 24hrs."
     )
     object Fourth : DirectChatPagerPages(
-        image = R.drawable.privacy,
+        image = R.drawable.privacy_new,
         title = "Privacy first.",
         description = "Your privacy is protected."
     )
