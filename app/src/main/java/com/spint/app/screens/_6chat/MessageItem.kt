@@ -4,6 +4,7 @@ package com.spint.app.screens._6chat
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -24,6 +25,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import com.spint.app.utils.constants.Constants
@@ -118,17 +121,17 @@ fun MessageItemUI(
     isSentByLoggedInUser: Boolean
 ) {
     val backgroundColor = if (isSentByLoggedInUser){
-        Color(0xFF797676)
-    } else{ Color(0xFFCF5630)
+        Color(0xFF727507)
+    } else{ Color(0xFF47474B) //0xFFCF5630
        }     ///    0xFF797676            0xFFCF5630
     val textColor = Color.White
     var time = ""
-    //if (timestamp != null) time = convertToIST(timestamp)
+    if (timestamp != null) time = convertToIST(timestamp)
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 12.dp, vertical = 4.dp),
+            .padding(horizontal = 12.dp).padding(bottom = 2.dp),
         horizontalArrangement = if (isSentByLoggedInUser) Arrangement.End else Arrangement.Start
     ) {
         Column(
@@ -143,7 +146,8 @@ fun MessageItemUI(
                 fontSize = 16.sp,
                 color = textColor,
                 lineHeight = 16.sp,
-                fontFamily = Constants.FONT_LIGHT
+                modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
+                fontFamily = FontFamily.Default
             )
 
             Row(
@@ -188,7 +192,7 @@ class BubbleShape(private val isSentByUser: Boolean) : Shape {
         density: Density
     ): Outline {
         return with(density) {
-            val cornerRadius = 16.dp.toPx()
+            val cornerRadius = 8.dp.toPx()
             val tailWidth = 8.dp.toPx()
             val tailHeight = 12.dp.toPx()
             val tailYOffset = 10.dp.toPx()
@@ -205,10 +209,10 @@ class BubbleShape(private val isSentByUser: Boolean) : Shape {
                     size.width - tailWidth, cornerRadius
                 )
 
-//                // Tail
-//                path.lineTo(size.width - tailWidth, tailYOffset)
-//                path.lineTo(size.width, tailYOffset - tailHeight / 2)
-//                path.lineTo(size.width - tailWidth, tailYOffset + tailHeight)
+                // Tail
+                path.lineTo(size.width - tailWidth, tailYOffset)
+                path.lineTo(size.width, tailYOffset - tailHeight / 2)
+                path.lineTo(size.width - tailWidth, tailYOffset + tailHeight)
 
                 // Right side
                 path.lineTo(size.width - tailWidth, size.height - cornerRadius)
@@ -237,10 +241,10 @@ class BubbleShape(private val isSentByUser: Boolean) : Shape {
                 path.lineTo(tailWidth + cornerRadius, size.height)
                 path.quadraticBezierTo(tailWidth, size.height, tailWidth, size.height - cornerRadius)
 
-//                // Tail
-//                path.lineTo(tailWidth, tailYOffset + tailHeight)
-//                path.lineTo(0f, tailYOffset - tailHeight / 2)
-//                path.lineTo(tailWidth, tailYOffset)
+                // Tail
+                path.lineTo(tailWidth, tailYOffset + tailHeight)
+                path.lineTo(0f, tailYOffset - tailHeight / 2)
+                path.lineTo(tailWidth, tailYOffset)
 
                 // Left side
                 path.lineTo(tailWidth, cornerRadius)

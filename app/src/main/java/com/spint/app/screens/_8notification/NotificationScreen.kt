@@ -27,6 +27,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -97,12 +98,13 @@ fun NotificationScreenUI(navController: NavHostController, viewModel:Notificatio
 @Composable
 fun NotificationTopBar(title:String="Notifications",onDeleteAllClicked:()->Unit,onBackClicked:()->Unit) {
     TopAppBar(
-        title = {Text(title, fontFamily = Constants.FONT_MEDIUM, color = Color.Black)},
+        title = {Text(title, fontFamily = Constants.FONT_MEDIUM, color = Constants.HOME_TOP_BAR_ICON_COLOR)},
         actions = { Image(painter = painterResource(id = R.drawable.delete), contentDescription ="", modifier = Modifier.padding(end=16.dp).size(24.dp).clickable { onDeleteAllClicked() } )},
-        navigationIcon = { Image(painter = painterResource(id = R.drawable.baseline_arrow_back_24), contentDescription ="", modifier = Modifier.clickable { onBackClicked() } )},
+        navigationIcon = { Image(painter = painterResource(id = R.drawable.baseline_arrow_back_24), contentDescription ="", modifier = Modifier.clickable { onBackClicked() }, colorFilter = ColorFilter.tint(
+            Constants.HOME_TOP_BAR_ICON_COLOR) )},
         modifier = Modifier
             .shadow(elevation = 60.dp,)
             .zIndex(2f),
-       // colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = Color(0xFFEEEBE4)),
+        colors = TopAppBarDefaults.topAppBarColors(containerColor = Constants.HOME_TOP_BAR_COLOR),
     )
 }

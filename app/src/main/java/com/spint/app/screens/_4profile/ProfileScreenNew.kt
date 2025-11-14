@@ -318,7 +318,7 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                                         "Logout",
                                         fontSize = 16.sp,
                                         fontFamily = Constants.FONT_MEDIUM,
-                                        color = Color.Black
+                                        color = Color.White
                                     ) },
                                     modifier = Modifier.wrapContentSize(),
                                     leadingIcon = {
@@ -347,7 +347,7 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                                         "Settings",
                                         fontSize = 16.sp,
                                         fontFamily = Constants.FONT_MEDIUM,
-                                        color = Color.Black
+                                        color = Color.White
                                     ) },
                                     modifier = Modifier.wrapContentSize(),
                                     leadingIcon = {
@@ -357,6 +357,7 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                                             modifier = Modifier
                                                 .size(20.dp),
                                             contentScale = ContentScale.Crop,
+                                            colorFilter = ColorFilter.tint(Color.White)
                                         )
                                     },
                                     onClick = {

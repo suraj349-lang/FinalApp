@@ -38,7 +38,7 @@ import com.spint.app.utils.constants.Constants
 import com.spint.app.utils.toRelativeTime
 
 
-@RequiresApi(Build.VERSION_CODES.O)
+
 @Composable
 fun NotificationItem(
     notification: NotificationEntity,
@@ -90,7 +90,8 @@ fun NotificationItem(
                             fontFamily = Constants.FONT_MEDIUM,
                             fontWeight = FontWeight.Normal,
                             fontSize = 16.sp,
-                            lineHeight = 18.sp
+                            lineHeight = 18.sp,
+                            color = Color.Black
                         )
                         Text(
                             text = notification.timeStamp.toRelativeTime(),

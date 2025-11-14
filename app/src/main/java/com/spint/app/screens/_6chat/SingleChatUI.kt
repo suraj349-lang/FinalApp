@@ -223,7 +223,7 @@ fun SingleChatScreenUI(
                         Text(text = "Type message....", fontSize = 14.sp, fontFamily = Constants.FONT_LIGHT, color = Color.Gray)
                     },
                     maxLines = 10,
-                    textStyle = TextStyle(fontSize = 14.sp, fontFamily = Constants.FONT_MEDIUM),
+                    textStyle = TextStyle(fontSize = 14.sp, fontFamily = Constants.ROBOTO_FLEX, color = Color.Black),
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Color.LightGray,

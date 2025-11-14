@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import com.google.firebase.Firebase
 import com.spint.app.viewmodels.AuthViewModel
 import com.spint.app.model.RegisterUserModel
 import com.spint.app.navigation.SCREENS
@@ -51,6 +52,7 @@ import com.spint.app.utils.constants.Constants
 import com.spint.app.utils.constants.Constants.TAG
 import com.spint.app.utils.RequestState
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.messaging.messaging
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -73,7 +75,7 @@ fun FinalUserCreation(authViewModel: AuthViewModel, navController: NavHostContro
 
     LaunchedEffect(key1 =true){
         scope.launch(Dispatchers.IO) {
-          //  token = Firebase.messaging.token.await()
+            token = Firebase.messaging.token.await()
             number=firebaseAuth.currentUser?.phoneNumber.toString()
         }
     }

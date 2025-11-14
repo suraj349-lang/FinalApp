@@ -10,6 +10,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.Firebase
+import com.google.firebase.messaging.messaging
 import com.spint.app.repository.AuthRepository
 import com.spint.app.screens.auth.RESPONSE
 import com.spint.app.database.Profile
@@ -143,7 +145,7 @@ class AuthViewModel @Inject constructor(
 
                    // saveProfileData(response.data);
                     try {
-                        val fcmToken= "Firebase.messaging.token.await()"
+                        val fcmToken= Firebase.messaging.token.await()
                         if (fcmToken!=null) {
                             repository.updateFcmToken(SendFcmTokenDto(userId = response.data.user, fcmToken = fcmToken))
                                 .catch {

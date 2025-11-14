@@ -22,6 +22,8 @@ object Constants {
     val FONT_LIGHT = FontFamily(Font(R.font.k2d_light))
     val FONT_MEDIUM = FontFamily(Font(R.font.k2d_medium))
 
+    val ROBOTO_FLEX = FontFamily(Font(R.font.roboto_flex))
+
     val ROBOTO_CONDENSED = FontFamily(Font(R.font.roboto_condensed));
 
     val DONGLE_BOLD =FontFamily(Font(R.font.dongle_bold));
