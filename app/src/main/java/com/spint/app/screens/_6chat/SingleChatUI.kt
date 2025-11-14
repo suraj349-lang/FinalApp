@@ -94,8 +94,8 @@ import kotlinx.coroutines.launch
 import java.io.File
 import java.util.Locale
 
-@RequiresApi(Build.VERSION_CODES.O)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+
+
 @Composable
 fun SingleChatScreenUI(
     sentTo: String,
@@ -342,7 +342,7 @@ fun SingleChatScreenUI(
                                         sent = message.sent,
                                         received = message.received,
                                         timestamp = message.timestamp,
-                                        isSentByLoggedInUser = message.senderId == UserObject.user.value.user
+                                        isSentByLoggedInUser = message.senderId == user.user
                                     )
                                 }
                             }

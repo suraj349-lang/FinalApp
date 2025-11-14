@@ -54,7 +54,7 @@ import com.spint.app.utils.formatDateTime
 
 
 
-@RequiresApi(Build.VERSION_CODES.O)
+
 @Composable
 fun PingDetailsScreen(navController: NavHostController, pingResponse: PingResponse?) {
           Scaffold(
@@ -89,7 +89,7 @@ fun PingDetailsScreen(navController: NavHostController, pingResponse: PingRespon
     }
 
 
-@RequiresApi(Build.VERSION_CODES.O)
+
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun PingDetailsScreenUI(pingResponse: PingResponse?, onSendMessageClicked:()->Unit, onBackPressed:()->Unit) {

@@ -51,8 +51,7 @@ import com.spint.app.utils.constants.Constants
 import com.spint.app.utils.constants.Constants.TAG
 import com.spint.app.utils.RequestState
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.messaging.ktx.messaging
+
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -74,7 +73,7 @@ fun FinalUserCreation(authViewModel: AuthViewModel, navController: NavHostContro
 
     LaunchedEffect(key1 =true){
         scope.launch(Dispatchers.IO) {
-            token = Firebase.messaging.token.await()
+          //  token = Firebase.messaging.token.await()
             number=firebaseAuth.currentUser?.phoneNumber.toString()
         }
     }

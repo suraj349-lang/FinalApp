@@ -42,7 +42,7 @@ sealed class Destinations(
         name = "Home"
     )
     object Beta : Destinations(
-        route = SCREENS.BETA.route,
+        route = SCREENS.EVENTS_SCREEN.route,
         activeIcon = R.drawable.ping,
         inactiveIcon=R.drawable.ping,
         name = "Events"

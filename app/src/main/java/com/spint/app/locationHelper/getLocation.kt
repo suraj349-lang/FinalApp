@@ -14,31 +14,45 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 
 
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
-fun getLocation(context: Context, authViewModel: AuthViewModel){
-    val fusedLocationProviderClient: FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
+fun getLocation(context: Context, authViewModel: AuthViewModel) {
+    val fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
 
-    if(ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
-        != PackageManager.PERMISSION_GRANTED
-        &&
+    if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
+        != PackageManager.PERMISSION_GRANTED &&
         ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION)
         != PackageManager.PERMISSION_GRANTED
-    ){
+    ) {
+        val permissions = mutableListOf(
+            Manifest.permission.ACCESS_FINE_LOCATION
+        )
+        // Only add POST_NOTIFICATIONS for Android 13+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            permissions.add(Manifest.permission.POST_NOTIFICATIONS)
+        }
+
         ActivityCompat.requestPermissions(
             context as Activity,
-            arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.POST_NOTIFICATIONS),100)
+            permissions.toTypedArray(),
+            100
+        )
         return
     }
 
-    val location=fusedLocationProviderClient.getCurrentLocation(100,null)
+    // Note: 100 here looks like a request priority constant—should likely be:
+    // fusedLocationProviderClient.getCurrentLocation(Priority.PRIORITY_HIGH_ACCURACY, null)
+    val location = fusedLocationProviderClient.getCurrentLocation(100, null)
     location.addOnSuccessListener {
-        if(it!=null){
-            authViewModel.latitude.value=it.latitude
-            authViewModel.longitude.value=it.longitude
-            authViewModel.address.value= getReadableLocation(authViewModel.latitude.value,authViewModel.longitude.value,context)
+        if (it != null) {
+            authViewModel.latitude.value = it.latitude
+            authViewModel.longitude.value = it.longitude
+            authViewModel.address.value = getReadableLocation(
+                authViewModel.latitude.value,
+                authViewModel.longitude.value,
+                context
+            )
             Log.d("Flash Location", "getLocation: ${authViewModel.address.value}")
-        }else{
-            Log.d(Constants.TAG,"error fetching location")
+        } else {
+            Log.d(Constants.TAG, "error fetching location")
         }
     }
 }

@@ -155,12 +155,13 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                             )
                             Column(modifier = Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.Start) {
                                 Text(
-                                    text = "Drop Profile",
+                                    text = "Spot:",
                                     modifier = Modifier.fillMaxWidth(),
-                                    color = Color.Black,
-                                    fontSize = 18.sp,
+                                    color = Color.DarkGray.copy(alpha = 0.8f),
+                                    fontSize = 16.sp,
                                     textAlign = TextAlign.Start,
                                     fontFamily = Constants.FONT_MEDIUM,
+                                    fontWeight = FontWeight.SemiBold,
                                     lineHeight = 14.sp // Adjust line height if needed
                                 )
                                 Text(
@@ -168,9 +169,10 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                                     modifier = Modifier.fillMaxWidth(),
                                     maxLines=1,
                                     overflow = TextOverflow.Ellipsis,
-                                    color = Color.Black.copy(alpha = 0.8f),//Color(0xFFF7ECD3),
+                                    color = Color.Black.copy(alpha = 1f),//Color(0xFFF7ECD3),
                                     fontSize = 10.sp,
                                     textAlign = TextAlign.Start,
+                                    fontWeight = FontWeight.Bold,
                                     fontFamily = Constants.FONT_LIGHT,
                                     lineHeight = 14.sp
                                 )
@@ -280,7 +282,9 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                 Divider(modifier = Modifier
                     .fillMaxWidth(), thickness = 1.dp,color=Color(0xFFDCD6DD)
                 )
-                Text("Caption",fontFamily = Constants.FONT_LIGHT,modifier = Modifier.fillMaxWidth().padding(start = 15.dp), fontSize = 14.sp, color = Color.DarkGray, textAlign = TextAlign.Start)
+                Text("Caption",fontFamily = Constants.FONT_LIGHT,modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 15.dp), fontSize = 14.sp, color = Color.DarkGray, textAlign = TextAlign.Start)
                 OutlinedTextField(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -295,8 +299,11 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                     textStyle = LocalTextStyle.current.copy(
                         lineHeight = 18.sp, fontSize = 14.sp
                     ),
-                    placeholder={ Text(text = "Type something ...", fontFamily = DONGLE_BOLD)},
-                    colors = OutlinedTextFieldDefaults.colors(cursorColor = Color.Red, unfocusedBorderColor = Color.LightGray, focusedBorderColor = Color.LightGray)
+                    placeholder={ Text(text = "Type something ...", fontFamily = Constants.FONT_EXTRA_LIGHT, fontSize = 9.sp,color=Color.LightGray)},
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color.DarkGray,
+                        unfocusedTextColor = Color.Gray,
+                        cursorColor = Color.Red, unfocusedBorderColor = Color.LightGray, focusedBorderColor = Color.LightGray)
                 )
                 //Expiration time
                 Column(modifier = Modifier
@@ -332,13 +339,13 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                         Button(onClick = { activeBtnKey=2 },
                             shape = RoundedCornerShape(6.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = if(activeBtnKey==2) Color.DarkGray//statusAndTopAppBarColor
+                                containerColor = if(activeBtnKey==2) Color(0xFF815F08)//statusAndTopAppBarColor
                                 else Color.LightGray ,
                                 contentColor =if(activeBtnKey==2) Color.White//topAppBarTextColor
                                 else Color.DarkGray
                             )
                         ) {
-                            Text(text = "1 week", fontFamily = Constants.ROBOTO_CONDENSED, fontSize = 12.sp)
+                            Text(text = "1 week", fontFamily = Constants.ROBOTO_CONDENSED, fontSize = 14.sp)
                         }
                     }
                 }
@@ -362,12 +369,15 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                                         expirationTime = expirationTime,
                                         createdBy = user.user
                                     )
+                                Log.i("UserData", "DropProfileDialog: ${user.user}")
                                 imageUploadViewModel.s3ImageUploadFunction(user.user,it)
                                 }
                         },
-                        shape= RoundedCornerShape(12.dp),
+                        shape= RoundedCornerShape(2.dp),
                         modifier= Modifier
-                            .fillMaxWidth(1f).padding(2.dp),
+                            .fillMaxWidth(1f).height(50.dp)
+                            //.padding(horizontal = 2.dp, vertical = 0.dp)
+                        ,
                         enabled= uri !=Uri.EMPTY,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = floatingActionBtnColor, //statusAndTopAppBarColor,
@@ -377,7 +387,7 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                         )
                     ) {
                      //   Text(text = "Click to:     ", fontFamily = Constants.FONT_EXTRA_LIGHT, fontSize = 8.sp)
-                        Text(text = "Drop Profile", fontFamily = Constants.FONT_LIGHT, fontSize = 16.sp)
+                        Text(text = "Drop Profile", fontFamily = Constants.FONT_MEDIUM, fontSize = 16.sp, fontWeight = FontWeight.Bold)
 
                     }
 

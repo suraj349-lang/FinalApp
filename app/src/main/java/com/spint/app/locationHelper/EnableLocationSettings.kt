@@ -9,7 +9,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.RequiresApi
 import com.spint.app.viewmodels.AuthViewModel
 
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+
 fun enableLocationSettings(context: Context, launcher: ActivityResultLauncher<Intent>, authViewModel: AuthViewModel) {
     val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
     if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {

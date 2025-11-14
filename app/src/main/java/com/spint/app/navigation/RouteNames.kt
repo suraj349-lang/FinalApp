@@ -3,7 +3,6 @@ package com.spint.app.navigation
 import android.net.Uri
 import com.spint.app.model.DropProfileResponse
 import com.spint.app.model.pings.PingResponse
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 
@@ -19,8 +18,9 @@ sealed class SCREENS(val route:String){
     object HOME:SCREENS("home_screen")
     object PROFILE:SCREENS("profile_screen")
     object SETTINGS:SCREENS("settings_screen")
-    object PINGS:SCREENS("personal")
-    object BETA:SCREENS("beta")
+    object FLASH_POSTS:SCREENS("personal")
+    object EVENTS_SCREEN:SCREENS("events")
+    object XHAM_LIVE_SCREEN:SCREENS("xhamlive")
     object NOTIFICATIONS:SCREENS("notifications_screen")
     object CHAT_LIST:SCREENS("chat_screen")
     object SINGLE_CHAT:SCREENS("singleChat/{userName}/{chatListUserId}"){

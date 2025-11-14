@@ -1,23 +1,15 @@
 package com.spint.app.screens._2pings
 
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Build
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Info
+
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -32,9 +24,6 @@ import androidx.navigation.NavHostController
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.spint.app.R
-import com.spint.app.screens._1home.EventAndPingDesigns.flashPosts.NoImageFlashPosts
-import com.spint.app.screens._1home.EventAndPingDesigns.flashPosts.FlashPostWithImageScreen
-import com.spint.app.screens._1home.EventAndPingDesigns.flashPosts.PrivateFlashPostScreen
 import com.spint.app.screens._3createEventOrPing.CreateEventOrPingBottomSheet
 import com.spint.app.screens.common.NoPingsFoundScreen
 import com.spint.app.ui.theme.floatingActionBtnColor
@@ -42,11 +31,13 @@ import com.spint.app.utils.UserLocationObject
 import com.spint.app.utils.constants.Constants
 import com.spint.app.viewmodels.EventsViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.spint.app.screens.EventAndPingDesigns.flashPosts.FlashPostWithImageScreen
+import com.spint.app.screens.EventAndPingDesigns.flashPosts.NoImageFlashPosts
+import com.spint.app.screens.EventAndPingDesigns.flashPosts.PrivateFlashPostScreen
 
 
-@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun PingScreenFinal(
+fun FlashPostsScreen(
     navController: NavHostController,
     eventsViewModel: EventsViewModel,
 ) {
@@ -105,7 +96,7 @@ fun PingScreenFinal(
                     //state = listState,
                     modifier= Modifier
                         .background(color = Constants.HOME_TOP_BAR_COLOR),
-                    contentPadding = PaddingValues(top = 0.dp, bottom = 16.dp))
+                    contentPadding = PaddingValues(top = 16.dp))
                 {
 
 //                Column(
@@ -403,59 +394,59 @@ fun PingScreenFinal(
 
 
 
-
-@Composable
-fun StatsCard(pingStats: Map<String, Int>) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF1F1F1F)),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(8.dp)
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = "Pings This Week in Your Area",
-                style = MaterialTheme.typography.titleMedium.copy(color = Color.White),
-                modifier = Modifier.padding(bottom = 12.dp)
-            )
-
-            pingStats.forEach { (type, count) ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 6.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = when (type.lowercase()) {
-                            "sports" -> Icons.Default.Info
-                            "politics" -> Icons.Default.Info
-                            "club" -> Icons.Default.Build
-                            "study" -> Icons.Default.AccountCircle
-                            else -> Icons.Default.Info
-                        },
-                        contentDescription = type,
-                        tint = Color.Cyan,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Text(
-                        text = type.replaceFirstChar { it.uppercaseChar() },
-                        color = Color.White,
-                        modifier = Modifier.weight(1f)
-                    )
-                    Text(
-                        text = "$count",
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
-        }
-    }
-}
+//
+//@Composable
+//fun StatsCard(pingStats: Map<String, Int>) {
+//    Card(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .padding(16.dp),
+//        colors = CardDefaults.cardColors(containerColor = Color(0xFF1F1F1F)),
+//        shape = RoundedCornerShape(16.dp),
+//        elevation = CardDefaults.cardElevation(8.dp)
+//    ) {
+//        Column(modifier = Modifier.padding(16.dp)) {
+//            Text(
+//                text = "Pings This Week in Your Area",
+//                style = MaterialTheme.typography.titleMedium.copy(color = Color.White),
+//                modifier = Modifier.padding(bottom = 12.dp)
+//            )
+//
+//            pingStats.forEach { (type, count) ->
+//                Row(
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .padding(vertical = 6.dp),
+//                    verticalAlignment = Alignment.CenterVertically
+//                ) {
+//                    Icon(
+//                        imageVector = when (type.lowercase()) {
+//                            "sports" -> Icons.Default.Info
+//                            "politics" -> Icons.Default.Info
+//                            "club" -> Icons.Default.Build
+//                            "study" -> Icons.Default.AccountCircle
+//                            else -> Icons.Default.Info
+//                        },
+//                        contentDescription = type,
+//                        tint = Color.Cyan,
+//                        modifier = Modifier.size(20.dp)
+//                    )
+//                    Spacer(modifier = Modifier.width(12.dp))
+//                    Text(
+//                        text = type.replaceFirstChar { it.uppercaseChar() },
+//                        color = Color.White,
+//                        modifier = Modifier.weight(1f)
+//                    )
+//                    Text(
+//                        text = "$count",
+//                        color = Color.White,
+//                        fontWeight = FontWeight.Bold
+//                    )
+//                }
+//            }
+//        }
+//    }
+//}
 
 @Composable
 fun StatsGrid(pingStats: Map<String, Int>) {
@@ -523,38 +514,38 @@ fun VerticalBarStats(pingStats: Map<String, Int>) {
         }
     }
 }
-
-@Composable
-fun StatsChipsRow(pingStats: Map<String, Int>) {
-    LazyRow(
-        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        items(pingStats.toList()) { (type, count) ->
-            Surface(
-                color = Color(0xFF2C2C2C),
-                shape = RoundedCornerShape(50),
-                tonalElevation = 2.dp
-            ) {
-                Row(
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.CheckCircle,
-                        contentDescription = type,
-                        tint = Color.Green,
-                        modifier = Modifier.size(16.dp)
-                    )
-                    Spacer(Modifier.width(8.dp))
-                    Text(
-                        text = "$type: $count",
-                        color = Color.White,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-            }
-        }
-    }
-}
+//
+//@Composable
+//fun StatsChipsRow(pingStats: Map<String, Int>) {
+//    LazyRow(
+//        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
+//        horizontalArrangement = Arrangement.spacedBy(8.dp)
+//    ) {
+//        items(pingStats.toList()) { (type, count) ->
+//            Surface(
+//                color = Color(0xFF2C2C2C),
+//                shape = RoundedCornerShape(50),
+//                tonalElevation = 2.dp
+//            ) {
+//                Row(
+//                    modifier = Modifier
+//                        .padding(horizontal = 16.dp, vertical = 8.dp),
+//                    verticalAlignment = Alignment.CenterVertically
+//                ) {
+//                    Icon(
+//                        imageVector = Icons.Default.CheckCircle,
+//                        contentDescription = type,
+//                        tint = Color.Green,
+//                        modifier = Modifier.size(16.dp)
+//                    )
+//                    Spacer(Modifier.width(8.dp))
+//                    Text(
+//                        text = "$type: $count",
+//                        color = Color.White,
+//                        style = MaterialTheme.typography.bodyMedium
+//                    )
+//                }
+//            }
+//        }
+//    }
+//}

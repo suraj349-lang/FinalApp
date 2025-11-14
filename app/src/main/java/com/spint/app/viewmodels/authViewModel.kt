@@ -25,8 +25,7 @@ import com.spint.app.model.User
 import com.spint.app.utils.LoginState
 import com.spint.app.utils.RequestState
 import com.spint.app.utils.TokenObject
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.messaging.ktx.messaging
+
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -144,7 +143,7 @@ class AuthViewModel @Inject constructor(
 
                    // saveProfileData(response.data);
                     try {
-                        val fcmToken= Firebase.messaging.token.await()
+                        val fcmToken= "Firebase.messaging.token.await()"
                         if (fcmToken!=null) {
                             repository.updateFcmToken(SendFcmTokenDto(userId = response.data.user, fcmToken = fcmToken))
                                 .catch {

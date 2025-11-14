@@ -4,14 +4,12 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -54,7 +52,7 @@ import com.google.android.libraries.places.api.Places
 import javax.inject.Inject
 
 
-@RequiresApi(Build.VERSION_CODES.TIRAMISU)
+
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val permissionsToRequest = arrayOf(
@@ -67,6 +65,7 @@ class MainActivity : ComponentActivity() {
     lateinit var splashViewModel: SplashViewModel
      @Inject
      lateinit var storeUserState:StoreUserState
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
@@ -186,7 +185,7 @@ fun handleDeepLink(uri: Uri?, navController: NavHostController) {
 
     when (pathSegments.firstOrNull()) {
         "chat" -> navController.navigate("chat/${pathSegments.lastOrNull()}")
-        "ping" -> navController.navigate(SCREENS.PINGS.route)
+        "ping" -> navController.navigate(SCREENS.FLASH_POSTS.route)
         "profile" -> navController.navigate("profile/${pathSegments.lastOrNull()}")
         "qr" -> navController.navigate("qr/${pathSegments.lastOrNull()}")
     }
@@ -195,7 +194,7 @@ fun handleDeepLink(uri: Uri?, navController: NavHostController) {
 
 
 
-@RequiresApi(Build.VERSION_CODES.O)
+
 @Composable
 fun FinalApp(
     authViewModel: AuthViewModel,

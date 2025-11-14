@@ -43,6 +43,7 @@ class ProfileRepository @Inject constructor(private val api: ApiService,private 
             true
         } else {
             Log.e("S3 Upload", "Failed with status: ${response.code()}")
+            Log.e("S3 Upload", "Failed with status: ${response}")
             false
         }
     }

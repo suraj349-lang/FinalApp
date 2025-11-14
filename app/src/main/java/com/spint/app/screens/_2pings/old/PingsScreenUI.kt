@@ -50,7 +50,6 @@ import androidx.navigation.NavHostController
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.spint.app.model.DropProfileResponse
-import com.spint.app.screens._1home.EventAndPingDesigns.flashPosts.PingItem3
 import com.spint.app.screens._2pings.Category
 import com.spint.app.screens._2pings.PingsTopBar
 import com.spint.app.screens._2pings.SearchBar
@@ -62,6 +61,7 @@ import com.spint.app.utils.UserLocationObject
 import com.spint.app.utils.constants.Constants.DONGLE_BOLD
 import com.spint.app.viewmodels.EventsViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.spint.app.screens.EventAndPingDesigns.flashPosts.PingItem3
 
 @Composable
 fun PingsScreenUI(navController:NavHostController,eventsViewModel: EventsViewModel) {

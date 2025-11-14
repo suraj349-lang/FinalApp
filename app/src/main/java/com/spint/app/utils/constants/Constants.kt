@@ -7,10 +7,9 @@ import com.spint.app.R
 
 object Constants {
 
-    const val IP_ADD ="3.108.55.84"//"3.108.55.84" //  192.168.1.5
-    const val SOCKET_CHAT_BASE_URL = "http://${IP_ADD}/chat/5001/"
-    const val TEMP_SOCKET_URL = "http://${IP_ADD}/"
+    const val IP_ADD ="3.108.55.84" //3.108.55.84" //  192.168.1.5
     const val BASE_URL = "http://${IP_ADD}/"
+    const val TEMP_SOCKET_URL = "http://${IP_ADD}/"
 
 
     const val APP_NAME="Spint"

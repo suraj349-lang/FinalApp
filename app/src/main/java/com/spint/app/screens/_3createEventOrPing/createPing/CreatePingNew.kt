@@ -33,9 +33,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Divider
+import androidx.compose.material.Switch
 import androidx.compose.material.TextButton
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -48,6 +47,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberDatePickerState
@@ -76,6 +76,7 @@ import com.spint.app.R
 import com.spint.app.model.pings.PingRequestDto
 import com.spint.app.navigation.SCREENS
 import com.spint.app.screens.dialogBox.uriToFile
+import com.spint.app.ui.theme.floatingActionBtnColor
 import com.spint.app.utils.UserObject
 import com.spint.app.utils.RequestState
 import com.spint.app.utils.UserLocationObject
@@ -90,7 +91,7 @@ import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
 
-@RequiresApi(Build.VERSION_CODES.O)
+
 @Composable
 fun CreatePingWrapper(navController: NavHostController, eventsViewModel: EventsViewModel) {
 
@@ -109,6 +110,7 @@ fun CreatePingWrapper(navController: NavHostController, eventsViewModel: EventsV
     val expiration by remember {
         mutableStateOf(12)
     }
+    var selectedCategory by remember { mutableStateOf<String>("") }
     val isActive by remember {
         derivedStateOf {  title.isNotEmpty()}
     }
@@ -123,7 +125,7 @@ fun CreatePingWrapper(navController: NavHostController, eventsViewModel: EventsV
             Log.d("PhotoPicker", "No media selected")
         }
     }
-    val expirationIso = calculateExpirationIso(expiration)
+   // val expirationIso = calculateExpirationIso(expiration)
 
 
 
@@ -185,9 +187,11 @@ fun CreatePingWrapper(navController: NavHostController, eventsViewModel: EventsV
                                     userName = user.userName,
                                     title = title,
                                     image = imageKey,
+                                    isPrivate = isPrivate,
+                                    category = selectedCategory,
                                     location = userLocation.address.toString(),
                                     description = description,
-                                    expirationTime = expirationIso
+                                    expirationTime = ""
                                 )
                             )
                         }
@@ -199,9 +203,11 @@ fun CreatePingWrapper(navController: NavHostController, eventsViewModel: EventsV
                                 userName = user.userName,
                                 title = title,
                                 image = null, // or "" if your backend expects empty
+                                isPrivate = isPrivate,
+                                category = selectedCategory,
                                 location = userLocation.address.toString(),
                                 description = description,
-                                expirationTime = expirationIso
+                                expirationTime = ""
                             )
                         )
                     }
@@ -225,6 +231,10 @@ fun CreatePingWrapper(navController: NavHostController, eventsViewModel: EventsV
                     description=description,
                     onDescriptionChange = { newDescription -> description = newDescription },
                     imageUri = imageUri,
+                    isPrivate = isPrivate,
+                    onIsPrivateChange = {isPrivate=!isPrivate},
+                    selectedCategory = selectedCategory,
+                    onSelectCategoryClicked = {selectedCategory=it},
                     onGalleryClicked={pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))},
                     onCameraClicked={},
                 )
@@ -234,15 +244,10 @@ fun CreatePingWrapper(navController: NavHostController, eventsViewModel: EventsV
 }
 
 
-@RequiresApi(Build.VERSION_CODES.O)
-fun calculateExpirationIso(hoursToAdd: Int): String {
-    val expirationInstant = Instant.now().plusSeconds(hoursToAdd * 3600L)
-    return DateTimeFormatter.ISO_INSTANT
-        .withZone(ZoneOffset.UTC)
-        .format(expirationInstant)
-}
 
-@RequiresApi(Build.VERSION_CODES.O)
+
+
+
 @Composable
 fun CreatePing(
     title: String,
@@ -250,11 +255,14 @@ fun CreatePing(
     description: String,
     onDescriptionChange: (String) -> Unit,
     imageUri:Uri?,
+    isPrivate: Boolean,
+    onIsPrivateChange:()-> Unit,
+    selectedCategory: String,
+    onSelectCategoryClicked: (String) -> Unit,
     onGalleryClicked:()->Unit,
     onCameraClicked:()->Unit
 ) {
     var showCategoryDialog by remember { mutableStateOf(false) }
-    var selectedCategory by remember { mutableStateOf<String?>(null) }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -263,8 +271,30 @@ fun CreatePing(
         verticalArrangement = Arrangement.spacedBy(4.dp),
         horizontalAlignment = Alignment.Start
     ) {
-        Text(text = "Add media", fontFamily = Constants.FONT_MEDIUM, fontSize = 14.sp, color = Color.Black)
-        MediaAddition(onGalleryClicked,onCameraClicked)
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight(), horizontalArrangement = Arrangement.SpaceBetween) {
+           Column(modifier = Modifier.fillMaxWidth(0.6f)) {
+               Text(text = "Add media", fontFamily = Constants.FONT_MEDIUM, fontSize = 14.sp, color = Color.Black)
+               MediaAddition(onGalleryClicked,onCameraClicked)
+           }
+            Column(modifier = Modifier) {
+                Text(text = "Private", fontFamily = Constants.FONT_MEDIUM, fontSize = 18.sp, color = Color.Black)
+                Switch(
+                    isPrivate,
+                    onCheckedChange = { onIsPrivateChange() },
+                    colors = androidx.compose.material.SwitchDefaults.colors(
+                        checkedThumbColor = Color(0xFFFBC02D),
+                        uncheckedTrackColor = Constants.HOME_TOP_BAR_COLOR
+                    )
+                )
+
+            }
+
+
+
+        }
+
         TitleTextSpace("Title", title) { onTitleChange(it) }
         Divider(modifier = Modifier.fillMaxWidth(), thickness = 0.5.dp)
         AddCategory(selectedCategory) {
@@ -279,7 +309,7 @@ fun CreatePing(
             CategorySelectionDialog(
                 categories = listOf("Food", "Event", "Music", "Study", "Travel", "Gaming", "News", "Workout", "Shopping"),
                 onCategorySelected = {
-                    selectedCategory = it
+                    onSelectCategoryClicked(it)
                     showCategoryDialog = false
                 },
                 onDismiss = { showCategoryDialog = false }
@@ -424,7 +454,7 @@ fun CategorySelectionDialog(
                     .padding(16.dp)
                     .verticalScroll(rememberScrollState())
             ) {
-                Text("Select a Category", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                Text("Select a Category", fontWeight = FontWeight.Bold, fontSize = 18.sp, color = Color.DarkGray)
                 Spacer(modifier = Modifier.height(16.dp))
 
                 FlowRow(
@@ -443,7 +473,8 @@ fun CategorySelectionDialog(
                                 text = category,
                                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
                                 fontSize = 12.sp,
-                                fontFamily = Constants.FONT_MEDIUM
+                                fontFamily = Constants.FONT_MEDIUM,
+                                color = Color.Black
                             )
                         }
                     }
@@ -495,13 +526,13 @@ fun DescriptionTextSpace(hint:String,description:String,onTextChange:(String)->U
 }
 
 
-@RequiresApi(Build.VERSION_CODES.O)
+
 @Composable
 fun Deadline() {
     var selectedDuration by remember { mutableStateOf("1 day") }
     var customDateTime by remember { mutableStateOf<LocalDateTime?>(null) }
 
-    val formattedCustom = customDateTime?.format(DateTimeFormatter.ofPattern("MMM d, h:mm a"))
+   // val formattedCustom = customDateTime?.format(DateTimeFormatter.ofPattern("MMM d, h:mm a"))
 
     Column(
         modifier = Modifier
@@ -568,17 +599,17 @@ fun TimeDurationDropdown(
                 label = { Text("Duration") },
                 trailingIcon = {
                     Icon(
-                        imageVector = Icons.Default.ArrowDropDown,
+                        painter = painterResource(R.drawable.arrow_down),
                         contentDescription = null
                     )
                 },
                 modifier = Modifier.fillMaxWidth(),
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = Color(0xFF00D26A),
-                    unfocusedBorderColor = Color.Gray,
-                    unfocusedTextColor = Color.White,
-                    cursorColor = Color.White
-                )
+//                colors = TextFieldDefaults.outlinedTextFieldColors(
+//                    focusedBorderColor = Color(0xFF00D26A),
+//                    unfocusedBorderColor = Color.Gray,
+//                    unfocusedTextColor = Color.White,
+//                    cursorColor = Color.White
+//                )
             )
         }
 

@@ -37,7 +37,7 @@ import com.spint.app.viewmodels.NotificationViewModel
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.SwipeRefreshState
 
-@RequiresApi(Build.VERSION_CODES.O)
+
 @Composable
 fun NotificationScreenUI(navController: NavHostController, viewModel:NotificationViewModel) {
     val buttonVisible = remember { mutableStateOf(false) };
@@ -103,6 +103,6 @@ fun NotificationTopBar(title:String="Notifications",onDeleteAllClicked:()->Unit,
         modifier = Modifier
             .shadow(elevation = 60.dp,)
             .zIndex(2f),
-        colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = Color(0xFFEEEBE4)),
+       // colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = Color(0xFFEEEBE4)),
     )
 }

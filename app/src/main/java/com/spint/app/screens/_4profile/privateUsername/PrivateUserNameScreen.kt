@@ -252,7 +252,7 @@ fun PrivateProfileTopBar(onBackClicked:()->Unit) {
             color = Color.White
         )
     },
-        colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = Constants.HOME_TOP_BAR_COLOR),
+        //colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = Constants.HOME_TOP_BAR_COLOR),
         navigationIcon = {
             Image(painter = painterResource(id = R.drawable.baseline_arrow_back_24),
                 contentDescription = "",

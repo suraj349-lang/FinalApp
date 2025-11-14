@@ -1,6 +1,7 @@
 package com.spint.app.screens._3createEventOrPing.createEvent.unused
 
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -81,7 +82,9 @@ fun CreateEventMainScreenOld(parentEventId:String ?= null,navController: NavCont
                                 parentPostId = if (!parentEventId.isNullOrEmpty()) parentEventId else null,
                                 isChildPost = !parentEventId.isNullOrEmpty(),
                                 expirationTime = "12")
+
                         )
+                        Log.i("Create event", "CreateEventMainScreenOld:$ ")
                     }
                 }
             }

@@ -1,45 +1,69 @@
 package com.spint.app.utils
 
+import android.annotation.SuppressLint
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import java.text.SimpleDateFormat
 import java.time.*
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 import java.util.*
 
-@RequiresApi(Build.VERSION_CODES.O)
+@SuppressLint("SimpleDateFormat")
 fun formatDateTime(isoString: String): String {
     try {
-    val zonedDateTime = ZonedDateTime.parse(isoString)
-    val now = ZonedDateTime.now(ZoneId.systemDefault())
+        // Parse the ISO string to a Date object
+        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
+        sdf.timeZone = TimeZone.getTimeZone("UTC")
+        val zonedDateTime = sdf.parse(isoString) ?: return "Invalid"
 
-    val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
-    val dateFormatter = DateTimeFormatter.ofPattern("dd MMM")
+        // Get the current date
+        val now = Date()
 
-    return when {
-        zonedDateTime.toLocalDate().isEqual(now.toLocalDate()) ->
-            "Today, ${zonedDateTime.format(timeFormatter)}"
+        // Set up formatters for time and date
+        val timeFormatter = SimpleDateFormat("HH:mm")
+        val dateFormatter = SimpleDateFormat("dd MMM")
 
-        zonedDateTime.toLocalDate().isEqual(now.minusDays(1).toLocalDate()) ->
-            "Yesterday, ${zonedDateTime.format(timeFormatter)}"
+        // Extract date (day, month, year) from both `zonedDateTime` and `now`
+        val calendarZoned = Calendar.getInstance()
+        calendarZoned.time = zonedDateTime
+        val calendarNow = Calendar.getInstance()
+        calendarNow.time = now
 
-        else -> "${zonedDateTime.format(dateFormatter)}, ${zonedDateTime.format(timeFormatter)}"
-    }}catch (e:Exception){
-        Log.e("FormatDateTime", "formatDateTime:${e.printStackTrace()} ",e)
+        // Compare dates (day, month, year)
+        return when {
+            calendarZoned.get(Calendar.YEAR) == calendarNow.get(Calendar.YEAR) &&
+                    calendarZoned.get(Calendar.DAY_OF_YEAR) == calendarNow.get(Calendar.DAY_OF_YEAR) -> {
+                // Same day
+                "Today, ${timeFormatter.format(zonedDateTime)}"
+            }
+            calendarZoned.get(Calendar.YEAR) == calendarNow.get(Calendar.YEAR) &&
+                    calendarZoned.get(Calendar.DAY_OF_YEAR) == calendarNow.get(Calendar.DAY_OF_YEAR) - 1 -> {
+                // Yesterday
+                "Yesterday, ${timeFormatter.format(zonedDateTime)}"
+            }
+            else -> {
+                // Different day
+                "${dateFormatter.format(zonedDateTime)}, ${timeFormatter.format(zonedDateTime)}"
+            }
+        }
+    } catch (e: Exception) {
+        Log.e("FormatDateTime", "Error formatting date: ${e.printStackTrace()}", e)
         return "Error getting time"
     }
 }
-@RequiresApi(Build.VERSION_CODES.O)
-fun Long.toRelativeTime(): String {
-    val now = Instant.now()
-    val eventTime = Instant.ofEpochMilli(this)
-    val zoneId = ZoneId.systemDefault()
 
-    val duration = Duration.between(eventTime, now)
-    val minutesAgo = duration.toMinutes()
-    val hoursAgo = duration.toHours()
-    val daysAgo = duration.toDays()
+@SuppressLint("SimpleDateFormat")
+fun Long.toRelativeTime(): String {
+    val now = Date()
+    val eventTime = Date(this)
+
+    val durationMillis = now.time - eventTime.time
+    val secondsAgo = durationMillis / 1000
+    val minutesAgo = secondsAgo / 60
+    val hoursAgo = minutesAgo / 60
+    val daysAgo = hoursAgo / 24
 
     return when {
         minutesAgo < 1 -> "Just now"
@@ -49,53 +73,55 @@ fun Long.toRelativeTime(): String {
         daysAgo == 1L -> "Yesterday"
         daysAgo < 7 -> "$daysAgo days ago"
         else -> {
-            val dateTime = eventTime.atZone(zoneId).toLocalDateTime()
-            val formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy hh:mm a")
-            dateTime.format(formatter)
+            val formatter = SimpleDateFormat("dd-MM-yyyy hh:mm a")
+            formatter.format(eventTime)
         }
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
+
+@SuppressLint("SimpleDateFormat")
 fun getFormattedTimeAndFlag(isoString: String): Pair<String, Boolean> {
     return try {
-        val targetTime = Instant.parse(isoString)
-        val now = Instant.now()
+        // Parse ISO 8601 timestamp like "2025-11-12T15:30:00Z"
+        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
+        sdf.timeZone = TimeZone.getTimeZone("UTC")
 
-        if (targetTime.isBefore(now)) {
+        val targetDate = sdf.parse(isoString)
+        val now = Date()
+
+        if (targetDate == null) return Pair("Invalid", true)
+
+        if (targetDate.before(now)) {
             return Pair("Expired", true)
         }
 
-        val duration = Duration.between(now, targetTime)
-        val days = duration.toDays()
+        // Calculate difference in milliseconds
+        val diffMillis = targetDate.time - now.time
 
-        when {
-            days >= 30 -> {
-                val startDate = LocalDate.now(ZoneId.systemDefault())
-                val endDate = targetTime.atZone(ZoneId.systemDefault()).toLocalDate()
-                val period = Period.between(startDate, endDate)
+        val seconds = diffMillis / 1000
+        val minutes = seconds / 60
+        val hours = minutes / 60
+        val days = hours / 24
+        val months = days / 30 // simple approximation for long durations
 
-                val months = period.months
-                val remainingDays = period.days
-                Pair(
-                    if (months > 0) "${months}mo ${remainingDays}d" else "${remainingDays}d",
-                    false
-                )
+        return when {
+            months >= 1 -> {
+                val remainingDays = days % 30
+                Pair("${months}mo ${remainingDays}d", false)
             }
             days >= 1 -> Pair("$days day${if (days > 1) "s" else ""}", false)
-            duration.toHours() >= 1 -> {
-                val hours = duration.toHours()
-                val minutes = duration.toMinutes() % 60
-                Pair("${hours}h ${minutes}m", false)
+            hours >= 1 -> {
+                val remMinutes = minutes % 60
+                Pair("${hours}h ${remMinutes}m", false)
             }
-            duration.toMinutes() >= 1 -> {
-                val minutes = duration.toMinutes()
-                val seconds = duration.seconds % 60
-                Pair("${minutes}m ${seconds}s", true) // less than an hour
+            minutes >= 1 -> {
+                val remSeconds = seconds % 60
+                Pair("${minutes}m ${remSeconds}s", true)
             }
-            else -> Pair("${duration.seconds}s", true) // less than an hour
+            else -> Pair("${seconds}s", true)
         }
-    } catch (e: DateTimeParseException) {
+    } catch (e: Exception) {
         Pair("Invalid", true)
     }
 }

@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
@@ -68,11 +69,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.items
+
 import coil.compose.AsyncImage
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
-import com.spint.app.R
+
 import com.spint.app.model.DirectChat
 import com.spint.app.model.DirectChatRequest
 import com.spint.app.navigation.SCREENS
@@ -89,6 +90,8 @@ import com.spint.app.viewmodels.AuthViewModel
 import com.spint.app.viewmodels.ChatViewModel
 import com.spint.app.viewmodels.EventsViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
+import com.spint.app.R
+import com.spint.app.utils.testdata.ChildPostCard
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class, ExperimentalPagerApi::class)
@@ -284,24 +287,26 @@ fun DirectChatProfiles(
                         NoDirectChatUsersFound(onJoinDuelClicked)
                     }
                 }
-                items(directChatObjectList) {directChatObject->
-                    if(directChatObject != null) {
 
-                        DirectChatItem(
-                            directChatObject = directChatObject,
-                            onProfileClicked = {
-                                navController.navigate(SCREENS.USER_PUBLIC_PROFILE.createPath(userId = directChatObject.userId.user))
-                            },
-                            onSendMessageClicked = {
-                                Log.i("Userr", "DirectChatProfiles: ${userObject.user} other ${directChatObject.userId.user}")
-                                eventsViewModel.saveUserToChatList(
-                                    currentUserId = userObject.user,
-                                    otherUserUserId = directChatObject.userId.user
-                                )
-                            }
-                        )
-                    }
-                }
+
+//                    items(directChatObjectList) {directChatObject->
+//                    if(directChatObject != null) {
+//
+//                        DirectChatItem(
+//                            directChatObject = directChatObject,
+//                            onProfileClicked = {
+//                                navController.navigate(SCREENS.USER_PUBLIC_PROFILE.createPath(userId = directChatObject.userId.user))
+//                            },
+//                            onSendMessageClicked = {
+//                                Log.i("Userr", "DirectChatProfiles: ${userObject.user} other ${directChatObject.userId.user}")
+//                                eventsViewModel.saveUserToChatList(
+//                                    currentUserId = userObject.user,
+//                                    otherUserUserId = directChatObject.userId.user
+//                                )
+//                            }
+//                        )
+//                    }
+//                }
             }
         }
         else -> {}

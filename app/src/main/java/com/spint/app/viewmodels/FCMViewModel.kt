@@ -15,8 +15,7 @@ import com.spint.app.fcm.stateObject.SendMessageDto
 import com.spint.app.fcm.stateObject.SendTokenDto
 import com.spint.app.utils.constants.Constants
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.messaging.ktx.messaging
+
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import retrofit2.HttpException
@@ -35,7 +34,7 @@ class FCMViewModel: ViewModel() {
 
     init {
         viewModelScope.launch {
-            Firebase.messaging.subscribeToTopic("chat").await()
+          //  Firebase.messaging.subscribeToTopic("chat").await()
 
         }
     }
@@ -116,7 +115,7 @@ class FCMViewModel: ViewModel() {
 
     fun sendMessage(isBroadcast:Boolean=false){
         viewModelScope.launch {
-            val message=SendMessageDto(to=Firebase.messaging.token.await(), notification = NotificationBody(title = "ZUNE",body="hello,how are you"))
+            val message=SendMessageDto(to=""/*Firebase.messaging.token.await()*/, notification = NotificationBody(title = "ZUNE",body="hello,how are you"))
             try {
                 api.sendMessage(message)
             }catch (e:Exception){

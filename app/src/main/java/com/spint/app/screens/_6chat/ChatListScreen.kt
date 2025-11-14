@@ -221,24 +221,24 @@ fun ChatTopBar(title: String,profileImage:String, navController: NavHostControll
                         contentDescription = "",
                         colorFilter = ColorFilter.tint(Color.White.copy(alpha = 0.8f)),
                         modifier = Modifier
-                            .size(30.dp)
+                            .size(24.dp)
                             .clickable { navController.navigateUp() }
 
                     )
-                    Card(
-                        modifier = Modifier.size(45.dp),
-                        shape = CircleShape,
-                    ) {
-                        GlideImage(
-                            model= imagePrefix+ profileImage,
-                            contentDescription = "",
-                            contentScale=ContentScale.Crop,
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .clickable { navController.navigate(SCREENS.PROFILE.route) }
-
-                        )
-                    }
+//                    Card(
+//                        modifier = Modifier.size(45.dp),
+//                        shape = CircleShape,
+//                    ) {
+//                        GlideImage(
+//                            model= imagePrefix+ profileImage,
+//                            contentDescription = "",
+//                            contentScale=ContentScale.Crop,
+//                            modifier = Modifier
+//                                .fillMaxSize()
+//                                .clickable { navController.navigate(SCREENS.PROFILE.route) }
+//
+//                        )
+//                    }
 
                 }
             }, actions = {
@@ -291,10 +291,10 @@ fun UserItem(navController: NavHostController, user: ChatList,setProfileImage:(S
 //                    .clip(CircleShape)
 //                    .border(1.dp, Color.DarkGray, CircleShape)
 //            )
-            Card(modifier = Modifier.size(60.dp), shape = CircleShape, colors = CardDefaults.cardColors(containerColor = Color.Transparent)) {
+            Card(modifier = Modifier.size(56.dp), shape = CircleShape, colors = CardDefaults.cardColors(containerColor = Color.Transparent)) {
                 GlideImage(model =if(user.withUserId !=null || user.withUserId.profileImage.isNotEmpty()) imagePrefix+user.withUserId.profileImage else R.drawable.femaleprofile, contentDescription = "",modifier = Modifier
                     .padding(2.dp)
-                    .size(60.dp)
+                    .fillMaxSize()
                     .clip(CircleShape),
                     contentScale = ContentScale.Crop
                 )
@@ -303,11 +303,11 @@ fun UserItem(navController: NavHostController, user: ChatList,setProfileImage:(S
                 .fillMaxSize()
                 .padding(horizontal = 8.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.Start) {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text(text = user.withUserId.userName, fontFamily =FONT_MEDIUM,fontSize = 18.sp, color = Color.Black, fontWeight = FontWeight.SemiBold)
-                    Text(text = "08:38", fontSize = 12.sp, color = Color.Gray)
+                    Text(text = user.withUserId.userName, fontFamily = Constants.ROBOTO_CONDENSED,fontSize = 18.sp, color = Color.Black, lineHeight = 14.sp)
+                    Text(text = "08:38", fontSize = 12.sp, color = Color.Gray, lineHeight = 14.sp)
                 }
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
-                    Text(text =  "hello", fontSize = 14.sp,color= Color.Gray, fontFamily = Constants.FONT_LIGHT)
+                    Text(text =  "hello", fontSize = 14.sp,color= Color.Gray, fontFamily = Constants.FONT_LIGHT, lineHeight = 14.sp)
                 }
 
             }

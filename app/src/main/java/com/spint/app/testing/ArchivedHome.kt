@@ -24,9 +24,7 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Person
+
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -60,7 +58,7 @@ import kotlin.random.Random
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
-@Preview(showBackground = true)
+
 @Composable
 fun HomeScreenUI2(navController: NavController= NavController(LocalContext.current)){
     val items=(1 .. 100).map {
@@ -75,10 +73,10 @@ fun HomeScreenUI2(navController: NavController= NavController(LocalContext.curre
 
             title ={ Text(text = "title")},
             actions = {
-                Icon(imageVector = Icons.Default.Add, contentDescription ="" )
+              //  Icon(imageVector = Icons.Default.Add, contentDescription ="" )
             },
             navigationIcon = {
-                Icon(imageVector =Icons.Default.Person , contentDescription ="" )
+             //   Icon(imageVector =Icons.Default.Person , contentDescription ="" )
             }
 
         )
@@ -115,10 +113,10 @@ fun CommonTopBar(title:String) {
 
         title ={ Text(text = title)},
         actions = {
-            Icon(imageVector = Icons.Default.Add, contentDescription ="" )
+           // Icon(imageVector = Icons.Default.Add, contentDescription ="" )
         },
         navigationIcon = {
-            Icon(imageVector =Icons.Default.Person , contentDescription ="" )
+          //  Icon(imageVector =Icons.Default.Person , contentDescription ="" )
         }
 
     )

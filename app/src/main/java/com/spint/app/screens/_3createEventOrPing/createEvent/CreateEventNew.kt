@@ -33,8 +33,6 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.Divider
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.TextButton
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -85,7 +83,7 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 
 
-@RequiresApi(Build.VERSION_CODES.O)
+
 @Composable
 fun CreateEventMainScreen(parentEventId:String ?= null,navController: NavHostController, eventsViewModel: EventsViewModel) {
 
@@ -165,18 +163,18 @@ fun CreateEventMainScreen(parentEventId:String ?= null,navController: NavHostCon
                 if(uri != Uri.EMPTY) imageFile = uriToFile(uri!!, context )
                 imageFile?.let {
                     eventsViewModel.uploadImageAndThenCreateEvent( user.user , it){ imageKey->
-                        eventsViewModel.createEvent(
-                            Event(
-                                user = user.user ,
-                                userName = user.userName,
-                                title=title,
-                                image = imageKey,
-                                location = userLocation.address.toString(),
-                                description =description,
-                                parentPostId = if (!parentEventId.isNullOrEmpty()) parentEventId else null,
-                                isChildPost = !parentEventId.isNullOrEmpty(),
-                                expirationTime = expiration)
-                        )
+                        val data=Event(
+                            user = user.user ,
+                            userName = user.userName,
+                            title=title,
+                            image = imageKey,
+                            location = userLocation.address.toString(),
+                            description =description,
+                            parentPostId =  null,
+                            isChildPost = false,//!parentEventId.isNullOrEmpty(),
+                            expirationTime = expiration)
+                        eventsViewModel.createEvent(data)
+                        Log.i("TCreateEventMainScreenAG", "CreateEventMainScreen:$data ")
                     }
                 }
             }
@@ -213,7 +211,7 @@ fun CreateEventMainScreen(parentEventId:String ?= null,navController: NavHostCon
 }
 
 
-@RequiresApi(Build.VERSION_CODES.O)
+
 @Composable
 fun CreateEvent(
     title: String,
@@ -363,7 +361,7 @@ fun DescriptionTextSpace(hint:String,description:String,onTextChange:(String)->U
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
+
 @Composable
 fun Deadline(
     onDeadlineSelected: (String) -> Unit
@@ -405,8 +403,8 @@ fun Deadline(
                         if (option == "Custom") {
                             showDateTimePicker = true
                         } else {
-                            val deadline = calculateDeadline(option)
-                            onDeadlineSelected(deadline)
+//                            val deadline = calculateDeadline(option)
+//                            onDeadlineSelected(deadline)
                         }
                     }
                 )
@@ -449,17 +447,17 @@ fun ExpirationUIItem(title: String, isSelected: Boolean, onClick: () -> Unit) {
     }
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
-fun calculateDeadline(option: String): String {
-    val now = LocalDateTime.now()
-    val deadline = when (option) {
-        "1 day" -> now.plusDays(1)
-        "1 week" -> now.plusWeeks(1)
-        "1 month" -> now.plusMonths(1)
-        else -> now
-    }
-    return deadline.toString() // or use DateTimeFormatter for custom format
-}
+
+//fun calculateDeadline(option: String): String {
+//    val now = LocalDateTime.now()
+//    val deadline = when (option) {
+//        "1 day" -> now.plusDays(1)
+//        "1 week" -> now.plusWeeks(1)
+//        "1 month" -> now.plusMonths(1)
+//        else -> now
+//    }
+//    return deadline.toString() // or use DateTimeFormatter for custom format
+//}
 
 
 
@@ -492,17 +490,17 @@ fun TimeDurationDropdown(
                 label = { Text("Duration") },
                 trailingIcon = {
                     Icon(
-                        imageVector = Icons.Default.ArrowDropDown,
+                        painter = painterResource(R.drawable.arrow_down),
                         contentDescription = null
                     )
                 },
                 modifier = Modifier.fillMaxWidth(),
-                colors = TextFieldDefaults.outlinedTextFieldColors(
-                    focusedBorderColor = Color(0xFF00D26A),
-                    unfocusedBorderColor = Color.Gray,
-                    unfocusedTextColor = Color.White,
-                    cursorColor = Color.White
-                )
+//                colors = TextFieldDefaults.(
+//                    focusedBorderColor = Color(0xFF00D26A),
+//                    unfocusedBorderColor = Color.Gray,
+//                    unfocusedTextColor = Color.White,
+//                    cursorColor = Color.White
+//                )
             )
         }
 

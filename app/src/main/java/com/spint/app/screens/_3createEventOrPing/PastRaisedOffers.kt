@@ -14,8 +14,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
@@ -28,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -62,7 +61,7 @@ fun PastRaisedOffer(authViewModel: AuthViewModel, eventsViewModel: EventsViewMod
         },
         floatingActionButton = {
             FloatingActionButton(onClick = { navController.navigate("") },Modifier.size(75.dp), backgroundColor = Color.White, contentColor = Color.Black) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = "", modifier = Modifier.size(40.dp))
+                Icon(painter = painterResource(R.drawable.share), contentDescription = "", modifier = Modifier.size(40.dp))
             }
         }, floatingActionButtonPosition = FabPosition.Center) { paddingValues ->
         Surface(modifier = Modifier

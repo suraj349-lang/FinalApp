@@ -1,8 +1,6 @@
 package com.spint.app.navigation
 
 import android.net.Uri
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -26,8 +24,8 @@ import com.spint.app.screens.auth.util.OtpBox
 import com.spint.app.screens._6chat.SingleChatScreenUI
 import com.spint.app.screens.auth.FinalUserCreation
 import com.spint.app.qrScanning.QRScannerScreen
-import com.spint.app.screens._1home.EventAndPingDesigns.events.EventAndChildPostWrapper
-import com.spint.app.screens._1home.EventAndPingDesigns.events.EventsDetailsVerticalWrapper
+import com.spint.app.screens.EventAndPingDesigns.events.EventsScreenWrapper
+import com.spint.app.screens.EventAndPingDesigns.events.EventsDetailsVerticalWrapper
 import com.spint.app.screens.pings.CameraPingScreen
 import com.spint.app.viewmodels.EventsViewModel
 import com.spint.app.screens._6chat.ChatListScreen
@@ -40,7 +38,7 @@ import com.spint.app.screens._5settings.SettingsScreenUI
 import com.spint.app.testing.TabView
 import com.spint.app.screens._3createEventOrPing.PastRaisedOffer
 import com.spint.app.screens._2pings.PingDetailsScreen
-import com.spint.app.screens._2pings.PingScreenFinal
+import com.spint.app.screens._2pings.FlashPostsScreen
 import com.spint.app.screens._3createEventOrPing.createPing.CreatePingWrapper
 import com.spint.app.screens._4profile.ProfileScreenNew
 import com.spint.app.screens._4profile.UserPublicProfile
@@ -75,11 +73,12 @@ import com.spint.app.viewmodels.ImageUploadViewModel
 import com.spint.app.viewmodels.NotificationViewModel
 import com.spint.app.viewmodels.SettingsViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
-import kotlinx.serialization.decodeFromString
+import com.spint.app.screens.EventAndPingDesigns.events.templates.xhmaslive.XHamsLiveScreenWrapper
+import com.spint.app.screens.EventAndPingDesigns.events.templates.xhmaslive.XhamLiveScreen
 import kotlinx.serialization.json.Json
 
 
-@RequiresApi(Build.VERSION_CODES.O)
+
 @OptIn(ExperimentalAnimationApi::class, ExperimentalPagerApi::class)
 @Composable
 fun Navigation(authViewModel: AuthViewModel, screen: String) {
@@ -90,7 +89,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
     val chatViewModel= hiltViewModel<ChatViewModel>()
     val notificationViewModel= hiltViewModel<NotificationViewModel>()
 
-    NavHost(navController = navController, startDestination =SCREENS.HOME.route){
+    NavHost(navController = navController, startDestination =SCREENS.SPLASH.route){
 
         composable(SCREENS.SPLASH.route){
             SplashScreenUI(navController,screen)
@@ -166,15 +165,20 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
         composable(SCREENS.ALL_USERS.route){
             //AllProfiles(profileViewModel)
         }
-        composable(SCREENS.PINGS.route){
+        composable(SCREENS.FLASH_POSTS.route){
             //PingsScreenUI(navController,eventsViewModel)
-            PingScreenFinal(navController,eventsViewModel)
+            FlashPostsScreen(navController,eventsViewModel)
         }
-        composable(SCREENS.BETA.route){
-            EventAndChildPostWrapper(eventsViewModel = eventsViewModel, navController = navController) {
+        composable(SCREENS.EVENTS_SCREEN.route){
+            EventsScreenWrapper(eventsViewModel = eventsViewModel, navController = navController) {
                 eventsViewModel.getAllEvents()
             }
+
         }
+        composable(SCREENS.XHAM_LIVE_SCREEN.route){
+            XHamsLiveScreenWrapper(eventsViewModel = eventsViewModel, navController = navController){eventsViewModel.getAllEvents()}
+        }
+
 
         composable(SCREENS.PAST_OFFERS.route){
             PastRaisedOffer(authViewModel = authViewModel, eventsViewModel =eventsViewModel , navController = navController)

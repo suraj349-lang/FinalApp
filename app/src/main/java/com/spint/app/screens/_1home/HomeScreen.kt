@@ -2,8 +2,6 @@ package com.spint.app.screens._1home
 
 
 import BottomBar
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -55,7 +53,7 @@ import com.spint.app.R
 import com.spint.app.viewmodels.AuthViewModel
 import com.spint.app.screens._1home.commonUI.HomeFloatingActionButton
 import com.spint.app.screens._1home.commonUI.HomeTopBar
-import com.spint.app.screens._2pings.PingScreenFinal
+import com.spint.app.screens._2pings.FlashPostsScreen
 import com.spint.app.screens._3createEventOrPing.CreateEventOrPingBottomSheet
 import com.spint.app.viewmodels.EventsViewModel
 import com.spint.app.screens.dialogBox.ShowQRDialog
@@ -72,7 +70,7 @@ import kotlinx.coroutines.launch
 
 
 
-@RequiresApi(Build.VERSION_CODES.O)
+
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewModel, imageUploadViewModel: ImageUploadViewModel, authViewModel: AuthViewModel,chatViewModel: ChatViewModel) {
@@ -228,7 +226,7 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
                             .imePadding()
                     ) { page ->
                         when (page) {
-                            0 -> PingScreenFinal(
+                            0 -> FlashPostsScreen(
                                 navController = navController,
                                 eventsViewModel = eventsViewModel
                             )//EventScreenWrapper(eventsViewModel = eventsViewModel, navController = navController, onRetryCalled = {eventsViewModel.getAllEvents()})

@@ -108,7 +108,7 @@ import com.spint.app.R
 //    }
 //}
 
-@RequiresApi(Build.VERSION_CODES.O)
+
 @Composable
 fun MessageItemUI(
     msg: String,
@@ -123,7 +123,7 @@ fun MessageItemUI(
        }     ///    0xFF797676            0xFFCF5630
     val textColor = Color.White
     var time = ""
-    if (timestamp != null) time = convertToIST(timestamp)
+    //if (timestamp != null) time = convertToIST(timestamp)
 
     Row(
         modifier = Modifier

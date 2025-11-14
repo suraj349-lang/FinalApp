@@ -19,6 +19,8 @@
         android:maxSdkVersion="32"
         tools:ignore="ScopedStorage" />
 
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
+
     <application
         android:name=".HIltAndroidApp"
         android:allowBackup="true"

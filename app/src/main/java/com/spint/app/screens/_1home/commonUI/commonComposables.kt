@@ -35,6 +35,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -133,7 +134,7 @@ fun HomeTopBar(
         },
         actions = {
             if(actionIcon) {
-                Row(modifier = Modifier.fillMaxHeight(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(24.dp)) {
+                Row(modifier = Modifier.padding(end = 16.dp).fillMaxHeight(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(24.dp)) {
                     Image(painter = painterResource(id = R.drawable.new_qr),
                         contentDescription = "",
                         colorFilter = ColorFilter.tint(color = iconAndTextColor),
@@ -172,8 +173,11 @@ fun HomeTopBar(
 @Composable
 fun RetryCall(eventsViewModel: EventsViewModel){
     val scope= rememberCoroutineScope()
-    scope.launch {
-        eventsViewModel.getAllEvents()
+    LaunchedEffect(Unit) {
+        scope.launch {
+            eventsViewModel.getAllEvents()
+        }
+
     }
 
 }

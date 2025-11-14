@@ -4,6 +4,9 @@ package com.spint.app.fcm.screen
 
 
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import com.spint.app.R
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,9 +16,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Send
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -24,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -56,20 +57,18 @@ fun ChatScreen(
                 .fillMaxWidth(),
             horizontalArrangement = Arrangement.End
         ) {
-            IconButton(
-                onClick = onMessageSend
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Send,
-                    contentDescription = "Send"
+
+            Image(
+                painter = painterResource( R.drawable.send_24),
+                    contentDescription = "Send", modifier = Modifier.clickable{onMessageSend()}
                 )
-            }
+
             Spacer(Modifier.width(16.dp))
             IconButton(
                 onClick = onMessageBroadcast
             ) {
-                Icon(
-                    imageVector = Icons.Default.Share,
+                Image(
+                    painter = painterResource( R.drawable.share),
                     contentDescription = "Broadcast"
                 )
             }

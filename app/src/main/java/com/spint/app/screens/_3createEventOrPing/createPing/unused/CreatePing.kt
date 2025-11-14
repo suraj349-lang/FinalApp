@@ -29,9 +29,6 @@ import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -92,7 +89,7 @@ fun CreatePing(authViewModel: AuthViewModel, eventsViewModel: EventsViewModel, n
     var activeBtnKey by remember {
         mutableStateOf(0)
     }
-    var imageFile by mutableStateOf<File?>(null)
+    var imageFile by remember { mutableStateOf<File?>(null)}
     if(keyForGallery==1) GalleryPickerForDropProfile(navController  ,{imageFile=it}){uri=it}
 
     Scaffold(
@@ -326,13 +323,13 @@ fun CreatePing(authViewModel: AuthViewModel, eventsViewModel: EventsViewModel, n
                             modifier = Modifier.fillMaxWidth(),
                             leadingIcon = {
                                 Icon(
-                                    imageVector = Icons.Default.Search,
+                                    painter = painterResource(R.drawable.search),
                                     contentDescription = ""
                                 )
                             },
                             trailingIcon = {
                                 Icon(
-                                    imageVector = Icons.Default.ArrowDropDown,
+                                    painter = painterResource(R.drawable.arrow_down),
                                     contentDescription = ""
                                 )
                             }

@@ -57,7 +57,7 @@ import com.spint.app.utils.formatDateTime
 
 // when the dropped profile is clicked then it is shown
 @OptIn(ExperimentalMaterial3Api::class)
-@RequiresApi(Build.VERSION_CODES.O)
+
 @Composable
 fun DropProfileUserProfile(navController: NavHostController,dropProfileResponse: DropProfileResponse?) {
     val buttonsVisible = remember { mutableStateOf(true) }
@@ -87,7 +87,7 @@ fun DropProfileUserProfile(navController: NavHostController,dropProfileResponse:
 
 
 
-@RequiresApi(Build.VERSION_CODES.O)
+
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun DropProfileUserProfileUI(dropProfileResponse: DropProfileResponse?,onSendMessageClicked:()->Unit,onBackPressed:()->Unit) {
