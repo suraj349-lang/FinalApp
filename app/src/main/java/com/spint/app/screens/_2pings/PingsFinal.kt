@@ -96,7 +96,7 @@ fun FlashPostsScreen(
                     //state = listState,
                     modifier= Modifier
                         .background(color = Constants.HOME_TOP_BAR_COLOR),
-                    contentPadding = PaddingValues(top = 16.dp))
+                    )
                 {
 
 //                Column(

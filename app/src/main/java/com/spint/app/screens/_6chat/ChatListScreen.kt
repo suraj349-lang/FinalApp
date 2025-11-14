@@ -49,7 +49,6 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -67,7 +66,6 @@ import com.spint.app.screens.common.CommonLoadingScreen
 import com.spint.app.utils.UserObject
 import com.spint.app.utils.RequestState
 import com.spint.app.utils.constants.Constants
-import com.spint.app.utils.constants.Constants.FONT_MEDIUM
 import com.spint.app.utils.constants.Constants.TAG
 import com.spint.app.viewmodels.ChatViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
@@ -270,7 +268,7 @@ fun UserItem(navController: NavHostController, user: ChatList,setProfileImage:(S
             setProfileImage(user.withUserId.profileImage)
             navController.navigate(
                 SCREENS.SINGLE_CHAT.createPath(
-                    user.withUserId.userName,
+                    user.withUserId.name,
                     user.withUserId._id
                 )
             )
@@ -303,7 +301,7 @@ fun UserItem(navController: NavHostController, user: ChatList,setProfileImage:(S
                 .fillMaxSize()
                 .padding(horizontal = 8.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.Start) {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text(text = user.withUserId.userName, fontFamily = Constants.ROBOTO_CONDENSED,fontSize = 18.sp, color = Color.Black, lineHeight = 14.sp)
+                    Text(text = user.withUserId.name, fontFamily = Constants.ROBOTO_CONDENSED,fontSize = 18.sp, color = Color.Black, lineHeight = 14.sp)
                     Text(text = "08:38", fontSize = 12.sp, color = Color.Gray, lineHeight = 14.sp)
                 }
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {

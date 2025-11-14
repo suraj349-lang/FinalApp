@@ -91,7 +91,6 @@ import com.spint.app.viewmodels.ChatViewModel
 import com.spint.app.viewmodels.EventsViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.spint.app.R
-import com.spint.app.utils.testdata.ChildPostCard
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class, ExperimentalPagerApi::class)
@@ -219,6 +218,7 @@ fun DirectChatProfiles(
 ) {
     val chatState by eventsViewModel.directChatResponse.collectAsState()
     val directChatObjectList = eventsViewModel.nearByUsersList.collectAsLazyPagingItems()
+    Log.i("directchat users list", "DirectChatProfiles:${directChatObjectList.itemCount} ")
     val saveToChatListSuccess by eventsViewModel.saveUserToChatListResponseState.collectAsState()
     val userObject by UserObject.user.collectAsState()
     when(val response=saveToChatListSuccess){
@@ -227,11 +227,11 @@ fun DirectChatProfiles(
         }
         is RequestState.Success ->{
             chatViewModel.connectSocket()
-            Log.i("Userr", "DirectChatProfiles: ${response.data.withUserId.userName} other user id ${response.data.withUserId._id}")
-            chatViewModel.profileImage.value = response.data.withUserId.profileImage
+            Log.i("Userr", "DirectChatProfiles: ${response.data.withUserId.name} other user id ${response.data.withUserId._id}")
+         //   chatViewModel.profileImage.value = response.data.withUserId.profileImage
             navController.navigate(
                 SCREENS.SINGLE_CHAT.createPath(
-                    userName = response.data.withUserId.userName,
+                    userName = response.data.withUserId.name,
                     chatListUserId = response.data.withUserId._id
                 )
             )
@@ -242,17 +242,16 @@ fun DirectChatProfiles(
         }
         else  ->{}
     }
+    // SHOW LOADING WHEN NEEDED
+    if (chatState is RequestState.Loading) {
+        DialogLoading()
+    }
 
-    when (chatState) {
-        is RequestState.Loading -> {
-            DialogLoading()
-        }
-        is RequestState.Error -> {
-            CommonErrorScreen(error = "Unable to get users.")
-        }
-        is RequestState.Success -> {
-            LazyColumn( //modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
-            ) {
+    // SHOW ERROR WHEN NEEDED
+    if (chatState is RequestState.Error) {
+        CommonErrorScreen(error = "Unable to get users.")
+    }
+            LazyColumn() {
                 item {
                     Row(
                         Modifier
@@ -289,28 +288,31 @@ fun DirectChatProfiles(
                 }
 
 
-//                    items(directChatObjectList) {directChatObject->
-//                    if(directChatObject != null) {
-//
-//                        DirectChatItem(
-//                            directChatObject = directChatObject,
-//                            onProfileClicked = {
-//                                navController.navigate(SCREENS.USER_PUBLIC_PROFILE.createPath(userId = directChatObject.userId.user))
-//                            },
-//                            onSendMessageClicked = {
-//                                Log.i("Userr", "DirectChatProfiles: ${userObject.user} other ${directChatObject.userId.user}")
-//                                eventsViewModel.saveUserToChatList(
-//                                    currentUserId = userObject.user,
-//                                    otherUserUserId = directChatObject.userId.user
-//                                )
-//                            }
-//                        )
-//                    }
-//                }
+
+                items(
+                    count = directChatObjectList.itemCount,
+                    key = { index -> directChatObjectList[index]?.userId?.user ?: index }
+                ) { index ->
+                    val directChatObject = directChatObjectList[index]
+                    if(directChatObject != null) {
+
+                        DirectChatItem(
+                            directChatObject = directChatObject,
+                            onProfileClicked = {
+                                navController.navigate(SCREENS.USER_PUBLIC_PROFILE.createPath(userId = directChatObject.userId.user))
+                            },
+                            onSendMessageClicked = {
+                                Log.i("Userr", "DirectChatProfiles: ${userObject.user} other ${directChatObject.userId.user}")
+                                eventsViewModel.saveUserToChatList(
+                                    currentUserId = userObject.user,
+                                    otherUserUserId = directChatObject.userId.user
+                                )
+                            }
+                        )
+                    }
+                }
             }
-        }
-        else -> {}
-    }
+
 }
 
 
@@ -571,7 +573,9 @@ fun NoDirectChatUsersFound(onJoinDuelClicked:()->Unit) {
         Column(modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight(), verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally) {
-            Image(painter = painterResource(id = R.drawable.smiley), contentDescription ="", modifier = Modifier.size(100.dp).padding(bottom = 20.dp) )
+            Image(painter = painterResource(id = R.drawable.smiley), contentDescription ="", modifier = Modifier
+                .size(100.dp)
+                .padding(bottom = 20.dp) )
         dynamicText(text = "No users found near you!", fontSize = 20, fontFamily = Constants.FONT_MEDIUM, lineHeight = 12)
         dynamicText(text = "Try the Duel instead",fontSize = 16, fontFamily = Constants.FONT_LIGHT)
             Spacer(modifier = Modifier.height(30.dp))

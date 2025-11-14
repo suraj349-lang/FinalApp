@@ -215,8 +215,10 @@ class ChatViewModel @Inject constructor(
                 _getUserChatList.value = RequestState.Loading
             }.catch {
                 _getUserChatList.value = RequestState.Error(it)
+                Log.e("getUserChatList", "getUserChatList:$it ",it.fillInStackTrace() )
             }.collect {
                 _getUserChatList.value = RequestState.Success(it.data)
+                Log.i("getUserChatList", "getUserChatList:$it ")
             }
     }
 

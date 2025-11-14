@@ -11,7 +11,7 @@ data class ChatList(
 
 data class WithUserId(
     val _id: String,
-    val userName:String,
+    val name:String,
     val profileImage:String
 )
 //"_id": "6809e73d70b553b7cea89da1",

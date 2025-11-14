@@ -60,11 +60,11 @@ import kotlinx.coroutines.delay
 fun FlashPostWithImageScreen(item:PingResponse) {
     val context= LocalContext.current
     Box(
-        modifier = Modifier
+        modifier = Modifier.padding(top=4.dp)
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
-                        Constants.HOME_TOP_BAR_COLOR,
+                        Color.Black,
                         Color.Black
                     )
                 )
@@ -165,10 +165,10 @@ fun FlashPostWithImageScreen(item:PingResponse) {
                     AsyncImage(
                         model = imagePrefix + item.image,
                         contentDescription = "Ping Image",
-                        modifier = Modifier
+                        modifier = Modifier.padding(horizontal = 4.dp)
                             .fillMaxWidth().height(500.dp)
                            // .aspectRatio(9f / 12f) // or 16f / 9f, or 1f for square
-                            .clip(RoundedCornerShape(12.dp)),
+                            .clip(RoundedCornerShape(2.dp)),
 //                        placeholder = painterResource(id = R.drawable.loading),
 //                        error = painterResource(id = R.drawable.error),
                         contentScale = ContentScale.Crop
@@ -243,8 +243,8 @@ fun FlashPostWithImageScreen(item:PingResponse) {
 //
 //                        }
                       ///  Text(text = item.location.capitalize(), fontWeight = FontWeight.Normal, fontSize = 11.sp, fontFamily = Constants.FONT_LIGHT, color = Color(0xFFC9D106))
-                        Text(text = item.title.toString().capitalize(), fontWeight = FontWeight.Normal, fontFamily = Constants.FONT_MEDIUM,fontSize = 17.sp, color = Color(0xFFECE6E1).copy(alpha = 01f))
-                        item.description?.let {  Text(text = item.description.capitalize(), fontWeight = FontWeight.Normal, fontSize = 11.sp, fontFamily = Constants.FONT_EXTRA_LIGHT, color = Color.LightGray.copy(alpha=0.9f), modifier = Modifier.padding(top=4.dp))}
+                        Text(text = item.title.toString().capitalize(), fontWeight = FontWeight.Normal, fontFamily = Constants.FONT_LIGHT,fontSize = 17.sp, color = Color(0xFFECE6E1).copy(alpha = 01f), modifier = Modifier.padding(top = 4.dp).padding(start=0.dp))
+                        item.description?.let {  Text(text = item.description.capitalize(), fontWeight = FontWeight.Normal, fontSize = 13.sp, fontFamily = Constants.FONT_LIGHT, color = Color.White.copy(alpha=0.8f), modifier = Modifier.padding(top=4.dp))}
                     }
 
                 }

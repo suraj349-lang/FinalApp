@@ -107,10 +107,10 @@ fun UserPublicProfileUI(eventsViewModel: EventsViewModel,navController: NavHostC
             androidx.compose.material3.Text(text = response.error.toString())
         }
         is RequestState.Success ->{
-            Log.i("Userr", "DirectChatProfiles: ${response.data.withUserId.userName} other user id ${response.data.withUserId._id}")
+            Log.i("Userr", "DirectChatProfiles: ${response.data.withUserId.name} other user id ${response.data.withUserId._id}")
             navController.navigate(
                 SCREENS.SINGLE_CHAT.createPath(
-                    userName = response.data.withUserId.userName,
+                    userName = response.data.withUserId.name,
                     chatListUserId = response.data.withUserId._id
                 )
             )
