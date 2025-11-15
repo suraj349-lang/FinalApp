@@ -15,7 +15,10 @@ import android.speech.SpeechRecognizer
 import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -37,6 +40,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -70,6 +74,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -92,10 +97,17 @@ import com.spint.app.viewmodels.ChatViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.launch
 import java.io.File
+import java.text.SimpleDateFormat
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.Date
 import java.util.Locale
 
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun SingleChatScreenUI(
     sentTo: String,
@@ -334,19 +346,50 @@ fun SingleChatScreenUI(
                     is RequestState.Success -> {
                         showLinearIndicator = false
                         val messageList = (messages as RequestState.Success<List<Message>>).data
+                        val sortedMessages = messageList.sortedBy {
+                            try {
+                                Instant.parse(it.timestamp).toEpochMilli()
+                            } catch (e: Exception) {
+                                0L
+                            }
+                        }
+
+
+
                         if (messageList.isNotEmpty()) {
-                            LazyColumn(state = listState, modifier = Modifier.weight(1f, true)) {
-                                items(messageList) { message ->
+
+                            LazyColumn(
+                                state = listState,
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                itemsIndexed(sortedMessages) { index, message ->
+                                    val currentDateText = formatDate(message.timestamp)
+                                    val previousDateText =
+                                        if (index > 0) formatDate(sortedMessages[index - 1].timestamp)
+                                        else null
+
+                                    if (previousDateText != currentDateText) {
+                                        DateHeader(text = currentDateText)
+                                    }
+
+                                    val isFromUser = message.senderId == user.user
+                                    val previousSender = if (index > 0) sortedMessages[index - 1].senderId else null
+                                    val isFirstOfBlock = previousSender != message.senderId
+
                                     MessageItemUI(
                                         msg = message.message,
                                         sent = message.sent,
                                         received = message.received,
                                         timestamp = message.timestamp,
-                                        isSentByLoggedInUser = message.senderId == user.user
+                                        isSentByLoggedInUser = isFromUser,
+                                        showTail = isFirstOfBlock
                                     )
                                 }
+
                             }
-                        } else {
+                        }
+
+                        else {
                             NoMessagesScreen(Modifier.weight(1f, true), "Say hi!")
                         }
                     }
@@ -368,6 +411,59 @@ fun SingleChatScreenUI(
         }
     }
 }
+
+
+@Composable
+fun DateHeader(text: String?) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 10.dp),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = text?: "",
+            fontSize = 12.sp,
+            color = Color.DarkGray,
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier
+                .background(
+                    color = Color(0xFFE8E8E8),
+                    shape = RoundedCornerShape(12.dp)
+                )
+                .padding(horizontal = 12.dp, vertical = 5.dp)
+        )
+    }
+}
+
+
+
+
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun formatDate(timestamp: String?): String? {
+    if (timestamp == null) return null
+
+    return try {
+        val date = Instant.parse(timestamp)
+            .atZone(ZoneId.systemDefault())
+            .toLocalDate()
+
+        val today = LocalDate.now()
+
+        when (date) {
+            today -> "Today"
+            today.minusDays(1) -> "Yesterday"
+            else -> date.format(DateTimeFormatter.ofPattern("dd MMM yyyy"))
+        }
+    } catch (e: Exception) {
+        null
+    }
+}
+
+
+
+
 
 /*
 @RequiresApi(Build.VERSION_CODES.O)

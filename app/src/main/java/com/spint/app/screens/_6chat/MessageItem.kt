@@ -14,6 +14,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
@@ -29,6 +31,7 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.em
 import com.spint.app.utils.constants.Constants
 import com.spint.app.utils.convertToIST
 import com.spint.app.R
@@ -118,7 +121,8 @@ fun MessageItemUI(
     sent: Int,
     received: Boolean,
     timestamp: String?,
-    isSentByLoggedInUser: Boolean
+    isSentByLoggedInUser: Boolean,
+    showTail: Boolean
 ) {
     val backgroundColor = if (isSentByLoggedInUser){
         Color(0xFF727507)
@@ -131,12 +135,16 @@ fun MessageItemUI(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 12.dp).padding(bottom = 2.dp),
+            .padding(horizontal = 12.dp).padding(bottom = 0.6.dp),
         horizontalArrangement = if (isSentByLoggedInUser) Arrangement.End else Arrangement.Start
     ) {
         Column(
             modifier = Modifier
-                .clip(BubbleShape(isSentByUser = isSentByLoggedInUser))
+                .padding(
+                    start = if (!showTail && !isSentByLoggedInUser) 8.dp else 0.dp,
+                    end = if (!showTail && isSentByLoggedInUser) 8.dp else 0.dp
+                )
+                .clip(BubbleShape(isSentByUser = isSentByLoggedInUser, showTail = showTail))
                 .background(backgroundColor)
                 .padding(horizontal = 12.dp, vertical = 4.dp)
                 .widthIn(max = 280.dp) // limit width for long texts
@@ -145,8 +153,9 @@ fun MessageItemUI(
                 text = msg,
                 fontSize = 16.sp,
                 color = textColor,
-                lineHeight = 16.sp,
-                modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
+                letterSpacing = (-0.01f).em,
+                lineHeight = 20.sp,
+                modifier = Modifier.padding(horizontal = 4.dp).padding(top=2.dp),
                 fontFamily = FontFamily.Default
             )
 
@@ -185,12 +194,17 @@ fun MessageItemUI(
 }
 
 
-class BubbleShape(private val isSentByUser: Boolean) : Shape {
-    override fun createOutline(
-        size: Size,
-        layoutDirection: LayoutDirection,
-        density: Density
-    ): Outline {
+class BubbleShape(
+    private val isSentByUser: Boolean,
+    private val showTail: Boolean
+) : Shape {
+
+    override fun createOutline(size: Size, layoutDirection: LayoutDirection, density: Density): Outline {
+        if (!showTail) {
+            // simple rounded rectangle when tail is hidden
+            return Outline.Rounded(RoundRect(0f, 0f, size.width, size.height, CornerRadius(24f)))
+        }
+
         return with(density) {
             val cornerRadius = 8.dp.toPx()
             val tailWidth = 8.dp.toPx()
@@ -200,38 +214,26 @@ class BubbleShape(private val isSentByUser: Boolean) : Shape {
             val path = Path()
 
             if (isSentByUser) {
-                // Sent Message (tail on top-end, rotated)
+                // tail on the right (sent)
                 path.moveTo(0f + cornerRadius, 0f)
-
                 path.lineTo(size.width - cornerRadius - tailWidth, 0f)
-                path.quadraticBezierTo(
-                    size.width - tailWidth, 0f,
-                    size.width - tailWidth, cornerRadius
-                )
+                path.quadraticBezierTo(size.width - tailWidth, 0f, size.width - tailWidth, cornerRadius)
 
-                // Tail
                 path.lineTo(size.width - tailWidth, tailYOffset)
                 path.lineTo(size.width, tailYOffset - tailHeight / 2)
                 path.lineTo(size.width - tailWidth, tailYOffset + tailHeight)
 
-                // Right side
                 path.lineTo(size.width - tailWidth, size.height - cornerRadius)
-                path.quadraticBezierTo(
-                    size.width - tailWidth, size.height,
-                    size.width - tailWidth - cornerRadius, size.height
-                )
+                path.quadraticBezierTo(size.width - tailWidth, size.height,
+                    size.width - tailWidth - cornerRadius, size.height)
 
-                // Bottom side
                 path.lineTo(cornerRadius, size.height)
                 path.quadraticBezierTo(0f, size.height, 0f, size.height - cornerRadius)
-
-                // Left side
                 path.lineTo(0f, cornerRadius)
                 path.quadraticBezierTo(0f, 0f, cornerRadius, 0f)
             } else {
-                // Received Message (tail on top-start, rotated)
+                // tail on the left (received)
                 path.moveTo(tailWidth + cornerRadius, 0f)
-
                 path.lineTo(size.width - cornerRadius, 0f)
                 path.quadraticBezierTo(size.width, 0f, size.width, cornerRadius)
 
@@ -241,12 +243,10 @@ class BubbleShape(private val isSentByUser: Boolean) : Shape {
                 path.lineTo(tailWidth + cornerRadius, size.height)
                 path.quadraticBezierTo(tailWidth, size.height, tailWidth, size.height - cornerRadius)
 
-                // Tail
                 path.lineTo(tailWidth, tailYOffset + tailHeight)
                 path.lineTo(0f, tailYOffset - tailHeight / 2)
                 path.lineTo(tailWidth, tailYOffset)
 
-                // Left side
                 path.lineTo(tailWidth, cornerRadius)
                 path.quadraticBezierTo(tailWidth, 0f, tailWidth + cornerRadius, 0f)
             }
