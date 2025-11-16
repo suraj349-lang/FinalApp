@@ -1,5 +1,6 @@
 package com.spint.app.screens.EventAndPingDesigns.flashPosts
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -60,7 +61,8 @@ import kotlinx.coroutines.delay
 fun FlashPostWithImageScreen(item:PingResponse) {
     val context= LocalContext.current
     Box(
-        modifier = Modifier.padding(top=4.dp)
+        modifier = Modifier
+            .padding(top = 4.dp)
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
@@ -165,9 +167,11 @@ fun FlashPostWithImageScreen(item:PingResponse) {
                     AsyncImage(
                         model = imagePrefix + item.image,
                         contentDescription = "Ping Image",
-                        modifier = Modifier.padding(horizontal = 4.dp)
-                            .fillMaxWidth().height(500.dp)
-                           // .aspectRatio(9f / 12f) // or 16f / 9f, or 1f for square
+                        modifier = Modifier
+                            .padding(horizontal = 4.dp)
+                            .fillMaxWidth()
+                            .height(500.dp)
+                            // .aspectRatio(9f / 12f) // or 16f / 9f, or 1f for square
                             .clip(RoundedCornerShape(2.dp)),
 //                        placeholder = painterResource(id = R.drawable.loading),
 //                        error = painterResource(id = R.drawable.error),
@@ -192,7 +196,8 @@ fun FlashPostWithImageScreen(item:PingResponse) {
                     Row(
                         horizontalArrangement = Arrangement.SpaceEvenly,
                         verticalAlignment=Alignment.Bottom,
-                        modifier = Modifier.padding(start = 10.dp)
+                        modifier = Modifier
+                            .padding(start = 10.dp)
                             .align(Alignment.BottomCenter)
                             .fillMaxWidth()
                             .background(color = Color.Transparent)
@@ -243,7 +248,9 @@ fun FlashPostWithImageScreen(item:PingResponse) {
 //
 //                        }
                       ///  Text(text = item.location.capitalize(), fontWeight = FontWeight.Normal, fontSize = 11.sp, fontFamily = Constants.FONT_LIGHT, color = Color(0xFFC9D106))
-                        Text(text = item.title.toString().capitalize(), fontWeight = FontWeight.Normal, fontFamily = Constants.FONT_LIGHT,fontSize = 17.sp, color = Color(0xFFECE6E1).copy(alpha = 01f), modifier = Modifier.padding(top = 4.dp).padding(start=0.dp))
+                        Text(text = item.title.toString().capitalize(), fontWeight = FontWeight.Normal, fontFamily = Constants.FONT_LIGHT,fontSize = 17.sp, color = Color(0xFFECE6E1).copy(alpha = 01f), modifier = Modifier
+                            .padding(top = 4.dp)
+                            .padding(start = 0.dp))
                         item.description?.let {  Text(text = item.description.capitalize(), fontWeight = FontWeight.Normal, fontSize = 13.sp, fontFamily = Constants.FONT_LIGHT, color = Color.White.copy(alpha=0.8f), modifier = Modifier.padding(top=4.dp))}
                     }
 
@@ -259,6 +266,7 @@ fun FlashPostWithImageScreen(item:PingResponse) {
 
 @Composable
 fun CountdownTimer(expirationIso: String) {
+    Log.i("item", "CountdownTimer:$expirationIso ")
     var timeLeft by remember { mutableStateOf("") }
     var isLessThanHour by remember { mutableStateOf(false) }
 

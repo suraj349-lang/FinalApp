@@ -359,6 +359,7 @@ fun FlashPostsScreen(
                         allPingsState?.itemCount?.let {count->
                             items(count) { index ->
                                 val item = allPingsState[index]
+                                Log.i("item", "FlashPostsScreen:$item ")
                                 if (item != null) {
 //                                    PingItemCard(
 //                                        item,

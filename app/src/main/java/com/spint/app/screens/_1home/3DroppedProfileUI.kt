@@ -427,6 +427,7 @@ fun LazyRowItem(item: Item) {
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun DroppedProfileItem(profile: DropProfileResponse, onProfileClicked:()->Unit) {
+    val (time, isLessThanHour)=getFormattedTimeAndFlag(profile.expirationTime)
     Column(modifier = Modifier
         .wrapContentSize()
         .padding(vertical = 8.dp)) {
@@ -450,7 +451,7 @@ fun DroppedProfileItem(profile: DropProfileResponse, onProfileClicked:()->Unit) 
                     }
                     .fillMaxSize())
             Text(
-                text = getFormattedTimeAndFlag(profile.expirationTime).toString() + " hrs left",
+                text =  "$time left",
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .padding(end = 4.dp)

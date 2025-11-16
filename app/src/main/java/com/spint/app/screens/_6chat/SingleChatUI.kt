@@ -74,10 +74,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -235,13 +238,20 @@ fun SingleChatScreenUI(
                         Text(text = "Type message....", fontSize = 14.sp, fontFamily = Constants.FONT_LIGHT, color = Color.Gray)
                     },
                     maxLines = 10,
-                    textStyle = TextStyle(fontSize = 14.sp, fontFamily = Constants.ROBOTO_FLEX, color = Color.Black),
+                    textStyle = TextStyle(
+                        fontFamily = FontFamily.Default,
+                        fontSize = 16.sp,
+                        lineHeight = 20.sp,
+                        color = Color.Black,
+                        letterSpacing = (-0.01f).em
+                    ),
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Color.LightGray,
                         unfocusedBorderColor = Color.LightGray,
-                        cursorColor = Color.Red,
-                        focusedContainerColor = Color.LightGray, unfocusedContainerColor = Color.LightGray.copy(alpha = 0.7f),
+                        cursorColor = floatingActionBtnColor,
+                        focusedContainerColor = Color.White.copy(alpha = 0.8f),
+                        unfocusedContainerColor = Color.White.copy(alpha = 0.6f),
                         focusedTextColor = Color.Black
                     ),trailingIcon = {
                         Row(
@@ -806,7 +816,9 @@ fun SingleChatTopBar(title: String,profileImage:String?, navController: NavHostC
 
             }
         }, actions = {
-            Row(modifier = Modifier.wrapContentSize().padding(end=20.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(26.dp)) {
+            Row(modifier = Modifier
+                .wrapContentSize()
+                .padding(end = 20.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(26.dp)) {
 
                 Image(
                     painter = painterResource(id = androidx.core.R.drawable.ic_call_answer_video),

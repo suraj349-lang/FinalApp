@@ -24,6 +24,10 @@ object Constants {
 
     val ROBOTO_FLEX = FontFamily(Font(R.font.roboto_flex))
 
+
+
+    val CHAT_FONT = FontFamily(Font(R.font.roboto_flex))
+
     val ROBOTO_CONDENSED = FontFamily(Font(R.font.roboto_condensed));
 
     val DONGLE_BOLD =FontFamily(Font(R.font.dongle_bold));

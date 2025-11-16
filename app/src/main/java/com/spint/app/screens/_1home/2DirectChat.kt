@@ -68,6 +68,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 
 import coil.compose.AsyncImage
@@ -212,108 +213,118 @@ fun DirectChatProfiles(
     scrollBehavior: TopAppBarScrollBehavior,
     navController: NavHostController,
     eventsViewModel: EventsViewModel,
-    chatViewModel:ChatViewModel,
-    onJoinDuelClicked:()->Unit,
-    onCheckedChange:()->Unit
+    chatViewModel: ChatViewModel,
+    onJoinDuelClicked: () -> Unit,
+    onCheckedChange: () -> Unit
 ) {
-    val chatState by eventsViewModel.directChatResponse.collectAsState()
-    val directChatObjectList = eventsViewModel.nearByUsersList.collectAsLazyPagingItems()
-    Log.i("directchat users list", "DirectChatProfiles:${directChatObjectList.itemCount} ")
-    val saveToChatListSuccess by eventsViewModel.saveUserToChatListResponseState.collectAsState()
+    val saveToChatResponse by eventsViewModel.saveUserToChatListResponseState.collectAsState()
     val userObject by UserObject.user.collectAsState()
-    when(val response=saveToChatListSuccess){
-        is RequestState.Error ->  {
-            Text(text = response.error.toString())
-        }
-        is RequestState.Success ->{
+    val directChatList = eventsViewModel.nearByUsersList.collectAsLazyPagingItems()
+
+    // -----------------------------
+    // HANDLE SAVE-TO-CHAT RESPONSE
+    // -----------------------------
+    when (val res = saveToChatResponse) {
+        is RequestState.Success -> {
             chatViewModel.connectSocket()
-            Log.i("Userr", "DirectChatProfiles: ${response.data.withUserId.name} other user id ${response.data.withUserId._id}")
-         //   chatViewModel.profileImage.value = response.data.withUserId.profileImage
             navController.navigate(
                 SCREENS.SINGLE_CHAT.createPath(
-                    userName = response.data.withUserId.name,
-                    chatListUserId = response.data.withUserId._id
+                    userName = res.data.withUserId.name,
+                    chatListUserId = res.data.withUserId._id
                 )
             )
             eventsViewModel.resetSaveToChatListSuccessToIdle()
         }
-        is RequestState.Loading ->{
-            CircularProgressIndicator()
+
+        is RequestState.Error -> Text(text = res.error.toString())
+        is RequestState.Loading -> CircularProgressIndicator()
+        else -> {}
+    }
+
+    // -----------------------------
+    // HANDLE PAGING LOAD STATES
+    // -----------------------------
+    val loadState = directChatList.loadState
+    when {
+        loadState.refresh is LoadState.Loading -> {
+            DialogLoading()
+            return
         }
-        else  ->{}
+        loadState.refresh is LoadState.Error -> {
+            CommonErrorScreen("Unable to get users.")
+            return
+        }
+        directChatList.itemCount == 0 -> {
+            NoDirectChatUsersFound(onJoinDuelClicked)
+            return
+        }
     }
-    // SHOW LOADING WHEN NEEDED
-    if (chatState is RequestState.Loading) {
-        DialogLoading()
-    }
 
-    // SHOW ERROR WHEN NEEDED
-    if (chatState is RequestState.Error) {
-        CommonErrorScreen(error = "Unable to get users.")
-    }
-            LazyColumn() {
-                item {
-                    Row(
-                        Modifier
-                            .padding(horizontal = 10.dp)
-                            .fillMaxWidth()
-                            .wrapContentHeight(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text(
-                            text = if(directChatObjectList.itemCount !=0) "Verified users near you" else  "",
-                            fontFamily = Constants.FONT_LIGHT,
-                            color = Constants.HOME_TOP_BAR_ICON_COLOR,
-                            fontWeight = FontWeight.Normal,
-                            fontSize = 20.sp,
-                            modifier = Modifier
-                               // .padding(top = 10.dp, start = 10.dp)
-                        )
-                        Switch(
-                            checked = true,
-                            onCheckedChange = {onCheckedChange()},
-                            colors = SwitchDefaults.colors(
-                                checkedThumbColor = floatingActionBtnColor,// MaterialTheme.colorScheme.primary,
-                                checkedTrackColor = Color(0xFFFFFFFF),
-                                uncheckedThumbColor = Color(0xFFFFFFFF),
-                                uncheckedTrackColor = Color(0xFFFFFFFF),
-                            ),
-                            modifier = Modifier.size(80.dp)
-                        )
+    // -----------------------------
+    // MAIN LIST
+    // -----------------------------
+    LazyColumn(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Top
+    ) {
 
-                    }
-                }
-                item {
-                    if(directChatObjectList.itemCount ==0){
-                        NoDirectChatUsersFound(onJoinDuelClicked)
-                    }
-                }
+        // Header + Switch
+        item {
+            Row(
+                modifier = Modifier
+                    .padding(horizontal = 10.dp, vertical = 8.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Verified users near you",
+                    fontFamily = Constants.FONT_LIGHT,
+                    color = Constants.HOME_TOP_BAR_ICON_COLOR,
+                    fontSize = 20.sp
+                )
 
-
-
-                items(
-                    count = directChatObjectList.itemCount,
-                    key = { index -> directChatObjectList[index]?.userId?.user ?: index }
-                ) { index ->
-                    val directChatObject = directChatObjectList[index]
-                    if(directChatObject != null) {
-
-                        DirectChatItem(
-                            directChatObject = directChatObject,
-                            onProfileClicked = {
-                                navController.navigate(SCREENS.USER_PUBLIC_PROFILE.createPath(userId = directChatObject.userId.user))
-                            },
-                            onSendMessageClicked = {
-                                Log.i("Userr", "DirectChatProfiles: ${userObject.user} other ${directChatObject.userId.user}")
-                                eventsViewModel.saveUserToChatList(
-                                    currentUserId = userObject.user,
-                                    otherUserUserId = directChatObject.userId.user
-                                )
-                            }
-                        )
-                    }
-                }
+                Switch(
+                    checked = true,
+                    onCheckedChange = { onCheckedChange() },
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = floatingActionBtnColor,
+                        checkedTrackColor = Color.White,
+                        uncheckedThumbColor = Color.White,
+                        uncheckedTrackColor = Color.White
+                    ),
+                    modifier = Modifier.size(80.dp)
+                )
             }
+        }
 
+        // Users list
+        items(
+            count = directChatList.itemCount,
+            key = { index -> directChatList[index]?.userId?.user ?: index }
+        ) { index ->
+            directChatList[index]?.let { item ->
+                DirectChatItem(
+                    directChatObject = item,
+                    onProfileClicked = {
+                        navController.navigate(
+                            SCREENS.USER_PUBLIC_PROFILE.createPath(
+                                userId = item.userId.user
+                            )
+                        )
+                    },
+                    onSendMessageClicked = {
+                        eventsViewModel.saveUserToChatList(
+                            currentUserId = userObject.user,
+                            otherUserUserId = item.userId.user
+                        )
+                    }
+                )
+            }
+        }
+    }
 }
+
 
 
 
