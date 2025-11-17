@@ -186,6 +186,8 @@ fun DuelScreen(navController: NavHostController) {
                                 webRTCManager.setupSocket()
                             } else {
                                 webRTCManager.release()
+                                isVisible = true         // show buttons again
+                                currentScreen = SCREEN.THREE_FOUR
                             }
                         } else {
                             permissionLauncher.launch(arrayOf(cameraPermission, micPermission))
@@ -239,11 +241,21 @@ fun DuelScreen(navController: NavHostController) {
 //                }
             }
             }
-        }, floatingActionButton = {
-            if(isConnected){
-                DuelOptions(isVisible, onCloseClicked ={webRTCManager.release();navController.navigateUp()}) { isVisible = true }
-            }
-                                  }, floatingActionButtonPosition = androidx.compose.material.FabPosition.Center
+        },
+        floatingActionButton = {
+            if (isConnected) {
+                DuelOptions(
+                    isVisible,
+                    onCloseClicked = {
+                        isConnected=false
+                        webRTCManager.release();
+
+                        navController.navigateUp()
+                    }) {
+                    isVisible = true
+                }
+            }},
+        floatingActionButtonPosition = androidx.compose.material.FabPosition.Center
     ) { padding ->
         Box(
             modifier = Modifier

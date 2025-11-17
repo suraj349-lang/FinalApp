@@ -21,6 +21,9 @@ class WebRTCManager(
     private var peerConnection: PeerConnection? = null
     private lateinit var socket: Socket
 
+    // optional callback so UI can react to partner disconnect
+    var onPartnerDisconnected: (() -> Unit)? = null
+
     private var videoCapturer: CameraVideoCapturer? = null
     private var videoSource: VideoSource? = null
     private var localVideoTrack: VideoTrack? = null
@@ -29,10 +32,8 @@ class WebRTCManager(
     private var audioSource: AudioSource? = null
     private var partnerId: String? = null
 
-    // inside class
     private val pendingRemoteCandidates = mutableListOf<IceCandidate>()
     private var isRemoteDescriptionSet = false
-
 
     /** Initialize factory + local tracks */
     fun initFactoryAndLocalTracks() {
@@ -41,37 +42,71 @@ class WebRTCManager(
         initVideoCapturer()
     }
 
-    /** Attach local video to renderer */
     fun setupLocalVideo() {
         localVideoTrack?.addSink(localRenderer)
     }
 
-    /** Start local camera preview */
     fun startLocalPreview() {
-        videoCapturer?.startCapture(1024, 720, 30)
-    }
-
-    /** Release resources */
-    fun release() {
         try {
-            videoCapturer?.stopCapture()
-        } catch (_: Exception) {}
-        videoCapturer?.dispose()
-        videoSource?.dispose()
-        audioSource?.dispose()
-        peerConnection?.close()
-        if (::socket.isInitialized) {
-            socket.disconnect()
-            socket.close()
+            videoCapturer?.startCapture(1024, 720, 30)
+        } catch (e: Exception) {
+            Log.e(tag, "startLocalPreview failed: ${e.message}")
         }
     }
 
-    /** Socket signaling */
-    fun setupSocket() {
-        socket = IO.socket("http://${Constants.IP_ADD}:5002")
-        socket.connect()
+    fun release() {
+        try { videoCapturer?.stopCapture() } catch (_: Exception) {}
 
-        socket.on(Socket.EVENT_CONNECT) { Log.d(tag, "Connected to server") }
+        try { peerConnection?.close() } catch (_: Exception) {}
+        peerConnection = null
+        partnerId = null
+
+
+        videoCapturer?.dispose()
+        videoSource?.dispose()
+        audioSource?.dispose()
+        pendingRemoteCandidates.clear()
+        isRemoteDescriptionSet = false
+
+        if (::socket.isInitialized) {
+            try {
+                socket.disconnect()
+                socket.close()
+            } catch (e: Exception) {
+                Log.w(tag, "Socket disconnect error: ${e.message}")
+            }
+        }
+    }
+
+    /** Setup socket */
+    fun setupSocket() {
+        // prevent double initialization
+        if (::socket.isInitialized && socket.connected()) {
+            Log.d(tag, "Socket already connected, ignoring setupSocket()")
+            return
+        }
+
+        try {
+            val opts = IO.Options().apply {
+            path = "/signaling/socket.io/"   // FIX
+            reconnection = true
+            }
+
+            socket = IO.socket("http://3.108.55.84", opts)
+
+
+            socket.connect()
+        } catch (e: Exception) {
+            Log.e(tag, "Socket connect error: ${e.message}")
+        }
+
+        socket.on(Socket.EVENT_CONNECT) {
+            Log.d(tag, "Connected to signaling server")
+        }
+
+        socket.on(Socket.EVENT_DISCONNECT) {
+            Log.d(tag, "Socket disconnected")
+        }
 
         socket.on("matched") { args ->
             val data = args[0] as JSONObject
@@ -80,119 +115,125 @@ class WebRTCManager(
 
             runOnMainThread {
                 createPeerConnection()
-                if (shouldOffer) {
-                    createAndSendOffer()
-                }
+                if (shouldOffer) createAndSendOffer()
             }
         }
 
-//        socket.on("offer") { args ->
-//            val data = args[0] as JSONObject
-//            val offer = data.getJSONObject("offer")
-//            val sdp = offer.getString("sdp")
-//            val type = offer.getString("type")
-//            runOnMainThread {
-//                if (peerConnection == null) createPeerConnection()
-//                peerConnection?.setRemoteDescription(
-//                    SdpObserverAdapter(),
-//                    SessionDescription(SessionDescription.Type.fromCanonicalForm(type), sdp)
-//                )
-//                createAndSendAnswer()
-//            }
-//        }
-//        socket.on("offer") { args ->
-//            val data = args[0] as JSONObject
-//            val offer = data.getJSONObject("offer")
-//            val sdp = offer.getString("sdp")
-//            val type = offer.getString("type")
-//
-//            runOnMainThread {
-//                if (peerConnection == null) {
-//                    createPeerConnection()
-//                    // ✅ Make sure local tracks are attached
-//                    localVideoTrack?.let { peerConnection?.addTrack(it) }
-//                    localAudioTrack?.let { peerConnection?.addTrack(it) }
-//                }
-//
-//                val remoteDesc = SessionDescription(SessionDescription.Type.fromCanonicalForm(type), sdp)
-//                peerConnection?.setRemoteDescription(SdpObserverAdapter(), remoteDesc)
-//
-//                // ✅ Wait until remote description is set before answering
-//                createAndSendAnswer()
-//            }
-//        }
+        /** Receive OFFER */
         socket.on("offer") { args ->
             val data = args[0] as JSONObject
             val offer = data.getJSONObject("offer")
-            val sdp = offer.getString("sdp")
-            val type = offer.getString("type")
+
+            val remoteDesc = SessionDescription(
+                SessionDescription.Type.fromCanonicalForm(offer.getString("type")),
+                offer.getString("sdp")
+            )
 
             runOnMainThread {
-                if (peerConnection == null) {
-                    createPeerConnection()
-                    // ensure local tracks are attached
-                    localVideoTrack?.let { peerConnection?.addTrack(it) }
-                    localAudioTrack?.let { peerConnection?.addTrack(it) }
-                }
+                if (peerConnection == null) createPeerConnection()
 
-                // reset candidate buffer and flag for this negotiation
+                // reset buffer/flag for this negotiation
                 pendingRemoteCandidates.clear()
                 isRemoteDescriptionSet = false
 
-                val remoteDesc = SessionDescription(SessionDescription.Type.fromCanonicalForm(type), sdp)
-                // Use a SdpObserverAdapter which calls createAndSendAnswer() only onSetSuccess
                 peerConnection?.setRemoteDescription(object : SdpObserverAdapter() {
                     override fun onSetSuccess() {
-                        super.onSetSuccess()
-                        Log.d(tag, "Remote description set successfully — creating answer")
+                        Log.d(tag, "Remote description (offer) set OK")
                         isRemoteDescriptionSet = true
-                        // flush any queued remote candidates
+
+                        // flush queued remote candidates
                         pendingRemoteCandidates.forEach { candidate ->
                             Log.d(tag, "Flushing queued remote candidate: $candidate")
                             peerConnection?.addIceCandidate(candidate)
                         }
                         pendingRemoteCandidates.clear()
 
-                        // Now create and send the answer
                         createAndSendAnswer()
                     }
 
                     override fun onSetFailure(error: String) {
                         super.onSetFailure(error)
-                        Log.e(tag, "Failed to set remote description: $error")
+                        Log.e(tag, "Failed to set remote description (offer): $error")
                     }
                 }, remoteDesc)
             }
         }
 
-
-
+        /** Receive ANSWER */
         socket.on("answer") { args ->
             val data = args[0] as JSONObject
             val answer = data.getJSONObject("answer")
-            val sdp = answer.getString("sdp")
-            val type = answer.getString("type")
+
+            val remoteDesc = SessionDescription(
+                SessionDescription.Type.fromCanonicalForm(answer.getString("type")),
+                answer.getString("sdp")
+            )
+
             runOnMainThread {
-                peerConnection?.setRemoteDescription(
-                    SdpObserverAdapter(),
-                    SessionDescription(SessionDescription.Type.fromCanonicalForm(type), sdp)
-                )
+                // when we receive answer, we consider remote description set for this negotiation
+                peerConnection?.setRemoteDescription(object : SdpObserverAdapter() {
+                    override fun onSetSuccess() {
+                        Log.d(tag, "Remote description (answer) set OK")
+                        isRemoteDescriptionSet = true
+
+                        // flush any buffered candidates
+                        pendingRemoteCandidates.forEach { candidate ->
+                            Log.d(tag, "Flushing queued remote candidate after answer: $candidate")
+                            peerConnection?.addIceCandidate(candidate)
+                        }
+                        pendingRemoteCandidates.clear()
+                    }
+
+                    override fun onSetFailure(error: String) {
+                        super.onSetFailure(error)
+                        Log.e(tag, "Failed to set remote description (answer): $error")
+                    }
+                }, remoteDesc)
             }
         }
 
+        /** Receive ICE CANDIDATE */
         socket.on("ice-candidate") { args ->
             val data = args[0] as JSONObject
-            val candidate = data.getJSONObject("candidate")
-            val sdpMid = candidate.getString("sdpMid")
-            val sdpMLineIndex = candidate.getInt("sdpMLineIndex")
-            val candidateStr = candidate.getString("candidate")
+            val c = data.getJSONObject("candidate")
+
+            val candidate = IceCandidate(
+                c.getString("sdpMid"),
+                c.getInt("sdpMLineIndex"),
+                c.getString("candidate")
+            )
+
             runOnMainThread {
-                peerConnection?.addIceCandidate(IceCandidate(sdpMid, sdpMLineIndex, candidateStr))
+                if (!isRemoteDescriptionSet) {
+                    Log.d(tag, "Remote SDP not set → buffering ICE candidate")
+                    pendingRemoteCandidates.add(candidate)
+                } else {
+                    Log.d(tag, "Applying ICE candidate now: $candidate")
+                    peerConnection?.addIceCandidate(candidate)
+                }
+            }
+        }
+
+        // partner disconnected event from server
+        socket.on("partner-disconnected") {
+            Log.d(tag, "Partner disconnected event received")
+            runOnMainThread {
+                // cleanup our connection
+                try {
+                    peerConnection?.close()
+                } catch (_: Exception) {}
+                peerConnection = null
+                pendingRemoteCandidates.clear()
+                isRemoteDescriptionSet = false
+                partnerId = null
+
+                // notify UI
+                onPartnerDisconnected?.invoke()
             }
         }
     }
 
-    /** --- Private helpers --- */
+    /** Helpers */
 
     private fun initPeerConnectionFactory() {
         PeerConnectionFactory.initialize(
@@ -200,199 +241,147 @@ class WebRTCManager(
                 .createInitializationOptions()
         )
 
-        val options = PeerConnectionFactory.Options()
         val encoderFactory = DefaultVideoEncoderFactory(eglBase.eglBaseContext, true, true)
         val decoderFactory = DefaultVideoDecoderFactory(eglBase.eglBaseContext)
 
         peerConnectionFactory = PeerConnectionFactory.builder()
-            .setOptions(options)
             .setVideoEncoderFactory(encoderFactory)
             .setVideoDecoderFactory(decoderFactory)
             .createPeerConnectionFactory()
     }
 
     private fun initAudio() {
-        val audioConstraints = MediaConstraints()
-        audioSource = peerConnectionFactory.createAudioSource(audioConstraints)
+        audioSource = peerConnectionFactory.createAudioSource(MediaConstraints())
         localAudioTrack = peerConnectionFactory.createAudioTrack("101", audioSource!!)
     }
 
     private fun initVideoCapturer() {
         val enumerator = Camera2Enumerator(context)
         val cameraName = enumerator.deviceNames.firstOrNull { enumerator.isFrontFacing(it) }
-        if (cameraName == null) {
-            Log.e(tag, "No front camera found")
-            return
-        }
+            ?: return
+
         videoCapturer = enumerator.createCapturer(cameraName, null)
-        val surfaceTextureHelper = SurfaceTextureHelper.create("CaptureThread", eglBase.eglBaseContext)
-        videoSource = peerConnectionFactory.createVideoSource(videoCapturer!!.isScreencast)
-        videoCapturer!!.initialize(surfaceTextureHelper, context, videoSource!!.capturerObserver)
+        val helper = SurfaceTextureHelper.create("CaptureThread", eglBase.eglBaseContext)
+
+        videoSource = peerConnectionFactory.createVideoSource(false)
+        videoCapturer!!.initialize(helper, context, videoSource!!.capturerObserver)
+
         localVideoTrack = peerConnectionFactory.createVideoTrack("100", videoSource!!)
         localVideoTrack?.addSink(localRenderer)
     }
 
     private fun createPeerConnection() {
-        // Add TURN server along with STUN
+        // Close existing and reset state
+        try { peerConnection?.close() } catch (_: Exception) {}
+        peerConnection = null
+        pendingRemoteCandidates.clear()
+        isRemoteDescriptionSet = false
+
+        /** STUN ONLY */
         val iceServers = listOf(
-            PeerConnection.IceServer.builder("stun:stun.l.google.com:19302").createIceServer(),
-            PeerConnection.IceServer.builder("turn:YOUR_TURN_SERVER_IP:3478")
-                .setUsername("username")
-                .setPassword("password")
-                .createIceServer()
+            PeerConnection.IceServer.builder("stun:stun.l.google.com:19302").createIceServer()
         )
 
-        val rtcConfig = PeerConnection.RTCConfiguration(iceServers).apply {
+        val config = PeerConnection.RTCConfiguration(iceServers).apply {
             sdpSemantics = PeerConnection.SdpSemantics.UNIFIED_PLAN
         }
 
-        peerConnection?.close()
-//        peerConnection = peerConnectionFactory.createPeerConnection(rtcConfig, object : PeerConnection.Observer {
-//            override fun onIceCandidate(candidate: IceCandidate) {
-//                Log.d(tag, "New ICE candidate: ${candidate.sdp}")
-//                partnerId?.let {
-//                    val json = JSONObject().apply {
-//                        put("partnerId", it)
-//                        put("candidate", JSONObject().apply {
-//                            put("sdpMid", candidate.sdpMid)
-//                            put("sdpMLineIndex", candidate.sdpMLineIndex)
-//                            put("candidate", candidate.sdp)
-//                        })
-//                    }
-//                    socket.emit("ice-candidate", json)
-//                }
-//            }
-//
-//            override fun onTrack(transceiver: RtpTransceiver?) {
-//                val track = transceiver?.receiver?.track()
-//                if (track is VideoTrack) {
-//                    remoteVideoTrack = track
-//                    runOnMainThread { remoteVideoTrack?.addSink(remoteRenderer) }
-//                }
-//            }
-//
-//            override fun onSignalingChange(state: PeerConnection.SignalingState?) {}
-//            override fun onIceConnectionChange(state: PeerConnection.IceConnectionState?) {
-//                Log.d(tag, "ICE connection state changed: $state")
-//            }
-//            override fun onConnectionChange(state: PeerConnection.PeerConnectionState?) {
-//                Log.d(tag, "PeerConnection state changed: $state")
-//            }
-//            override fun onIceGatheringChange(state: PeerConnection.IceGatheringState?) {}
-//            override fun onIceCandidatesRemoved(candidates: Array<out IceCandidate>?) {}
-//            override fun onDataChannel(dc: DataChannel?) {}
-//            override fun onAddStream(stream: MediaStream?) {
-//                Log.d(tag, "onAddStream: tracks=${stream?.videoTracks?.size}")
-//                stream?.videoTracks?.firstOrNull()?.let { track ->
-//                    remoteVideoTrack = track
-//                    runOnMainThread { remoteVideoTrack?.addSink(remoteRenderer) }
-//                }
-//            }
-//            override fun onRemoveStream(p0: MediaStream?) {}
-//            override fun onRenegotiationNeeded() {}
-//            override fun onIceConnectionReceivingChange(p0: Boolean) {}
-        peerConnection = peerConnectionFactory.createPeerConnection(rtcConfig, object : PeerConnection.Observer {
-            override fun onIceCandidate(candidate: IceCandidate) {
-                Log.d(tag, "New ICE candidate: $candidate") // <-- full candidate info
-                partnerId?.let {
-                    val json = JSONObject().apply {
-                        put("partnerId", it)
-                        put("candidate", JSONObject().apply {
-                            put("sdpMid", candidate.sdpMid)
-                            put("sdpMLineIndex", candidate.sdpMLineIndex)
-                            put("candidate", candidate.sdp)
-                        })
+        peerConnection = peerConnectionFactory.createPeerConnection(config,
+            object : PeerConnection.Observer {
+                override fun onIceCandidate(candidate: IceCandidate) {
+                    Log.d(tag, "New ICE candidate generated: $candidate")
+                    partnerId?.let {
+                        val json = JSONObject().apply {
+                            put("partnerId", it)
+                            put("candidate", JSONObject().apply {
+                                put("sdpMid", candidate.sdpMid)
+                                put("sdpMLineIndex", candidate.sdpMLineIndex)
+                                put("candidate", candidate.sdp)
+                            })
+                        }
+                        try {
+                            socket.emit("ice-candidate", json)
+                        } catch (e: Exception) {
+                            Log.w(tag, "Failed to emit ice-candidate: ${e.message}")
+                        }
                     }
-                    socket.emit("ice-candidate", json)
                 }
-            }
 
-            override fun onTrack(transceiver: RtpTransceiver?) {
-                val track = transceiver?.receiver?.track()
-                if (track is VideoTrack) {
-                    remoteVideoTrack = track
-                    runOnMainThread { remoteVideoTrack?.addSink(remoteRenderer) }
+                override fun onTrack(transceiver: RtpTransceiver?) {
+                    (transceiver?.receiver?.track() as? VideoTrack)?.let { videoTrack ->
+                        remoteVideoTrack = videoTrack
+                        runOnMainThread { remoteVideoTrack?.addSink(remoteRenderer) }
+                    }
                 }
-            }
 
-            override fun onSignalingChange(state: PeerConnection.SignalingState?) {}
-            override fun onIceConnectionChange(state: PeerConnection.IceConnectionState?) {
-                Log.d(tag, "ICE connection state changed: $state")
-            }
-            override fun onConnectionChange(state: PeerConnection.PeerConnectionState?) {
-                Log.d(tag, "PeerConnection state changed: $state")
-            }
-            override fun onIceGatheringChange(state: PeerConnection.IceGatheringState?) {}
-            override fun onIceCandidatesRemoved(candidates: Array<out IceCandidate>?) {}
-            override fun onDataChannel(dc: DataChannel?) {}
-            override fun onAddStream(stream: MediaStream?) {
-                Log.d(tag, "onAddStream: tracks=${stream?.videoTracks?.size}")
-                stream?.videoTracks?.firstOrNull()?.let { track ->
-                    remoteVideoTrack = track
-                    runOnMainThread { remoteVideoTrack?.addSink(remoteRenderer) }
+                override fun onIceConnectionChange(state: PeerConnection.IceConnectionState?) {
+                    Log.d(tag, "ICE → $state")
                 }
-            }
-            override fun onRemoveStream(p0: MediaStream?) {}
-            override fun onRenegotiationNeeded() {}
-            override fun onIceConnectionReceivingChange(p0: Boolean) {}
-    })
+
+                override fun onConnectionChange(state: PeerConnection.PeerConnectionState?) {
+                    Log.d(tag, "PC State → $state")
+                }
+
+                override fun onSignalingChange(p0: PeerConnection.SignalingState?) {}
+                override fun onIceGatheringChange(p0: PeerConnection.IceGatheringState?) {}
+                override fun onIceCandidatesRemoved(p0: Array<out IceCandidate>?) {}
+                override fun onDataChannel(p0: DataChannel?) {}
+                override fun onAddStream(p0: MediaStream?) {}
+                override fun onRemoveStream(p0: MediaStream?) {}
+                override fun onRenegotiationNeeded() {}
+                override fun onIceConnectionReceivingChange(p0: Boolean) {}
+            })
 
         // Add local tracks after PeerConnection is created
         localVideoTrack?.let { peerConnection?.addTrack(it) }
         localAudioTrack?.let { peerConnection?.addTrack(it) }
     }
 
-
     private fun createAndSendOffer() {
-        val constraints = MediaConstraints()
         peerConnection?.createOffer(object : SdpObserverAdapter() {
             override fun onCreateSuccess(desc: SessionDescription) {
                 peerConnection?.setLocalDescription(SdpObserverAdapter(), desc)
-                partnerId?.let { pid ->
+
+                partnerId?.let {
                     val json = JSONObject().apply {
-                        put("partnerId", pid)
+                        put("partnerId", it)
                         put("offer", JSONObject().apply {
                             put("type", desc.type.canonicalForm())
                             put("sdp", desc.description)
                         })
                     }
-                    socket.emit("offer", json)
+                    try {
+                        socket.emit("offer", json)
+                    } catch (e: Exception) {
+                        Log.w(tag, "Failed to emit offer: ${e.message}")
+                    }
                 }
             }
-        }, constraints)
+        }, MediaConstraints())
     }
 
     private fun createAndSendAnswer() {
-        val constraints = MediaConstraints()
         peerConnection?.createAnswer(object : SdpObserverAdapter() {
             override fun onCreateSuccess(desc: SessionDescription) {
                 peerConnection?.setLocalDescription(SdpObserverAdapter(), desc)
-                partnerId?.let { pid ->
+
+                partnerId?.let {
                     val json = JSONObject().apply {
-                        put("partnerId", pid)
+                        put("partnerId", it)
                         put("answer", JSONObject().apply {
                             put("type", desc.type.canonicalForm())
                             put("sdp", desc.description)
                         })
                     }
-                    socket.emit("answer", json)
+                    try {
+                        socket.emit("answer", json)
+                    } catch (e: Exception) {
+                        Log.w(tag, "Failed to emit answer: ${e.message}")
+                    }
                 }
             }
-        }, constraints)
+        }, MediaConstraints())
     }
-    private fun createIceServers(): List<PeerConnection.IceServer> {
-        return listOf(
-            // STUN server (existing)
-            PeerConnection.IceServer.builder("stun:stun.l.google.com:19302").createIceServer(),
-
-            // TURN server (add your own)
-            PeerConnection.IceServer.builder("turn:YOUR_TURN_SERVER_IP:3478")
-                .setUsername("TURN_USERNAME")
-                .setPassword("TURN_PASSWORD")
-                .createIceServer()
-        )
-    }
-
 
     private fun runOnMainThread(action: () -> Unit) {
         Handler(context.mainLooper).post { action() }
@@ -402,11 +391,19 @@ class WebRTCManager(
 open class SdpObserverAdapter : SdpObserver {
     private val tag = "WEBRTC_SDP"
 
-    override fun onCreateSuccess(sessionDescription: SessionDescription) {
-        Log.d(tag, "onCreateSuccess: ${sessionDescription.type}")
+    override fun onCreateSuccess(sdp: SessionDescription) {
+        Log.d(tag, "onCreateSuccess: ${sdp.type}")
     }
 
-    override fun onSetSuccess() { Log.d(tag, "onSetSuccess") }
-    override fun onCreateFailure(error: String) { Log.e(tag, "onCreateFailure: $error") }
-    override fun onSetFailure(error: String) { Log.e(tag, "onSetFailure: $error") }
+    override fun onSetSuccess() {
+        Log.d(tag, "onSetSuccess")
+    }
+
+    override fun onCreateFailure(error: String) {
+        Log.e(tag, "onCreateFailure: $error")
+    }
+
+    override fun onSetFailure(error: String) {
+        Log.e(tag, "onSetFailure: $error")
+    }
 }
