@@ -2,6 +2,7 @@ package com.spint.app.screens.common
 
 import android.content.ContentUris
 import android.content.Context
+import android.hardware.display.DisplayManager
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
@@ -42,7 +43,16 @@ import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.spint.app.R
 import com.spint.app.enums.ImageUploadScreens
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
+import androidx.exifinterface.media.ExifInterface
 import java.io.File
+import android.view.Surface
+
+
+
+
 
 
 @Composable
@@ -51,7 +61,11 @@ fun CameraXScreen(navController: NavHostController, screen: String) {
     val lifecycleOwner = LocalLifecycleOwner.current
     val cameraProviderFuture = remember { ProcessCameraProvider.getInstance(context) }
     val previewView = remember { PreviewView(context) }
-    val imageCapture = remember { ImageCapture.Builder().build() }
+    val imageCapture = remember {
+        ImageCapture.Builder()
+            .setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY)
+            .build()
+    }
 
     var imageList by remember { mutableStateOf<List<Uri>>(emptyList()) }
     var permissionsGranted by remember { mutableStateOf(false) }
@@ -239,51 +253,65 @@ fun CameraXScreen(navController: NavHostController, screen: String) {
                                 "IMG_${System.currentTimeMillis()}.jpg"
                             )
 
-                            val metadata = ImageCapture
-                                .Metadata()
-                                .apply {
-                                    isReversedHorizontal =
-                                        cameraSelector == CameraSelector.DEFAULT_FRONT_CAMERA
-                                }
+                            val metadata = ImageCapture.Metadata().apply {
+                                isReversedHorizontal = cameraSelector == CameraSelector.DEFAULT_FRONT_CAMERA
+                            }
 
                             val outputOptions = ImageCapture.OutputFileOptions
                                 .Builder(photoFile)
                                 .setMetadata(metadata)
                                 .build()
 
+// 2. Capture the image
                             imageCapture.takePicture(
                                 outputOptions,
                                 ContextCompat.getMainExecutor(context),
                                 object : ImageCapture.OnImageSavedCallback {
                                     override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                                        Toast
-                                            .makeText(
-                                                context,
-                                                "Saved: ${photoFile.name}",
-                                                Toast.LENGTH_SHORT
-                                            )
-                                            .show()
-                                        selectedImageUri = Uri.fromFile(photoFile)
-                                        navController.navigate(
-                                            "preview/$screen/${
-                                                Uri.encode(
-                                                    selectedImageUri.toString()
-                                                )
-                                            }"
-                                        )
-                                    }
 
+                                        val bitmap = BitmapFactory.decodeFile(photoFile.absolutePath)
+                                        val matrix = Matrix()
+
+                                        // 1) GUARANTEED ROTATION FROM CAMERAX (better than EXIF)
+                                        val rotationDegrees = when (imageCapture.targetRotation) {
+                                            Surface.ROTATION_0 -> 90f
+                                            Surface.ROTATION_90 -> 90f
+                                            Surface.ROTATION_180 -> 180f
+                                            Surface.ROTATION_270 -> 270f
+                                            else -> 0f
+                                        }
+
+                                        if (rotationDegrees != 0f) {
+                                            matrix.postRotate(rotationDegrees)
+                                        }
+
+                                        // 2) Mirror only if front camera
+                                        if (cameraSelector == CameraSelector.DEFAULT_FRONT_CAMERA) {
+                                            matrix.preScale(-1f, 1f)
+                                        }
+
+                                        val rotatedBitmap = Bitmap.createBitmap(
+                                            bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true
+                                        )
+
+                                        val rotatedFile = File(
+                                            context.cacheDir,
+                                            "ROTATED_IMG_${System.currentTimeMillis()}.jpg"
+                                        )
+                                        rotatedFile.outputStream().use { out ->
+                                            rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
+                                        }
+
+                                        selectedImageUri = Uri.fromFile(rotatedFile)
+                                        navController.navigate("preview/$screen/${Uri.encode(selectedImageUri.toString())}")
+                                    }
                                     override fun onError(exception: ImageCaptureException) {
-                                        Toast
-                                            .makeText(
-                                                context,
-                                                "Failed: ${exception.message}",
-                                                Toast.LENGTH_SHORT
-                                            )
-                                            .show()
+                                        Toast.makeText(context, "Capture failed: ${exception.message}", Toast.LENGTH_SHORT).show()
                                     }
                                 }
                             )
+
+
                         },
                     contentAlignment = Alignment.Center
                 ) {

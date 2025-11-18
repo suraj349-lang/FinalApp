@@ -1,6 +1,10 @@
 package com.spint.app.screens.common
 
+import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Matrix
+import android.media.ExifInterface
 import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
@@ -39,6 +43,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -64,11 +69,10 @@ fun ImagePreviewScreen(
     val context = LocalContext.current
     var selectedFilter by remember { mutableStateOf(FilterType.Original) }
 
-    // Load the original bitmap
     val originalBitmap = remember(uri) {
-        val stream = context.contentResolver.openInputStream(uri)
-        BitmapFactory.decodeStream(stream)
+        loadBitmapSmart(context, uri)
     }
+
 
     // Apply selected filter
     val filteredBitmap = remember(selectedFilter, originalBitmap) {
@@ -164,7 +168,8 @@ fun ImagePreviewScreen(
                 Icon(
                     painter = painterResource(R.drawable.cross),
                     contentDescription = ""
-                    ,tint = Color.White
+                    ,tint = Color.White,
+                    modifier = Modifier.size(24.dp)
                 )
             }
 
@@ -185,3 +190,41 @@ fun ImagePreviewTopBar(onDoneClicked:()->Unit) {
       colors =TopAppBarDefaults.mediumTopAppBarColors(containerColor = Color.Black)
   )
 }
+
+    fun loadBitmapSmart(context: Context, uri: Uri): Bitmap? {
+        val input = context.contentResolver.openInputStream(uri) ?: return null
+        val bitmap = BitmapFactory.decodeStream(input)
+
+        // Detect CameraX output images (your naming patterns)
+        val isCameraXImage =
+            uri.path?.contains("FINAL_IMG_") == true ||
+                    uri.path?.contains("IMG_") == true
+
+        // CameraX images → DO NOT rotate (CameraX already outputs correct orientation)
+        if (isCameraXImage) {
+            return bitmap
+        }
+
+        // Gallery images → apply EXIF rotation normally
+        val exif = ExifInterface(context.contentResolver.openInputStream(uri)!!)
+        val rotationDegrees = when (
+            exif.getAttributeInt(
+                ExifInterface.TAG_ORIENTATION,
+                ExifInterface.ORIENTATION_NORMAL
+            )
+        ) {
+            ExifInterface.ORIENTATION_ROTATE_90 -> 90f
+            ExifInterface.ORIENTATION_ROTATE_180 -> 180f
+            ExifInterface.ORIENTATION_ROTATE_270 -> 270f
+            else -> 0f
+        }
+
+        val matrix = Matrix()
+        if (rotationDegrees != 0f) {
+            matrix.postRotate(rotationDegrees)
+        }
+
+        return Bitmap.createBitmap(
+            bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true
+        )
+    }
