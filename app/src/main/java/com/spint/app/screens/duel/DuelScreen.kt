@@ -32,6 +32,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -39,12 +40,15 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,6 +58,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
+import androidx.compose.ui.modifier.ModifierLocalReadScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -63,9 +69,13 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
 import com.spint.app.R
+import com.spint.app.utils.UserLocation
+import com.spint.app.utils.UserLocationObject
+import com.spint.app.utils.UserObject
 import com.spint.app.utils.constants.Constants
 import kotlinx.coroutines.delay
 import org.webrtc.EglBase
+import org.webrtc.RendererCommon
 import org.webrtc.SurfaceViewRenderer
 
 
@@ -88,11 +98,15 @@ fun DuelScreen(navController: NavHostController) {
 
     // Initialize renderers safely
     DisposableEffect(localView) {
+        localView.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT)
+        localView.setEnableHardwareScaler(true)
         localView.init(eglBase.eglBaseContext, null)
         localView.setMirror(true)
         onDispose { localView.release() }
     }
     DisposableEffect(remoteView) {
+        remoteView.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT)
+        remoteView.setEnableHardwareScaler(true)
         remoteView.init(eglBase.eglBaseContext, null)
         remoteView.setMirror(false)
         onDispose { remoteView.release() }
@@ -143,74 +157,52 @@ fun DuelScreen(navController: NavHostController) {
     Scaffold(
         topBar = {
             if(!isConnected){
-            TopAppBar(
-                title = {
-                    Row(
-                        Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-
-                        Column(
-                            Modifier
-                                .fillMaxHeight(), verticalArrangement = Arrangement.Center) {
-                                Text("Duel", fontSize = 20.sp, color = Color.White, fontFamily = Constants.FONT_MEDIUM, lineHeight = 12.sp)
-                                Text("connect on mood...", fontSize = 9.sp, color = Color.White, fontFamily = Constants.ROBOTO_CONDENSED, lineHeight = 12.sp)
-                        }
-                    }
-                 },
-                backgroundColor = Constants.HOME_TOP_BAR_COLOR,
-               // modifier = Modifier.shadow(elevation = 20.dp, spotColor =Color.White),
-                navigationIcon = {
-                    Image(painterResource(id = R.drawable.app_icon_dynamic), contentDescription = "", modifier = Modifier.size(44.dp))
-                   // Image(painter = painterResource(id = R.drawable.baseline_arrow_back_24), contentDescription ="", modifier = Modifier.size(24.dp) , colorFilter = ColorFilter.tint(Color.White) )
-                },
-                modifier = Modifier.statusBarsPadding()
-            )
+            DuelTopBar()
         }},
         bottomBar = {
             if (!isConnected){
-            Column(
-                modifier = Modifier
-                    .navigationBarsPadding()
-                    .fillMaxWidth()
-                    .height(90.dp)
-                    .background(Color.Black.copy(alpha = 0.9f))
-                    .padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Button(
-                    onClick = {
-                        if (permissionsGranted) {
-                            isConnected = !isConnected
-                            if (isConnected) {
-                                webRTCManager.setupSocket()
-                            } else {
-                                webRTCManager.release()
-                                isVisible = true         // show buttons again
-                                currentScreen = SCREEN.THREE_FOUR
-                            }
-                        } else {
-                            permissionLauncher.launch(arrayOf(cameraPermission, micPermission))
-                        }
-                    },
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF1976D2)),
+                Column(
                     modifier = Modifier
-                        .width(220.dp)
-                        .height(45.dp),
-                    shape = RoundedCornerShape(50)
-                ) {
-                    Text(if (isConnected) "Disconnect" else "Connect", color = Color.White, fontFamily = Constants.FONT_MEDIUM)
-                }
-
-                Row(
-                    modifier = Modifier
-                        .padding(horizontal = 0.dp)
-                        .padding(top = 8.dp)
+                        .navigationBarsPadding()
                         .fillMaxWidth()
-                        .height(10.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Start
+                        .height(90.dp)
+                        .background(Color.Black.copy(alpha = 0.9f))
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+                    Button(
+                        onClick = {
+                            if (permissionsGranted) {
+                                isConnected = !isConnected
+                                if (isConnected) {
+                                    webRTCManager.setupSocket()
+                                } else {
+                                    webRTCManager.release()
+                                    isVisible = true         // show buttons again
+                                    currentScreen = SCREEN.THREE_FOUR
+                                }
+                            } else {
+                                permissionLauncher.launch(arrayOf(cameraPermission, micPermission))
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF1976D2)),
+                        modifier = Modifier
+                            .width(220.dp)
+                            .height(45.dp),
+                        shape = RoundedCornerShape(50)
+                    ) {
+                        Text(if (isConnected) "Disconnect" else "Connect", color = Color.White, fontFamily = Constants.FONT_MEDIUM)
+                    }
+
+                    Row(
+                        modifier = Modifier
+                            .padding(horizontal = 0.dp)
+                            .padding(top = 8.dp)
+                            .fillMaxWidth()
+                            .height(10.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Start
+                    ) {
 //                    Checkbox(
 //                        checked = true,
 //                        onCheckedChange = { /*TODO*/ },
@@ -220,14 +212,14 @@ fun DuelScreen(navController: NavHostController) {
 //                        ),
 //                        modifier = Modifier.size(10.dp)
 //                    )
-                    Text(
-                        text = "By clicking on connect you agree to our app policy on duel feature and avoid nudity, threat, hate and crime. Click here to know ${Constants.APP_NAME.lowercase()}'s DUEL POLICY.",
-                        maxLines = 2,
-                        overflow = TextOverflow.Visible,
-                        fontFamily = Constants.FONT_LIGHT,
-                        fontSize = 6.5.sp,color= Color.LightGray
-                    )
-                }
+                        Text(
+                            text = "By clicking on connect you agree to our app policy on duel feature and avoid nudity, threat, hate and crime. Click here to know ${Constants.APP_NAME.lowercase()}'s DUEL POLICY.",
+                            maxLines = 2,
+                            overflow = TextOverflow.Visible,
+                            fontFamily = Constants.FONT_LIGHT,
+                            fontSize = 6.5.sp,color= Color.LightGray
+                        )
+                    }
 
 //                Button(
 //                    onClick = { /* TODO: Next random user */ },
@@ -239,7 +231,7 @@ fun DuelScreen(navController: NavHostController) {
 //                ) {
 //                    Text("Next >", color = Color.White, fontFamily = Constants.FONT_LIGHT)
 //                }
-            }
+                }
             }
         },
         floatingActionButton = {
@@ -280,7 +272,9 @@ fun DuelScreen(navController: NavHostController) {
                     AndroidView(factory = {
                         (remoteView.parent as? ViewGroup)?.removeView(remoteView)
                         remoteView
-                    }, modifier = Modifier.fillMaxSize())
+                    }, modifier = Modifier.align(Alignment.TopCenter).fillMaxHeight(0.5f).fillMaxWidth()
+                    )
+
                     Box(modifier = Modifier
                         .align(Alignment.CenterEnd)
                         .wrapContentSize()){
@@ -296,9 +290,9 @@ fun DuelScreen(navController: NavHostController) {
                     Box(
                         modifier = Modifier
                             .clickable { isVisible = true }
-                            .align(Alignment.BottomEnd)
+                            .align(Alignment.BottomCenter)
                             .fillMaxWidth()
-                            .fillMaxHeight(currentScreen.flo.toFloat())
+                            .fillMaxHeight()
                     ) {
                         AndroidView( factory = { context ->
                             (localView.parent as? ViewGroup)?.let { parent ->
@@ -348,23 +342,32 @@ fun DuelScreen(navController: NavHostController) {
 
 @Composable
 fun DuelFirstScreenLocal(localView: SurfaceViewRenderer) {
-
+    val user= UserObject.user.collectAsState()
+    val location= UserLocationObject.userLocation.collectAsState()
     Column(modifier = Modifier.fillMaxSize()) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .fillMaxHeight(0.7f)
+                .fillMaxHeight(0.5f)
                 // .size(240.dp, 320.dp)
                 .background(Color.DarkGray),
             contentAlignment = Alignment.TopCenter
         ) {
-            AndroidView(
-                factory = {
-                    (localView.parent as? ViewGroup)?.removeView(localView)
-                    localView
-                },
-                modifier = Modifier.fillMaxSize()
-            )
+            Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally) {
+                AndroidView(
+                    factory = {
+                        (localView.parent as? ViewGroup)?.removeView(localView)
+                        localView
+                    },
+                    modifier = Modifier.padding(top = 10.dp).size(200.dp).clip(shape = CircleShape)
+                )
+                Spacer(modifier = Modifier.height(18.dp))
+                Text(user.value.userName, fontFamily = Constants.ROBOTO_FLEX, fontSize = 24.sp, color = Color.White)
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(location.value.city.toString()+", " + location.value.state.toString() +", " +location.value.country.toString(), fontFamily = Constants.FONT_LIGHT, fontSize = 12.sp, color = Color.White)
+
+            }
+
 
             // 🟢 2. Overlay icons on top-right
             Column(
@@ -404,7 +407,8 @@ fun DuelFirstScreenLocal(localView: SurfaceViewRenderer) {
                     }
                 }
                 Spacer(modifier = Modifier.height(3.dp))
-                Text(text = "Select a Mood!", fontFamily = Constants.FONT_LIGHT, fontSize = 16.sp,color= Color.White)
+                InterestSelector()
+
                 MoodSelector()
 
             }
@@ -413,12 +417,63 @@ fun DuelFirstScreenLocal(localView: SurfaceViewRenderer) {
 
     }
 }
+
+@Composable
+fun InterestSelector(modifier: Modifier = Modifier) {
+    var expanded by remember { mutableStateOf(false) }
+    val list = listOf("Happy", "Sad", "Bored", "Excited")
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+    ) {
+        Text(
+            text = "Matching on:",
+            fontFamily = Constants.FONT_LIGHT,
+            fontSize = 16.sp,
+            color = Color.White,
+            modifier = Modifier.align(Alignment.CenterVertically)
+        )
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        Box {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(0.dp), modifier = Modifier.clickable { expanded = true }.clip(shape = RoundedCornerShape(12.dp)).background(Color.Gray).wrapContentWidth().height(40.dp)) {
+                Text(
+                    text = "Mood",
+                    color = Color.White,
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+                )
+                Image(painter=painterResource(R.drawable.arrow_down), contentDescription = "", modifier = Modifier.size(30.dp), colorFilter = ColorFilter.tint(color = Color.White))
+            }
+
+
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                modifier = Modifier.width(100.dp)
+            ) {
+                list.forEach { item ->
+                    DropdownMenuItem(onClick = {
+                        // handle selection
+                        println("Selected: $item")
+                        expanded = false
+                    }) {
+                        Text(text = item)
+                    }
+                }
+            }
+        }
+    }
+
+}
 @Composable
 fun ScreenOptions(onScreenClicked: (screen:SCREEN) -> Unit) {
     val listOfScreenOrientation= listOf<ScreenOrientation>(
         ScreenOrientation(R.drawable.baseline_crop_24,SCREEN.HALF),
-        ScreenOrientation(R.drawable.baseline_crop_24,SCREEN.THREE_FOUR),
-        ScreenOrientation(R.drawable.baseline_crop_24,SCREEN.FULL),
+//        ScreenOrientation(R.drawable.baseline_crop_24,SCREEN.THREE_FOUR),
+//        ScreenOrientation(R.drawable.baseline_crop_24,SCREEN.FULL),
         ScreenOrientation(R.drawable.baseline_crop_24,SCREEN.FLOAT),
     )
     Column(modifier = Modifier
@@ -510,7 +565,7 @@ fun DuelCameraEdit(id:Int,tint:Boolean=true,size:Int=28) {
 
 @Composable
 fun MoodSelector() {
-    var selectedMood by remember { mutableStateOf<String?>(null) }
+    var selectedMood by remember { mutableStateOf<String?>(moods[0].first) }
 
     LazyRow(
         modifier = Modifier
@@ -519,37 +574,41 @@ fun MoodSelector() {
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
         items(moods) { emoji ->
-            val isSelected = emoji == selectedMood
+            val isSelected = emoji.first == selectedMood
             Box(
                 modifier = Modifier
                     .size(56.dp)
                     .clip(CircleShape)
                     .background(if (isSelected) Color.White else Color.Transparent)
-                    .clickable { selectedMood = emoji },
+                    .clickable { selectedMood = emoji.first },
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = emoji,
-                    fontSize = 32.sp,
-                    color = if (isSelected) Color.Black else Color.White
-                )
+                Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = emoji.first,
+                        fontSize = 20.sp,
+                        color = if (isSelected) Color.Black else Color.White
+                    )
+                    Text(
+                        text = emoji.second,
+                        fontSize = 10.sp,
+                        color = if (isSelected) Color.Black else Color.White
+                    )
+                }
+
             }
         }
     }
 }
 
 
- val  moods = listOf(
-    "😊", // happy
-    "😎", // cool
-    "😢", // sad
-    "😡", // angry
-    "🤔", // thinking
-    "😍", // in love
-    "🥰", // affectionate
-    "😂", // laughing
-    "😭", // crying hard
-    "❤️", // heart
-    "💔", // broken heart
-    "🤯"  // mind-blown
+ val  moods = listOf<Pair<String, String>>(
+     Pair("😊", "happy"),
+     Pair("😎", "cool"),
+     Pair("😢", "sad"),
+     Pair("😡", "angry"),
+     Pair("🤔", "thinking"),
+     Pair("😍", "in love"),
+     Pair("🥰", "affectionate"),
+     Pair("😂", "laughing")
 )

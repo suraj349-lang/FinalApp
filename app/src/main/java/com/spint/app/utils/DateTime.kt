@@ -20,14 +20,18 @@ fun formatDateTime(isoString: String): String {
         sdf.timeZone = TimeZone.getTimeZone("UTC")
         val zonedDateTime = sdf.parse(cleaned) ?: return "Invalid"
 
-        // Get current date
+        // Get current date in UTC
         val now = Date()
 
-        val timeFormatter = SimpleDateFormat("HH:mm")
-        val dateFormatter = SimpleDateFormat("dd MMM")
+        val timeFormatter = SimpleDateFormat("HH:mm").apply {
+            timeZone = TimeZone.getTimeZone("UTC")  // <- important
+        }
+        val dateFormatter = SimpleDateFormat("dd MMM").apply {
+            timeZone = TimeZone.getTimeZone("UTC")  // <- important
+        }
 
-        val calendarZoned = Calendar.getInstance().apply { time = zonedDateTime }
-        val calendarNow = Calendar.getInstance().apply { time = now }
+        val calendarZoned = Calendar.getInstance(TimeZone.getTimeZone("UTC")).apply { time = zonedDateTime }
+        val calendarNow = Calendar.getInstance(TimeZone.getTimeZone("UTC")).apply { time = now }
 
         return when {
             calendarZoned.get(Calendar.YEAR) == calendarNow.get(Calendar.YEAR) &&
@@ -46,6 +50,7 @@ fun formatDateTime(isoString: String): String {
         "Error getting time"
     }
 }
+
 
 @SuppressLint("SimpleDateFormat")
 fun Long.toRelativeTime(): String {

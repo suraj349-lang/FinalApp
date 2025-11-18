@@ -55,9 +55,9 @@ class ChatDatabaseRepository @Inject constructor(private val chatDao: ChatDao,pr
         flow {emit(apiService.saveUserChatList(currentUserId, otherUserId))
     }.flowOn(Dispatchers.IO)
 
-    suspend fun getMessages(userId: String, otherUserId: String): Flow<ApiResponse<List<Message>>> = flow {
+     fun getMessages(userId: String, otherUserId: String): Flow<ApiResponse<List<Message>>> = flow {
         Log.d("Messageschat", "getAllMessages: called in repo")
         Log.i("Messageschat", "getMessages:$userId   $otherUserId ")
-            emit( apiService.getChats("http://${Constants.IP_ADD}/api/chat/api/chat/getMessages/${userId}/${otherUserId}"))
+            emit( apiService.getChats(userId = userId, otherUserId = otherUserId))
         }.flowOn(Dispatchers.IO)
 }

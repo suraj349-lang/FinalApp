@@ -333,6 +333,7 @@ class WebRTCManager(
             })
 
         // Add local tracks after PeerConnection is created
+        enableSpeakerphone()
         localVideoTrack?.let { peerConnection?.addTrack(it) }
         localAudioTrack?.let { peerConnection?.addTrack(it) }
     }
@@ -386,6 +387,11 @@ class WebRTCManager(
     private fun runOnMainThread(action: () -> Unit) {
         Handler(context.mainLooper).post { action() }
     }
+    private fun enableSpeakerphone() {
+        val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as android.media.AudioManager
+        audioManager.mode = android.media.AudioManager.MODE_IN_COMMUNICATION
+        audioManager.isSpeakerphoneOn = true
+    }
 }
 
 open class SdpObserverAdapter : SdpObserver {
@@ -406,4 +412,7 @@ open class SdpObserverAdapter : SdpObserver {
     override fun onSetFailure(error: String) {
         Log.e(tag, "onSetFailure: $error")
     }
+
+
+
 }

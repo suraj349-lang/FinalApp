@@ -121,10 +121,8 @@ interface ApiService {
     @POST("/api/v1/chats/saveChatList")
     suspend fun saveUserChatList(@Query("userId")userId: String, @Query("otherUserId")otherUserId: String):ApiResponse<ChatList>
 
-    @GET
-    suspend fun getChats(@Url url:String):ApiResponse<List<Message>>
-
-
+    @GET("/api/chat/getMessages/{userId}/{otherUserId}/")
+    suspend fun getChats(@Path("userId") userId:String,@Path("otherUserId") otherUserId:String):ApiResponse<List<Message>>
 
 
 }

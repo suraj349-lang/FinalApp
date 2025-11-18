@@ -5,22 +5,31 @@ package com.spint.app.screens._6chat
 import BottomBar
 import android.annotation.SuppressLint
 import android.util.Log
+import android.widget.Space
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Surface
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -32,6 +41,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.ShouldPauseCallback
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -40,21 +50,26 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.computeHorizontalBounds
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.spint.app.R
@@ -69,6 +84,12 @@ import com.spint.app.utils.constants.Constants
 import com.spint.app.utils.constants.Constants.TAG
 import com.spint.app.viewmodels.ChatViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.spint.app.screens.dialogBox.ShowDialog
+import com.spint.app.screens.dialogBox.ShowQRDialog
+import com.spint.app.screens.qrcode.QRCode
+import com.spint.app.screens.qrcode.rememberQrBitmapPainter
+import com.spint.app.ui.theme.floatingActionBtnColor
+import com.spint.app.utils.UserLocationObject
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -125,7 +146,7 @@ fun ChatListScreen(navController: NavHostController,chatViewModel: ChatViewModel
     },
         bottomBar = {BottomBar(navController = navController, state =buttonsVisible, containerColor = Constants.HOME_BOTTOM_BAR_COLOR )}
     ) {
-        Surface(modifier = Modifier.fillMaxSize(), color = Color.LightGray) {
+        Surface(modifier = Modifier.fillMaxSize(), color = Color.Gray) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -155,19 +176,26 @@ fun ChatListScreen(navController: NavHostController,chatViewModel: ChatViewModel
                     is RequestState.Success -> {
                         val users =
                             remember { (chatListState as RequestState.Success<List<ChatList>>).data }
-                        LazyColumn(modifier = Modifier) {
-                            itemsIndexed(users) { i, user ->
-                                UserItem(navController, user) { imageUrl ->
-                                    if (!imageUrl.isNullOrEmpty()) {
-                                        chatViewModel.profileImage.value = imageUrl
-                                    }
+                        Column(modifier = Modifier.fillMaxHeight(0.99f)) {
+                            LazyColumn(modifier = Modifier.padding(top=5.dp)) {
+                                item(){
+                                   ChatSections()
                                 }
-                                Spacer(modifier = Modifier.padding(top = 1.dp))
+                                items(users) { user ->
+                                    UserItem(navController, user) { imageUrl ->
+                                        if (!imageUrl.isNullOrEmpty()) {
+                                            chatViewModel.profileImage.value = imageUrl
+                                        }
+                                    }
+                                    Spacer(modifier = Modifier.padding(top = 1.dp))
 //                                Divider(
 //                                    modifier = Modifier.fillMaxWidth(),
 //                                    color = Color(0xFFF1EAEA)
 //                                )
+                                }
                             }
+                            AddPeopleFromContacts()
+                            ShareYourProfileInstead()
                         }
                     }
 
@@ -177,6 +205,70 @@ fun ChatListScreen(navController: NavHostController,chatViewModel: ChatViewModel
         }
     }
 }
+
+@Composable
+fun ChatSections() {
+    val list=listOf("Connections","")
+}
+
+@Composable
+fun AddPeopleFromContacts(modifier: Modifier = Modifier) {
+    Card(Modifier
+        .padding(top = 30.dp)
+        .padding(16.dp)
+        .fillMaxWidth()
+        .height(160.dp), shape = RoundedCornerShape(12.dp), colors = CardDefaults.cardColors(containerColor = Color(
+        0xFFEAE0D3
+    )
+    )) {
+        Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+            Text("Add more people!", fontFamily = Constants.ROBOTO_FLEX, fontSize = 20.sp, color = Color.Black, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(6.dp))
+            Text("Get your friends from your contacts on ${Constants.APP_NAME}", fontFamily = Constants.ROBOTO_FLEX, fontSize = 12.sp, color = Color.DarkGray)
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(onClick = {}, colors = ButtonDefaults.buttonColors(backgroundColor = floatingActionBtnColor)) {
+                Text("Get Contacts", fontFamily = Constants.FONT_LIGHT, fontSize = 16.sp, color = Color.White)
+            }
+        }
+
+    }
+}
+@Composable
+fun ShareYourProfileInstead(onShareProfileClicked:()-> Unit={}) {
+    val user= UserObject.user.collectAsState()
+    val qrPainter = rememberQrBitmapPainter("https://spint.com/profile/${user.value.user}", qrColor = Color.Black, backgroundColor = Color(0xFFE9F0F7).copy(alpha = 0.8f) )//0xFFEEF707
+    Card(Modifier
+        .padding(16.dp)
+        .fillMaxWidth()
+        .height(100.dp), shape = RoundedCornerShape(12.dp), colors = CardDefaults.cardColors(containerColor = Color(
+        0xFFC5B8E5
+    )
+    )) {
+            Row(modifier = Modifier.fillMaxWidth().wrapContentHeight(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+                Box(modifier = Modifier.size(100.dp)) {
+                    Image(
+                        painter = qrPainter,
+                        contentDescription = null,
+                        modifier = Modifier.padding(4.dp).fillMaxSize(),
+                        contentScale = ContentScale.FillBounds,
+                        )
+                    AsyncImage(model = imagePrefix+user.value.profileImage, contentDescription = "", modifier = Modifier.align(Alignment.Center).clip(shape = CircleShape).size(30.dp), contentScale = ContentScale.Crop)
+                }
+                Column(modifier = Modifier.padding(vertical = 10.dp).fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween, horizontalAlignment = Alignment.CenterHorizontally) {
+
+                   Text("Share your Profile instead!", fontFamily = Constants.FONT_LIGHT, fontSize = 12.sp, color = Color.Black.copy(alpha = 0.9f), fontWeight = FontWeight.Bold)
+                   Button(onClick = {onShareProfileClicked()}, colors = ButtonDefaults.buttonColors(backgroundColor = floatingActionBtnColor)) {
+                     Image(painter = painterResource(R.drawable.share_event), contentDescription = "", modifier = Modifier.size(16.dp), colorFilter = ColorFilter.tint(Color.White))
+                     Spacer(modifier = Modifier.width(10.dp))
+                     Text("Share", fontFamily = Constants.FONT_LIGHT, fontSize = 16.sp, color = Color.White)
+                }
+            }
+
+        }
+    }
+}
+
+
 
 @Composable
 fun ChatRowItem(item: String) {
@@ -240,17 +332,17 @@ fun ChatTopBar(title: String,profileImage:String, navController: NavHostControll
 
                 }
             }, actions = {
-//                Row(modifier = Modifier.padding(end = 16.dp)) {
-//                    Image(
-//                        painterResource(id = R.drawable.search_new_filled),
-//                        contentDescription = "",
-//                        colorFilter = ColorFilter.tint(Color.DarkGray),
-//                        modifier = Modifier
-//                            .size(24.dp)
-//                            .clickable { onSearchClicked() }
-//
-//                    )
-//                }
+                Row(modifier = Modifier.padding(end = 16.dp)) {
+                    Image(
+                        painterResource(id = R.drawable.menu),
+                        contentDescription = "",
+                        colorFilter = ColorFilter.tint(Color.DarkGray),
+                        modifier = Modifier
+                            .size(24.dp)
+                            .clickable {/* onSearchClicked() TODO: "  */ }
+
+                                )
+                            }
 
 
             }
@@ -315,107 +407,3 @@ fun UserItem(navController: NavHostController, user: ChatList,setProfileImage:(S
     }
 }
 
-/*
-
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@Composable
-fun ChatScreenUI(userNumber: String?,navController: NavHostController,chatViewModel: ChatViewModel) {
-    val context= LocalContext.current
-    val viewModel = viewModel<ChatViewModel>()
-    val authViewModel = hiltViewModel<AuthViewModel>()
-    val messages by viewModel.messages.collectAsState()
-    val listState = rememberLazyListState()
-    var key by remember {
-        mutableStateOf(0)
-    }
-    var inputText by remember { mutableStateOf("") }
-    val datastore=StoreUserData(context )
-//    val number by  datastore.getUserNumber.collectAsState("")
-//    LaunchedEffect(key1 = true){
-//        datastore.saveUserNumber("+9179034")
-//    }
-
-
-
-
-    Scaffold(topBar = { HomeTopBar(
-        title = userNumber!!,
-        navController = navController,
-        navIcon =false ,
-        actionIcon =false,
-        icon = R.drawable.profile_image_1
-    )
-    }) {
-
-        // Auto-scroll to the bottom when messages list is updated
-        LaunchedEffect(messages) {
-            listState.animateScrollToItem(messages.size)
-        }
-        val scope = rememberCoroutineScope()
-        if (key == 1) {
-
-            LaunchedEffect(key1 = true) {
-                scope.launch {
-                    chatViewModel.saveChatToDB(
-                        Chat(
-                            sentTo = userNumber.toString(),
-                            message = inputText,
-                            received = "false",
-                            sent = "Single Tick",
-                            seen = "false",
-                            timeStamp = System.currentTimeMillis()
-                        )
-                    )
-                }
-                key=0
-            }
-        }
-
-        Column(modifier = Modifier.padding(it)) {
-            LazyColumn(state = listState, modifier = Modifier.weight(1f)) {
-                items(messages) { message ->
-                    MessageItem("you", message,navController)
-                }
-            }
-
-
-            Row {
-                OutlinedTextField(
-                    value = inputText,
-                    onValueChange = { inputText = it },
-                    modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(20.dp)
-                )
-                Button(onClick = {
-                    key=1
-                    viewModel.sendMessage(userNumber!!,inputText)
-                    viewModel.messages.value
-                    inputText = ""
-                }) {
-                    Text("Send")
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun MessageItem(name:String,msg:String,navController: NavHostController){
-    Card(modifier = Modifier
-        .padding(start = 8.dp, top = 4.dp)
-        .wrapContentSize(),
-        shape= RoundedCornerShape(6.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFFFFF)),
-        border = BorderStroke(1.dp, Color.DarkGray)
-
-    ) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            Text(text =name, modifier = Modifier.padding(4.dp), style = MaterialTheme.typography.titleMedium)
-            Text(text =msg, modifier = Modifier.padding(4.dp), style = MaterialTheme.typography.titleMedium)
-        }
-
-
-
-    }
-}
-*/

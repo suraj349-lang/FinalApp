@@ -75,10 +75,14 @@ import com.spint.app.viewmodels.AuthViewModel
 import com.spint.app.viewmodels.EventsViewModel
 import com.spint.app.viewmodels.ImageUploadViewModel
 import java.io.File
+import java.time.temporal.ChronoUnit
+import kotlin.time.Clock
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.ExperimentalTime
+import kotlin.time.Instant
 
 
-
-@OptIn(ExperimentalGlideComposeApi::class)
+@OptIn(ExperimentalGlideComposeApi::class, ExperimentalTime::class)
 @Composable
 fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewModel, imageUploadViewModel: ImageUploadViewModel, navController: NavHostController, onDismiss: () -> Unit) {
     var caption by remember{ mutableStateOf("") }
@@ -113,6 +117,16 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                 else -> "infinite"
             }
         )
+    }
+
+    val expirationHours = expirationTime
+
+    val finalExpirationTime = if (expirationHours == "infinite") {
+        "infinite"
+    } else {
+        Clock.System.now()
+            .plus(expirationHours.toLong().hours)
+            .toString()
     }
     val dropProfileState by imageUploadViewModel.imageUploadState.collectAsState()
 
@@ -361,12 +375,13 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                             //todo later on turn enabled to true
                           //  enabled = false;
                             imageFile?.let {
+
                                 imageUploadViewModel.dropProfileModel.value=
                                     DropProfileModel(
                                         image = "",
                                         location = authViewModel.address.value,
                                         message = caption,
-                                        expirationTime = expirationTime,
+                                        expirationTime = finalExpirationTime,
                                         createdBy = user.user
                                     )
                                 Log.i("UserData", "DropProfileDialog: ${user.user}")
