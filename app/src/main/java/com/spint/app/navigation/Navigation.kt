@@ -76,7 +76,8 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.spint.app.screens.EventAndPingDesigns.events.templates.xhmaslive.XHamsLiveScreenWrapper
 import com.spint.app.screens.EventAndPingDesigns.events.templates.xhmaslive.XhamLiveScreen
 import kotlinx.serialization.json.Json
-
+import java.net.URLDecoder
+import java.nio.charset.StandardCharsets
 
 
 @OptIn(ExperimentalAnimationApi::class, ExperimentalPagerApi::class)
@@ -88,6 +89,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
     val eventsViewModel= hiltViewModel<EventsViewModel>()
     val chatViewModel= hiltViewModel<ChatViewModel>()
     val notificationViewModel= hiltViewModel<NotificationViewModel>()
+
 
     NavHost(navController = navController, startDestination =SCREENS.SPLASH.route){
 
@@ -149,9 +151,14 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
                 navArgument("chatListUserId"){type= NavType.StringType}
             ))
           {navBackStackEntry->
-              val userName=navBackStackEntry.arguments?.getString("userName")
-              val chatListUserId=navBackStackEntry.arguments?.getString("chatListUserId")
-              SingleChatScreenUI(userName!!,chatListUserId!!, navController ,chatViewModel)
+              val userName=navBackStackEntry.arguments?.getString("userName")?: ""
+              val chatListUserId=navBackStackEntry.arguments?.getString("chatListUserId") ?: ""
+              val imagePath = URLDecoder.decode(
+                  navBackStackEntry.arguments?.getString("profileImage") ?: "",
+                  StandardCharsets.UTF_8.toString()
+              )
+
+              SingleChatScreenUI(userName,chatListUserId, imagePath,navController ,chatViewModel)
         }
         composable(SCREENS.OTP2.route){
             OtpBox()
@@ -221,7 +228,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
         composable(route=SCREENS.DROP_PROFILE_USER_PROFILE.route, arguments = listOf(navArgument("dropProfileResponse"){ type= NavType.StringType })){navBackStackEntry ->
             val json=navBackStackEntry.arguments?.getString("dropProfileResponse")
             val dropProfileResponse=json?.let { Json.decodeFromString<DropProfileResponse>(it) }
-            DropProfileUserProfile(navController,dropProfileResponse)
+            DropProfileUserProfile(navController,chatViewModel,dropProfileResponse)
 
         }
         composable(route=SCREENS.PING_DETAILS.route, arguments = listOf(navArgument("pingResponse"){ type= NavType.StringType })){navBackStackEntry ->

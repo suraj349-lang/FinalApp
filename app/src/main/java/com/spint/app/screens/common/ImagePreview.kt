@@ -54,6 +54,7 @@ import com.spint.app.ui.theme.floatingActionBtnColor
 import com.spint.app.utils.constants.Constants
 import com.spint.app.viewmodels.EventsViewModel
 import com.spint.app.viewmodels.ImageUploadViewModel
+import java.io.File
 
 
 @Composable
@@ -81,17 +82,22 @@ fun ImagePreviewScreen(
     Scaffold(modifier = Modifier.fillMaxSize(),
         topBar = {
             ImagePreviewTopBar{
+                val finalUri =
+                    if (filteredBitmap != null)
+                        saveBitmapToFile(context, filteredBitmap)
+                    else
+                        uri // fallback
                 when(lastScreen){
                     ImageUploadScreens.PROFILE.screen->{
-                        imageUploadViewModel.profileImageUri.value=uri
+                        imageUploadViewModel.profileImageUri.value=finalUri
                         onDoneClicked()
                     }
                     ImageUploadScreens.CREATE_EVENT.screen->{
-                        imageUploadViewModel.createEventImageUri.value=uri
+                        imageUploadViewModel.createEventImageUri.value=finalUri
                         onDoneClicked()
                     }
                     else->{
-                        eventsViewModel.dropProfileUploadUri.value=uri
+                        eventsViewModel.dropProfileUploadUri.value=finalUri
                         onDoneClicked()
                     }
                 }
@@ -228,3 +234,10 @@ fun ImagePreviewTopBar(onDoneClicked:()->Unit) {
             bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true
         )
     }
+fun saveBitmapToFile(context: Context, bitmap: Bitmap): Uri {
+    val file = File(context.cacheDir, "FILTERED_${System.currentTimeMillis()}.jpg")
+    file.outputStream().use { out ->
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, out)
+    }
+    return Uri.fromFile(file)
+}

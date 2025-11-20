@@ -6,6 +6,8 @@ import android.util.Log
 import com.spint.app.utils.constants.Constants
 import io.socket.client.IO
 import io.socket.client.Socket
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import org.json.JSONObject
 import org.webrtc.*
 
@@ -16,7 +18,7 @@ class WebRTCManager(
     private val eglBase: EglBase
 ) {
     private val tag = "WEBRTC_MANAGER"
-
+    val isRemoteUserConnected= MutableStateFlow(false)
     private lateinit var peerConnectionFactory: PeerConnectionFactory
     private var peerConnection: PeerConnection? = null
     private lateinit var socket: Socket
@@ -34,6 +36,14 @@ class WebRTCManager(
 
     private val pendingRemoteCandidates = mutableListOf<IceCandidate>()
     private var isRemoteDescriptionSet = false
+
+    private val blurFlag = MutableStateFlow(false) // start UNBLURRED
+    private lateinit var blurProcessor: BlurVideoProcessor
+
+    fun toggleBlur() {
+        blurFlag.value = !blurFlag.value
+    }
+
 
     /** Initialize factory + local tracks */
     fun initFactoryAndLocalTracks() {
@@ -114,7 +124,9 @@ class WebRTCManager(
             val shouldOffer = data.optBoolean("shouldOffer", false)
 
             runOnMainThread {
-                createPeerConnection()
+                createPeerConnection(){
+                    isRemoteUserConnected.value=true
+                }
                 if (shouldOffer) createAndSendOffer()
             }
         }
@@ -130,7 +142,7 @@ class WebRTCManager(
             )
 
             runOnMainThread {
-                if (peerConnection == null) createPeerConnection()
+                if (peerConnection == null) createPeerConnection(){isRemoteUserConnected.value=true}
 
                 // reset buffer/flag for this negotiation
                 pendingRemoteCandidates.clear()
@@ -270,7 +282,7 @@ class WebRTCManager(
         localVideoTrack?.addSink(localRenderer)
     }
 
-    private fun createPeerConnection() {
+    private fun createPeerConnection(onRemoteUserConnected:()-> Unit) {
         // Close existing and reset state
         try { peerConnection?.close() } catch (_: Exception) {}
         peerConnection = null
@@ -310,6 +322,7 @@ class WebRTCManager(
                 override fun onTrack(transceiver: RtpTransceiver?) {
                     (transceiver?.receiver?.track() as? VideoTrack)?.let { videoTrack ->
                         remoteVideoTrack = videoTrack
+                        onRemoteUserConnected()
                         runOnMainThread { remoteVideoTrack?.addSink(remoteRenderer) }
                     }
                 }
@@ -415,4 +428,37 @@ open class SdpObserverAdapter : SdpObserver {
 
 
 
+}
+
+class BlurVideoProcessor(private val blurFlag: StateFlow<Boolean>) : VideoProcessor {
+
+    private var sink: VideoSink? = null
+
+    override fun setSink(sink: VideoSink?) {
+        this.sink = sink
+    }
+
+    override fun onCapturerStarted(p0: Boolean) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onCapturerStopped() {
+        TODO("Not yet implemented")
+    }
+
+    override fun onFrameCaptured(frame: VideoFrame) {
+
+        val outputFrame = if (blurFlag.value) {
+            blurFrame(frame)   // blur ONLY if turned on
+        } else {
+            frame              // otherwise send clean video
+        }
+
+        sink?.onFrame(outputFrame)
+    }
+
+    private fun blurFrame(frame: VideoFrame): VideoFrame {
+        // TODO: GPU blur
+        return frame
+    }
 }

@@ -51,8 +51,8 @@ import com.spint.app.ui.imagePrefix
 import com.spint.app.ui.theme.floatingActionBtnColor
 import com.spint.app.utils.constants.Constants
 import com.spint.app.utils.formatDateTime
-
-
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 
 @Composable
@@ -71,10 +71,12 @@ fun PingDetailsScreen(navController: NavHostController, pingResponse: PingRespon
                         pingResponse = pingResponse,
                         onSendMessageClicked = {
                             if (pingResponse?.user != null) {
+                                val encodedImageUrl = URLEncoder.encode(pingResponse.user.profileImage, StandardCharsets.UTF_8.toString())
                                 navController.navigate(
                                         SCREENS.SINGLE_CHAT.createPath(
-                                            pingResponse.user.userName,
-                                            pingResponse.user.user
+                                            userName = pingResponse.user.userName,
+                                            profileImage = encodedImageUrl,
+                                            chatListUserId = pingResponse.user.user
                                         )
                                 )
                             }

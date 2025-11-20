@@ -49,6 +49,8 @@ import com.spint.app.navigation.SCREENS
 import com.spint.app.utils.RequestState
 import com.spint.app.utils.UserObject
 import com.spint.app.utils.constants.Constants
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 // when the dropped profile is clicked then it is shown
 @Composable
@@ -108,9 +110,11 @@ fun UserPublicProfileUI(eventsViewModel: EventsViewModel,navController: NavHostC
         }
         is RequestState.Success ->{
             Log.i("Userr", "DirectChatProfiles: ${response.data.withUserId.name} other user id ${response.data.withUserId._id}")
+            val encodedImageUrl = URLEncoder.encode(response.data.withUserId.profileImage, StandardCharsets.UTF_8.toString())
             navController.navigate(
                 SCREENS.SINGLE_CHAT.createPath(
                     userName = response.data.withUserId.name,
+                    profileImage = encodedImageUrl,
                     chatListUserId = response.data.withUserId._id
                 )
             )

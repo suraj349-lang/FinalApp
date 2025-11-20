@@ -90,6 +90,8 @@ import com.spint.app.screens.qrcode.QRCode
 import com.spint.app.screens.qrcode.rememberQrBitmapPainter
 import com.spint.app.ui.theme.floatingActionBtnColor
 import com.spint.app.utils.UserLocationObject
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -357,10 +359,12 @@ fun UserItem(navController: NavHostController, user: ChatList,setProfileImage:(S
         .fillMaxWidth()
         .height(60.dp)
         .clickable {
-            setProfileImage(user.withUserId.profileImage)
+           // setProfileImage(user.withUserId.profileImage)
+            val encodedImageUrl = URLEncoder.encode(user.withUserId.profileImage, StandardCharsets.UTF_8.toString())
             navController.navigate(
                 SCREENS.SINGLE_CHAT.createPath(
                     user.withUserId.name,
+                    encodedImageUrl,
                     user.withUserId._id
                 )
             )

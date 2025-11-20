@@ -115,6 +115,7 @@ import java.util.Locale
 fun SingleChatScreenUI(
     sentTo: String,
     chatListUserId: String,
+    profileImage:String,
     navController: NavHostController,
     chatViewModel: ChatViewModel
 ) {
@@ -214,7 +215,7 @@ fun SingleChatScreenUI(
     }
 
     Scaffold(
-        topBar = { SingleChatTopBar(title = sentTo, chatUserImage, navController) },
+        topBar = { SingleChatTopBar(title = sentTo, profileImage, navController) },
         bottomBar = {
             // Input row with text field and mic button
             Row(

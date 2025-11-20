@@ -275,7 +275,7 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center
                     ) {
-                        Text(
+                       /* Text(
                             text = "Add Background image",
                             fontSize = 8.sp,
                             modifier=Modifier.clickable {
@@ -295,7 +295,7 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                                 .size(30.dp),
                             contentScale = ContentScale.Crop,
                             colorFilter = ColorFilter.tint(Color.White.copy(alpha = 0.9f))
-                        )
+                        )*/
                         Box {
                             Image(
                                 painterResource(id = R.drawable.settings_new),
@@ -313,6 +313,53 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                                 modifier = Modifier.wrapContentSize(),
                                 onDismissRequest = { expanded = false }
                             ) {
+                                DropdownMenuItem(
+                                    text = { Text(
+                                        "Background",
+                                        fontSize = 16.sp,
+                                        fontFamily = Constants.FONT_MEDIUM,
+                                        color = Color.White
+                                    ) },
+                                    modifier = Modifier.wrapContentSize(),
+                                    leadingIcon = {
+                                        Image(
+                                            painterResource(id = R.drawable.edit_new),
+                                            contentDescription = "settings",
+                                            modifier = Modifier
+                                                .size(20.dp),
+                                            contentScale = ContentScale.Crop,
+                                            colorFilter = ColorFilter.tint(Color.White)
+                                        )
+                                    },
+                                    onClick = {
+                                        expanded = false
+                                        pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                                    }
+                                )
+
+                                DropdownMenuItem(
+                                    text = { Text(
+                                        "Settings",
+                                        fontSize = 16.sp,
+                                        fontFamily = Constants.FONT_MEDIUM,
+                                        color = Color.White
+                                    ) },
+                                    modifier = Modifier.wrapContentSize(),
+                                    leadingIcon = {
+                                        Image(
+                                            painterResource(id = R.drawable.settings_new),
+                                            contentDescription = "settings",
+                                            modifier = Modifier
+                                                .size(20.dp),
+                                            contentScale = ContentScale.Crop,
+                                            colorFilter = ColorFilter.tint(Color.White)
+                                        )
+                                    },
+                                    onClick = {
+                                        expanded = false
+                                        navController.navigate(SCREENS.SETTINGS.route)
+                                    }
+                                )
                                 DropdownMenuItem(
                                     text = { Text(
                                         "Logout",
@@ -340,29 +387,6 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
                                                 launchSingleTop = true
                                             }
                                         }
-                                    }
-                                )
-                                DropdownMenuItem(
-                                    text = { Text(
-                                        "Settings",
-                                        fontSize = 16.sp,
-                                        fontFamily = Constants.FONT_MEDIUM,
-                                        color = Color.White
-                                    ) },
-                                    modifier = Modifier.wrapContentSize(),
-                                    leadingIcon = {
-                                        Image(
-                                            painterResource(id = R.drawable.settings_new),
-                                            contentDescription = "settings",
-                                            modifier = Modifier
-                                                .size(20.dp),
-                                            contentScale = ContentScale.Crop,
-                                            colorFilter = ColorFilter.tint(Color.White)
-                                        )
-                                    },
-                                    onClick = {
-                                        expanded = false
-                                        navController.navigate(SCREENS.SETTINGS.route)
                                     }
                                 )
                             }

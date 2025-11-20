@@ -4,6 +4,7 @@ import android.net.Uri
 import com.spint.app.model.DropProfileResponse
 import com.spint.app.model.pings.PingResponse
 import kotlinx.serialization.json.Json
+import java.net.URLDecoder
 
 
 sealed class SCREENS(val route:String){
@@ -23,9 +24,9 @@ sealed class SCREENS(val route:String){
     object XHAM_LIVE_SCREEN:SCREENS("xhamlive")
     object NOTIFICATIONS:SCREENS("notifications_screen")
     object CHAT_LIST:SCREENS("chat_screen")
-    object SINGLE_CHAT:SCREENS("singleChat/{userName}/{chatListUserId}"){
-        fun createPath(userName:String,chatListUserId:String):String{
-            return "singleChat/${userName}/${chatListUserId}"
+    object SINGLE_CHAT:SCREENS("singleChat/{userName}/{profileImage}/{chatListUserId}"){
+        fun createPath(userName:String,profileImage:String,chatListUserId:String):String{
+            return "singleChat/${userName}/${profileImage}/${chatListUserId}"
         }
     }
 

@@ -92,6 +92,8 @@ import com.spint.app.viewmodels.ChatViewModel
 import com.spint.app.viewmodels.EventsViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.spint.app.R
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class, ExperimentalPagerApi::class)
@@ -227,9 +229,11 @@ fun DirectChatProfiles(
     when (val res = saveToChatResponse) {
         is RequestState.Success -> {
             chatViewModel.connectSocket()
+            val encodedImageUrl = URLEncoder.encode(res.data.withUserId.profileImage, StandardCharsets.UTF_8.toString())
             navController.navigate(
                 SCREENS.SINGLE_CHAT.createPath(
                     userName = res.data.withUserId.name,
+                    profileImage = encodedImageUrl,
                     chatListUserId = res.data.withUserId._id
                 )
             )

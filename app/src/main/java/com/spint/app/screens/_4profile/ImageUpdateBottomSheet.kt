@@ -39,6 +39,7 @@ import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.spint.app.ui.imagePrefix
 import com.spint.app.utils.AppIcons
+import com.spint.app.utils.constants.Constants
 import com.spint.app.utils.constants.Constants.DONGLE_BOLD
 
 enum class SheetValue { Collapsed, PartiallyExpanded, Expanded }
@@ -56,23 +57,22 @@ fun ImageUpdateBottomSheet(showSheet: Boolean,
         skipPartiallyExpanded = true
     )
     if (showSheet){
-        ModalBottomSheet(onDismissRequest = { onDismiss()}, sheetState = sheetState, modifier = Modifier
+        ModalBottomSheet(onDismissRequest = { onDismiss()}, sheetState = sheetState, tonalElevation = 20.dp, modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight()) {
             Column(modifier = Modifier
-                .padding(start = 16.dp, end = 16.dp, bottom = 80.dp)) {
+                .padding(start = 16.dp, end = 16.dp, bottom = 10.dp)) {
                 Box(modifier = Modifier
                     .fillMaxWidth()
                     .height(400.dp)) {
-                    GlideImage(model = imagePrefix+currentProfileImage, contentDescription ="", modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop )
+                    GlideImage(model = imagePrefix+currentProfileImage, contentDescription ="", modifier = Modifier.clip(shape = RoundedCornerShape(12.dp)).fillMaxSize(), contentScale = ContentScale.Crop )
                 }
-                Text(
-                    "Update Image",
-                    fontSize = 30.sp,
-                    fontWeight = FontWeight.Bold,
-                    fontFamily =DONGLE_BOLD,
-                    color = Color.DarkGray
-                )
+//                Text(
+//                    "Update Image",
+//                    fontSize = 20.sp,
+//                    fontFamily = Constants.FONT_MEDIUM,
+//                    color = Color.LightGray
+//                )
                 Row(horizontalArrangement = Arrangement.SpaceEvenly, modifier = Modifier
                     .fillMaxWidth()
                     .wrapContentHeight()
@@ -83,7 +83,7 @@ fun ImageUpdateBottomSheet(showSheet: Boolean,
                             contentDescription = ""
                             , modifier = Modifier.size(50.dp)
                         )
-                        Text(text = "Remove image", fontFamily = DONGLE_BOLD,color = Color.DarkGray, fontSize = 14.sp)
+                        Text(text = "Remove", fontFamily = Constants.FONT_LIGHT,color = Color.LightGray, fontSize = 12.sp)
 
                     }
                     Column(modifier = Modifier.wrapContentSize().clickable { onChangeImageClicked() }, verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
@@ -92,7 +92,7 @@ fun ImageUpdateBottomSheet(showSheet: Boolean,
                             contentDescription = ""
                             , modifier = Modifier.size(50.dp)
                         )
-                        Text(text = "Change Image", fontFamily = DONGLE_BOLD,color = Color.DarkGray, fontSize = 14.sp)
+                        Text(text = "Update",  fontFamily = Constants.FONT_LIGHT,color = Color.LightGray, fontSize = 12.sp)
 
                     }
 //                    Column(modifier = Modifier.wrapContentSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {

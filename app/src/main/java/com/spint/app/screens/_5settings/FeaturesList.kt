@@ -80,7 +80,7 @@ fun FeaturesListScreen(onItemClicked:()->Unit,onBackClicked:()->Unit) {
                     text = "Where in ${Constants.APP_NAME.capitalize()} did you encounter this issue?",
                     fontSize = 12.sp,
                     fontFamily = Constants.FONT_MEDIUM,
-                    color = Color.Gray,
+                    color = Color.DarkGray.copy(alpha = 0.8f),
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center
                 )

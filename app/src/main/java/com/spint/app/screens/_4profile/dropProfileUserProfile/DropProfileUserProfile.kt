@@ -54,12 +54,15 @@ import com.spint.app.ui.imagePrefix
 import com.spint.app.ui.theme.floatingActionBtnColor
 import com.spint.app.utils.constants.Constants
 import com.spint.app.utils.formatDateTime
+import com.spint.app.viewmodels.ChatViewModel
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 // when the dropped profile is clicked then it is shown
 @OptIn(ExperimentalMaterial3Api::class)
 
 @Composable
-fun DropProfileUserProfile(navController: NavHostController,dropProfileResponse: DropProfileResponse?) {
+fun DropProfileUserProfile(navController: NavHostController, chatViewModel: ChatViewModel, dropProfileResponse: DropProfileResponse?) {
     val buttonsVisible = remember { mutableStateOf(true) }
     if(dropProfileResponse!=null) {
         Scaffold(
@@ -73,9 +76,17 @@ fun DropProfileUserProfile(navController: NavHostController,dropProfileResponse:
                     DropProfileUserProfileUI(
                         dropProfileResponse = dropProfileResponse,
                         onSendMessageClicked = {
-                            navController.navigate(SCREENS.SINGLE_CHAT.createPath(dropProfileResponse.createdBy.userName,dropProfileResponse.createdBy.user))
+                            chatViewModel.connectSocket()
+                            val encodedImageUrl = URLEncoder.encode(dropProfileResponse.createdBy.profileImage, StandardCharsets.UTF_8.toString())
+                            navController.navigate(
+                                SCREENS.SINGLE_CHAT.createPath(
+                                    dropProfileResponse.createdBy.userName,
+                                    encodedImageUrl,
+                                    dropProfileResponse.createdBy.user
+                                )
+                            )
                         },
-                        onBackPressed = {navController.navigateUp()}
+                        onBackPressed = { navController.navigateUp() }
                     )
 
                 }
@@ -93,19 +104,24 @@ fun DropProfileUserProfile(navController: NavHostController,dropProfileResponse:
 fun DropProfileUserProfileUI(dropProfileResponse: DropProfileResponse?,onSendMessageClicked:()->Unit,onBackPressed:()->Unit) {
     val context = LocalContext.current
     if (dropProfileResponse != null) {
-        Box(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .statusBarsPadding()) {
             Image(
                 painter = painterResource(id = R.drawable.baseline_arrow_back_24),
                 contentDescription = "Back",
-                modifier = Modifier.align(Alignment.TopStart)
-                    .clickable {onBackPressed() }
+                modifier = Modifier
+                    .align(Alignment.TopStart)
+                    .clickable { onBackPressed() }
                     .padding(8.dp)
-                    .shadow(elevation = 10.dp, spotColor = Color.White).zIndex(4f)
+                    .shadow(elevation = 10.dp, spotColor = Color.White)
+                    .zIndex(4f)
                     .size(30.dp),
                 colorFilter = ColorFilter.tint(Color.White)
             )
             Column(
-                modifier = Modifier.padding(bottom = 16.dp)
+                modifier = Modifier
+                    .padding(bottom = 16.dp)
                     .fillMaxSize()
                     .navigationBarsPadding()
                     .verticalScroll(rememberScrollState()),
@@ -161,7 +177,12 @@ fun DropProfileUserProfileUI(dropProfileResponse: DropProfileResponse?,onSendMes
                             modifier = Modifier
                                 .padding(end = 30.dp, bottom = 26.dp)
                                 .align(Alignment.BottomEnd)
-                                .clickable { shareEventDeepLink(context, dropProfileResponse.id ?: "") }
+                                .clickable {
+                                    shareEventDeepLink(
+                                        context,
+                                        dropProfileResponse.id ?: ""
+                                    )
+                                }
                                 .size(20.dp),
                             colorFilter = ColorFilter.tint(Color.White))
 

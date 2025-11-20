@@ -19,6 +19,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -28,7 +30,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
@@ -40,11 +41,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Divider
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Scaffold
+import androidx.compose.material.Switch
+import androidx.compose.material.SwitchDefaults
 import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -58,18 +62,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
-import androidx.compose.ui.modifier.ModifierLocalReadScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
 import com.spint.app.R
-import com.spint.app.utils.UserLocation
+import com.spint.app.ui.theme.floatingActionBtnColor
 import com.spint.app.utils.UserLocationObject
 import com.spint.app.utils.UserObject
 import com.spint.app.utils.constants.Constants
@@ -96,6 +99,9 @@ fun DuelScreen(navController: NavHostController) {
     val localView = remember { SurfaceViewRenderer(context) }
     val remoteView = remember { SurfaceViewRenderer(context) }
 
+
+
+
     // Initialize renderers safely
     DisposableEffect(localView) {
         localView.setScalingType(RendererCommon.ScalingType.SCALE_ASPECT_FIT)
@@ -113,6 +119,7 @@ fun DuelScreen(navController: NavHostController) {
     }
 
     val webRTCManager = remember { WebRTCManager(context, localView, remoteView, eglBase) }
+     val  isRemoteUserConnected by webRTCManager.isRemoteUserConnected.collectAsState()
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
@@ -269,30 +276,49 @@ fun DuelScreen(navController: NavHostController) {
                 isConnected -> {
 
                     // Remote user view screen
-                    AndroidView(factory = {
-                        (remoteView.parent as? ViewGroup)?.removeView(remoteView)
-                        remoteView
-                    }, modifier = Modifier.align(Alignment.TopCenter).fillMaxHeight(0.5f).fillMaxWidth()
-                    )
+                    Box(modifier = Modifier.fillMaxHeight()
+                        .fillMaxWidth()) {
+                        if (!isRemoteUserConnected) {
 
-                    Box(modifier = Modifier
-                        .align(Alignment.CenterEnd)
-                        .wrapContentSize()){
-                        ScreenOptions(){
-                            currentScreen=it
+                            // ⏳ SHOW LOADING UNTIL THE REMOTE USER JOINS
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth().fillMaxHeight(0.5f)) {
+                                FlippingIconLoader(modifier = Modifier.align(Alignment.Center), icon = R.drawable.spint1)
+                            }
+
+                        } else {
+                            AndroidView(
+                                factory = {
+                                    (remoteView.parent as? ViewGroup)?.removeView(remoteView)
+                                    remoteView
+                                }, modifier = Modifier
+                                    .align(Alignment.TopCenter).fillMaxWidth()
+                                    .fillMaxHeight(0.5f)
+                            )
+
+                            Box(
+                                modifier = Modifier
+                                    .align(Alignment.CenterEnd)
+                                    .wrapContentSize()
+                            ) {
+                                ScreenOptions() {
+                                    currentScreen = it
+                                }
+                            }
                         }
                     }
-                    
 
 
-                    // current user screen
+                    //--------------------------------------------------------------------------------------------------
+                    // --current user screen-----------------------------------------------------------------------------
 
                     Box(
                         modifier = Modifier
                             .clickable { isVisible = true }
                             .align(Alignment.BottomCenter)
                             .fillMaxWidth()
-                            .fillMaxHeight()
+                            .fillMaxHeight(0.5f)
                     ) {
                         AndroidView( factory = { context ->
                             (localView.parent as? ViewGroup)?.let { parent ->
@@ -344,6 +370,17 @@ fun DuelScreen(navController: NavHostController) {
 fun DuelFirstScreenLocal(localView: SurfaceViewRenderer) {
     val user= UserObject.user.collectAsState()
     val location= UserLocationObject.userLocation.collectAsState()
+    var isBlur by remember { mutableStateOf(false) }
+    var isPrivate by remember { mutableStateOf(false) }
+    val categories = listOf(
+        MatchCategory.MoodCategory(moodList),
+        MatchCategory.Sports,
+        MatchCategory.Entertainment,
+        MatchCategory.Lifestyle,
+        MatchCategory.Technology,
+        MatchCategory.Relationships,
+        MatchCategory.RandomFun
+    )
     Column(modifier = Modifier.fillMaxSize()) {
         Box(
             modifier = Modifier
@@ -359,7 +396,10 @@ fun DuelFirstScreenLocal(localView: SurfaceViewRenderer) {
                         (localView.parent as? ViewGroup)?.removeView(localView)
                         localView
                     },
-                    modifier = Modifier.padding(top = 10.dp).size(200.dp).clip(shape = CircleShape)
+                    modifier = Modifier
+                        .padding(top = 10.dp)
+                        .size(200.dp)
+                        .clip(shape = CircleShape)
                 )
                 Spacer(modifier = Modifier.height(18.dp))
                 Text(user.value.userName, fontFamily = Constants.ROBOTO_FLEX, fontSize = 24.sp, color = Color.White)
@@ -379,10 +419,10 @@ fun DuelFirstScreenLocal(localView: SurfaceViewRenderer) {
                 verticalArrangement = Arrangement.spacedBy(30.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                DuelCameraEdit(R.drawable.edit_new)
-                DuelCameraEdit(R.drawable.camera)
-                DuelCameraEdit(R.drawable.filter)
-                DuelCameraEdit(R.drawable.menu,false,20)
+                PrivatePublicSwitch(isSelected =isPrivate ,{isPrivate=!isPrivate})
+                DuelCameraEdit(title = "blur",R.drawable.blur, unSelectedIcon = R.drawable.non_blur, isSelected = isBlur, onClick = {isBlur= ! isBlur})
+                DuelCameraEdit("filter",R.drawable.filter2)
+                DuelCameraEdit("menu",R.drawable.menu,tint=false,size=20)
 
             }
         }
@@ -394,22 +434,10 @@ fun DuelFirstScreenLocal(localView: SurfaceViewRenderer) {
                 Modifier
                     .fillMaxWidth()
                     .wrapContentHeight(), horizontalAlignment = Alignment.Start, verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                Text(text = "Looking For:", fontFamily = Constants.FONT_LIGHT, fontSize = 14.sp,color= Color.White)
-                Row(
-                    Modifier
-                        .fillMaxWidth()
-                        .wrapContentHeight(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(20.dp)) {
-                    val listOfTypes= listOf<String>("Male","Female","Others","Random")
-                    listOfTypes.forEach {
-                        Card(Modifier.wrapContentSize(), backgroundColor = Color.DarkGray, contentColor = Color.White) {
-                            Text(text = it, fontFamily = Constants.FONT_LIGHT, fontSize = 18.sp,color= Color.White, modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp))
-                        }
-                    }
-                }
-                Spacer(modifier = Modifier.height(3.dp))
-                InterestSelector()
+                GenderSelection()
 
-                MoodSelector()
+                Divider(modifier = Modifier.fillMaxWidth(), thickness = 0.3.dp, color = Color.Gray)
+                MatchScreen(categories)
 
             }
 
@@ -417,21 +445,109 @@ fun DuelFirstScreenLocal(localView: SurfaceViewRenderer) {
 
     }
 }
+@Composable
+fun SubtopicSelector(
+    subtopics: List<MatchSubtopic>,
+    selected: MatchSubtopic?,
+    onSelect: (MatchSubtopic) -> Unit
+) {
+    FlowRow(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        subtopics.forEach { topic ->
+            val isSelected = topic == selected
+            Row(
+                modifier = Modifier
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(if (isSelected) Color.White else Color.DarkGray)
+                    .clickable { onSelect(topic) }
+                    .padding(horizontal = 12.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = topic.name,
+                    color = if (isSelected) Color.Black else Color.White,
+                    fontSize = 14.sp
+                )
+            }
+        }
+    }
+}
+@Composable
+fun MatchScreen(categories: List<MatchCategory>) {
+
+    var selectedCategory by remember { mutableStateOf<MatchCategory>(MatchCategory.MoodCategory(moodList)) }
+    var selectedMood by remember { mutableStateOf<MoodItem?>(null) }
+    var selectedSubtopic by remember { mutableStateOf<MatchSubtopic?>(null) }
+
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+
+        InterestSelector(
+            categories = categories,
+            selectedCategory = selectedCategory,
+            onCategorySelected = {
+                selectedCategory = it
+                selectedMood = null
+                selectedSubtopic = null
+            }
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+
+       // Divider(color = Color.Gray, thickness = 0.5.dp)
+
+        when (selectedCategory) {
+
+            is MatchCategory.MoodCategory -> MoodSelector2(
+                moods = (selectedCategory as MatchCategory.MoodCategory).moods,
+                selected = selectedMood,
+                onSelect = { selectedMood = it }
+            )
+
+            else -> SubtopicSelector(
+                subtopics = selectedCategory.subtopics,
+                selected = selectedSubtopic,
+                onSelect = { selectedSubtopic = it }
+            )
+        }
+
+    }
+}
+
 
 @Composable
-fun InterestSelector(modifier: Modifier = Modifier) {
-    var expanded by remember { mutableStateOf(false) }
-    val list = listOf("Happy", "Sad", "Bored", "Excited")
+fun GenderSelection() {
+    val listOfTypes= listOf("Male","Female","Others","Random")
+    var selected by remember { mutableStateOf(listOfTypes[0]) }
+    Text(text = "Looking For:", fontFamily = Constants.FONT_LIGHT, fontSize = 14.sp,color= Color.White)
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .wrapContentHeight(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(20.dp)) {
 
+        listOfTypes.forEach {
+            Card(Modifier.wrapContentSize().clickable{selected=it}, backgroundColor = if (selected==it) floatingActionBtnColor else Color.Gray, contentColor = Color.White) {
+                Text(text = it, fontFamily = Constants.FONT_LIGHT, fontSize = 14.sp,color= if (selected==it)Color.White else Color.DarkGray, modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp))
+            }
+        }
+    }
+}
+
+@Composable
+fun InterestSelector(categories: List<MatchCategory>,
+                     selectedCategory: MatchCategory,
+                     onCategorySelected: (MatchCategory) -> Unit) {
+    var expanded by remember { mutableStateOf(false) }
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(vertical = 8.dp)
     ) {
         Text(
             text = "Matching on:",
             fontFamily = Constants.FONT_LIGHT,
-            fontSize = 16.sp,
+            fontSize = 14.sp,
             color = Color.White,
             modifier = Modifier.align(Alignment.CenterVertically)
         )
@@ -439,28 +555,52 @@ fun InterestSelector(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.width(8.dp))
 
         Box {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(0.dp), modifier = Modifier.clickable { expanded = true }.clip(shape = RoundedCornerShape(12.dp)).background(Color.Gray).wrapContentWidth().height(40.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(0.dp), modifier = Modifier
+                .clickable { expanded = true }
+                .clip(shape = RoundedCornerShape(12.dp))
+                .background(floatingActionBtnColor)
+                .wrapContentWidth()
+                .height(30.dp)) {
                 Text(
-                    text = "Mood",
+                    text = selectedCategory.title,
                     color = Color.White,
                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
                 )
-                Image(painter=painterResource(R.drawable.arrow_down), contentDescription = "", modifier = Modifier.size(30.dp), colorFilter = ColorFilter.tint(color = Color.White))
+                Image(painter=painterResource(R.drawable.arrow_down), contentDescription = "", modifier = Modifier.size(24.dp), colorFilter = ColorFilter.tint(color = Color.White))
             }
 
 
             DropdownMenu(
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
-                modifier = Modifier.width(100.dp)
+                modifier = Modifier.width(120.dp)
             ) {
-                list.forEach { item ->
+                categories.forEach { category ->
                     DropdownMenuItem(onClick = {
-                        // handle selection
-                        println("Selected: $item")
                         expanded = false
-                    }) {
-                        Text(text = item)
+                        onCategorySelected(category)
+                    },contentPadding=PaddingValues(horizontal = 4.dp)) {
+                        Column(modifier = Modifier.fillMaxWidth()) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Text(
+                                    text = category.title,
+                                    fontFamily = Constants.ROBOTO_CONDENSED,
+                                    fontSize = 16.sp,
+                                    lineHeight = 12.sp
+                                )
+//                                Text(
+//                                    text = item.second.toString(),
+//                                    fontFamily = Constants.ROBOTO_CONDENSED,
+//                                    fontSize = 14.sp,
+//                                    lineHeight = 12.sp
+//                                )
+                            }
+                            Divider(modifier = Modifier.fillMaxWidth().padding(top=2.dp), thickness = 0.25.dp, color = Color.Gray)
+                        }
                     }
                 }
             }
@@ -550,65 +690,87 @@ data class ScreenOrientation(
     val image:Int,
     val screen: SCREEN,
 )
+@Composable
+fun PrivatePublicSwitch(isSelected: Boolean=true, onClick:()-> Unit={}) {
+
+    Column(modifier = Modifier.wrapContentSize(), verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally) {
+        Switch(isSelected, onCheckedChange = {onClick()}, modifier = Modifier.size(28.dp), colors = SwitchDefaults.colors(checkedThumbColor = floatingActionBtnColor, uncheckedThumbColor = Constants.HOME_TOP_BAR_COLOR, checkedTrackColor = Color(
+            0xFFFFFFFF
+        ), uncheckedTrackColor = Color.LightGray))
+        Text("private", fontFamily = Constants.ROBOTO_CONDENSED, fontSize = 9.sp, lineHeight = 12.sp, color = Color.LightGray)
+    }
+}
 
 @Composable
-fun DuelCameraEdit(id:Int,tint:Boolean=true,size:Int=28) {
+fun DuelCameraEdit(title: String,selectedIcon:Int, unSelectedIcon: Int=0, tint:Boolean=true, size:Int=28, isSelected: Boolean=true, onClick:()-> Unit={}) {
 
-    Image(
-        painter = painterResource(id = id),
-        contentDescription = "",
-        modifier = Modifier.size(size.dp),
-        //colorFilter = if (tint) ColorFilter.tint(Color.White) else ColorFilter.tint(Color.Transparent)
-    )
+    Column(modifier = Modifier.wrapContentSize(), verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally) {
+        Image(
+            painter = painterResource(id = if (isSelected) selectedIcon else unSelectedIcon),
+            contentDescription = "",
+            modifier = Modifier.size(size.dp).clickable { onClick() },
+            //colorFilter = if (tint) ColorFilter.tint(Color.White) else ColorFilter.tint(Color.Transparent)
+        )
+    Text(title, fontFamily = Constants.ROBOTO_CONDENSED, fontSize = 9.sp, lineHeight = 12.sp, color = Color.LightGray.copy(alpha = 0.7f))
+ }
 }
 
 
 @Composable
-fun MoodSelector() {
-    var selectedMood by remember { mutableStateOf<String?>(moods[0].first) }
-
-    LazyRow(
-        modifier = Modifier
-            .fillMaxWidth()
-            ,
-        horizontalArrangement = Arrangement.SpaceEvenly
+fun MoodSelector2(
+    moods: List<MoodItem>,
+    selected: MoodItem?,
+    onSelect: (MoodItem) -> Unit
+) {
+    FlowRow(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
     ) {
-        items(moods) { emoji ->
-            val isSelected = emoji.first == selectedMood
-            Box(
+        moods.forEach { mood ->
+            val isSelected = mood == selected
+            Row(
                 modifier = Modifier
-                    .size(56.dp)
-                    .clip(CircleShape)
-                    .background(if (isSelected) Color.White else Color.Transparent)
-                    .clickable { selectedMood = emoji.first },
-                contentAlignment = Alignment.Center
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(if (isSelected) Color.White else Color(android.graphics.Color.parseColor(mood.colorHex)).copy(alpha = 0.6f))
+                    .clickable { onSelect(mood) }
+                    .padding(horizontal = 8.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = emoji.first,
-                        fontSize = 20.sp,
-                        color = if (isSelected) Color.Black else Color.White
-                    )
-                    Text(
-                        text = emoji.second,
-                        fontSize = 10.sp,
-                        color = if (isSelected) Color.Black else Color.White
-                    )
-                }
-
+               // MoodBall(mood.colorHex)
+                //Spacer(modifier = Modifier.width(6.dp))
+                Text(
+                    text = mood.label,
+                    color = if (isSelected) Color.Black else Color.White,
+                    fontSize = 14.sp, modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp)
+                )
             }
         }
     }
 }
+@Composable
+fun MoodBall(colorHex: String, size: Dp = 16.dp) {
+    Box(
+        modifier = Modifier
+            .size(size)
+            .clip(CircleShape)
+            .background(Color(android.graphics.Color.parseColor(colorHex)).copy(alpha = 0.7f))
+    )
+}
 
 
- val  moods = listOf<Pair<String, String>>(
-     Pair("😊", "happy"),
-     Pair("😎", "cool"),
-     Pair("😢", "sad"),
-     Pair("😡", "angry"),
-     Pair("🤔", "thinking"),
-     Pair("😍", "in love"),
-     Pair("🥰", "affectionate"),
-     Pair("😂", "laughing")
+
+val moodList = listOf(
+    MoodItem("#FFD93D", "Happy"),      // Warm Yellow
+    MoodItem("#4D8BFF", "Sad"),        // Soft Blue
+    MoodItem("#FF3B6B", "In Love"),    // Vibrant Pink/Red
+    MoodItem("#7DF4C4", "Cool"),       // Mint Green
+    MoodItem("#C39EFF", "Curious"),    // Lavender Purple
+    MoodItem("#A0A4A8", "Tired"),      // Muted Grey
+    MoodItem("#FF5F5F", "Angry"),
+    MoodItem("#FFB14A", "Hype"), // Punch Red
+    MoodItem("#9BA6B2", "Bored"),      // Neutral Blue-Grey
+    MoodItem("#6EE7B7", "Chill")      // Calm Green
+           // Energetic Orange
 )
+
