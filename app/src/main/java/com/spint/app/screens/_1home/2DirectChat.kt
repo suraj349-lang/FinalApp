@@ -258,7 +258,7 @@ fun DirectChatProfiles(
             CommonErrorScreen("Unable to get users.")
             return
         }
-        directChatList.itemCount == 0 -> {
+        directChatList.itemCount == 0 && loadState.refresh !is LoadState.Loading  -> {
             NoDirectChatUsersFound(onJoinDuelClicked)
             return
         }

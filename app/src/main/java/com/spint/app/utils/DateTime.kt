@@ -78,7 +78,7 @@ fun Long.toRelativeTime(): String {
 }
 
 
-fun getFormattedTimeAndFlag(isoString: String): Pair<String, Boolean> {
+fun getFormattedTimeAndFlag(isoString: String): Triple<String, Boolean, Boolean> {
     return try {
         // Remove microseconds if present
         val cleaned = isoString.replace(Regex("\\.\\d+"), "")
@@ -86,10 +86,10 @@ fun getFormattedTimeAndFlag(isoString: String): Pair<String, Boolean> {
         val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault())
         sdf.timeZone = TimeZone.getTimeZone("UTC")
 
-        val targetDate = sdf.parse(cleaned) ?: return Pair("Invalid", true)
+        val targetDate = sdf.parse(cleaned) ?: return Triple("Invalid", true,false)
         val now = Date()
 
-        if (targetDate.before(now)) return Pair("Expired", true)
+        if (targetDate.before(now)) return Triple("00-00", true,true)
 
         val diffMillis = targetDate.time - now.time
         val seconds = diffMillis / 1000
@@ -99,16 +99,16 @@ fun getFormattedTimeAndFlag(isoString: String): Pair<String, Boolean> {
         val months = days / 30
 
         when {
-            months >= 1 -> Pair("${months}mo ${days % 30}d", false)
-            days >= 1 -> Pair("$days day${if (days > 1) "s" else ""}", false)
-            hours >= 1 -> Pair("${hours}h ${minutes % 60}m", false)
-            minutes >= 1 -> Pair("${minutes}m ${seconds % 60}s", true)
-            else -> Pair("${seconds}s", true)
+            months >= 1 -> Triple("${months}mo ${days % 30}d", false,false)
+            days >= 1 -> Triple("$days day${if (days > 1) "s" else ""}", false,false)
+            hours >= 1 -> Triple("${hours}h ${minutes % 60}m", false,false)
+            minutes >= 1 -> Triple("${minutes}m ${seconds % 60}s", true,false)
+            else -> Triple("${seconds}s", true,false)
         }
 
     } catch (e: Exception) {
         Log.e("getFormattedTimeAndFlag", "getFormattedTimeAndFlag: $e",e.fillInStackTrace() )
-        Pair("Invalid", true)
+        Triple("Invalid", true,false)
     }
 }
 

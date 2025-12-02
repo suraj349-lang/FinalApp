@@ -2,9 +2,8 @@ package com.spint.app.navigation
 
 import android.net.Uri
 import com.spint.app.model.DropProfileResponse
-import com.spint.app.model.pings.PingResponse
+import com.spint.app.model.pings.FlashPostResponse
 import kotlinx.serialization.json.Json
-import java.net.URLDecoder
 
 
 sealed class SCREENS(val route:String){
@@ -61,10 +60,10 @@ sealed class SCREENS(val route:String){
             return "drop_profile_user_profile/$profileJson"
         }
     }
-    object PING_DETAILS:SCREENS("ping_details/{pingResponse}"){
-        fun createRoute(pingResponse: PingResponse):String{
-            val ping= Uri.encode(Json.encodeToString(pingResponse))
-            return "ping_details/$ping"
+    object PING_DETAILS:SCREENS("ping_details/{flashPostResponse}"){
+        fun createRoute(flashPostResponse: FlashPostResponse):String{
+            val flashPostResponse= Uri.encode(Json.encodeToString(flashPostResponse))
+            return "ping_details/$flashPostResponse"
         }
     }
     object USER_PUBLIC_PROFILE:SCREENS("user_public_profile/{userId}"){

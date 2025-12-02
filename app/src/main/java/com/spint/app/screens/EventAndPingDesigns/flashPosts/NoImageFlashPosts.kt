@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.spint.app.R
-import com.spint.app.model.pings.PingResponse
+import com.spint.app.model.pings.FlashPostResponse
 import com.spint.app.screens._4profile.privateUsername.dynamicText
 import com.spint.app.ui.imagePrefix
 import com.spint.app.utils.constants.Constants
@@ -41,7 +41,7 @@ import com.spint.app.utils.formatDateTime
 
 
 @Composable
-fun NoImageFlashPosts(pingResponse: PingResponse) {
+fun NoImageFlashPosts(flashPostResponse: FlashPostResponse) {
     Box(modifier = Modifier
         .padding(vertical = 4.dp, horizontal = 2.dp)
         .background(color = Color.Black)
@@ -65,27 +65,27 @@ fun NoImageFlashPosts(pingResponse: PingResponse) {
                  .fillMaxWidth()
                  .height(100.dp)) {
              Card(Modifier.size(100.dp), shape = CircleShape) {
-                 AsyncImage(model = imagePrefix+pingResponse.user?.profileImage, contentDescription = "", modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
+                 AsyncImage(model = imagePrefix+flashPostResponse.user?.profileImage, contentDescription = "", modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop)
              }
              Column(
                  Modifier
                      .padding(start = 10.dp)
                      .fillMaxHeight(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.Start) {
                  Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement =Arrangement.spacedBy(5.dp)) {
-                     pingResponse.user?.name?.let { Text(text = it, fontSize = 14.sp, fontFamily = Constants.USER_NAME_FONT, color = Color.LightGray, fontWeight = FontWeight.Bold) }
+                     flashPostResponse.user?.name?.let { Text(text = it, fontSize = 14.sp, fontFamily = Constants.USER_NAME_FONT, color = Color.LightGray, fontWeight = FontWeight.Bold) }
                      Image(painter = painterResource(id = R.drawable.verified_new_white), contentDescription = "", modifier = Modifier.size(16.dp))
                  }
-                 Type(pingResponse.category)
-                 dynamicText(text = "Expiring at: ${formatDateTime(pingResponse.expirationTime)}", fontFamily = Constants.FONT_EXTRA_LIGHT, fontSize = 10, color = Color.LightGray.copy(alpha = 0.8f))
+                 Type(flashPostResponse.category)
+                 dynamicText(text = "Expiring at: ${formatDateTime(flashPostResponse.expirationTime)}", fontFamily = Constants.FONT_EXTRA_LIGHT, fontSize = 10, color = Color.LightGray.copy(alpha = 0.8f))
              }
 
 
          }
-            pingResponse.title?.let { dynamicText(text = it, fontSize = 18, fontFamily = Constants.FONT_MEDIUM) }
-            Text(text = pingResponse.description ?: "", fontSize = 12.sp, fontFamily = Constants.FONT_LIGHT, lineHeight = 12.sp)
+            flashPostResponse.title?.let { dynamicText(text = it, fontSize = 18, fontFamily = Constants.FONT_MEDIUM) }
+            Text(text = flashPostResponse.description ?: "", fontSize = 12.sp, fontFamily = Constants.FONT_LIGHT, lineHeight = 12.sp)
             Row(modifier = Modifier.padding(top=16.dp).fillMaxWidth().wrapContentHeight(), horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
                 Image(painter = painterResource(id = R.drawable.location_new), contentDescription = "", modifier = Modifier.size(16.dp))
-                Text(text = pingResponse.location, maxLines = 1, fontFamily = Constants.FONT_LIGHT, fontSize = 10.sp, color = Color.LightGray, lineHeight = 12.sp)
+                Text(text = flashPostResponse.location, maxLines = 1, fontFamily = Constants.FONT_LIGHT, fontSize = 10.sp, color = Color.LightGray, lineHeight = 12.sp)
             }
             Row(
                 horizontalArrangement = Arrangement.SpaceEvenly,
@@ -95,11 +95,11 @@ fun NoImageFlashPosts(pingResponse: PingResponse) {
                     .background(color = Color.Transparent)
             ) {
 
-                ViewRoundUI()
-                CommentRoundUI()
-                CountdownTimer(pingResponse.expirationTime)
-                JoinRoundUI()
-                ChatRoundUI(){
+                ViewRoundUI(flashPostResponse.totalViews)
+                CommentRoundUI(flashPostResponse.totalComments)
+                CountdownTimer(flashPostResponse.expirationTime)
+                JoinRoundUI(flashPostResponse.peopleJoined)
+                ShareRoundUI(flashPostResponse.totalShared){
 //                    val deeplink="http://socail.com/ping/${item._id}"
 //                    sharePingDeepLink(context,deeplink)
                 }

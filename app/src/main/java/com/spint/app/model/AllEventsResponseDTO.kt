@@ -1,6 +1,6 @@
 package com.spint.app.model
 
-import com.spint.app.model.pings.PingResponse
+import com.spint.app.model.pings.FlashPostResponse
 
 data class AllEventsResponseDTO(
     val success:Boolean,
@@ -12,5 +12,5 @@ data class AllEventsResponseDTO(
 data class AllPingsResponseDTO(
     val success:Boolean,
     val code:Int,
-    val data:List<PingResponse>
+    val data:List<FlashPostResponse>
 )

@@ -35,14 +35,14 @@ import androidx.compose.ui.unit.sp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.spint.app.R
-import com.spint.app.model.pings.PingResponse
+import com.spint.app.model.pings.FlashPostResponse
 import com.spint.app.ui.imagePrefix
 import com.spint.app.ui.theme.floatingActionBtnColor
 import com.spint.app.utils.constants.Constants
 
 @Composable
 fun MyPings(
-    items: List<PingResponse> = emptyList(),
+    items: List<FlashPostResponse> = emptyList(),
     onCreatePingClicked: () -> Unit = {}
 ) {
     val pingsList = remember { items }
@@ -145,7 +145,7 @@ fun MyPings(
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun MyPingItem(item: PingResponse) {
+fun MyPingItem(item: FlashPostResponse) {
     Box(modifier = Modifier
         .aspectRatio(9f/13f) //120 earlier
         .clip(shape = RoundedCornerShape(2.dp))) {

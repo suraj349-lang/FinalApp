@@ -45,7 +45,7 @@ import com.spint.app.R
 import com.spint.app.model.DropProfileResponse
 import com.spint.app.model.EventResponse
 import com.spint.app.model.User
-import com.spint.app.model.pings.PingResponse
+import com.spint.app.model.pings.FlashPostResponse
 import com.spint.app.ui.imagePrefix
 import com.spint.app.utils.constants.Constants
 
@@ -131,7 +131,7 @@ fun ChildMicroPostsInDetailsScreen(events: List<EventResponse>, onAddChildPostCl
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun ChildMicroPingsInDetailsScreen(events: List<PingResponse>, onAddChildPostClicked: () -> Unit, onChildPostClicked:(String)->Unit) {
+fun ChildMicroPingsInDetailsScreen(events: List<FlashPostResponse>, onAddChildPostClicked: () -> Unit, onChildPostClicked:(String)->Unit) {
     LazyRow(
         modifier= Modifier
             .fillMaxWidth()

@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import coil.compose.AsyncImage
 import com.spint.app.R
-import com.spint.app.model.pings.PingResponse
+import com.spint.app.model.pings.FlashPostResponse
 import com.spint.app.ui.imagePrefix
 import com.spint.app.ui.theme.floatingActionBtnColor
 import com.spint.app.utils.constants.Constants
@@ -35,7 +35,7 @@ import kotlinx.coroutines.delay
 
 
 @Composable
-fun PingsItemUI(item: PingResponse,onShareClicked: () -> Unit,onRespondClicked: () -> Unit) {
+fun PingsItemUI(item: FlashPostResponse, onShareClicked: () -> Unit, onRespondClicked: () -> Unit) {
 
     Card(
         modifier = Modifier

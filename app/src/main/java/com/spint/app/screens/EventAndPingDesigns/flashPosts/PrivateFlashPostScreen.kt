@@ -33,13 +33,15 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.spint.app.R
-import com.spint.app.model.pings.PingResponse
+import com.spint.app.model.pings.FlashPostResponse
+import com.spint.app.screens._1home.commonUI.sharePingDeepLink
 import com.spint.app.screens._4profile.privateUsername.dynamicText
 import com.spint.app.utils.constants.Constants
 import com.spint.app.utils.formatDateTime
@@ -49,7 +51,8 @@ import kotlinx.coroutines.delay
 
 
 @Composable
-fun PrivateFlashPostScreen(pingResponse: PingResponse) {
+fun PrivateFlashPostScreen(flashPostResponse: FlashPostResponse) {
+    val context=LocalContext.current
     Box(modifier = Modifier
         .padding(vertical = 4.dp, horizontal = 2.dp)
         .background(color = Color(0xFF190124))
@@ -57,12 +60,9 @@ fun PrivateFlashPostScreen(pingResponse: PingResponse) {
         .wrapContentHeight()){
         Image(painter = painterResource(id = R.drawable.menu), contentDescription ="", modifier = Modifier
             .padding(10.dp)
-            .align(
-                Alignment.TopEnd
-            )
+            .align(Alignment.TopEnd)
             .rotate(90f)
-            .size(15.dp), colorFilter = ColorFilter.tint(
-            Color.White) )
+            .size(15.dp), colorFilter = ColorFilter.tint(Color.White) )
         Column(
             Modifier
                 .padding(8.dp)
@@ -88,23 +88,23 @@ fun PrivateFlashPostScreen(pingResponse: PingResponse) {
                         .padding(start = 10.dp)
                         .fillMaxHeight(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.Start) {
                     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement =Arrangement.spacedBy(5.dp)) {
-                        pingResponse.user?.name?.let { Text(text = it, fontSize = 14.sp, fontFamily = Constants.USER_NAME_FONT, color = Color.LightGray, fontWeight = FontWeight.Bold) }
+                        flashPostResponse.user?.name?.let { Text(text = it, fontSize = 14.sp, fontFamily = Constants.USER_NAME_FONT, color = Color.LightGray, fontWeight = FontWeight.Bold) }
 
                         Image(painter = painterResource(id = R.drawable.verified_new_white), contentDescription = "", modifier = Modifier.size(16.dp))
                     }
-                    TypeForPrivateFlashPost(pingResponse.category)
-                    dynamicText(text = "Expiring at: ${formatDateTime(pingResponse.expirationTime)}", fontFamily = Constants.FONT_EXTRA_LIGHT, fontSize = 10, color = Color.LightGray.copy(alpha = 0.8f))
+                    TypeForPrivateFlashPost(flashPostResponse.category)
+                    dynamicText(text = "Expiring at: ${formatDateTime(flashPostResponse.expirationTime)}", fontFamily = Constants.FONT_EXTRA_LIGHT, fontSize = 10, color = Color.LightGray.copy(alpha = 0.8f))
                 }
 
 
             }
-            pingResponse.title?.let { dynamicText(text = it, fontSize = 18, fontFamily = Constants.FONT_MEDIUM) }
-            Text(text = pingResponse.description ?: "", fontSize = 12.sp, fontFamily = Constants.FONT_LIGHT, lineHeight = 12.sp)
+            flashPostResponse.title?.let { dynamicText(text = it, fontSize = 18, fontFamily = Constants.FONT_MEDIUM) }
+            Text(text = flashPostResponse.description ?: "", fontSize = 12.sp, fontFamily = Constants.FONT_LIGHT, lineHeight = 12.sp)
             Row(modifier = Modifier.padding(top=16.dp)
                 .fillMaxWidth()
                 .wrapContentHeight(), horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
                 Image(painter = painterResource(id = R.drawable.location_new), contentDescription = "", modifier = Modifier.size(12.dp))
-                Text(text = pingResponse.location, maxLines = 1, fontFamily = Constants.FONT_LIGHT, fontSize = 10.sp, color = Color.LightGray, lineHeight = 12.sp)
+                Text(text = flashPostResponse.location, maxLines = 1, fontFamily = Constants.FONT_LIGHT, fontSize = 10.sp, color = Color.LightGray, lineHeight = 12.sp)
             }
             Row(
                 horizontalArrangement = Arrangement.SpaceEvenly,
@@ -115,13 +115,13 @@ fun PrivateFlashPostScreen(pingResponse: PingResponse) {
                     .background(color = Color.Transparent)
             ) {
 
-                ViewRoundUI()
-                CommentRoundUI()
-                CountdownTimerForPrivate(pingResponse.expirationTime)
-                JoinRoundUI()
-                ChatRoundUI(){
-//                    val deeplink="http://socail.com/ping/${item._id}"
-//                    sharePingDeepLink(context,deeplink)
+                ViewRoundUI(flashPostResponse.totalViews)
+                CommentRoundUI(flashPostResponse.totalComments)
+                CountdownTimerForPrivate(flashPostResponse.expirationTime)
+                JoinRoundUI(flashPostResponse.peopleJoined)
+                ShareRoundUI(flashPostResponse.totalShared){
+                    val deeplink="http://socail.com/ping/${flashPostResponse._id}"
+                    sharePingDeepLink(context,deeplink)
                 }
 
 

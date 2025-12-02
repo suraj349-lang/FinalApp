@@ -24,9 +24,10 @@ import com.spint.app.model.EventDetailsResponse
 import com.spint.app.model.FCMTokenResponse
 import com.spint.app.model.Message
 import com.spint.app.model.PremiumEventResponseDTO
+import com.spint.app.model.pings.CommentData
 import com.spint.app.model.pings.PingRequestDto
-import com.spint.app.model.pings.PingResponse
-import com.spint.app.utils.AllPingsResponse
+import com.spint.app.model.pings.FlashPostResponse
+import com.spint.app.utils.PingsResponse
 import com.spint.app.utils.ApiResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -46,9 +47,9 @@ import retrofit2.http.Url
 interface ApiService {
 
     @GET("/api/v1/dropProfile/getAllDropProfiles")
-    suspend fun getAllDropProfiles(@Query("page") page:Int):Response<GetDropProfileResponseModel>
+    suspend fun getAllDropProfiles(@Query("page") page:Int): Response<GetDropProfileResponseModel>
     @POST("/api/v1/dropProfile/postDropProfile")
-    suspend fun dropProfile(@Body data:DropProfileModel):DropProfileResponseModel
+    suspend fun dropProfile(@Body data:DropProfileModel): DropProfileResponseModel
 
     //------------------------- Direct chat --------------------------------------------//
     @GET("/api/v1/directChat/")
@@ -84,7 +85,10 @@ interface ApiService {
     //---------------------------------------------------------------------//
 
     @GET("/api/v1/ping")
-    suspend fun getAllPings(@Query("page") page:Int): AllPingsResponse<List<PingResponse>>
+    suspend fun getAllPings(@Query("page") page:Int): PingsResponse<List<FlashPostResponse>>
+
+    @GET("api/v1/getPingComments")
+    suspend fun getPingComments(): PingsResponse<List<CommentData>>
 
     //-----------------------------------------------------------------//
     @GET("api/getPreSignedUrl")
@@ -94,11 +98,11 @@ interface ApiService {
 
     //---------------------------------------------------------------------//
     @GET("/api/v1/user/getUser")
-    suspend fun getUserData(@Query("userId") userId: String):OkResponse
+    suspend fun getUserData(@Query("userId") userId: String): OkResponse
 
     //---------------------------------------------------------------------//
     @PATCH("/api/v1/user/update")
-    suspend fun updateUserData(@Query("id") id:String,@Body backgroundImage: Map<String,String> ):OkResponse
+    suspend fun updateUserData(@Query("id") id:String,@Body backgroundImage: Map<String,String> ):  OkResponse
 
     //---------------------------------------------------------------------//
     @GET("/api/v1/auth/updateUserImage")

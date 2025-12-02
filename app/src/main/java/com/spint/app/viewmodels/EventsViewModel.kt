@@ -22,7 +22,7 @@ import com.spint.app.model.GetDropProfileResponseModel
 import com.spint.app.model.PremiumEventResponseDTO
 import com.spint.app.model.User
 import com.spint.app.model.pings.PingRequestDto
-import com.spint.app.model.pings.PingResponse
+import com.spint.app.model.pings.FlashPostResponse
 import com.spint.app.paging.DirectChatUsersPagingSource
 import com.spint.app.paging.DropProfilePagingSource
 import com.spint.app.repository.ChatDatabaseRepository
@@ -34,6 +34,7 @@ import com.spint.app.utils.RequestState
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.AutocompletePrediction
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
+import com.spint.app.model.pings.CommentData
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -311,8 +312,8 @@ class EventsViewModel @Inject constructor(
             }
     }
     //----------------------------Get user events for Profile----------------------------------------------------------------------------------------//
-    private val _userPingsListResponse = MutableStateFlow<RequestState<List<PingResponse>>>(RequestState.Idle)
-    val userPingsListResponse: StateFlow<RequestState<List<PingResponse>>> = _userPingsListResponse.asStateFlow()
+    private val _userPingsListResponse = MutableStateFlow<RequestState<List<FlashPostResponse>>>(RequestState.Idle)
+    val userPingsListResponse: StateFlow<RequestState<List<FlashPostResponse>>> = _userPingsListResponse.asStateFlow()
     val canFetchPings = mutableStateOf(true)
 
     fun getUserPings(id:String)=viewModelScope.launch(Dispatchers.IO) {
@@ -474,8 +475,8 @@ class EventsViewModel @Inject constructor(
 
 //--------------------------------------------------------------------------------------------------------------------//
 
-    private val _allPingsFlow = MutableStateFlow<Flow<PagingData<PingResponse>>?>(null)
-    val allPingsFlow: StateFlow<Flow<PagingData<PingResponse>>?> = _allPingsFlow.asStateFlow()
+    private val _allPingsFlow = MutableStateFlow<Flow<PagingData<FlashPostResponse>>?>(null)
+    val allPingsFlow: StateFlow<Flow<PagingData<FlashPostResponse>>?> = _allPingsFlow.asStateFlow()
 //    private val _shouldLoadDroppedProfiles= MutableStateFlow(false)
 //    val shouldLoadDroppedProfiles:StateFlow<Boolean>  = _shouldLoadDroppedProfiles
 
@@ -485,6 +486,24 @@ class EventsViewModel @Inject constructor(
             pagingSourceFactory = { PingsPagingSource(eventsRepository) }
         ).flow.cachedIn(viewModelScope)
     }
+
+    val _pingComments = MutableStateFlow<RequestState<List<CommentData>>> (RequestState.Idle)
+    val pingComments: StateFlow<RequestState<List<CommentData>>> = _pingComments
+
+    fun getPingComments(pingId:String)= viewModelScope.launch {
+            eventsRepository.getPingComments(pingId)
+                .onStart {
+                    _pingComments.value= RequestState.Loading
+                }
+                .catch {ex->
+                    _pingComments.value= RequestState.Error(ex)
+                }
+                .collect { value ->
+                    _pingComments.value= RequestState.Success(value.data)
+                }
+    }
+
+
 
 
 

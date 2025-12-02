@@ -3,11 +3,12 @@ package com.spint.app.screens.EventAndPingDesigns.flashPosts
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -48,7 +49,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.spint.app.R
-import com.spint.app.model.pings.PingResponse
+import com.spint.app.model.pings.FlashPostResponse
 import com.spint.app.screens._1home.commonUI.sharePingDeepLink
 import com.spint.app.ui.imagePrefix
 import com.spint.app.utils.constants.Constants
@@ -58,10 +59,10 @@ import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun FlashPostWithImageScreen(item:PingResponse) {
+fun FlashPostWithImageScreen(item:FlashPostResponse, onFlashPostClicked:()->Unit, onCommentButtonClicked: () -> Unit) {
     val context= LocalContext.current
     Box(
-        modifier = Modifier
+        modifier = Modifier.clickable{onFlashPostClicked()}
             .padding(top = 4.dp)
             .background(
                 brush = Brush.verticalGradient(
@@ -203,11 +204,11 @@ fun FlashPostWithImageScreen(item:PingResponse) {
                             .background(color = Color.Transparent)
                     ) {
 
-                        ViewRoundUI()
-                        CommentRoundUI()
+                        ViewRoundUI(item.totalViews)
+                        CommentRoundUI(item.totalComments,onCommentButtonClicked)
                         CountdownTimer(item.expirationTime)
-                        JoinRoundUI()
-                        ChatRoundUI(){
+                        JoinRoundUI(item.peopleJoined)
+                        ShareRoundUI(item.totalShared){
                             val deeplink="http://${Constants.APP_NAME}.com/ping/${item._id}"
                             sharePingDeepLink(context,deeplink)
                         }
@@ -269,24 +270,26 @@ fun CountdownTimer(expirationIso: String) {
     Log.i("item", "CountdownTimer:$expirationIso ")
     var timeLeft by remember { mutableStateOf("") }
     var isLessThanHour by remember { mutableStateOf(false) }
+    var isExpired by remember { mutableStateOf(false) }
 
     LaunchedEffect(expirationIso) {
-        while (true) {
-            val (formatted, lessThanHour) = getFormattedTimeAndFlag(expirationIso)
+        while (!isExpired) {
+            val (formatted, lessThanHour,expired) = getFormattedTimeAndFlag(expirationIso)
             timeLeft = formatted
             isLessThanHour = lessThanHour
-            delay(1000) // tick every second
+            isExpired=expired
+            delay(1000)
         }
     }
 
-    RoundUI(time = timeLeft, isLessThanHour = isLessThanHour)
+     RoundUI(time = timeLeft, isLessThanHour = isLessThanHour,isExpired)
 }
 
 
 @Composable
-fun RoundUI(time: String, isLessThanHour: Boolean) {
+fun RoundUI(time: String, isLessThanHour: Boolean,isExpired: Boolean) {
     val containerColor = when {
-        time == "Expired" -> Color.Gray
+        isExpired -> Color.Black.copy(alpha = 0.5f)
         isLessThanHour -> Color(0xFF940707)
         else -> Color(0xFF214601)///0xFF545707 0xFF888D0B 0xFF689F38
     }
@@ -301,27 +304,55 @@ fun RoundUI(time: String, isLessThanHour: Boolean) {
             contentColor = Color.White
         )
     ) {
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(2.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = time,
-                fontWeight = FontWeight.Bold,
-                fontFamily = Constants.FONT_MEDIUM,
-                fontSize = 13.sp,
-                maxLines = 2, color = Color.White
-            )
+            if(!isExpired) {
+                Text(
+                    text = "expecting response till:",
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = Constants.ROBOTO_CONDENSED,
+                    fontSize = 8.sp,
+                    lineHeight = 12.sp,
+                    maxLines = 1, color = Color.White
+                )
+                Text(
+                    text = time,
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = Constants.FONT_MEDIUM,
+                    fontSize = 13.sp,
+                    lineHeight = 12.sp,
+                    maxLines = 2, color = Color.White
+                )
+            }else {
+                Text(
+                    text = "post expired",
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = Constants.ROBOTO_CONDENSED,
+                    fontSize = 8.sp,
+                    lineHeight = 12.sp,
+                    maxLines = 1, color = Color.White
+                )
+                Text(
+                    text = "Ping user",
+                    fontWeight = FontWeight.Bold,
+                    fontFamily = Constants.FONT_MEDIUM,
+                    fontSize = 12.sp,
+                    lineHeight = 12.sp,
+                    maxLines = 2, color = Color.White
+                )
+            }
         }
     }
 }
 
 
 @Composable
-fun ChatRoundUI(onChatClicked:()->Unit) {
+fun ShareRoundUI(shareCount:Int,onShareClicked:()->Unit) {
     Card(
         onClick = {},
         modifier=Modifier.size(40.dp),
@@ -329,44 +360,65 @@ fun ChatRoundUI(onChatClicked:()->Unit) {
     ) {
         Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
 
-            Image(painter = painterResource(id = R.drawable.chat_new), contentDescription ="", modifier = Modifier.size(20.dp), colorFilter = ColorFilter.tint(
+            Image(painter = painterResource(id = R.drawable.share_event), contentDescription ="", modifier = Modifier.size(20.dp), colorFilter = ColorFilter.tint(
                 Color.White.copy(alpha = 0.954f)) )
-            Text("2.3k", color = Color.White, fontFamily = Constants.FONT_EXTRA_LIGHT, fontSize = 9.sp)
+            if(shareCount !=0) Text("2.3k", color = Color.White, fontFamily = Constants.FONT_EXTRA_LIGHT, fontSize = 9.sp)
         }}
 
 }
+//@Composable
+//fun JoinRoundUI() {
+//    Card(
+//        onClick = {},
+//        modifier=Modifier.height(40.dp).width(80.dp),
+//        shape = RoundedCornerShape(12.dp), colors = CardDefaults.cardColors(containerColor =  Constants.HOME_TOP_BAR_COLOR)
+//    ) {
+//        Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+//            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
+//                Image(painter = painterResource(id = R.drawable.join_blue), contentDescription ="", modifier = Modifier.size(14.dp) )
+//                Spacer(modifier = Modifier.width(8.dp))
+//                Text("JOIN", color = Color.White, fontFamily = Constants.FONT_LIGHT, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+//            }
+//            Text("122k", color = Color.White, fontFamily = Constants.FONT_EXTRA_LIGHT, fontSize = 9.sp)
+//        }}
+//
+//}
 @Composable
-fun JoinRoundUI() {
+fun JoinRoundUI(joinedCount: Int) {
     Card(
         onClick = {},
-        modifier=Modifier.size(40.dp),
-        shape = CircleShape, colors = CardDefaults.cardColors(containerColor =  Constants.HOME_TOP_BAR_COLOR)
+        modifier=Modifier.height(40.dp).width(80.dp),
+        shape = RoundedCornerShape(12.dp), colors = CardDefaults.cardColors(containerColor =  Constants.HOME_TOP_BAR_COLOR)
     ) {
-        Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+        Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
+            Image(painter = painterResource(id = R.drawable.join_blue), contentDescription ="", modifier = Modifier.size(28.dp) )
+            Spacer(modifier = Modifier.width(8.dp))
+        Column(modifier = Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                Text("JOIN", color = Color.White, fontFamily = Constants.FONT_LIGHT, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                if(joinedCount !=0)Text("122k", color = Color.Gray, fontFamily = Constants.FONT_EXTRA_LIGHT, fontSize = 9.sp)
+            }
 
-            Image(painter = painterResource(id = R.drawable.join_blue), contentDescription ="", modifier = Modifier.size(20.dp) )
-            Text("122k", color = Color.White, fontFamily = Constants.FONT_EXTRA_LIGHT, fontSize = 9.sp)
         }}
 
 }
 @Composable
-fun CommentRoundUI() {//50,30 earlier
+fun CommentRoundUI(commentCount: Int,onCommentButtonClicked:()-> Unit={}) {//50,30 earlier
 
     Card(
-        onClick = {},
+        onClick = {onCommentButtonClicked()},
         modifier=Modifier.size(40.dp),
         shape = CircleShape, colors = CardDefaults.cardColors(containerColor =  Constants.HOME_TOP_BAR_COLOR)
     ) {
         Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
         Image(painter = painterResource(id = R.drawable.comment), contentDescription ="", modifier = Modifier.size(20.dp), colorFilter = ColorFilter.tint(
             Color.White.copy(alpha = 0.954f)) )
-        Text("56k", color = Color.White, fontFamily = Constants.FONT_EXTRA_LIGHT, fontSize = 9.sp)}
+       if(commentCount !=0) Text("56k", color = Color.White, fontFamily = Constants.FONT_EXTRA_LIGHT, fontSize = 9.sp)}
 
     }
 
 }
 @Composable
-fun ViewRoundUI() {
+fun ViewRoundUI(viewCount: Int) {
     Card(
         onClick = {},
         modifier=Modifier.size(40.dp),
@@ -379,7 +431,7 @@ fun ViewRoundUI() {
         Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
             Image(painter = painterResource(id = R.drawable.view), contentDescription ="", modifier = Modifier.size(20.dp), colorFilter = ColorFilter.tint(
                 Color.White.copy(alpha = 0.954f)) )
-            Text("24k", color = Color.White, fontFamily = Constants.FONT_EXTRA_LIGHT, fontSize = 9.sp)
+           if(viewCount !=0) Text("24k", color = Color.White, fontFamily = Constants.FONT_EXTRA_LIGHT, fontSize = 9.sp)
     }
         }
 }

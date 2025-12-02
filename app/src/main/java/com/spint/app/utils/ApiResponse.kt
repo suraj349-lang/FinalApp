@@ -8,7 +8,7 @@ data class ApiResponse<T>(
 )
 
 
-data class AllPingsResponse<T>(
+data class PingsResponse<T>(
     val success:Boolean,
     val code:Int,
     val data:T,

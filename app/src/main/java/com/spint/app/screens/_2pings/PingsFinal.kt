@@ -31,6 +31,7 @@ import com.spint.app.utils.UserLocationObject
 import com.spint.app.utils.constants.Constants
 import com.spint.app.viewmodels.EventsViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.spint.app.navigation.SCREENS
 import com.spint.app.screens.EventAndPingDesigns.flashPosts.FlashPostWithImageScreen
 import com.spint.app.screens.EventAndPingDesigns.flashPosts.NoImageFlashPosts
 import com.spint.app.screens.EventAndPingDesigns.flashPosts.PrivateFlashPostScreen
@@ -374,9 +375,15 @@ fun FlashPostsScreen(
                                   //  PingItem1()
                                    
                                     if(item.image.isNotEmpty() && !item.isPrivate){
-                                        FlashPostWithImageScreen(item)
+                                        FlashPostWithImageScreen(
+                                            item,
+                                            onFlashPostClicked = {navController.navigate(SCREENS.PING_DETAILS.createRoute(item))},
+                                            onCommentButtonClicked = {
+                                                navController.navigate(SCREENS.COMMENT.route)
+                                            }
+                                        )
                                     }else if (item.image.isEmpty() && !item.isPrivate ){
-                                       NoImageFlashPosts(pingResponse = item)
+                                       NoImageFlashPosts(flashPostResponse = item)
                                     }else{
                                         PrivateFlashPostScreen(item)
                                     }

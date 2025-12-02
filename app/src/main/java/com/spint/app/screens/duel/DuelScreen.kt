@@ -34,14 +34,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
@@ -98,6 +95,12 @@ fun DuelScreen(navController: NavHostController) {
     // Keep the views across recompositions
     val localView = remember { SurfaceViewRenderer(context) }
     val remoteView = remember { SurfaceViewRenderer(context) }
+    val webRTCManager = remember { WebRTCManager(context, localView, remoteView, eglBase) }
+    val  isRemoteUserConnected by webRTCManager.isRemoteUserConnected.collectAsState()
+
+    BackHandler(true) {
+     webRTCManager.release()
+    }
 
 
 
@@ -118,8 +121,7 @@ fun DuelScreen(navController: NavHostController) {
         onDispose { remoteView.release() }
     }
 
-    val webRTCManager = remember { WebRTCManager(context, localView, remoteView, eglBase) }
-     val  isRemoteUserConnected by webRTCManager.isRemoteUserConnected.collectAsState()
+
 
     val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestMultiplePermissions()
@@ -163,9 +165,10 @@ fun DuelScreen(navController: NavHostController) {
 
     Scaffold(
         topBar = {
-            if(!isConnected){
-            DuelTopBar()
-        }},
+            if (!isConnected) {
+                DuelTopBar()
+            }
+        },
         bottomBar = {
             if (!isConnected){
                 Column(
@@ -249,7 +252,7 @@ fun DuelScreen(navController: NavHostController) {
                         isConnected=false
                         webRTCManager.release();
 
-                        navController.navigateUp()
+                        isConnected=false
                     }) {
                     isVisible = true
                 }
@@ -265,8 +268,8 @@ fun DuelScreen(navController: NavHostController) {
             contentAlignment = Alignment.Center
         ) {
             BackHandler(true) {
-                webRTCManager.release()
-                navController.navigateUp()
+               // webRTCManager.release()
+                isConnected=false
             }
             when {
                 !permissionsGranted -> {
@@ -276,14 +279,16 @@ fun DuelScreen(navController: NavHostController) {
                 isConnected -> {
 
                     // Remote user view screen
-                    Box(modifier = Modifier.fillMaxHeight()
+                    Box(modifier = Modifier
+                        .fillMaxHeight()
                         .fillMaxWidth()) {
                         if (!isRemoteUserConnected) {
 
                             // ⏳ SHOW LOADING UNTIL THE REMOTE USER JOINS
                             Box(
                                 modifier = Modifier
-                                    .fillMaxWidth().fillMaxHeight(0.5f)) {
+                                    .fillMaxWidth()
+                                    .fillMaxHeight(0.5f)) {
                                 FlippingIconLoader(modifier = Modifier.align(Alignment.Center), icon = R.drawable.spint1)
                             }
 
@@ -293,7 +298,8 @@ fun DuelScreen(navController: NavHostController) {
                                     (remoteView.parent as? ViewGroup)?.removeView(remoteView)
                                     remoteView
                                 }, modifier = Modifier
-                                    .align(Alignment.TopCenter).fillMaxWidth()
+                                    .align(Alignment.TopCenter)
+                                    .fillMaxWidth()
                                     .fillMaxHeight(0.5f)
                             )
 
@@ -420,8 +426,8 @@ fun DuelFirstScreenLocal(localView: SurfaceViewRenderer) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 PrivatePublicSwitch(isSelected =isPrivate ,{isPrivate=!isPrivate})
-                DuelCameraEdit(title = "blur",R.drawable.blur, unSelectedIcon = R.drawable.non_blur, isSelected = isBlur, onClick = {isBlur= ! isBlur})
-                DuelCameraEdit("filter",R.drawable.filter2)
+                DuelCameraEdit(title = "blur",R.drawable.blur_outlined, unSelectedIcon = R.drawable.blur_outlined, isSelected = isBlur, tint = isBlur, onClick = {isBlur= ! isBlur})
+                DuelCameraEdit("filter",R.drawable.filter2, tint = false)
                 DuelCameraEdit("menu",R.drawable.menu,tint=false,size=20)
 
             }
@@ -527,7 +533,9 @@ fun GenderSelection() {
             .wrapContentHeight(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(20.dp)) {
 
         listOfTypes.forEach {
-            Card(Modifier.wrapContentSize().clickable{selected=it}, backgroundColor = if (selected==it) floatingActionBtnColor else Color.Gray, contentColor = Color.White) {
+            Card(Modifier
+                .wrapContentSize()
+                .clickable { selected = it }, backgroundColor = if (selected==it) floatingActionBtnColor else Color.Gray, contentColor = Color.White) {
                 Text(text = it, fontFamily = Constants.FONT_LIGHT, fontSize = 14.sp,color= if (selected==it)Color.White else Color.DarkGray, modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp))
             }
         }
@@ -599,7 +607,9 @@ fun InterestSelector(categories: List<MatchCategory>,
 //                                    lineHeight = 12.sp
 //                                )
                             }
-                            Divider(modifier = Modifier.fillMaxWidth().padding(top=2.dp), thickness = 0.25.dp, color = Color.Gray)
+                            Divider(modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 2.dp), thickness = 0.25.dp, color = Color.Gray)
                         }
                     }
                 }
@@ -708,8 +718,10 @@ fun DuelCameraEdit(title: String,selectedIcon:Int, unSelectedIcon: Int=0, tint:B
         Image(
             painter = painterResource(id = if (isSelected) selectedIcon else unSelectedIcon),
             contentDescription = "",
-            modifier = Modifier.size(size.dp).clickable { onClick() },
-            //colorFilter = if (tint) ColorFilter.tint(Color.White) else ColorFilter.tint(Color.Transparent)
+            modifier = Modifier
+                .size(size.dp)
+                .clickable { onClick() },
+            colorFilter = if (isSelected && tint) ColorFilter.tint(floatingActionBtnColor) else null
         )
     Text(title, fontFamily = Constants.ROBOTO_CONDENSED, fontSize = 9.sp, lineHeight = 12.sp, color = Color.LightGray.copy(alpha = 0.7f))
  }
@@ -732,7 +744,13 @@ fun MoodSelector2(
             Row(
                 modifier = Modifier
                     .clip(RoundedCornerShape(20.dp))
-                    .background(if (isSelected) Color.White else Color(android.graphics.Color.parseColor(mood.colorHex)).copy(alpha = 0.6f))
+                    .background(
+                        if (isSelected) Color.White else Color(
+                            android.graphics.Color.parseColor(
+                                mood.colorHex
+                            )
+                        ).copy(alpha = 0.6f)
+                    )
                     .clickable { onSelect(mood) }
                     .padding(horizontal = 8.dp, vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically

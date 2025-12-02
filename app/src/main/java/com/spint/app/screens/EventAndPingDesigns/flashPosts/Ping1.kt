@@ -37,7 +37,7 @@ import androidx.compose.ui.unit.sp
 import com.spint.app.R
 import com.spint.app.model.User
 import com.spint.app.model.pings.CommentData
-import com.spint.app.model.pings.PingResponse
+import com.spint.app.model.pings.FlashPostResponse
 import com.spint.app.utils.constants.Constants
 import com.spint.app.utils.formatDateTime
 
@@ -46,7 +46,7 @@ import com.spint.app.utils.formatDateTime
 @Preview
 @Composable
 fun PingItem1() {
-    val item = PingResponse(
+    val item = FlashPostResponse(
         _id = "12345",
         user = User( ),
         title = "Special Offer!",

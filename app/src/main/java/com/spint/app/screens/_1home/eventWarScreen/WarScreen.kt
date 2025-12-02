@@ -37,13 +37,15 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.spint.app.R
+import com.spint.app.screens._1home.publicEvent.sampleComments
 
-
+@Preview(showBackground = true)
 @Composable
-fun CommentsScreen(comments:List<Comment> = emptyList()) {
+fun CommentsScreen(comments:List<Comment> = com.spint.app.screens._1home.eventWarScreen.comments) {
     // Use mutable state list for top-level comments
     val commentsState = remember { mutableStateListOf<Comment>().apply { addAll(comments) } }
 
@@ -133,7 +135,7 @@ fun CommentItem(
                 .fillMaxWidth()
                 .padding(4.dp)
                 .background(
-                    if (indentLevel == 0) Color(0xFF753CC5) else Color(0xFF1B70C4),
+                    if (indentLevel == 0) Color(0xFF753CC5) else Color(0xFF0970CB), //0xFF753CC5
                     shape = RoundedCornerShape(4.dp)
                 )
                 .padding(4.dp)

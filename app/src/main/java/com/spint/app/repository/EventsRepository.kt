@@ -14,11 +14,12 @@ import com.spint.app.model.AllPingsResponseDTO
 import com.spint.app.model.CreatePingResponse
 import com.spint.app.model.EventDetailsResponse
 import com.spint.app.model.PremiumEventResponseDTO
+import com.spint.app.model.pings.CommentData
 import com.spint.app.model.pings.PingRequestDto
-import com.spint.app.model.pings.PingResponse
+import com.spint.app.model.pings.FlashPostResponse
 import com.spint.app.network.ApiService
 import com.spint.app.screens._4profile.uriToMultipart
-import com.spint.app.utils.AllPingsResponse
+import com.spint.app.utils.PingsResponse
 import com.spint.app.utils.ApiResponse
 import dagger.hilt.android.scopes.ViewModelScoped
 import kotlinx.coroutines.Dispatchers
@@ -88,9 +89,12 @@ class EventsRepository @Inject constructor(private val api: ApiService) {
         emit(api.createPing(data))
     }.flowOn(Dispatchers.IO)
 
-    suspend fun getAllPings(page:Int): AllPingsResponse<List<PingResponse>> {
+    suspend fun getAllPings(page:Int): PingsResponse<List<FlashPostResponse>> {
         return api.getAllPings(page)
     }
+    suspend fun getPingComments(pingId: String): Flow<PingsResponse<List<CommentData>>> = flow {
+        emit(api.getPingComments())
+    }.flowOn(Dispatchers.IO)
 
 
 }

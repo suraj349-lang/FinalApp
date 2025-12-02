@@ -211,7 +211,7 @@ fun PublicEvent(  //currently in use
             )
 
 //            if(!event.topComments.isNullOrEmpty())
-         //   EventComments(sampleComments)
+//            EventComments(sampleComments)
 
         }
     }

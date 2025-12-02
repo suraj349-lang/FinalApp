@@ -27,13 +27,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.spint.app.R
 import com.spint.app.model.CommentData
 import com.spint.app.utils.constants.Constants
 import kotlinx.coroutines.delay
-val sampleComments = listOf(
+val sampleComments: List<CommentData> = listOf(
     CommentData(
         userName = "Aarav Sharma",
         profileImage = "https://example.com/profiles/aarav.jpg",
@@ -63,7 +64,7 @@ val sampleComments = listOf(
 
 
 @Composable
-fun EventComments(commentList:List<CommentData>) {
+fun EventComments(commentList:List<CommentData> ) {
     val listState = rememberLazyListState()
 
     // Auto-scroll slowly in a loop

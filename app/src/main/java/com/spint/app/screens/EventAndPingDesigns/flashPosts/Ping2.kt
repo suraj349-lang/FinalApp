@@ -40,13 +40,13 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import coil.compose.AsyncImage
 import com.spint.app.R
-import com.spint.app.model.pings.PingResponse
+import com.spint.app.model.pings.FlashPostResponse
 import com.spint.app.ui.imagePrefix
 import com.spint.app.utils.constants.Constants
 
 
 @Composable
-fun PingItem2(item: PingResponse) {
+fun PingItem2(item: FlashPostResponse) {
     Box(
         modifier = Modifier
             .padding(10.dp)

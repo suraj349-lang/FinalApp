@@ -14,7 +14,7 @@ import androidx.navigation.navDeepLink
 import com.spint.app.enums.ImageUploadScreens
 import com.spint.app.model.DropProfileResponse
 import com.spint.app.model.RegisterUserModel
-import com.spint.app.model.pings.PingResponse
+import com.spint.app.model.pings.FlashPostResponse
 import com.spint.app.viewmodels.ChatViewModel
 import com.spint.app.viewmodels.AuthViewModel
 import com.spint.app.screens.auth.EnterOTPScreenUI
@@ -74,7 +74,6 @@ import com.spint.app.viewmodels.NotificationViewModel
 import com.spint.app.viewmodels.SettingsViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.spint.app.screens.EventAndPingDesigns.events.templates.xhmaslive.XHamsLiveScreenWrapper
-import com.spint.app.screens.EventAndPingDesigns.events.templates.xhmaslive.XhamLiveScreen
 import kotlinx.serialization.json.Json
 import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
@@ -231,10 +230,10 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
             DropProfileUserProfile(navController,chatViewModel,dropProfileResponse)
 
         }
-        composable(route=SCREENS.PING_DETAILS.route, arguments = listOf(navArgument("pingResponse"){ type= NavType.StringType })){navBackStackEntry ->
-            val json=navBackStackEntry.arguments?.getString("pingResponse")
-            val pingResponse=json?.let { Json.decodeFromString<PingResponse>(it) }
-            PingDetailsScreen(navController,pingResponse)
+        composable(route=SCREENS.PING_DETAILS.route, arguments = listOf(navArgument("flashPostResponse"){ type= NavType.StringType })){navBackStackEntry ->
+            val json=navBackStackEntry.arguments?.getString("flashPostResponse")
+            val flashPostResponse=json?.let { Json.decodeFromString<FlashPostResponse>(it) }
+            PingDetailsScreen(navController,flashPostResponse)
 
         }
         composable("camerax/{screen}"){backStackEntry->

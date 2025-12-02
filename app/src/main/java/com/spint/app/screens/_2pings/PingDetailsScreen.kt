@@ -1,7 +1,5 @@
 package com.spint.app.screens._2pings
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -43,7 +41,7 @@ import androidx.navigation.NavHostController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.spint.app.R
-import com.spint.app.model.pings.PingResponse
+import com.spint.app.model.pings.FlashPostResponse
 import com.spint.app.navigation.SCREENS
 import com.spint.app.screens._1home.commonUI.shareEventDeepLink
 import com.spint.app.testing.CommonTopBar
@@ -56,7 +54,7 @@ import java.nio.charset.StandardCharsets
 
 
 @Composable
-fun PingDetailsScreen(navController: NavHostController, pingResponse: PingResponse?) {
+fun PingDetailsScreen(navController: NavHostController, flashPostResponse: FlashPostResponse?) {
           Scaffold(
             topBar = {CommonTopBar(title = "Ping") },
             //  bottomBar = {BottomBar(navController = navController, state = buttonsVisible)},
@@ -68,15 +66,15 @@ fun PingDetailsScreen(navController: NavHostController, pingResponse: PingRespon
                         .fillMaxSize()
                 ) {
                     PingDetailsScreenUI(
-                        pingResponse = pingResponse,
+                        flashPostResponse = flashPostResponse,
                         onSendMessageClicked = {
-                            if (pingResponse?.user != null) {
-                                val encodedImageUrl = URLEncoder.encode(pingResponse.user.profileImage, StandardCharsets.UTF_8.toString())
+                            if (flashPostResponse?.user != null) {
+                                val encodedImageUrl = URLEncoder.encode(flashPostResponse.user.profileImage, StandardCharsets.UTF_8.toString())
                                 navController.navigate(
                                         SCREENS.SINGLE_CHAT.createPath(
-                                            userName = pingResponse.user.userName,
+                                            userName = flashPostResponse.user.userName,
                                             profileImage = encodedImageUrl,
-                                            chatListUserId = pingResponse.user.user
+                                            chatListUserId = flashPostResponse.user.user
                                         )
                                 )
                             }
@@ -94,9 +92,9 @@ fun PingDetailsScreen(navController: NavHostController, pingResponse: PingRespon
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun PingDetailsScreenUI(pingResponse: PingResponse?, onSendMessageClicked:()->Unit, onBackPressed:()->Unit) {
+fun PingDetailsScreenUI(flashPostResponse: FlashPostResponse?, onSendMessageClicked:()->Unit, onBackPressed:()->Unit) {
     val context = LocalContext.current
-    if (pingResponse != null) {
+    if (flashPostResponse != null) {
         Box(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
             Image(
                 painter = painterResource(id = R.drawable.baseline_arrow_back_24),
@@ -126,7 +124,7 @@ fun PingDetailsScreenUI(pingResponse: PingResponse?, onSendMessageClicked:()->Un
                             .height(600.dp)
                     ) {
                         GlideImage(
-                            model = imagePrefix + pingResponse.image,
+                            model = imagePrefix + flashPostResponse.image,
                             contentDescription = "",
                             contentScale = ContentScale.Crop,
                             modifier = Modifier.fillMaxSize()
@@ -139,7 +137,7 @@ fun PingDetailsScreenUI(pingResponse: PingResponse?, onSendMessageClicked:()->Un
                             verticalArrangement = Arrangement.Bottom,
                             horizontalAlignment = Alignment.Start
                         ) {
-                                pingResponse.user?.name?.uppercase()?.let {
+                                flashPostResponse.user?.name?.uppercase()?.let {
                                     Text(
                                         text = it,
                                         fontFamily = Constants.FONT_MEDIUM,
@@ -153,7 +151,7 @@ fun PingDetailsScreenUI(pingResponse: PingResponse?, onSendMessageClicked:()->Un
                                     )
                                 }
                             Text(
-                                text = pingResponse.location,
+                                text = flashPostResponse.location,
                                 maxLines = 3,
                                 color = Color.White.copy(alpha = 0.95f),
                                 fontFamily = Constants.FONT_LIGHT,
@@ -167,7 +165,7 @@ fun PingDetailsScreenUI(pingResponse: PingResponse?, onSendMessageClicked:()->Un
                             modifier = Modifier
                                 .padding(end = 30.dp, bottom = 26.dp)
                                 .align(Alignment.BottomEnd)
-                                .clickable { shareEventDeepLink(context, pingResponse.user?.user ?: "") }
+                                .clickable { shareEventDeepLink(context, flashPostResponse.user?.user ?: "") }
                                 .size(20.dp),
                             colorFilter = ColorFilter.tint(Color.White))
 
@@ -190,7 +188,7 @@ fun PingDetailsScreenUI(pingResponse: PingResponse?, onSendMessageClicked:()->Un
                     ) {
                         Card(modifier = Modifier.wrapContentSize(), shape = CircleShape) {
                             GlideImage(
-                                model = imagePrefix + pingResponse.user?.profileImage,
+                                model = imagePrefix + flashPostResponse.user?.profileImage,
                                 contentDescription = "",
                                 modifier = Modifier.size(40.dp),
                                 contentScale = ContentScale.Crop
@@ -203,7 +201,7 @@ fun PingDetailsScreenUI(pingResponse: PingResponse?, onSendMessageClicked:()->Un
                             verticalArrangement = Arrangement.Center,
                             horizontalAlignment = Alignment.Start
                         ) {
-                            pingResponse.user?.userName?.lowercase()?.let {
+                            flashPostResponse.user?.userName?.lowercase()?.let {
                                 Text(
                                     text = it,
                                     fontFamily = Constants.USER_NAME_FONT,
@@ -219,7 +217,7 @@ fun PingDetailsScreenUI(pingResponse: PingResponse?, onSendMessageClicked:()->Un
                                     fontSize = 12.sp
                                 )
                                 Text(
-                                    text = formatDateTime(pingResponse.expirationTime).lowercase(),
+                                    text = formatDateTime(flashPostResponse.expirationTime).lowercase(),
                                     color = floatingActionBtnColor,
                                     fontFamily = Constants.FONT_EXTRA_LIGHT,
                                     fontSize = 12.sp
@@ -267,7 +265,7 @@ fun PingDetailsScreenUI(pingResponse: PingResponse?, onSendMessageClicked:()->Un
                         fontSize = 14.sp
                     )
                     Text(
-                        text = formatDateTime(pingResponse.expirationTime),
+                        text = formatDateTime(flashPostResponse.expirationTime),
                         modifier = Modifier,
                         color = floatingActionBtnColor,
                         fontFamily = Constants.FONT_MEDIUM,
@@ -277,7 +275,7 @@ fun PingDetailsScreenUI(pingResponse: PingResponse?, onSendMessageClicked:()->Un
                 }
 
                 Text(
-                    text = pingResponse.offer.capitalize(),
+                    text = flashPostResponse.offer.capitalize(),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 16.dp, top = 4.dp),

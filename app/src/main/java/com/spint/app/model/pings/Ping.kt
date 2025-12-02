@@ -1,6 +1,7 @@
 package com.spint.app.model.pings
 
 import com.spint.app.model.User
+import kotlinx.serialization.Serializable
 
 data class PingRequestDto(
     val user: String,
@@ -33,8 +34,8 @@ data class PingRequestDto(
     }
 }
 
-
-data class PingResponse(
+@Serializable
+data class FlashPostResponse(
     val _id:String="",
     val user: User? = null,
     val title: String? = null,
@@ -52,9 +53,11 @@ data class PingResponse(
     val topComments:List<CommentData> ? =null,
     val totalChildPosts:Int =0,
     val totalViews:Int=0,
-    val totalUpVotes:Int=0
+    val totalUpVotes:Int=0,
+    val totalShared:Int=0
 )
 
+@Serializable
 data class CommentData(
     val userName:String,
     val profileImage:String,
