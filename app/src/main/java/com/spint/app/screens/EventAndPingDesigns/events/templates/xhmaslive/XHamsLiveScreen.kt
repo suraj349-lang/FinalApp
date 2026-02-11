@@ -3,9 +3,7 @@ package com.spint.app.screens.EventAndPingDesigns.events.templates.xhmaslive
 
 import BottomBar
 import android.app.Activity
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -65,7 +63,7 @@ import com.spint.app.screens.loadingAndErrorScreen.loadingScreen.EventLoadingScr
 import com.spint.app.ui.imagePrefix
 import com.spint.app.utils.RequestState
 import com.spint.app.utils.constants.Constants
-import com.spint.app.viewmodels.EventsViewModel
+import com.spint.app.viewmodels.HomeViewModel
 
 
 
@@ -73,20 +71,20 @@ import com.spint.app.viewmodels.EventsViewModel
 @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 @Composable
 fun XHamsLiveScreenWrapper(
-    eventsViewModel: EventsViewModel,
+    homeViewModel: HomeViewModel,
     modifier: Modifier = Modifier,
     initialPage: Int? = 0,
     navController: NavHostController,
     onRetryCalled:()->Unit
 ) {
     LaunchedEffect(key1 = true){
-        eventsViewModel.getAllEvents()
+        homeViewModel.getAllEvents()
     }
     val pagerState = rememberPagerState(
         initialPage = initialPage ?: 0,
-        pageCount = { (eventsViewModel.eventsListResponse.value as? RequestState.Success<List<Event>>)?.data?.size ?: 0 }
+        pageCount = { (homeViewModel.eventsListResponse.value as? RequestState.Success<List<Event>>)?.data?.size ?: 0 }
     )
-    val eventsState by eventsViewModel.eventsListResponse.collectAsState()
+    val eventsState by homeViewModel.eventsListResponse.collectAsState()
 
     when (eventsState) {
         is RequestState.Loading -> {
@@ -97,7 +95,7 @@ fun XHamsLiveScreenWrapper(
             Column(modifier=Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
                 Log.e("Events", "EventsScreen:${(eventsState as RequestState.Error).error} ", )
                 CommonErrorScreen(error = "Unable to fetch events.",true){
-                    eventsViewModel.getAllEvents()
+                    homeViewModel.getAllEvents()
                 }
             }
         }

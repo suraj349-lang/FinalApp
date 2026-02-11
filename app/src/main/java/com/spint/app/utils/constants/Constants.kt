@@ -7,9 +7,9 @@ import com.spint.app.R
 
 object Constants {
 
-    const val IP_ADD ="3.108.55.84" //3.108.55.84" //  192.168.1.5
-    const val BASE_URL = "http://${IP_ADD}/"
-    const val TEMP_SOCKET_URL = "http://${IP_ADD}/"
+    const val IP_ADD ="192.168.1.56" //3.108.55.84" //  192.168.1.5
+    const val BASE_URL = "http://${IP_ADD}:5000/"
+    const val TEMP_SOCKET_URL = "http://${IP_ADD}:5001/"
 
 
     const val APP_NAME="Spint"
@@ -62,4 +62,6 @@ object Constants {
 
     val BOTTOM_BAR_INACTIVE_ICON_COLOR= Color.LightGray
     val BOTTOM_BAR_INACTIVE_TEXT_COLOR= Color.LightGray
+
+    val CHAT_LIST_BKG=Color(0xFF090115)
 }

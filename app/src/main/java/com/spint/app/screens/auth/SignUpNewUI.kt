@@ -32,6 +32,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -59,21 +60,24 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.spint.app.R
+import com.spint.app.screens.auth.util.BirthdayPicker
 import com.spint.app.screens.auth.util.OtpInputField
 import com.spint.app.utils.constants.Constants
 
 
 @Composable
 fun SignupScreenNewUI(
-    name:String,
+    name: String ,
     onNameChange: (String) -> Unit,
-    password:String,
-    onPasswordChange:(String)->Unit,
-    confirmPassword:String,
-    onConfirmPasswordChange:(String)->Unit,
+    birthDay: String,
+    onBirthDayChange: (String) -> Unit,
+    password: String ,
+    onPasswordChange: (String) -> Unit,
+    confirmPassword: String ,
+    onConfirmPasswordChange: (String) -> Unit,
     onBackClicked: () -> Unit,
     onSignInClicked: () -> Unit,
-    onNextClicked: () -> Unit
+    onNextClicked: () -> Unit,
 ) {
 
     var passwordVisibility by rememberSaveable { mutableStateOf(false) }
@@ -90,6 +94,7 @@ fun SignupScreenNewUI(
         painterResource(id = R.drawable.round_visibility_off_24)
 
     val keyboardController = LocalSoftwareKeyboardController.current
+    val gender=listOf("Male","Female","Others")
 
 
     var checked by remember {
@@ -101,9 +106,10 @@ fun SignupScreenNewUI(
                 .background(
                     brush = Brush.verticalGradient(
                         colors = listOf(
-//                            Color(0xFF1976D2), Color(0xFFE9D8AE)
-//                            Color(0xFFFBC02D), Color(0xFFDCDEF0)
-                            Color(0xFF0288D1), Color(0xFF7B1FA2)
+                            //Color(0xFF0288D1),
+                            //   Color(0xFF7B1FA2)
+                            Color(0xFF020236),
+                            Color(0xFF2A033B)
                         )
                     )
                 )
@@ -128,7 +134,7 @@ fun SignupScreenNewUI(
                     .fillMaxSize()
                     .padding(30.dp)
             ) {
-                Spacer(modifier = Modifier.height(30.dp))
+                Spacer(modifier = Modifier.height(10.dp))
                 Column(
                     Modifier
                         .fillMaxWidth()
@@ -172,7 +178,7 @@ fun SignupScreenNewUI(
                         }
                     }, modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 30.dp)
+                        .padding(vertical = 20.dp)
                 )
 
                 Spacer(modifier = Modifier.padding(bottom = 10.dp))
@@ -188,10 +194,10 @@ fun SignupScreenNewUI(
                     ),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedTextColor = Color.Black,
-                        unfocusedTextColor = Color.Black,
-                        cursorColor = Color.Black,
+                        unfocusedTextColor = Color.White,
+                        cursorColor = Color.Green,
                         focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color.Gray,
                         unfocusedLabelColor = Color.LightGray,
                         focusedLabelColor = Color.LightGray,
                     ),
@@ -204,6 +210,33 @@ fun SignupScreenNewUI(
 
                 )
                 OutlinedTextField(
+                    value = gender.get(0),
+                    onValueChange = {
+
+                    },
+                    placeholder = { Text(text = "Gender", fontFamily = Constants.FONT_LIGHT) },
+                    modifier = Modifier.fillMaxWidth(),
+                    textStyle = TextStyle(
+                        fontFamily = Constants.FONT_MEDIUM
+                    ),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color.Black,
+                        unfocusedTextColor = Color.White,
+                        cursorColor = Color.Green,
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color.Gray,
+                        unfocusedLabelColor = Color.LightGray,
+                        focusedLabelColor = Color.LightGray,
+                    ),
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text,
+                        imeAction = ImeAction.Next
+                    ), keyboardActions = KeyboardActions(
+                        onNext = { }
+                    )
+                )
+                BirthdayPicker(birthDay,onBirthDayChange)
+                OutlinedTextField(
                     value = password,
                     onValueChange = {
                         onPasswordChange(it)
@@ -215,10 +248,10 @@ fun SignupScreenNewUI(
                     placeholder = { Text(text = "Password", fontFamily = Constants.FONT_LIGHT) },
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedTextColor = Color.Black,
-                        unfocusedTextColor = Color.Black,
-                        cursorColor = Color.Black,
+                        unfocusedTextColor = Color.White,
+                        cursorColor = Color.Green,
                         focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color.Gray,
                         unfocusedLabelColor = Color.LightGray,
                         focusedLabelColor = Color.LightGray,
                     ),
@@ -256,10 +289,10 @@ fun SignupScreenNewUI(
                     placeholder = { Text(text = "Confirm Password", fontFamily = Constants.FONT_LIGHT) },
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedTextColor = Color.Black,
-                        unfocusedTextColor = Color.Black,
-                        cursorColor = Color.Black,
+                        unfocusedTextColor = Color.White,
+                        cursorColor = Color.Green,
                         focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color.Gray,
                         unfocusedLabelColor = Color.LightGray,
                         focusedLabelColor = Color.LightGray,
                     ),
@@ -298,6 +331,7 @@ fun SignupScreenNewUI(
                 Button(
                     onClick = {onNextClicked() },
                     shape = RoundedCornerShape(10.dp),
+                    enabled = name.isNotEmpty() && password.isNotEmpty() && confirmPassword==password ,
                     elevation=ButtonDefaults.buttonElevation(defaultElevation = 10.dp),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -329,7 +363,7 @@ fun SignupScreenNewUI(
 
 @Composable
 fun SignInText(onSignInClicked: () -> Unit) {
-    Row {
+    Row(modifier = Modifier.fillMaxWidth().wrapContentHeight().clickable{onSignInClicked()}, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
         Text(
             text = "Have an account? ",
             style = TextStyle(
@@ -340,7 +374,7 @@ fun SignInText(onSignInClicked: () -> Unit) {
         )
         Text(
             text = "Sign in",
-            modifier = Modifier.clickable { onSignInClicked() },
+            modifier = Modifier,
             style = TextStyle(
                 fontSize = 14.sp,
                 color = Color(0xFFF7E7C2),
@@ -360,7 +394,7 @@ fun TermsAndConditions() {
         }
 
         pushStringAnnotation(tag = "URL", annotation = "https://finalapp-3494.web.app/")
-        withStyle(style = SpanStyle(color = Color.Yellow, fontWeight = FontWeight.SemiBold,fontSize = 8.sp, fontFamily = Constants.FONT_LIGHT)) {
+        withStyle(style = SpanStyle(color = Color.LightGray, fontWeight = FontWeight.SemiBold,fontSize = 8.sp, fontFamily = Constants.FONT_LIGHT)) {
             append("Terms of Services & Privacy Policy")
         }
         pop()
@@ -380,7 +414,7 @@ fun TermsAndConditions() {
 
 }
 
-
+/*
 @Composable
 fun UserNameAndPhone(phoneNumber:String,onPhoneNumberChange:(String)->Unit,userName:String,onUserNameChange:(String)->Unit,otp:String,onOtpChange:(String)->Unit) {
     Column(modifier = Modifier
@@ -439,7 +473,7 @@ fun UserNameAndPhone(phoneNumber:String,onPhoneNumberChange:(String)->Unit,userN
             )
         )
 
-        OtpInputField(otpLength = 6, onOtpChanged = { value -> onOtpChange(value) })
+        OtpInputField(otp,otpLength = 6, onOtpChanged = { value -> onOtpChange(value) })
         Spacer(modifier = Modifier.height(16.dp))
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -470,3 +504,4 @@ fun UserNameAndPhone(phoneNumber:String,onPhoneNumberChange:(String)->Unit,userN
     }
 
 }
+*/

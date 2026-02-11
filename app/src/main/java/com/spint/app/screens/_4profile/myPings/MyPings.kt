@@ -1,6 +1,7 @@
 package com.spint.app.screens._4profile.myPings
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,9 +15,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Text
@@ -35,7 +39,7 @@ import androidx.compose.ui.unit.sp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.spint.app.R
-import com.spint.app.model.pings.FlashPostResponse
+import com.spint.app.model.flashPost.FlashPostResponse
 import com.spint.app.ui.imagePrefix
 import com.spint.app.ui.theme.floatingActionBtnColor
 import com.spint.app.utils.constants.Constants
@@ -150,20 +154,10 @@ fun MyPingItem(item: FlashPostResponse) {
         .aspectRatio(9f/13f) //120 earlier
         .clip(shape = RoundedCornerShape(2.dp))) {
         GlideImage(model=  imagePrefix +item.image/*R.drawable.profile_image_1*/ , contentDescription = "", modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop) //todo add imagePrefix when upload is happening
-//        Row(modifier = Modifier
-//            .align(Alignment.BottomStart)
-//            .padding(4.dp)
-//            .fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-//            item.title?.let { Text(text = it, color = Color.White, fontWeight = FontWeight.SemiBold) }
-//            Card(shape = CircleShape,backgroundColor = Color.Black.copy(alpha = 0.4f)) {
-//                Text(text=item.expirationTime, color = Color.White, modifier = Modifier.padding(2.dp))
-//            }
-//
-//
-//        }
+        Box(modifier= Modifier.align(Alignment.TopEnd).wrapContentSize().clip(shape = CircleShape).background(color=Color.Red)) {
+            Text(item.pingCount.toString(),modifier= Modifier.padding(4.dp))
 
-
-
+        }
     }
 }
 

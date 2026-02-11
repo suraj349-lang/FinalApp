@@ -56,7 +56,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.spint.app.viewmodels.EventsViewModel
+import com.spint.app.viewmodels.HomeViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -102,10 +102,10 @@ fun DroppedProfilesUI(
     pagerState: PagerState,
     scrollBehavior: TopAppBarScrollBehavior,
     navController: NavHostController,
-    eventsViewModel: EventsViewModel,
+    homeViewModel: HomeViewModel,
 ) {
-    val triggerFetch by eventsViewModel.triggerFetch.collectAsState()
-    val droppedProfiles by eventsViewModel.droppedProfiles.collectAsState()
+    val triggerFetch by homeViewModel.triggerFetch.collectAsState()
+    val droppedProfiles by homeViewModel.droppedProfiles.collectAsState()
     val droppedProfilesList = droppedProfiles?.collectAsLazyPagingItems()
     var showLoader by remember {
         mutableStateOf(false)
@@ -124,13 +124,13 @@ fun DroppedProfilesUI(
     val scope= rememberCoroutineScope()
     val userLocation by UserLocationObject.userLocation.collectAsState()
 
-    val predictions by eventsViewModel.getAutocompletePredictions(query).collectAsState(emptyList())
-    val shouldLoadDroppedProfiles by eventsViewModel.shouldLoadDroppedProfiles.collectAsState()
+    val predictions by homeViewModel.getAutocompletePredictions(query).collectAsState(emptyList())
+    val shouldLoadDroppedProfiles by homeViewModel.shouldLoadDroppedProfiles.collectAsState()
     LaunchedEffect(pagerState.currentPage) {
         // if page is not checked then on scrolling it will make the api call i.e. in the direct screen itself
         if (pagerState.currentPage == 2 && !shouldLoadDroppedProfiles) {
-            eventsViewModel.getDefaultDropProfiles(UserObject.user.value.address)
-            eventsViewModel.resetShouldLoadDroppedProfiles()
+            homeViewModel.getDefaultDropProfiles(UserObject.user.value.address)
+            homeViewModel.resetShouldLoadDroppedProfiles()
         }
     }
     val animatedAlpha by animateFloatAsState(
@@ -313,7 +313,7 @@ fun DroppedProfilesUI(
                         }
 
                         Button(
-                            onClick = { scope.launch { eventsViewModel.getDefaultDropProfiles("") } },
+                            onClick = { scope.launch { homeViewModel.getDefaultDropProfiles("") } },
                             colors = ButtonDefaults.buttonColors(backgroundColor = Constants.HOME_TOP_BAR_TITLE_COLOR)) {
                             Text(text = "Search", fontFamily = Constants.FONT_LIGHT, fontSize = 14.sp, color = Color.White)
 
@@ -382,7 +382,7 @@ fun DroppedProfilesUI(
                                     item {
                                         Log.e("Error in dropped profiles", "DroppedProfilesUI: $error ", )
                                             NoProfilesFoundScreen(error = "Error getting profiles.",) {
-                                                eventsViewModel.getDefaultDropProfiles("")
+                                                homeViewModel.getDefaultDropProfiles("")
                                             }
                                     }
                                 }

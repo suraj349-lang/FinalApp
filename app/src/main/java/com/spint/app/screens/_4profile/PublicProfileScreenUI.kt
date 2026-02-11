@@ -45,17 +45,17 @@ import com.spint.app.R
 import com.spint.app.screens.dialogBox.DropProfileDialog
 import com.spint.app.ui.theme.floatingActionBtnColor
 import com.spint.app.viewmodels.AuthViewModel
-import com.spint.app.viewmodels.EventsViewModel
+import com.spint.app.viewmodels.HomeViewModel
 import com.spint.app.viewmodels.ImageUploadViewModel
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun PublicProfileScreenUI(navController: NavHostController,authViewModel:AuthViewModel,eventsViewModel:EventsViewModel,imageUploadViewModel:ImageUploadViewModel) {
+fun PublicProfileScreenUI(navController: NavHostController, authViewModel:AuthViewModel, homeViewModel:HomeViewModel, imageUploadViewModel:ImageUploadViewModel) {
     var showCustomDialog by remember {
         mutableStateOf(false)
     }
     if (showCustomDialog) {
-        DropProfileDialog(authViewModel ,eventsViewModel , imageUploadViewModel ,navController ) { showCustomDialog = !showCustomDialog }
+        DropProfileDialog(authViewModel ,homeViewModel , imageUploadViewModel ,navController ) { showCustomDialog = !showCustomDialog }
         Log.d("Suraj", "Profile Screen : Drop Profile ")
     }
     Surface(modifier = Modifier.fillMaxSize()) {

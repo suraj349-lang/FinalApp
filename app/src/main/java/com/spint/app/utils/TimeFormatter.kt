@@ -36,10 +36,3 @@ fun convertToIST(utcTimestamp: String): String {
     return istFormat.format(date)
 }
 
-
-//fun calculateExpirationIso(hoursToAdd: Int): String {
-//    val expirationInstant = Instant.now().plusSeconds(hoursToAdd * 3600L)
-//    return DateTimeFormatter.ISO_INSTANT
-//        .withZone(ZoneOffset.UTC)
-//        .format(expirationInstant)
-//}

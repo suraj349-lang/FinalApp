@@ -45,7 +45,7 @@ import com.spint.app.R
 import com.spint.app.model.DropProfileResponse
 import com.spint.app.model.EventResponse
 import com.spint.app.model.User
-import com.spint.app.model.pings.FlashPostResponse
+import com.spint.app.model.flashPost.FlashPostResponse
 import com.spint.app.ui.imagePrefix
 import com.spint.app.utils.constants.Constants
 

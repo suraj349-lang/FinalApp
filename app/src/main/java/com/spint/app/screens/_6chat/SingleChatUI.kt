@@ -110,7 +110,7 @@ import java.util.Locale
 
 
 
-@RequiresApi(Build.VERSION_CODES.O)
+
 @Composable
 fun SingleChatScreenUI(
     sentTo: String,
@@ -184,11 +184,11 @@ fun SingleChatScreenUI(
     }
 
     // Fetch messages on startup or trigger
-    LaunchedEffect(chatViewModel.canFetch.value) {
-        if (chatViewModel.canFetch.value) {
+    LaunchedEffect(chatListUserId) {
+//        if (chatViewModel.canFetch.value) {
             chatViewModel.getAllMessages(user.user, chatListUserId)
-            chatViewModel.canFetch.value = false
-        }
+//            chatViewModel.canFetch.value = false
+//        }
     }
 
     // Auto scroll when messages update
@@ -205,11 +205,11 @@ fun SingleChatScreenUI(
 
     SideEffect {
         systemUiController.setNavigationBarColor(
-            color = Color.White,
+            color = Constants.HOME_BOTTOM_BAR_COLOR,
             darkIcons = false
         )
         systemUiController.setStatusBarColor(
-            color = Constants.HOME_BOTTOM_BAR_COLOR,     // Your desired color
+            color = Constants.HOME_TOP_BAR_COLOR,     // Your desired color
             darkIcons = false        // true = dark icons (for light backgrounds)
         )
     }
@@ -243,17 +243,17 @@ fun SingleChatScreenUI(
                         fontFamily = FontFamily.Default,
                         fontSize = 16.sp,
                         lineHeight = 20.sp,
-                        color = Color.Black,
+                        color = Color.White,
                         letterSpacing = (-0.01f).em
                     ),
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color.LightGray,
-                        unfocusedBorderColor = Color.LightGray,
+                        focusedBorderColor = Color.DarkGray,
+                        unfocusedBorderColor = Color.DarkGray,
                         cursorColor = floatingActionBtnColor,
-                        focusedContainerColor = Color.White.copy(alpha = 0.8f),
-                        unfocusedContainerColor = Color.White.copy(alpha = 0.6f),
-                        focusedTextColor = Color.Black
+                        focusedContainerColor = Color.DarkGray,
+                        unfocusedContainerColor = Color.DarkGray,
+                        focusedTextColor = Color.White
                     ),trailingIcon = {
                         Row(
                             modifier = Modifier
@@ -291,7 +291,7 @@ fun SingleChatScreenUI(
                                 Image(
                                     painter = painterResource(id = R.drawable.cameranew),
                                     contentDescription = "Camera",
-                                    colorFilter = ColorFilter.tint(color = Color.Black),
+                                    colorFilter = ColorFilter.tint(color = Color.LightGray.copy(alpha = 0.8f)),
                                     alignment = Alignment.Center,
                                     modifier = Modifier
                                         .size(26.dp)
@@ -323,7 +323,7 @@ fun SingleChatScreenUI(
                                     },
                                     fontFamily = Constants.FONT_MEDIUM,
                                     fontSize = 14.sp,
-                                    color = Color.DarkGray
+                                    color = Color.White
                                 )
                             }
                         }
@@ -333,8 +333,8 @@ fun SingleChatScreenUI(
             }
         }
     ) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            Image(painter = painterResource(id = R.drawable.whatsapp), contentDescription ="", modifier = Modifier.fillMaxSize(),contentScale = ContentScale.Crop  )
+        Box(modifier = Modifier.fillMaxSize().background(Constants.HOME_TOP_BAR_COLOR)) {
+           // Image(painter = painterResource(id = R.drawable.whatsapp), contentDescription ="", modifier = Modifier.fillMaxSize(),contentScale = ContentScale.Crop )
             Column(
                 modifier = Modifier
                     .padding(it)
@@ -388,6 +388,7 @@ fun SingleChatScreenUI(
                                     val isFirstOfBlock = previousSender != message.senderId
 
                                     MessageItemUI(
+                                        sentUserImage = profileImage,
                                         msg = message.message,
                                         sent = message.sent,
                                         received = message.received,
@@ -442,7 +443,7 @@ fun DateHeader(text: String?) {
                     color = Color(0xFFE8E8E8),
                     shape = RoundedCornerShape(12.dp)
                 )
-                .padding(horizontal = 12.dp, vertical = 5.dp)
+                .padding(horizontal = 12.dp, vertical = 1.dp)
         )
     }
 }
@@ -836,7 +837,7 @@ fun SingleChatTopBar(title: String,profileImage:String?, navController: NavHostC
             }
 
         },
-        modifier = Modifier.shadow(elevation = 10.dp, spotColor = Color.White),
+        modifier = Modifier.shadow(elevation = 2.dp, spotColor = Color.LightGray),
         colors = TopAppBarDefaults.mediumTopAppBarColors(containerColor = Constants.HOME_BOTTOM_BAR_COLOR)
     )
 }
@@ -1017,7 +1018,7 @@ fun MicButton(
         Image(
             painter = painterResource(id = R.drawable.mic),
             contentDescription = "Mic",
-            colorFilter = ColorFilter.tint(if (isRecording || isListening) Color.Red else Color.Black),
+            colorFilter = ColorFilter.tint(if (isRecording || isListening) Color.Red else Color.LightGray.copy(alpha = 0.8f)),
             modifier = Modifier.size(28.dp)
         )
 

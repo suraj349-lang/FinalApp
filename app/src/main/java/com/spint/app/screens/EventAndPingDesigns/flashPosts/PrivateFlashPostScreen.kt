@@ -2,6 +2,7 @@ package com.spint.app.screens.EventAndPingDesigns.flashPosts
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -40,7 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.spint.app.R
-import com.spint.app.model.pings.FlashPostResponse
+import com.spint.app.model.flashPost.FlashPostResponse
 import com.spint.app.screens._1home.commonUI.sharePingDeepLink
 import com.spint.app.screens._4profile.privateUsername.dynamicText
 import com.spint.app.utils.constants.Constants
@@ -51,9 +52,9 @@ import kotlinx.coroutines.delay
 
 
 @Composable
-fun PrivateFlashPostScreen(flashPostResponse: FlashPostResponse) {
+fun PrivateFlashPostScreen(flashPostResponse: FlashPostResponse,onFlashPostClicked:()-> Unit) {
     val context=LocalContext.current
-    Box(modifier = Modifier
+    Box(modifier = Modifier.clickable{onFlashPostClicked()}
         .padding(vertical = 4.dp, horizontal = 2.dp)
         .background(color = Color(0xFF190124))
         .fillMaxWidth()
@@ -116,9 +117,9 @@ fun PrivateFlashPostScreen(flashPostResponse: FlashPostResponse) {
             ) {
 
                 ViewRoundUI(flashPostResponse.totalViews)
-                CommentRoundUI(flashPostResponse.totalComments)
+                CommentRoundUI(flashPostResponse.commentsCount)
                 CountdownTimerForPrivate(flashPostResponse.expirationTime)
-                JoinRoundUI(flashPostResponse.peopleJoined)
+                AddPingOnFlashPost(flashPostResponse.peopleJoined,flashPostResponse.pingCount)
                 ShareRoundUI(flashPostResponse.totalShared){
                     val deeplink="http://socail.com/ping/${flashPostResponse._id}"
                     sharePingDeepLink(context,deeplink)

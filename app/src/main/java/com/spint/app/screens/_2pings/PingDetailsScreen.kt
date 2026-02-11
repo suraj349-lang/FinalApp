@@ -41,7 +41,7 @@ import androidx.navigation.NavHostController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.spint.app.R
-import com.spint.app.model.pings.FlashPostResponse
+import com.spint.app.model.flashPost.FlashPostResponse
 import com.spint.app.navigation.SCREENS
 import com.spint.app.screens._1home.commonUI.shareEventDeepLink
 import com.spint.app.testing.CommonTopBar

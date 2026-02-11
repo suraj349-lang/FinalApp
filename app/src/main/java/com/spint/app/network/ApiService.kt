@@ -19,14 +19,19 @@ import com.spint.app.model.LoginAPIResponse
 import com.spint.app.model.AllEventsResponseDTO
 import com.spint.app.model.AllPingsResponseDTO
 import com.spint.app.model.ChatList
-import com.spint.app.model.CreatePingResponse
+import com.spint.app.model.CreateFlashPostResponse
+import com.spint.app.model.Email
 import com.spint.app.model.EventDetailsResponse
 import com.spint.app.model.FCMTokenResponse
 import com.spint.app.model.Message
 import com.spint.app.model.PremiumEventResponseDTO
-import com.spint.app.model.pings.CommentData
-import com.spint.app.model.pings.PingRequestDto
-import com.spint.app.model.pings.FlashPostResponse
+import com.spint.app.model.ResponseOfEmail
+import com.spint.app.model.VerifyEmailOtp
+import com.spint.app.model.flashPost.CommentData
+import com.spint.app.model.flashPost.FlashPostRequestDto
+import com.spint.app.model.flashPost.FlashPostResponse
+import com.spint.app.model.flashPost.PingsOnFlashPostRequest
+import com.spint.app.model.flashPost.PingsOnFlashPostResponse
 import com.spint.app.utils.PingsResponse
 import com.spint.app.utils.ApiResponse
 import okhttp3.MultipartBody
@@ -71,24 +76,36 @@ interface ApiService {
     suspend fun upvoteEvent(@Path("id") id: String) : String
     @GET("/api/v1/event/getEventDetails/{id}")
     suspend fun getEventDetails(@Path("id") id: String): EventDetailsResponse
-    @GET("/api/v1/ping/getUserPings/{id}")
-    suspend fun getUserPings(@Path("id") id:String): AllPingsResponseDTO
 
     @GET("/api/v1/event/getUserEvents/{id}")
     suspend fun getUserEvents(@Path("id") id:String): AllEventsResponseDTO
 
     @GET("/api/v1/dropProfile/dropProfileByUser")
     suspend fun getUserDropProfiles(@Query("id") id:String): GetDropProfileResponseModel
-    //---------------------------------------------------------------------//
-    @POST("/api/v1/ping")
-    suspend fun createPing(@Body event:PingRequestDto):CreatePingResponse
-    //---------------------------------------------------------------------//
 
-    @GET("/api/v1/ping")
-    suspend fun getAllPings(@Query("page") page:Int): PingsResponse<List<FlashPostResponse>>
 
-    @GET("api/v1/getPingComments")
-    suspend fun getPingComments(): PingsResponse<List<CommentData>>
+ //========================================== flash posts=======================================================
+
+    @GET("/api/v1/flashPost/getUserFlashPosts/{id}")
+    suspend fun getUserFlashPosts(@Path("id") id:String): AllPingsResponseDTO
+
+    @POST("/api/v1/flashPost")
+    suspend fun createFlashPost(@Body input:FlashPostRequestDto):CreateFlashPostResponse
+
+    @GET("/api/v1/flashPost")
+    suspend fun getAllFlashPosts(@Query("page") page:Int): PingsResponse<List<FlashPostResponse>>
+
+
+    @GET("api/v1/flashPostComments")
+    suspend fun getFlashPostComments(): PingsResponse<List<CommentData>>
+
+    @POST("api/v1/flashPostComment")
+    suspend fun createFlashPostComments(): PingsResponse<List<CommentData>>
+
+    @POST("/api/v1/flashPost/addPingOnPost")
+    suspend fun addPingToFlashPost(@Body pingsOnFlashPostRequest: PingsOnFlashPostRequest) : PingsOnFlashPostResponse
+
+
 
     //-----------------------------------------------------------------//
     @GET("api/getPreSignedUrl")
@@ -129,10 +146,18 @@ interface ApiService {
     suspend fun getChats(@Path("userId") userId:String,@Path("otherUserId") otherUserId:String):ApiResponse<List<Message>>
 
 
+
+
 }
 
 
 interface NonAuthApiService{
+
+    @POST("/api/v1/auth/sendEmailOtp")
+    suspend fun getEmailOtp(@Body email: Email ): ResponseOfEmail
+
+    @POST("/api/v1/auth/verifyEmailOtp")
+    suspend fun verifyEmailOtp(@Body emailOtp: VerifyEmailOtp): ResponseOfEmail
     @POST("/api/v1/auth/login")
     suspend fun postLoginData(@Body loginData:LoginModel): LoginAPIResponse
     //-----------------------------------------------------------------------------------//

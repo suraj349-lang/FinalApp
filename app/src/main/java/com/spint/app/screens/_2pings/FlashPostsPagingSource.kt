@@ -2,12 +2,12 @@ package com.spint.app.screens._2pings
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
-import com.spint.app.model.pings.FlashPostResponse
+import com.spint.app.model.flashPost.FlashPostResponse
 import com.spint.app.repository.EventsRepository
 import retrofit2.HttpException
 import java.io.IOException
 
-class PingsPagingSource(private  val eventsRepository: EventsRepository):
+class FlashPostsPagingSource(private  val eventsRepository: EventsRepository):
     PagingSource<Int, FlashPostResponse>() {
     override fun getRefreshKey(state: PagingState<Int, FlashPostResponse>): Int? {
         return state.anchorPosition?.let { anchorPosition->
@@ -19,7 +19,7 @@ class PingsPagingSource(private  val eventsRepository: EventsRepository):
         val page=params.key?:1
         return try {
 
-            val response=eventsRepository.getAllPings(page)
+            val response=eventsRepository.getAllFlashPosts(page)
             if (response.success) {
                 val body = response.data
                 LoadResult.Page(

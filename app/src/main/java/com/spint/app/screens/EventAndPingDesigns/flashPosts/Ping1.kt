@@ -36,8 +36,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.spint.app.R
 import com.spint.app.model.User
-import com.spint.app.model.pings.CommentData
-import com.spint.app.model.pings.FlashPostResponse
+import com.spint.app.model.flashPost.CommentData
+import com.spint.app.model.flashPost.FlashPostResponse
 import com.spint.app.utils.constants.Constants
 import com.spint.app.utils.formatDateTime
 
@@ -58,7 +58,7 @@ fun PingItem1() {
         topPostsList = listOf("p1", "p2", "p3"),
         expirationTime = "2025-12-31T23:59:59Z",
         peopleJoined = 42,
-        totalComments = 10,
+        commentsCount = 10,
         topComments = listOf(
             CommentData("c1", "Looks great!", "Alice"),
             CommentData("c2", "I’m in!", "Bob")

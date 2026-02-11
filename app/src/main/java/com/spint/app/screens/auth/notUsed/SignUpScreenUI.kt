@@ -1,4 +1,4 @@
-package com.spint.app.screens.auth
+package com.spint.app.screens.auth.notUsed
 
 import android.app.Activity
 import android.text.TextUtils
@@ -38,7 +38,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -56,7 +55,7 @@ import com.google.firebase.auth.PhoneAuthProvider
 import kotlinx.coroutines.launch
 
 
-@Preview(showBackground = true)
+
 @Composable
 fun SignupScreenUI(navController: NavController = NavController(LocalContext.current)) {
 

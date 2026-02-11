@@ -25,7 +25,7 @@ import com.spint.app.screens._3createEventOrPing.createEvent.CreateEventTopBar2
 import com.spint.app.screens._3createEventOrPing.createEvent.PreviewCreateEvent
 import com.spint.app.screens.dialogBox.uriToFile
 import com.spint.app.utils.UserLocationObject
-import com.spint.app.viewmodels.EventsViewModel
+import com.spint.app.viewmodels.HomeViewModel
 import java.io.File
 
 
@@ -35,7 +35,7 @@ enum class CREATE_EVENT {
     IMAGE,TYPE,CAPTION,LOCATION,PREVIEW
 }
 @Composable
-fun CreateEventMainScreenOld(parentEventId:String ?= null,navController: NavController, eventsViewModel: EventsViewModel) {
+fun CreateEventMainScreenOld(parentEventId:String ?= null, navController: NavController, homeViewModel: HomeViewModel) {
     var page by remember {
         mutableStateOf(CREATE_EVENT.IMAGE)
     }
@@ -70,8 +70,8 @@ fun CreateEventMainScreenOld(parentEventId:String ?= null,navController: NavCont
                 var imageFile by mutableStateOf<File?>(null)
                 if(uri != Uri.EMPTY) imageFile = uriToFile(uri!!, context )
                 imageFile?.let {
-                    eventsViewModel.uploadImageAndThenCreateEvent(UserObject.user.value.user , it){ imageKey->
-                        eventsViewModel.createEvent(
+                    homeViewModel.uploadImageAndThenCreateEvent(UserObject.user.value.user , it){ imageKey->
+                        homeViewModel.createEvent(
                             Event(
                                 user = UserObject.user.value.user ,
                                 userName = UserObject.user.value.userName,

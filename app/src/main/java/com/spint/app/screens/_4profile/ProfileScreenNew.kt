@@ -96,7 +96,7 @@ import com.spint.app.utils.UserObject
 import com.spint.app.utils.RequestState
 import com.spint.app.utils.constants.Constants
 import com.spint.app.viewmodels.AuthViewModel
-import com.spint.app.viewmodels.EventsViewModel
+import com.spint.app.viewmodels.HomeViewModel
 import com.spint.app.viewmodels.ImageUploadViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.delay
@@ -104,7 +104,7 @@ import java.io.File
 
 @OptIn(ExperimentalGlideComposeApi::class, ExperimentalMaterialApi::class)
 @Composable
-fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewModel,eventsViewModel:EventsViewModel,imageUploadViewModel:ImageUploadViewModel) {
+fun ProfileScreenNew(navController: NavHostController, authViewModel:AuthViewModel, homeViewModel:HomeViewModel, imageUploadViewModel:ImageUploadViewModel) {
     val context= LocalContext.current
     var showPasswordDialog by remember {
         mutableStateOf(false)
@@ -119,9 +119,9 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
     var showSheetForImageUpdate by remember { mutableStateOf(false) }
     var showSheet by remember { mutableStateOf(false) }
     val startProfileImageUpload=imageUploadViewModel.startProfileImageUpload.collectAsState()
-    val userPingsList by eventsViewModel.userPingsListResponse.collectAsState()
-    val userEventsList by eventsViewModel.userEventsListResponse.collectAsState()
-    val userDropProfilesList by eventsViewModel.userDropProfilesListResponse.collectAsState()
+    val userPingsList by homeViewModel.userPingsListResponse.collectAsState()
+    val userEventsList by homeViewModel.userEventsListResponse.collectAsState()
+    val userDropProfilesList by homeViewModel.userDropProfilesListResponse.collectAsState()
 
     var imageUri by remember { mutableStateOf<Uri?>(null) }
 
@@ -133,8 +133,8 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
             var imageFile by mutableStateOf<File?>(null)
             if(imageUri != Uri.EMPTY) imageFile = uriToFile(uri, context )
             imageFile?.let {
-                eventsViewModel.uploadImageAndThenCreateEvent(user.user, it){ urlKey->
-                    eventsViewModel.updateUserDetails(user.user, urlKey)
+                homeViewModel.uploadImageAndThenCreateEvent(user.user, it){ urlKey->
+                    homeViewModel.updateUserDetails(user.user, urlKey)
                 }
             }
         } else {
@@ -196,24 +196,24 @@ fun ProfileScreenNew(navController: NavHostController,authViewModel:AuthViewMode
 
 
     if (showDropProfileDialog) {
-        DropProfileDialog(authViewModel ,eventsViewModel , imageUploadViewModel ,navController ) { showDropProfileDialog = !showDropProfileDialog }
+        DropProfileDialog(authViewModel ,homeViewModel , imageUploadViewModel ,navController ) { showDropProfileDialog = !showDropProfileDialog }
     }
     if(showPasswordDialog){
         PasswordForPrivateUsername(onDismiss = {showPasswordDialog=false}, onEnterClicked = {navController.navigate(SCREENS.PRIVATE_PROFILE.route)})
     }
     LaunchedEffect(key1 = user.user){
-        if(eventsViewModel.canFetchEvents.value && eventsViewModel.canFetchDroppedProfiles.value) {
-            eventsViewModel.getUserPings(user.user)
-            eventsViewModel.getUserEvents(user.user)
-            eventsViewModel.getUserDropProfiles(user.user)
+        if(homeViewModel.canFetchEvents.value && homeViewModel.canFetchDroppedProfiles.value) {
+            homeViewModel.getUserFlashPosts(user.user)
+            homeViewModel.getUserEvents(user.user)
+            homeViewModel.getUserDropProfiles(user.user)
         }
     }
     var isRefreshing by remember { mutableStateOf(false) }
     LaunchedEffect(isRefreshing) {
         if (isRefreshing) {
-            eventsViewModel.getUserPings(user.user)
-            eventsViewModel.getUserEvents(user.user)
-            eventsViewModel.getUserDropProfiles(user.user)
+            homeViewModel.getUserFlashPosts(user.user)
+            homeViewModel.getUserEvents(user.user)
+            homeViewModel.getUserDropProfiles(user.user)
             delay(1500L)
             isRefreshing = false
         }

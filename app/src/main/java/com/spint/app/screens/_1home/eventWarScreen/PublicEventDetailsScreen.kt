@@ -79,19 +79,19 @@ import com.spint.app.ui.imagePrefix
 import com.spint.app.utils.RequestState
 import com.spint.app.viewmodels.AuthViewModel
 import com.spint.app.viewmodels.ChatViewModel
-import com.spint.app.viewmodels.EventsViewModel
+import com.spint.app.viewmodels.HomeViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 
 @Composable
-fun PublicEventDetailsScreenWrapper(id:String,navController: NavHostController,eventsViewModel: EventsViewModel,authViewModel: AuthViewModel) {
+fun PublicEventDetailsScreenWrapper(id:String, navController: NavHostController, homeViewModel: HomeViewModel, authViewModel: AuthViewModel) {
 
-    val eventDetailsResponse by eventsViewModel.eventDetailsResponse.collectAsState()
+    val eventDetailsResponse by homeViewModel.eventDetailsResponse.collectAsState()
     Log.i("EventDetailsResponse", "PublicEventDetailsScreenWrapper: $eventDetailsResponse")
 
     LaunchedEffect(id ){
-        eventsViewModel.getEventDetails(id)
+        homeViewModel.getEventDetails(id)
     }
 
     Scaffold(
@@ -101,7 +101,7 @@ fun PublicEventDetailsScreenWrapper(id:String,navController: NavHostController,e
                     Surface(modifier = Modifier
                         .padding(it)
                         .fillMaxSize(), color = Color.Black) {
-                        PublicEventDetailsScreen(response.data, authViewModel ,eventsViewModel, navController,{ navController.navigateUp() }) {
+                        PublicEventDetailsScreen(response.data, authViewModel ,homeViewModel, navController,{ navController.navigateUp() }) {
                             navController.navigate(SCREENS.COMMENT.route)
                         }
                     }
@@ -147,7 +147,7 @@ fun EventTagsDetailsScreen() {
 fun PublicEventDetailsScreen(
     response: EventResponse,
     authViewModel: AuthViewModel,
-    eventsViewModel: EventsViewModel,
+    homeViewModel: HomeViewModel,
     navController: NavHostController,
     onBackClicked: () -> Unit,
     onCommentClicked: () -> Unit
@@ -462,7 +462,7 @@ fun EventTitleAndDescriptionWar(eventTitle:String,eventDescription:String?) {
     ExperimentalMaterial3Api::class
 )
 @Composable
-fun ThreeOptions(events:List<EventResponse>,authViewModel:AuthViewModel,eventsViewModel:EventsViewModel,chatViewModel: ChatViewModel,navController:NavHostController) {
+fun ThreeOptions(events:List<EventResponse>, authViewModel:AuthViewModel, homeViewModel:HomeViewModel, chatViewModel: ChatViewModel, navController:NavHostController) {
     val pagerState = rememberPagerState(0, pageCount = { 3 })
     val scope= rememberCoroutineScope()
     val scrollBehavior =TopAppBarDefaults.enterAlwaysScrollBehavior()
@@ -543,7 +543,7 @@ fun ThreeOptions(events:List<EventResponse>,authViewModel:AuthViewModel,eventsVi
         ) { page ->
             when (page) {
                 0 -> ChildPosts(events =events )
-                1 -> DirectChatScreen(scrollBehavior, authViewModel, eventsViewModel, chatViewModel , navController)
+                1 -> DirectChatScreen(scrollBehavior, authViewModel, homeViewModel, chatViewModel , navController)
                 2 -> GeneralPosts()
             }
         }

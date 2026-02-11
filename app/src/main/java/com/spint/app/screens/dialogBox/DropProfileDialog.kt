@@ -72,25 +72,23 @@ import com.spint.app.utils.UserLocationObject
 import com.spint.app.utils.constants.Constants
 import com.spint.app.utils.constants.Constants.DONGLE_BOLD
 import com.spint.app.viewmodels.AuthViewModel
-import com.spint.app.viewmodels.EventsViewModel
+import com.spint.app.viewmodels.HomeViewModel
 import com.spint.app.viewmodels.ImageUploadViewModel
 import java.io.File
-import java.time.temporal.ChronoUnit
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.ExperimentalTime
-import kotlin.time.Instant
 
 
 @OptIn(ExperimentalGlideComposeApi::class, ExperimentalTime::class)
 @Composable
-fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewModel, imageUploadViewModel: ImageUploadViewModel, navController: NavHostController, onDismiss: () -> Unit) {
+fun DropProfileDialog(authViewModel: AuthViewModel, homeViewModel: HomeViewModel, imageUploadViewModel: ImageUploadViewModel, navController: NavHostController, onDismiss: () -> Unit) {
     var caption by remember{ mutableStateOf("") }
     val context= LocalContext.current
     val user by UserObject.user.collectAsState()
     val userLocation by UserLocationObject.userLocation.collectAsState()
 
-    var uri = eventsViewModel.dropProfileUploadUri.value
+    var uri = homeViewModel.dropProfileUploadUri.value
 
     var imageFile by remember {
         mutableStateOf<File?>(null)
@@ -98,12 +96,12 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
     if(uri != Uri.EMPTY) imageFile = uriToFile(uri, context )
 
     var keyForCamera by remember { mutableStateOf(false) }
-    if (keyForCamera) { ImageCaptureFromCameraForDropProfile({imageFile=it}){eventsViewModel.dropProfileUploadUri.value=it} }
+    if (keyForCamera) { ImageCaptureFromCameraForDropProfile({imageFile=it}){homeViewModel.dropProfileUploadUri.value=it} }
 
     var keyForGallery by remember { mutableStateOf(0) }
 
     if(keyForGallery!=0) {
-        GalleryPickerForDropProfile(navController = navController, onFileCreated = {imageFile=it}, onImageSelected = { eventsViewModel.dropProfileUploadUri.value=it })
+        GalleryPickerForDropProfile(navController = navController, onFileCreated = {imageFile=it}, onImageSelected = { homeViewModel.dropProfileUploadUri.value=it })
     }
     var activeBtnKey by remember {
         mutableStateOf(0)
@@ -132,7 +130,7 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
 
 
     Dialog(
-        onDismissRequest = { onDismiss();eventsViewModel.dropProfileUploadUri.value=Uri.EMPTY },
+        onDismissRequest = { onDismiss();homeViewModel.dropProfileUploadUri.value=Uri.EMPTY },
         properties = DialogProperties(dismissOnBackPress = true,dismissOnClickOutside = false)) {
         Card(
             shape = RoundedCornerShape((6.dp)),
@@ -371,7 +369,7 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                     Button(
                         onClick = {
                             Log.i("DropProfile", "DropProfileDialog:button clicked ")
-                            eventsViewModel.premiumCreateEventKey.value = 1
+                            homeViewModel.premiumCreateEventKey.value = 1
                             //todo later on turn enabled to true
                           //  enabled = false;
                             imageFile?.let {
@@ -421,9 +419,9 @@ fun DropProfileDialog(authViewModel: AuthViewModel, eventsViewModel: EventsViewM
                         else->{}
                     }
 
-                if(eventsViewModel.premiumCreateEventKey.value==1){
+                if(homeViewModel.premiumCreateEventKey.value==1){
                     Log.d("Data received","runned this")
-                    OfferResponseDataAndAction(eventsViewModel,navController)
+                    OfferResponseDataAndAction(homeViewModel,navController)
 
                 }
 

@@ -39,14 +39,14 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.navigation.NavHostController
 import com.spint.app.R
 import com.spint.app.screens._1home.commonUI.OfferResponseDataAndAction
-import com.spint.app.viewmodels.EventsViewModel
+import com.spint.app.viewmodels.HomeViewModel
 import com.spint.app.ui.theme.DarkBlue
 import com.spint.app.ui.theme.statusAndTopAppBarColor
 import com.spint.app.ui.theme.topAppBarTextColor
 
 
 @Composable
-fun CustomAlertDialog(eventsViewModel: EventsViewModel, navController: NavHostController, onDismiss: () -> Unit) {
+fun CustomAlertDialog(homeViewModel: HomeViewModel, navController: NavHostController, onDismiss: () -> Unit) {
     var offerTextField:String by remember{ mutableStateOf("") }
 
     val scope= rememberCoroutineScope()
@@ -103,7 +103,7 @@ fun CustomAlertDialog(eventsViewModel: EventsViewModel, navController: NavHostCo
 
                     Button(
                         onClick = {
-                            eventsViewModel.premiumCreateEventKey.value = 1;
+                            homeViewModel.premiumCreateEventKey.value = 1;
                             enabled=false;
                             //TODO nothing on click right now
 
@@ -124,9 +124,9 @@ fun CustomAlertDialog(eventsViewModel: EventsViewModel, navController: NavHostCo
                         Text(text = "Upload")
                     }
                 }
-                if(eventsViewModel.premiumCreateEventKey.value==1){
+                if(homeViewModel.premiumCreateEventKey.value==1){
                     Log.d("Data received","runned this")
-                    OfferResponseDataAndAction(eventsViewModel,navController)
+                    OfferResponseDataAndAction(homeViewModel,navController)
 
                 }
 

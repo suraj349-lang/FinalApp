@@ -44,12 +44,15 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import coil.compose.AsyncImage
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.spint.app.R
-import com.spint.app.model.pings.FlashPostResponse
+import com.spint.app.model.flashPost.FlashPostResponse
 import com.spint.app.screens._1home.commonUI.sharePingDeepLink
 import com.spint.app.ui.imagePrefix
 import com.spint.app.utils.constants.Constants
@@ -59,11 +62,11 @@ import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun FlashPostWithImageScreen(item:FlashPostResponse, onFlashPostClicked:()->Unit, onCommentButtonClicked: () -> Unit) {
+fun FlashPostWithImageScreen(item:FlashPostResponse, onFlashPostClicked:()->Unit, onPingOfFlashPostClicked:(String, String)->Unit, onCommentButtonClicked: () -> Unit) {
     val context= LocalContext.current
     Box(
         modifier = Modifier.clickable{onFlashPostClicked()}
-            .padding(top = 4.dp)
+            .padding(top = 4.dp).padding( 4.dp)
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
@@ -107,7 +110,7 @@ fun FlashPostWithImageScreen(item:FlashPostResponse, onFlashPostClicked:()->Unit
                                 ).copy(alpha = 0.9f), lineHeight = 12.sp)
                             }
                             Row(modifier = Modifier.wrapContentSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(0.dp)) {
-                                Text(text = item.location, fontWeight = FontWeight.Normal, fontSize = 9.sp, fontFamily = Constants.FONT_LIGHT, color = Color.Gray, lineHeight = 1.sp, modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp))
+                                Text(text = item.location, fontWeight = FontWeight.Normal, fontSize = 9.sp, fontFamily = Constants.FONT_LIGHT, color = Color.Gray, lineHeight = 1.sp, modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp), maxLines = 1, overflow = TextOverflow.Ellipsis)
 //                                Card(modifier = Modifier.wrapContentSize(), colors = CardDefaults.cardColors(containerColor = Color.Gray)) {
 //                                    Text(text = item.category, fontWeight = FontWeight.Normal, fontSize = 16.sp, fontFamily = Constants.FONT_MEDIUM, color = Color(
 //                                        0xFF00060C
@@ -205,9 +208,9 @@ fun FlashPostWithImageScreen(item:FlashPostResponse, onFlashPostClicked:()->Unit
                     ) {
 
                         ViewRoundUI(item.totalViews)
-                        CommentRoundUI(item.totalComments,onCommentButtonClicked)
+                        CommentRoundUI(item.commentsCount,onCommentButtonClicked)
                         CountdownTimer(item.expirationTime)
-                        JoinRoundUI(item.peopleJoined)
+                        AddPingOnFlashPost(item.peopleJoined,item.pingCount,{ onPingOfFlashPostClicked(item._id,"I am interested")})
                         ShareRoundUI(item.totalShared){
                             val deeplink="http://${Constants.APP_NAME}.com/ping/${item._id}"
                             sharePingDeepLink(context,deeplink)
@@ -384,21 +387,25 @@ fun ShareRoundUI(shareCount:Int,onShareClicked:()->Unit) {
 //
 //}
 @Composable
-fun JoinRoundUI(joinedCount: Int) {
-    Card(
-        onClick = {},
-        modifier=Modifier.height(40.dp).width(80.dp),
-        shape = RoundedCornerShape(12.dp), colors = CardDefaults.cardColors(containerColor =  Constants.HOME_TOP_BAR_COLOR)
+fun AddPingOnFlashPost(joinedCount: Int,pingCount:Int,onClick:()-> Unit={}) {
+    Box(modifier= Modifier.height(40.dp).width(80.dp)) {
+        Box(modifier=Modifier.zIndex(2f).size(14.dp).clip(shape = CircleShape).background(color = Color.Red).align(Alignment.TopEnd)){
+            Text(pingCount.toString(), fontSize = 10.sp, modifier = Modifier.padding(bottom = 2.dp).fillMaxSize(), color = Color.White, textAlign = TextAlign.Center)
+        }
+    Box (
+        modifier= Modifier.height(40.dp).width(80.dp).clickable{onClick()}.clip(shape = RoundedCornerShape(12.dp)).background(color = Constants.HOME_TOP_BAR_COLOR)
     ) {
+
         Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
             Image(painter = painterResource(id = R.drawable.join_blue), contentDescription ="", modifier = Modifier.size(28.dp) )
             Spacer(modifier = Modifier.width(8.dp))
         Column(modifier = Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("JOIN", color = Color.White, fontFamily = Constants.FONT_LIGHT, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                Text("PING", color = Color.White, fontFamily = Constants.FONT_LIGHT, fontWeight = FontWeight.Bold, fontSize = 14.sp)
                 if(joinedCount !=0)Text("122k", color = Color.Gray, fontFamily = Constants.FONT_EXTRA_LIGHT, fontSize = 9.sp)
             }
 
-        }}
+        }}}
+
 
 }
 @Composable

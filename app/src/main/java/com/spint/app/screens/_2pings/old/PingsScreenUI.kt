@@ -59,12 +59,12 @@ import com.spint.app.screens.common.NoPingsFoundScreen
 import com.spint.app.ui.theme.floatingActionBtnColor
 import com.spint.app.utils.UserLocationObject
 import com.spint.app.utils.constants.Constants.DONGLE_BOLD
-import com.spint.app.viewmodels.EventsViewModel
+import com.spint.app.viewmodels.HomeViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.spint.app.screens.EventAndPingDesigns.flashPosts.PingItem3
 
 @Composable
-fun PingsScreenUI(navController:NavHostController,eventsViewModel: EventsViewModel) {
+fun PingsScreenUI(navController:NavHostController, homeViewModel: HomeViewModel) {
     val buttonsVisible = remember { mutableStateOf(true) }
     var searchBox by remember { mutableStateOf(false) }
     var showLoader by remember { mutableStateOf(false) }
@@ -76,11 +76,11 @@ fun PingsScreenUI(navController:NavHostController,eventsViewModel: EventsViewMod
     var showSheet by remember {
         mutableStateOf(false)
     }
-    val allPings by eventsViewModel.allPingsFlow.collectAsState()
-    val allPingsState = allPings?.collectAsLazyPagingItems()
+    val allPingsState = homeViewModel.flashPostsFlow.collectAsLazyPagingItems()
+   // val allPingsState = allPings?.collectAsLazyPagingItems()
 
     LaunchedEffect(key1 = Unit){
-        eventsViewModel.getAllPings(userLocation.address.toString())
+        homeViewModel.getAllFlashPosts(userLocation.address.toString())
     }
 
     LaunchedEffect(listState) {
@@ -232,7 +232,7 @@ fun PingsScreenUI(navController:NavHostController,eventsViewModel: EventsViewMod
                                     item {
                                         Log.e("Error in getting pings", "PingsScreenUI: $error ")
                                         NoPingsFoundScreen(error = "Error getting pings.") {
-                                             eventsViewModel.getAllPings("")
+                                             homeViewModel.getAllFlashPosts("")
                                         }
                                     }
                                 }

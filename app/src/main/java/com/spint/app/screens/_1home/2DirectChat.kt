@@ -1,7 +1,6 @@
 package com.spint.app.screens._1home
 
 
-import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -28,7 +27,6 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.CircularProgressIndicator
@@ -89,7 +87,7 @@ import com.spint.app.utils.UserLocationObject
 import com.spint.app.utils.constants.Constants
 import com.spint.app.viewmodels.AuthViewModel
 import com.spint.app.viewmodels.ChatViewModel
-import com.spint.app.viewmodels.EventsViewModel
+import com.spint.app.viewmodels.HomeViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.spint.app.R
 import java.net.URLEncoder
@@ -101,13 +99,13 @@ import java.nio.charset.StandardCharsets
 fun DirectChatScreen(
     scrollBehavior: TopAppBarScrollBehavior,
     authViewModel: AuthViewModel,
-    eventsViewModel: EventsViewModel,
+    homeViewModel: HomeViewModel,
     chatViewModel: ChatViewModel,
     navController: NavHostController
 ) {
 
-    val checked by eventsViewModel.checked
-    val shareProfileClickedON by eventsViewModel.shareProfileClicked.collectAsState()
+    val checked by homeViewModel.checked
+    val shareProfileClickedON by homeViewModel.shareProfileClicked.collectAsState()
     var remove by remember{
         mutableStateOf(false)
     }
@@ -116,16 +114,16 @@ fun DirectChatScreen(
 
     LaunchedEffect(key1 =shareProfileClickedON){
         if(shareProfileClickedON ){
-            eventsViewModel.checked.value=!checked
-            eventsViewModel.sendDirectChatData(DirectChatRequest(user.user,userLocation.latitude ?: 0.0,userLocation.longitude ?: 0.0))
+            homeViewModel.checked.value=!checked
+            homeViewModel.sendDirectChatData(DirectChatRequest(user.user,userLocation.latitude ?: 0.0,userLocation.longitude ?: 0.0))
         } else {
             if(remove){
-                eventsViewModel.removeUserFromDirectChat(UserObject.user.value.user)
+                homeViewModel.removeUserFromDirectChat(UserObject.user.value.user)
                 remove=false
             }
             // eventsViewModel.emptyNearByUsersList()
         }
-        eventsViewModel.shareProfileClicked.value = false
+        homeViewModel.shareProfileClicked.value = false
 
     }
 
@@ -168,18 +166,18 @@ fun DirectChatScreen(
                     DirectChatUI(
                         address = userLocation.address ?: "",
                         scrollBehavior,
-                        eventsViewModel,
+                        homeViewModel,
                         chatViewModel ,
                         navController,
                         checked,
                         remove,
                         onCheckedChange = {
-                            eventsViewModel.shareProfileClicked.value = !eventsViewModel.shareProfileClicked.value
+                            homeViewModel.shareProfileClicked.value = !homeViewModel.shareProfileClicked.value
                             remove=!remove
                         },
                         onJoinDuelClicked = {navController.navigate(SCREENS.DUEL.route)}
                     ) {
-                        eventsViewModel.shareProfileClicked.value = true
+                        homeViewModel.shareProfileClicked.value = true
                     }
                 }
             }
@@ -192,7 +190,7 @@ fun DirectChatScreen(
 fun DirectChatUI(
     address:String,
     scrollBehavior: TopAppBarScrollBehavior,
-    eventsViewModel: EventsViewModel,
+    homeViewModel: HomeViewModel,
     chatViewModel: ChatViewModel,
     navController: NavHostController,
     checked: Boolean,
@@ -204,7 +202,7 @@ fun DirectChatUI(
     if (!checked ) {
         ShareProfileForDirectChat(address = address,onJoinDuelClicked,onShareProfileClicked)
     } else {
-        DirectChatProfiles(scrollBehavior,navController, eventsViewModel,chatViewModel, onJoinDuelClicked = onJoinDuelClicked, onCheckedChange = onCheckedChange )
+        DirectChatProfiles(scrollBehavior,navController, homeViewModel,chatViewModel, onJoinDuelClicked = onJoinDuelClicked, onCheckedChange = onCheckedChange )
     }
 
 
@@ -214,14 +212,14 @@ fun DirectChatUI(
 fun DirectChatProfiles(
     scrollBehavior: TopAppBarScrollBehavior,
     navController: NavHostController,
-    eventsViewModel: EventsViewModel,
+    homeViewModel: HomeViewModel,
     chatViewModel: ChatViewModel,
     onJoinDuelClicked: () -> Unit,
     onCheckedChange: () -> Unit
 ) {
-    val saveToChatResponse by eventsViewModel.saveUserToChatListResponseState.collectAsState()
+    val saveToChatResponse by homeViewModel.saveUserToChatListResponseState.collectAsState()
     val userObject by UserObject.user.collectAsState()
-    val directChatList = eventsViewModel.nearByUsersList.collectAsLazyPagingItems()
+    val directChatList = homeViewModel.nearByUsersList.collectAsLazyPagingItems()
 
     // -----------------------------
     // HANDLE SAVE-TO-CHAT RESPONSE
@@ -237,7 +235,7 @@ fun DirectChatProfiles(
                     chatListUserId = res.data.withUserId._id
                 )
             )
-            eventsViewModel.resetSaveToChatListSuccessToIdle()
+            homeViewModel.resetSaveToChatListSuccessToIdle()
         }
 
         is RequestState.Error -> Text(text = res.error.toString())
@@ -318,7 +316,7 @@ fun DirectChatProfiles(
                         )
                     },
                     onSendMessageClicked = {
-                        eventsViewModel.saveUserToChatList(
+                        homeViewModel.saveUserToChatList(
                             currentUserId = userObject.user,
                             otherUserUserId = item.userId.user
                         )

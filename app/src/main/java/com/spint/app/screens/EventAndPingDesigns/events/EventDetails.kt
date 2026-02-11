@@ -44,18 +44,18 @@ import com.spint.app.ui.imagePrefix
 import com.spint.app.utils.RequestState
 import com.spint.app.utils.constants.Constants
 import com.spint.app.viewmodels.AuthViewModel
-import com.spint.app.viewmodels.EventsViewModel
+import com.spint.app.viewmodels.HomeViewModel
 
 
 
 @Composable
-fun EventsDetailsVerticalWrapper(id:String, navController: NavHostController, eventsViewModel: EventsViewModel, authViewModel: AuthViewModel) {
+fun EventsDetailsVerticalWrapper(id:String, navController: NavHostController, homeViewModel: HomeViewModel, authViewModel: AuthViewModel) {
 
-    val eventDetailsResponse by eventsViewModel.eventDetailsResponse.collectAsState()
+    val eventDetailsResponse by homeViewModel.eventDetailsResponse.collectAsState()
     Log.i("EventDetailsResponse", "PublicEventDetailsScreenWrapper: $eventDetailsResponse")
 
     LaunchedEffect(id ){
-        eventsViewModel.getEventDetails(id)
+        homeViewModel.getEventDetails(id)
     }
 
     Scaffold(
@@ -70,7 +70,7 @@ fun EventsDetailsVerticalWrapper(id:String, navController: NavHostController, ev
                         EventsDetailsVertical(
                             response.data,
                             authViewModel,
-                            eventsViewModel,
+                            homeViewModel,
                             navController,
                             { navController.navigateUp() }
                         ){
@@ -116,7 +116,7 @@ fun EventsDetailsVerticalWrapper(id:String, navController: NavHostController, ev
 fun EventsDetailsVertical(
     event: EventResponse,
     authViewModel: AuthViewModel,
-    eventsViewModel: EventsViewModel,
+    homeViewModel: HomeViewModel,
     navController: NavHostController,
     onBackClicked: () -> Unit,
     onCommentClicked: () -> Unit

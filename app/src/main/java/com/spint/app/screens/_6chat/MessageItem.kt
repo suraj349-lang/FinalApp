@@ -3,10 +3,13 @@ package com.spint.app.screens._6chat
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.collection.emptyDoubleList
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -26,15 +29,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.em
+import androidx.datastore.preferences.core.doublePreferencesKey
+import coil.compose.AsyncImage
 import com.spint.app.utils.constants.Constants
 import com.spint.app.utils.convertToIST
 import com.spint.app.R
+import com.spint.app.ui.imagePrefix
 
 
 //
@@ -117,6 +124,7 @@ import com.spint.app.R
 
 @Composable
 fun MessageItemUI(
+    sentUserImage:String,
     msg: String,
     sent: Int,
     received: Boolean,
@@ -125,19 +133,31 @@ fun MessageItemUI(
     showTail: Boolean
 ) {
     val backgroundColor = if (isSentByLoggedInUser){
-        Color(0xFF727507)
-    } else{ Color(0xFF47474B) //0xFFCF5630
+        Color(0xFF4F2B72) //0xFF727507  0xFF4C067B
+    } else{  Color.Black //0xFFBB8CEE
        }     ///    0xFF797676            0xFFCF5630
-    val textColor = Color.White
+    val textColor = Color.White.copy(alpha = 0.8f)
     var time = ""
     if (timestamp != null) time = convertToIST(timestamp)
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 12.dp).padding(bottom = 0.6.dp),
+            .padding(horizontal = 12.dp).padding(bottom = 4.dp),
         horizontalArrangement = if (isSentByLoggedInUser) Arrangement.End else Arrangement.Start
     ) {
+        if(!isSentByLoggedInUser) {
+            Card(modifier = Modifier.size(30.dp)) {
+                AsyncImage(
+                    model = imagePrefix + sentUserImage,
+                    contentDescription = "",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+
+            }
+            Spacer(Modifier.width(4.dp))
+        }
         Column(
             modifier = Modifier
                 .padding(
@@ -146,7 +166,7 @@ fun MessageItemUI(
                 )
                 .clip(BubbleShape(isSentByUser = isSentByLoggedInUser, showTail = showTail))
                 .background(backgroundColor)
-                .padding(horizontal = 12.dp, vertical = 4.dp)
+                .padding(start = if(!showTail) 4.dp else 12.dp, end=if(!showTail) 4.dp else 12.dp).padding(vertical = 4.dp)
                 .widthIn(max = 280.dp) // limit width for long texts
         ) {
             Text(
@@ -168,7 +188,7 @@ fun MessageItemUI(
                 Text(
                     text = time,
                     fontSize = 9.sp,
-                    color = Color.LightGray, lineHeight = 2.sp, fontFamily = Constants.FONT_LIGHT
+                    color = Color.White.copy(alpha = 0.7f), lineHeight = 2.sp, fontFamily = Constants.FONT_LIGHT
                 )
                 if (isSentByLoggedInUser) {
                     Spacer(modifier = Modifier.width(4.dp))

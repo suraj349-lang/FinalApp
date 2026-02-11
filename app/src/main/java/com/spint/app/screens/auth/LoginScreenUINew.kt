@@ -58,7 +58,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.spint.app.R
 import com.spint.app.viewmodels.AuthViewModel
-import com.spint.app.login.PhoneLogin
 import com.spint.app.model.User
 import com.spint.app.navigation.SCREENS
 import com.spint.app.screens.dialogBox.DialogLoading
@@ -103,10 +102,7 @@ fun LoginScreenUINew(onBackClicked:()->Unit={},onSignUpClicked:()->Unit={},onLog
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
 
-    val addString = "+91";
-    val maxLength = 10;
-    val loginMethod = PhoneLogin()
-    var phoneNumber by rememberSaveable { mutableStateOf("") }
+    var userNameOrEmail by rememberSaveable { mutableStateOf("") }
     var loginPasswordText by remember { mutableStateOf("") }
 
     //
@@ -209,14 +205,12 @@ fun LoginScreenUINew(onBackClicked:()->Unit={},onSignUpClicked:()->Unit={},onLog
 
             }
                 OutlinedTextField(
-                    value = phoneNumber,
+                    value = userNameOrEmail,
                     onValueChange = {
-                        if (it.length <= maxLength) phoneNumber = it
-                        else Toast.makeText(context, "Can be 10 digits only !", Toast.LENGTH_SHORT)
-                            .show()
+                         userNameOrEmail = it
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    placeholder = { Text(text = "Enter number / username", fontFamily = Constants.FONT_LIGHT, fontSize = 12.sp) },
+                    placeholder = { Text(text = "Enter email / username", fontFamily = Constants.FONT_LIGHT, fontSize = 12.sp) },
                     textStyle = TextStyle(
                         fontFamily = Constants.FONT_MEDIUM,
                         fontSize = 16.sp
@@ -230,17 +224,8 @@ fun LoginScreenUINew(onBackClicked:()->Unit={},onSignUpClicked:()->Unit={},onLog
                         unfocusedLabelColor = Color.LightGray,
                         focusedLabelColor = Color.LightGray,
                     ),
-                    leadingIcon = {
-                        Text(
-                            text = "+91",
-                            fontWeight = FontWeight.Normal,
-                            fontFamily = Constants.FONT_LIGHT,
-                            fontSize = 18.sp, textAlign = TextAlign.Justify,
-                            color = Color(0xFF615C5C)
-                        )
-                    },
                     keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Number,
+                       // keyboardType = KeyboardType.Number,
                         imeAction = ImeAction.Done
                     ), keyboardActions = KeyboardActions(
                         onDone = { keyboardController?.hide() })
@@ -287,12 +272,8 @@ fun LoginScreenUINew(onBackClicked:()->Unit={},onSignUpClicked:()->Unit={},onLog
                 Button(
                     onClick = {
                         scope.launch {
-                            //if(loginMethod.validate(phoneNumber)){
-                            // TODO  authViewModel.loginUser("$addString$phoneNumber", loginPasswordText)
-                            onLoginClicked("$addString$phoneNumber",loginPasswordText)
-                            // }else{
-                            ////  authViewModel.setValidationError("Invalid phone  number")
-                            // }
+                            onLoginClicked(userNameOrEmail,loginPasswordText)
+
                         }
                     },
                     modifier = Modifier.fillMaxWidth(),

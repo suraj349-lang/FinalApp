@@ -3,6 +3,11 @@ package com.spint.app.navigation
 import android.net.Uri
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -14,7 +19,7 @@ import androidx.navigation.navDeepLink
 import com.spint.app.enums.ImageUploadScreens
 import com.spint.app.model.DropProfileResponse
 import com.spint.app.model.RegisterUserModel
-import com.spint.app.model.pings.FlashPostResponse
+import com.spint.app.model.flashPost.FlashPostResponse
 import com.spint.app.viewmodels.ChatViewModel
 import com.spint.app.viewmodels.AuthViewModel
 import com.spint.app.screens.auth.EnterOTPScreenUI
@@ -27,7 +32,7 @@ import com.spint.app.qrScanning.QRScannerScreen
 import com.spint.app.screens.EventAndPingDesigns.events.EventsScreenWrapper
 import com.spint.app.screens.EventAndPingDesigns.events.EventsDetailsVerticalWrapper
 import com.spint.app.screens.pings.CameraPingScreen
-import com.spint.app.viewmodels.EventsViewModel
+import com.spint.app.viewmodels.HomeViewModel
 import com.spint.app.screens._6chat.ChatListScreen
 import com.spint.app.screens._4profile.GalleryPicker
 import com.spint.app.screens._1home.HomeScreenUI
@@ -73,7 +78,10 @@ import com.spint.app.viewmodels.ImageUploadViewModel
 import com.spint.app.viewmodels.NotificationViewModel
 import com.spint.app.viewmodels.SettingsViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.firebase.Firebase
+import com.google.firebase.messaging.messaging
 import com.spint.app.screens.EventAndPingDesigns.events.templates.xhmaslive.XHamsLiveScreenWrapper
+import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.json.Json
 import java.net.URLDecoder
 import java.nio.charset.StandardCharsets
@@ -85,12 +93,19 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
     val navController:NavHostController= rememberNavController();
     val imageUploadViewModel= hiltViewModel<ImageUploadViewModel>()
     val settingsViewModel = hiltViewModel<SettingsViewModel>()
-    val eventsViewModel= hiltViewModel<EventsViewModel>()
+    val homeViewModel= hiltViewModel<HomeViewModel>()
     val chatViewModel= hiltViewModel<ChatViewModel>()
     val notificationViewModel= hiltViewModel<NotificationViewModel>()
+    var token by remember { mutableStateOf("") }
+    LaunchedEffect(Unit) {
+        token= Firebase.messaging.token.await()
+    }
 
 
-    NavHost(navController = navController, startDestination =SCREENS.SPLASH.route){
+
+
+
+    NavHost(navController = navController, startDestination =screen){
 
         composable(SCREENS.SPLASH.route){
             SplashScreenUI(navController,screen)
@@ -104,6 +119,8 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
             SignupScreenNewUI(
                 name = authViewModel.name.value,
                 onNameChange = {authViewModel.name.value=it},
+                birthDay=authViewModel.birthDay.value,
+                onBirthDayChange={authViewModel.birthDay.value=it},
                 password = authViewModel.password.value,
                 onPasswordChange = {authViewModel.password.value=it},
                 confirmPassword = authViewModel.confirmPassword.value,
@@ -115,25 +132,36 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
         }
         composable(SCREENS.OTP.route){
            EnterOTPScreenUI(
+               authViewModel=authViewModel,
                navController = navController,
-               userName = authViewModel.username.value,
-               onUserNameChange = {authViewModel.username.value=it},
-               phoneNumber = authViewModel.phoneNumber.value,
-               onPhoneNumberChange = {authViewModel.phoneNumber.value=it},
+               userName = authViewModel.userName.value,
+               onUserNameChange = {authViewModel.userName.value=it},
+               email = authViewModel.email.value,
+               onEmailChange = {authViewModel.email.value=it},
                otp = authViewModel.otp.value,
                onOtpChange = {authViewModel.otp.value=it},
-               onSignUpClicked = {authViewModel.registerUser(RegisterUserModel.empty())}
+               onGetOtpClicked = {authViewModel.getEmailOtp()},
+               onVerifyOtpClicked = {authViewModel.verifyOtp()},
+               onSignUpClicked = {authViewModel.registerUser(RegisterUserModel(
+                   name=authViewModel.name.value,
+                   userName =authViewModel.userName.value,
+                   email=authViewModel.email.value,
+                   password =authViewModel.password.value,
+                   token = token,
+                   address =authViewModel.address.value,
+
+               ))}
            )
         }
         composable(SCREENS.FINALUSERCREATION.route){
             FinalUserCreation(authViewModel,navController)
         }
         composable(SCREENS.HOME.route){
-            HomeScreenUI( navController,eventsViewModel,imageUploadViewModel,authViewModel,chatViewModel)
+            HomeScreenUI( navController,homeViewModel,imageUploadViewModel,authViewModel,chatViewModel)
         }
         composable(SCREENS.PROFILE.route){
            // ProfileScreenUI(navController,imageUploadViewModel,authViewModel)
-            ProfileScreenNew(navController,authViewModel, eventsViewModel, imageUploadViewModel)
+            ProfileScreenNew(navController,authViewModel, homeViewModel, imageUploadViewModel)
         }
         composable(SCREENS.SETTINGS.route){
             SettingsScreenUI(navController,authViewModel)
@@ -173,21 +201,21 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
         }
         composable(SCREENS.FLASH_POSTS.route){
             //PingsScreenUI(navController,eventsViewModel)
-            FlashPostsScreen(navController,eventsViewModel)
+            FlashPostsScreen(navController,homeViewModel)
         }
         composable(SCREENS.EVENTS_SCREEN.route){
-            EventsScreenWrapper(eventsViewModel = eventsViewModel, navController = navController) {
-                eventsViewModel.getAllEvents()
+            EventsScreenWrapper(homeViewModel = homeViewModel, navController = navController) {
+                homeViewModel.getAllEvents()
             }
 
         }
         composable(SCREENS.XHAM_LIVE_SCREEN.route){
-            XHamsLiveScreenWrapper(eventsViewModel = eventsViewModel, navController = navController){eventsViewModel.getAllEvents()}
+            XHamsLiveScreenWrapper(homeViewModel = homeViewModel, navController = navController){homeViewModel.getAllEvents()}
         }
 
 
         composable(SCREENS.PAST_OFFERS.route){
-            PastRaisedOffer(authViewModel = authViewModel, eventsViewModel =eventsViewModel , navController = navController)
+            PastRaisedOffer(authViewModel = authViewModel, homeViewModel =homeViewModel , navController = navController)
         }
         composable(SCREENS.TABVIEW.route){
             //todo for testing purpose
@@ -197,7 +225,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
           //  CreateEvent(eventsViewModel, navController)
             //CreatePing(authViewModel, eventsViewModel, navController)
            // CreatePingMainScreen(navController,eventsViewModel)
-            CreatePingWrapper(navController,eventsViewModel)
+            CreatePingWrapper(navController,homeViewModel)
         }
         composable(SCREENS.CREATE_EVENT.route, arguments = listOf(navArgument("parentEventId"){
             type= NavType.StringType
@@ -205,7 +233,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
             defaultValue=null
         })) {
             val parentEventId=it.arguments?.getString("parentEventId")
-            CreateEventMainScreen(parentEventId,navController,eventsViewModel)
+            CreateEventMainScreen(parentEventId,navController,homeViewModel)
         }
         composable(route = SCREENS.PUBLIC_EVENT_DETAILS_SCREEN_WRAPPER.route, arguments = listOf(
             navArgument(name = "id"){
@@ -214,7 +242,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
         )){navBackStackEntry->
             val id=navBackStackEntry.arguments?.getString("id") ?: ""
            // PublicEventDetailsScreenWrapper(id, navController,eventsViewModel,authViewModel)
-            EventsDetailsVerticalWrapper(id, navController,eventsViewModel,authViewModel)
+            EventsDetailsVerticalWrapper(id, navController,homeViewModel,authViewModel)
         }
         composable(SCREENS.PRIVATE_PROFILE.route){
             PrivateProfileScreenWrapper(navController = navController)
@@ -227,7 +255,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
         composable(route=SCREENS.DROP_PROFILE_USER_PROFILE.route, arguments = listOf(navArgument("dropProfileResponse"){ type= NavType.StringType })){navBackStackEntry ->
             val json=navBackStackEntry.arguments?.getString("dropProfileResponse")
             val dropProfileResponse=json?.let { Json.decodeFromString<DropProfileResponse>(it) }
-            DropProfileUserProfile(navController,chatViewModel,dropProfileResponse)
+            DropProfileUserProfile(navController,chatViewModel, homeViewModel ,dropProfileResponse)
 
         }
         composable(route=SCREENS.PING_DETAILS.route, arguments = listOf(navArgument("flashPostResponse"){ type= NavType.StringType })){navBackStackEntry ->
@@ -248,7 +276,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
                 uri = uri,
                 lastScreen=lastScreen,
                 imageUploadViewModel=imageUploadViewModel,
-                eventsViewModel=eventsViewModel,
+                homeViewModel=homeViewModel,
                 onDoneClicked = {
                     when(lastScreen){
                         ImageUploadScreens.PROFILE.screen->{
@@ -264,7 +292,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
                                 launchSingleTop = true
                                 restoreState = true
                             }
-                            eventsViewModel.showDropDialog.value=true
+                            homeViewModel.showDropDialog.value=true
                         }
                     }
 
@@ -279,7 +307,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
             }),
             arguments = listOf(navArgument("userId"){ type= NavType.StringType })){navBackStackEntry ->
             val userId=navBackStackEntry.arguments?.getString("userId")
-            UserPublicProfile(eventsViewModel,navController,userId)
+            UserPublicProfile(homeViewModel,navController,userId)
 
         }
         composable("ping"){

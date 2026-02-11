@@ -5,8 +5,8 @@ import kotlinx.serialization.Serializable
 
 data class RegisterUserModel(
     val name:String,
-    val number:String,
-    val username:String,
+    val email:String,
+    val userName:String,
     var password:String,
     val token:String,
     val address:String
@@ -15,8 +15,8 @@ data class RegisterUserModel(
         fun empty():RegisterUserModel{
             return RegisterUserModel(
                 name="",
-                number = "",
-                username ="",
+                email = "",
+                userName ="",
                 password = "",
                 token="",
                 address = ""

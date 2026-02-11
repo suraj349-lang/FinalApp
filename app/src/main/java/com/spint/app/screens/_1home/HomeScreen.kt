@@ -55,7 +55,7 @@ import com.spint.app.screens._1home.commonUI.HomeFloatingActionButton
 import com.spint.app.screens._1home.commonUI.HomeTopBar
 import com.spint.app.screens._2pings.FlashPostsScreen
 import com.spint.app.screens._3createEventOrPing.CreateEventOrPingBottomSheet
-import com.spint.app.viewmodels.EventsViewModel
+import com.spint.app.viewmodels.HomeViewModel
 import com.spint.app.screens.dialogBox.ShowQRDialog
 import com.spint.app.screens.dialogBox.ShowDialog
 import com.spint.app.ui.TAB_ITEMS
@@ -73,7 +73,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
-fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewModel, imageUploadViewModel: ImageUploadViewModel, authViewModel: AuthViewModel,chatViewModel: ChatViewModel) {
+fun HomeScreenUI(navController: NavHostController, homeViewModel: HomeViewModel, imageUploadViewModel: ImageUploadViewModel, authViewModel: AuthViewModel, chatViewModel: ChatViewModel) {
     val buttonsVisible = remember { mutableStateOf(true) }
     val scope = rememberCoroutineScope()
     var showQR: ShowDialog by remember { mutableStateOf(ShowDialog.CLOSE) }
@@ -104,12 +104,12 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
     LaunchedEffect(isRefreshing) {
         if (isRefreshing && pagerState.currentPage == 0) {
             delay(1000L)
-            eventsViewModel.getAllPings("")
+            homeViewModel.getAllFlashPosts("")
             delay(500L)
             isRefreshing = false
         } else if (isRefreshing && pagerState.currentPage == 1) {
             delay(1000L)
-            eventsViewModel.loadDirectChatUsers(
+            homeViewModel.loadDirectChatUsers(
                 user.user,
                 userLocation.latitude ?: 0.0,
                 userLocation.longitude ?: 0.0
@@ -118,7 +118,7 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
             isRefreshing = false
         } else if (isRefreshing && pagerState.currentPage == 2) {
             delay(1000L)
-            eventsViewModel.getDefaultDropProfiles("")
+            homeViewModel.getDefaultDropProfiles("")
             delay(500L)
             isRefreshing = false
         }
@@ -170,7 +170,7 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
         floatingActionButton = {
             HomeFloatingActionButton(
                 authViewModel,
-                eventsViewModel,
+                homeViewModel,
                 imageUploadViewModel,
                 navController
             )
@@ -228,12 +228,12 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
                         when (page) {
                             0 -> FlashPostsScreen(
                                 navController = navController,
-                                eventsViewModel = eventsViewModel
+                                homeViewModel = homeViewModel
                             )//EventScreenWrapper(eventsViewModel = eventsViewModel, navController = navController, onRetryCalled = {eventsViewModel.getAllEvents()})
                             1 -> DirectChatScreen(
                                 scrollBehavior,
                                 authViewModel,
-                                eventsViewModel,
+                                homeViewModel,
                                 chatViewModel ,
                                 navController
                             )
@@ -242,7 +242,7 @@ fun HomeScreenUI(navController: NavHostController, eventsViewModel: EventsViewMo
                                 pagerState,
                                 scrollBehavior,
                                 navController,
-                                eventsViewModel
+                                homeViewModel
                             )
                         }
                     }

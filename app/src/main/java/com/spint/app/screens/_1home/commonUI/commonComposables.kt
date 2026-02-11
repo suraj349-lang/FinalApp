@@ -68,19 +68,19 @@ import com.spint.app.utils.RequestState
 import com.spint.app.utils.constants.Constants
 import com.spint.app.utils.constants.Constants.APP_NAME_FONT
 import com.spint.app.viewmodels.AuthViewModel
-import com.spint.app.viewmodels.EventsViewModel
+import com.spint.app.viewmodels.HomeViewModel
 import com.spint.app.viewmodels.ImageUploadViewModel
 import kotlinx.coroutines.launch
 
 
 @Composable
-fun HomeError(eventsViewModel: EventsViewModel){
+fun HomeError(homeViewModel: HomeViewModel){
     var retry by remember {
         mutableStateOf(false)
     }
     if(retry) {
         retry=false;
-        RetryCall(eventsViewModel = eventsViewModel)
+        RetryCall(homeViewModel = homeViewModel)
     }
 
     Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
@@ -171,11 +171,11 @@ fun HomeTopBar(
 
 
 @Composable
-fun RetryCall(eventsViewModel: EventsViewModel){
+fun RetryCall(homeViewModel: HomeViewModel){
     val scope= rememberCoroutineScope()
     LaunchedEffect(Unit) {
         scope.launch {
-            eventsViewModel.getAllEvents()
+            homeViewModel.getAllEvents()
         }
 
     }
@@ -256,8 +256,8 @@ fun ShimmerEffect(showShimmer: Boolean = true, targetValue: Float = 10000f): Bru
 
 
 @Composable
-fun HomeFloatingActionButton(authViewModel: AuthViewModel, eventsViewModel: EventsViewModel, imageUploadViewModel: ImageUploadViewModel, navController: NavHostController) {
-    var showCustomDialog=eventsViewModel.showDropDialog.value
+fun HomeFloatingActionButton(authViewModel: AuthViewModel, homeViewModel: HomeViewModel, imageUploadViewModel: ImageUploadViewModel, navController: NavHostController) {
+    var showCustomDialog=homeViewModel.showDropDialog.value
 
     FloatingActionButton(
         onClick = {
@@ -286,22 +286,22 @@ fun HomeFloatingActionButton(authViewModel: AuthViewModel, eventsViewModel: Even
     if (showCustomDialog) {
         DropProfileDialog(
             authViewModel,
-            eventsViewModel,
+            homeViewModel,
             imageUploadViewModel,
             navController
-        ) { showCustomDialog = !showCustomDialog;eventsViewModel.showDropDialog.value = false }
+        ) { showCustomDialog = !showCustomDialog;homeViewModel.showDropDialog.value = false }
     }
 
 }
 
 
 @Composable
-fun OfferResponseDataAndAction(eventsViewModel: EventsViewModel, navController: NavHostController) {
+fun OfferResponseDataAndAction(homeViewModel: HomeViewModel, navController: NavHostController) {
     val context = LocalContext.current
     Log.d("Data received", "Into the function")
-    when (val result = eventsViewModel.premiumCreateEventResponse.value) {
+    when (val result = homeViewModel.premiumCreateEventResponse.value) {
         is RequestState.Success -> {
-            eventsViewModel.premiumCreateEventKey.value = 0;
+            homeViewModel.premiumCreateEventKey.value = 0;
             Log.d("Suraj", result.data.toString())
             Toast.makeText(context, "${result.data}", Toast.LENGTH_SHORT).show()
             navController.navigate(SCREENS.HOME.route) {

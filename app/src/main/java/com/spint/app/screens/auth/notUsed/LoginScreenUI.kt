@@ -1,4 +1,4 @@
-package com.spint.app.screens.auth
+package com.spint.app.screens.auth.notUsed
 
 import android.annotation.SuppressLint
 import android.util.Log

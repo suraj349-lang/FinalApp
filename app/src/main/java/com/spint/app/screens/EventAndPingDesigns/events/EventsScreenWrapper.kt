@@ -30,7 +30,6 @@ import com.spint.app.R
 import com.spint.app.model.Event
 import com.spint.app.model.EventResponse
 import com.spint.app.screens.EventAndPingDesigns.events.templates.databased.EventsAndChildPostsParent
-import com.spint.app.screens.EventAndPingDesigns.events.templates.xhmaslive.XhamLiveScreen
 import com.spint.app.screens._3createEventOrPing.CreateEventOrPingBottomSheet
 import com.spint.app.screens.common.NoDataFound
 import com.spint.app.screens.common.CommonErrorScreen
@@ -38,30 +37,30 @@ import com.spint.app.screens.loadingAndErrorScreen.loadingScreen.EventLoadingScr
 import com.spint.app.ui.theme.floatingActionBtnColor
 import com.spint.app.utils.RequestState
 import com.spint.app.utils.constants.Constants
-import com.spint.app.viewmodels.EventsViewModel
+import com.spint.app.viewmodels.HomeViewModel
 
 
 @OptIn(ExperimentalFoundationApi::class)
 @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 @Composable
 fun EventsScreenWrapper(
-    eventsViewModel: EventsViewModel,
+    homeViewModel: HomeViewModel,
     modifier: Modifier = Modifier,
     initialPage: Int? = 0,
     navController: NavHostController,
     onRetryCalled:()->Unit
 ) {
     LaunchedEffect(key1 = true){
-        eventsViewModel.getAllEvents()
+        homeViewModel.getAllEvents()
     }
     var showSheet by remember {
         mutableStateOf(false)
     }
     val pagerState = rememberPagerState(
         initialPage = initialPage ?: 0,
-        pageCount = { (eventsViewModel.eventsListResponse.value as? RequestState.Success<List<Event>>)?.data?.size ?: 0 }
+        pageCount = { (homeViewModel.eventsListResponse.value as? RequestState.Success<List<Event>>)?.data?.size ?: 0 }
     )
-    val eventsState by eventsViewModel.eventsListResponse.collectAsState()
+    val eventsState by homeViewModel.eventsListResponse.collectAsState()
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         bottomBar = { BottomBar(navController = navController, containerColor = Constants.HOME_BOTTOM_BAR_COLOR, highlightedTextColor = Constants.BOTTOM_BAR_ACTIVE_TEXT_COLOR, inactiveTextColor = Constants.BOTTOM_BAR_INACTIVE_TEXT_COLOR, inactiveIconColor = Constants.BOTTOM_BAR_INACTIVE_ICON_COLOR, onCreateEventClick = {showSheet=true}) }) {
@@ -88,7 +87,7 @@ fun EventsScreenWrapper(
                             "EventsScreen:${(eventsState as RequestState.Error).error} ",
                         )
                         CommonErrorScreen(error = "Unable to fetch events.", true) {
-                            eventsViewModel.getAllEvents()
+                            homeViewModel.getAllEvents()
                         }
                     }
                 }
@@ -106,7 +105,7 @@ fun EventsScreenWrapper(
                             EventsAndChildPostsParent(
                                 event = event,
                                 navController = navController,
-                                onUpVotesClicked = { eventsViewModel.upvoteEvent(it) }
+                                onUpVotesClicked = { homeViewModel.upvoteEvent(it) }
                             )
                         }
 

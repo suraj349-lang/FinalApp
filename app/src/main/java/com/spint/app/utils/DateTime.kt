@@ -80,7 +80,6 @@ fun Long.toRelativeTime(): String {
 
 fun getFormattedTimeAndFlag(isoString: String): Triple<String, Boolean, Boolean> {
     return try {
-        // Remove microseconds if present
         val cleaned = isoString.replace(Regex("\\.\\d+"), "")
 
         val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.getDefault())

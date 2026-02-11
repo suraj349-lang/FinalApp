@@ -2,7 +2,7 @@ package com.spint.app.navigation
 
 import android.net.Uri
 import com.spint.app.model.DropProfileResponse
-import com.spint.app.model.pings.FlashPostResponse
+import com.spint.app.model.flashPost.FlashPostResponse
 import kotlinx.serialization.json.Json
 
 

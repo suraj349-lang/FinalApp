@@ -27,6 +27,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,7 +38,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -51,28 +51,33 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.spint.app.R
+import com.spint.app.navigation.SCREENS
 import com.spint.app.screens.auth.util.OtpInputField
+import com.spint.app.utils.RequestState
 import com.spint.app.utils.constants.Constants
-
+import com.spint.app.viewmodels.AuthViewModel
 
 
 @Composable
 fun EnterOTPScreenUI(
+    authViewModel: AuthViewModel,
     navController: NavController,
     userName:String,
     onUserNameChange:(String)->Unit,
-    phoneNumber:String,
-    onPhoneNumberChange:(String)->Unit,
+    email:String,
+    onEmailChange:(String)->Unit,
     otp:String,
     onOtpChange:(String)->Unit,
+    onGetOtpClicked:()-> Unit,
+    onVerifyOtpClicked:()-> Unit,
     onSignUpClicked:()->Unit) {
-    var otpValue by remember { mutableStateOf("") }
-//    val verificationID = remember { mutableStateOf("") }
-//    val message = remember { mutableStateOf("") }
-//    val context= LocalContext.current
-//    val mAuth: FirebaseAuth = FirebaseAuth.getInstance();
-//    lateinit var callbacks: PhoneAuthProvider.OnVerificationStateChangedCallbacks
-    val keyboardController = LocalSoftwareKeyboardController.current
+    val registerUserResponse=authViewModel.mySignupResponse.collectAsState()
+    when(registerUserResponse.value){
+        is RequestState.Success ->{navController.navigate(SCREENS.HOME.route)}
+        else -> {}
+    }
+
+
 
     Box(
         modifier = Modifier
@@ -80,8 +85,6 @@ fun EnterOTPScreenUI(
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
-//                            Color(0xFF1976D2), Color(0xFFE9D8AE)
-//                            Color(0xFFFBC02D), Color(0xFFDCDEF0)
                         Color(0xFFFAF8F3), Color(0xFFF5F3F0)
                     )
                 )
@@ -155,7 +158,7 @@ fun EnterOTPScreenUI(
                                 fontSize = 13.sp, color = Color.Gray
                             )
                         ) {
-                            append("Verify phone number to continue")
+                            append("Verify your email to continue")
                         }
 
 
@@ -192,24 +195,49 @@ fun EnterOTPScreenUI(
 
 
             )
+//            OutlinedTextField(
+//                value = phoneNumber,
+//                onValueChange = {
+//                    onPhoneNumberChange(it)
+//                },
+//                modifier = Modifier.fillMaxWidth(),
+//                textStyle = TextStyle(
+//                    fontFamily = Constants.FONT_MEDIUM, fontSize = 16.sp
+//                ),
+//                leadingIcon = {
+//                    Row(modifier = Modifier.wrapContentSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+//                        Spacer(modifier = Modifier.width(4.dp))
+//                        Image(painter = painterResource(id = R.drawable.india), contentDescription ="country flag", contentScale = ContentScale.Crop, modifier = Modifier.size(30.dp) )
+//                        Divider(modifier = Modifier.width(1.dp), thickness = 30.dp, color = Color.LightGray)
+//                        Spacer(modifier = Modifier.width(4.dp))
+//                    }
+//                },
+//                placeholder = { Text(text = "Phone Number", fontFamily = Constants.FONT_LIGHT) },
+//                colors = OutlinedTextFieldDefaults.colors(
+//                    focusedTextColor = Color.Black,
+//                    unfocusedTextColor = Color.Black,
+//                    cursorColor = Color.Black,
+//                    focusedContainerColor = Color.White,
+//                    unfocusedContainerColor = Color.White,
+//                    unfocusedLabelColor = Color.LightGray,
+//                    focusedLabelColor = Color.LightGray,
+//                ),
+//
+//                keyboardOptions = KeyboardOptions(
+//                    keyboardType = KeyboardType.Number,
+//                    imeAction = ImeAction.Next
+//                )
+//            )
             OutlinedTextField(
-                value = phoneNumber,
+                value = email,
                 onValueChange = {
-                    onPhoneNumberChange(it)
+                    onEmailChange(it)
                 },
                 modifier = Modifier.fillMaxWidth(),
                 textStyle = TextStyle(
                     fontFamily = Constants.FONT_MEDIUM, fontSize = 16.sp
                 ),
-                leadingIcon = {
-                    Row(modifier = Modifier.wrapContentSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Image(painter = painterResource(id = R.drawable.india), contentDescription ="country flag", contentScale = ContentScale.Crop, modifier = Modifier.size(30.dp) )
-                        Divider(modifier = Modifier.width(1.dp), thickness = 30.dp, color = Color.LightGray)
-                        Spacer(modifier = Modifier.width(4.dp))
-                    }
-                },
-                placeholder = { Text(text = "Phone Number", fontFamily = Constants.FONT_LIGHT) },
+                placeholder = { Text(text = "Email", fontFamily = Constants.FONT_LIGHT) },
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedTextColor = Color.Black,
                     unfocusedTextColor = Color.Black,
@@ -221,12 +249,48 @@ fun EnterOTPScreenUI(
                 ),
 
                 keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Number,
+                    keyboardType = KeyboardType.Email,
                     imeAction = ImeAction.Next
                 )
             )
 
             OtpInputField(otpLength = 6, onOtpChanged = { value -> onOtpChange(value) })
+            Button(
+                onClick = {
+                    onGetOtpClicked()
+                },
+                shape = RoundedCornerShape(6.dp),
+                modifier = Modifier.fillMaxWidth(0.8f),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF303F9F),
+                    contentColor = Color.White
+                )
+            ) {
+                Text(
+                    text = "Get OTP",
+                    fontFamily = Constants.FONT_MEDIUM,
+                    fontSize = 14.sp,
+                    color = Color.White
+                )
+            }
+            Button(
+                onClick = {
+                    onVerifyOtpClicked()
+                },
+                shape = RoundedCornerShape(6.dp),
+                modifier = Modifier.fillMaxWidth(0.8f),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF7B1FA2),
+                    contentColor = Color.White
+                )
+            ) {
+                Text(
+                    text = "Verify OTP",
+                    fontFamily = Constants.FONT_MEDIUM,
+                    fontSize = 14.sp,
+                    color = Color.White
+                )
+            }
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -261,7 +325,7 @@ fun EnterOTPScreenUI(
                 )
             ) {
                 Text(
-                    text = "Verify OTP",
+                    text = "Create Account",
                     fontFamily = Constants.FONT_MEDIUM,
                     fontSize = 14.sp,
                     color = Color.White

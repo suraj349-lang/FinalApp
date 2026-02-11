@@ -18,12 +18,15 @@ import com.spint.app.database.Profile
 import com.spint.app.datastore.StoreLoginState
 import com.spint.app.datastore.StoreUserState
 import com.spint.app.fcm.stateObject.SendFcmTokenDto
+import com.spint.app.model.Email
 import com.spint.app.model.LatLng
 import com.spint.app.repository.ProfileDatabaseRepository
 import com.spint.app.model.LoginModel
 import com.spint.app.model.RegisterUserModel
+import com.spint.app.model.ResponseOfEmail
 import com.spint.app.model.SignupAPIResponse
 import com.spint.app.model.User
+import com.spint.app.model.VerifyEmailOtp
 import com.spint.app.utils.LoginState
 import com.spint.app.utils.RequestState
 import com.spint.app.utils.TokenObject
@@ -177,13 +180,41 @@ class AuthViewModel @Inject constructor(
        }
    //-----------------------------------------------------------------------------------------------------------------------//
        val name= mutableStateOf("")
-       val username= mutableStateOf("")
-       val phoneNumber= mutableStateOf("")
-
+       val userName= mutableStateOf("")
+       val email= mutableStateOf("")
        val password= mutableStateOf("")
+       val birthDay= mutableStateOf("")
        val confirmPassword= mutableStateOf("")
+       val getEmailOtpResponse: MutableState<RequestState<ResponseOfEmail>> = mutableStateOf(RequestState.Idle)
 
-    val mySignupResponse: MutableState<RequestState<SignupAPIResponse>> = mutableStateOf(RequestState.Idle)
+       fun getEmailOtp()= viewModelScope.launch {
+           repository.getEmailOtp(Email(email.value) )
+               .onStart {
+                   getEmailOtpResponse.value= RequestState.Loading
+               }
+               .catch {
+                   getEmailOtpResponse.value= RequestState.Error(it)
+               }
+               .collect {
+                   getEmailOtpResponse.value= RequestState.Success(it)
+               }
+       }
+       val verifyOtpResponse: MutableState<RequestState<ResponseOfEmail>> = mutableStateOf(RequestState.Idle)
+
+       fun verifyOtp()= viewModelScope.launch {
+           repository.verifyEmailOtp(VerifyEmailOtp(email.value,otp.value))
+               .onStart {
+                   verifyOtpResponse.value= RequestState.Loading
+               }
+               .catch {
+                   verifyOtpResponse.value= RequestState.Error(it)
+               }
+               .collect {
+                   verifyOtpResponse.value= RequestState.Success(it)
+               }
+       }
+
+    val mySignupResponse: MutableStateFlow<RequestState<SignupAPIResponse>> = MutableStateFlow(RequestState.Idle)
     fun registerUser(registerUserModel : RegisterUserModel)=viewModelScope.launch(Dispatchers.IO) {
         registerUserModel.password=hashPassword(registerUserModel.password)
         repository.sendSignupData(registerUserModel)
@@ -193,9 +224,34 @@ class AuthViewModel @Inject constructor(
             }.catch {
                 mySignupResponse.value= RequestState.Error(it)
 
-            }.collect{
-                storeUserState.saveUserInDataStore(it.data)
-                mySignupResponse.value= RequestState.Success(it)
+            }.collect{response->
+                if (response.success) {
+                    storeUserState.saveUserInDataStore(response.data)
+
+                    // saveProfileData(response.data);
+                    try {
+                        val fcmToken= Firebase.messaging.token.await()
+                        if (fcmToken!=null) {
+                            repository.updateFcmToken(SendFcmTokenDto(userId = response.data.user, fcmToken = fcmToken))
+                                .catch {
+                                    Log.d("FCMTOKENUPDATE", "register error:$it ")
+                                }.collect {
+                                    Log.d("FCMTOKENUPDATE", "register Success: $it")
+                                }
+                        }
+                        TokenObject.token=response.data.token
+                        storeLoginState.saveLoginState(true)
+                        storeLoginState.saveUserToken( response.data.token)
+                        mySignupResponse.value= RequestState.Success(response)
+                    } catch (e: Exception) {
+                        Log.e("REgister ERROR", "registerUser: ${e.printStackTrace()}",e )
+                        mySignupResponse.value= RequestState.Error(e)
+                    }
+                } else {
+                    Log.e("REgister ERROR", "loginUser: $response" )
+                    mySignupResponse.value= RequestState.Error(Throwable("error creating user"))
+                }
+
 
             }
     }

@@ -29,50 +29,31 @@ import com.spint.app.screens.common.NoPingsFoundScreen
 import com.spint.app.ui.theme.floatingActionBtnColor
 import com.spint.app.utils.UserLocationObject
 import com.spint.app.utils.constants.Constants
-import com.spint.app.viewmodels.EventsViewModel
+import com.spint.app.viewmodels.HomeViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.spint.app.model.flashPost.PingsOnFlashPostRequest
 import com.spint.app.navigation.SCREENS
 import com.spint.app.screens.EventAndPingDesigns.flashPosts.FlashPostWithImageScreen
 import com.spint.app.screens.EventAndPingDesigns.flashPosts.NoImageFlashPosts
 import com.spint.app.screens.EventAndPingDesigns.flashPosts.PrivateFlashPostScreen
+import com.spint.app.utils.UserObject
 
 
 @Composable
 fun FlashPostsScreen(
     navController: NavHostController,
-    eventsViewModel: EventsViewModel,
+    homeViewModel: HomeViewModel
 ) {
-    val selectedCategory = remember { mutableStateOf("All") }
-   // val categories = listOf("All", "Dating", "Personal", "Sports", "Politics", "Adventure")
-    val gridItems = listOf("Alpha-1", "Pari Chowk")
-    val shorts = listOf("Ending in hours", "Today's pings", "Ending this week")
-    val staggeredItems = listOf("Music", "Travel", "Education", "Gaming", "Art", "Food")
     var searchOn by remember { mutableStateOf(false) }
     var showSheet by remember { mutableStateOf(false) }
-    val allPings by eventsViewModel.allPingsFlow.collectAsState()
-    val allPingsState = allPings?.collectAsLazyPagingItems()
+    val allPingsState = homeViewModel.flashPostsFlow.collectAsLazyPagingItems()
     var showLoader by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
-    val cities = listOf(R.drawable.img_3, R.drawable.img_4)
-    val girls = listOf(R.drawable.img, R.drawable.img_1, R.drawable.img_2)
     val userLocation by UserLocationObject.userLocation.collectAsState()
-    val cardColors = listOf(
-        Color(0xFFEF476F), // Red
-        Color(0xFF03CC98), // Green
-        Color(0xFF118AB2), // Blue
-        Color(0xFFEEA807), // Yellow
-        Color(0xFF8338EC), // Purple
-        Color(0xFFFB5607)  // Orange
-    )
+    val user by UserObject.user.collectAsState()
 
-    val examplePingStats = mapOf(
-        "Club" to 12,
-        "Sports" to 8,
-        "Politics" to 5,
-        "Study" to 10f
-    )
     LaunchedEffect(key1 = Unit){
-        eventsViewModel.getAllPings(userLocation.address.toString())
+        homeViewModel.getAllFlashPosts(userLocation.address.toString())
     }
 
     val systemUiController = rememberSystemUiController()
@@ -99,39 +80,6 @@ fun FlashPostsScreen(
                         .background(color = Constants.HOME_TOP_BAR_COLOR),
                     )
                 {
-
-//                Column(
-//                    modifier = Modifier
-//                        .padding(it)
-//                        .verticalScroll(rememberScrollState())
-//                        .fillMaxSize()
-//                        .background(Color.Black)
-//                ) {
-//                    item {
-//                        LazyRow {
-//                            items(categories.size) { index ->
-//                                val category = categories[index]
-//                                val isSelected = category == selectedCategory.value
-//                                Box(
-//                                    modifier = Modifier
-//                                        .padding(horizontal = 4.dp, vertical = 8.dp)
-//                                        .clip(RoundedCornerShape(15.dp))
-//                                        .wrapContentSize()
-//                                        .background(if (isSelected) Color(0xFF065F0A) else Color.Gray)
-//                                        .clickable { selectedCategory.value = category }
-//                                ) {
-//                                    Text(
-//                                        category,
-//                                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-//                                        color = Color.White,
-//                                        fontFamily = Constants.FONT_MEDIUM,
-//                                        fontSize = 12.sp
-//                                    )
-//                                }
-//                            }
-//                        }
-//                    }
-
                     item {
                         if (searchOn) {
                             Box(
@@ -349,7 +297,7 @@ fun FlashPostsScreen(
                                             .fillMaxWidth()
                                             .fillMaxHeight(0.9f), verticalArrangement = Arrangement.Center) {
                                         NoPingsFoundScreen(error = "Error getting pings.") {
-                                            eventsViewModel.getAllPings("")
+                                            homeViewModel.getAllFlashPosts("")
                                         }
                                     }
 
@@ -378,18 +326,27 @@ fun FlashPostsScreen(
                                         FlashPostWithImageScreen(
                                             item,
                                             onFlashPostClicked = {navController.navigate(SCREENS.PING_DETAILS.createRoute(item))},
+                                            onPingOfFlashPostClicked = {postId,message->
+                                                homeViewModel.addPingOnFlashPost(
+                                                    PingsOnFlashPostRequest(userId = user.user,postId,message)
+                                                )
+                                            },
                                             onCommentButtonClicked = {
                                                 navController.navigate(SCREENS.COMMENT.route)
                                             }
                                         )
                                     }else if (item.image.isEmpty() && !item.isPrivate ){
-                                       NoImageFlashPosts(flashPostResponse = item)
+                                       NoImageFlashPosts(flashPostResponse = item){
+                                           navController.navigate(SCREENS.PING_DETAILS.createRoute(item))
+                                       }
                                     }else{
-                                        PrivateFlashPostScreen(item)
+                                        PrivateFlashPostScreen(item){
+                                            navController.navigate(SCREENS.PING_DETAILS.createRoute(item))
+                                        }
                                     }
                                   
 
-                                    Spacer(modifier = Modifier.height(6.dp))
+                                  //  Spacer(modifier = Modifier.height(6.dp))
                                  //  Divider(modifier = Modifier.fillMaxWidth(), thickness = 0.5.dp, color = Color.Gray.copy(alpha = 0.6f))
                                 }
                             }

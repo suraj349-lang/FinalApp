@@ -47,9 +47,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -73,27 +71,23 @@ import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.spint.app.R
-import com.spint.app.model.pings.PingRequestDto
+import com.spint.app.model.flashPost.FlashPostRequestDto
 import com.spint.app.navigation.SCREENS
 import com.spint.app.screens.dialogBox.uriToFile
-import com.spint.app.ui.theme.floatingActionBtnColor
 import com.spint.app.utils.UserObject
 import com.spint.app.utils.RequestState
 import com.spint.app.utils.UserLocationObject
 import com.spint.app.utils.constants.Constants
-import com.spint.app.viewmodels.EventsViewModel
+import com.spint.app.viewmodels.HomeViewModel
 import java.io.File
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
-import java.time.ZoneOffset
-import java.time.format.DateTimeFormatter
-
 
 
 @Composable
-fun CreatePingWrapper(navController: NavHostController, eventsViewModel: EventsViewModel) {
+fun CreatePingWrapper(navController: NavHostController, homeViewModel: HomeViewModel) {
 
     var title by remember {
         mutableStateOf("")
@@ -130,7 +124,7 @@ fun CreatePingWrapper(navController: NavHostController, eventsViewModel: EventsV
 
 
     val context = LocalContext.current
-    val createPing by eventsViewModel.createPingResponse.collectAsState()
+    val createPing by homeViewModel.createFlashPostResponse.collectAsState()
     when(createPing){
         is RequestState.Idle ->{}
         is RequestState.Error ->{
@@ -138,7 +132,7 @@ fun CreatePingWrapper(navController: NavHostController, eventsViewModel: EventsV
             navController.navigate(SCREENS.HOME.route){
                 popUpTo(0)
             }
-            eventsViewModel.resetCreatePingResponseState()
+            homeViewModel.resetCreatePingResponseState()
         }
         is RequestState.Success->{
 
@@ -146,7 +140,7 @@ fun CreatePingWrapper(navController: NavHostController, eventsViewModel: EventsV
             navController.navigate(SCREENS.HOME.route){
                 popUpTo(0)
             }
-            eventsViewModel.resetCreatePingResponseState()
+            homeViewModel.resetCreatePingResponseState()
         }
         is RequestState.Loading->{
             CircularProgressIndicator()
@@ -154,21 +148,6 @@ fun CreatePingWrapper(navController: NavHostController, eventsViewModel: EventsV
     }
 
     Scaffold(
-        //                    imageFile?.let {file->
-//                        eventsViewModel.uploadImageAndThenCreateEvent(user.user , file) { imageKey ->
-//                            eventsViewModel.createPing(
-//                                PingRequestDto(
-//                                    user = user.user,
-//                                    userName = user.userName ,
-//                                    title = title,
-//                                    image = imageKey,
-//                                    location = userLocation.address.toString(),
-//                                    description = description,
-//                                    expirationTime = expirationIso
-//                                )
-//                            )
-//                        }
-//                    }
         topBar = {
             CreatePingTopNew(isActive) {
                 if (title.isNotEmpty()) {val uri = imageUri
@@ -180,9 +159,9 @@ fun CreatePingWrapper(navController: NavHostController, eventsViewModel: EventsV
 
                     if (imageFile != null) {
                         // Upload image first, then create ping with the image key
-                        eventsViewModel.uploadImageAndThenCreateEvent(user.user, imageFile) { imageKey ->
-                            eventsViewModel.createPing(
-                                PingRequestDto(
+                        homeViewModel.uploadImageAndThenCreateEvent(user.user, imageFile) { imageKey ->
+                            homeViewModel.createFlashPost(
+                                FlashPostRequestDto(
                                     user = user.user,
                                     userName = user.userName,
                                     title = title,
@@ -191,14 +170,14 @@ fun CreatePingWrapper(navController: NavHostController, eventsViewModel: EventsV
                                     category = selectedCategory,
                                     location = userLocation.address.toString(),
                                     description = description,
-                                    expirationTime = ""
+                                    expirationHours = expiration
                                 )
                             )
                         }
                     } else {
                         // No image -> create ping directly
-                        eventsViewModel.createPing(
-                            PingRequestDto(
+                        homeViewModel.createFlashPost(
+                            FlashPostRequestDto(
                                 user = user.user,
                                 userName = user.userName,
                                 title = title,
@@ -207,7 +186,7 @@ fun CreatePingWrapper(navController: NavHostController, eventsViewModel: EventsV
                                 category = selectedCategory,
                                 location = userLocation.address.toString(),
                                 description = description,
-                                expirationTime = ""
+                                expirationHours = expiration
                             )
                         )
                     }

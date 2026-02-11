@@ -43,7 +43,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -52,7 +51,7 @@ import com.spint.app.R
 import com.spint.app.enums.ImageUploadScreens
 import com.spint.app.ui.theme.floatingActionBtnColor
 import com.spint.app.utils.constants.Constants
-import com.spint.app.viewmodels.EventsViewModel
+import com.spint.app.viewmodels.HomeViewModel
 import com.spint.app.viewmodels.ImageUploadViewModel
 import java.io.File
 
@@ -62,7 +61,7 @@ fun ImagePreviewScreen(
     uri: Uri,
     lastScreen: String,
     imageUploadViewModel: ImageUploadViewModel,
-    eventsViewModel: EventsViewModel,
+    homeViewModel: HomeViewModel,
     onDoneClicked: () -> Unit,
     onClose: () -> Unit
 ) {
@@ -97,7 +96,7 @@ fun ImagePreviewScreen(
                         onDoneClicked()
                     }
                     else->{
-                        eventsViewModel.dropProfileUploadUri.value=finalUri
+                        homeViewModel.dropProfileUploadUri.value=finalUri
                         onDoneClicked()
                     }
                 }

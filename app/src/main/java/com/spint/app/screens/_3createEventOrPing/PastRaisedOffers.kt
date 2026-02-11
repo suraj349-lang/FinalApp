@@ -34,11 +34,11 @@ import androidx.navigation.NavHostController
 import com.spint.app.R
 import com.spint.app.viewmodels.AuthViewModel
 import com.spint.app.screens._1home.commonUI.HomeTopBar
-import com.spint.app.viewmodels.EventsViewModel
+import com.spint.app.viewmodels.HomeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PastRaisedOffer(authViewModel: AuthViewModel, eventsViewModel: EventsViewModel, navController: NavHostController){
+fun PastRaisedOffer(authViewModel: AuthViewModel, homeViewModel: HomeViewModel, navController: NavHostController){
     val items:List<String> = listOf("Alpha-1","Beta-1","Gamma-1")
     val buttonsVisible = remember { mutableStateOf(true) }
     Scaffold(

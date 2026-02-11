@@ -1,9 +1,9 @@
-package com.spint.app.model.pings
+package com.spint.app.model.flashPost
 
 import com.spint.app.model.User
 import kotlinx.serialization.Serializable
 
-data class PingRequestDto(
+data class FlashPostRequestDto(
     val user: String,
     val userName:String,
     val title: String = "",
@@ -14,11 +14,11 @@ data class PingRequestDto(
     val offer: String = "",
     val isPrivate :Boolean=true,
     val parentPostId:String?=null,
-    val expirationTime: String,
+    val expirationHours: Int,
 ){
     companion object{
-        fun empty():PingRequestDto{
-            return PingRequestDto(
+        fun empty():FlashPostRequestDto{
+            return FlashPostRequestDto(
                 user="",
                 userName = "",
                 title = "",
@@ -28,7 +28,7 @@ data class PingRequestDto(
                 location = "",
                 offer = "",
                 parentPostId = "",
-                expirationTime = ""
+                expirationHours = 0
             )
         }
     }
@@ -45,11 +45,12 @@ data class FlashPostResponse(
     val isPrivate: Boolean=false,
     val location: String = "",
     val offer: String = "",
+    val pingCount:Int=0,
     val topPostsList:List<String>? = emptyList(),
     val expirationTime: String = "",
     val createdAt:String="",
     val peopleJoined:Int=0,
-    val totalComments:Int=0,
+    val commentsCount:Int=0,
     val topComments:List<CommentData> ? =null,
     val totalChildPosts:Int =0,
     val totalViews:Int=0,
@@ -64,3 +65,15 @@ data class CommentData(
     val commentText:String
 )
 
+
+@Serializable
+data class PingsOnFlashPostRequest(
+    val userId:String,
+    val flashPostId:String,
+    val message: String
+)
+data class PingsOnFlashPostResponse(
+    val userId:String,
+    val flashPostId:String,
+    val message: String
+)

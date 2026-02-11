@@ -43,7 +43,7 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.spint.app.R
 import com.spint.app.model.User
 import com.spint.app.ui.imagePrefix
-import com.spint.app.viewmodels.EventsViewModel
+import com.spint.app.viewmodels.HomeViewModel
 import androidx.compose.runtime.getValue
 import com.spint.app.navigation.SCREENS
 import com.spint.app.utils.RequestState
@@ -54,12 +54,12 @@ import java.nio.charset.StandardCharsets
 
 // when the dropped profile is clicked then it is shown
 @Composable
-fun UserPublicProfile(eventsViewModel: EventsViewModel,navController:NavHostController,userId: String?) {
+fun UserPublicProfile(homeViewModel: HomeViewModel, navController:NavHostController, userId: String?) {
     val buttonsVisible = remember { mutableStateOf(false) }
-    val directChatUser by  eventsViewModel.userProfileResponse.collectAsState()
+    val directChatUser by  homeViewModel.userProfileResponse.collectAsState()
     val user by UserObject.user.collectAsState()
     LaunchedEffect(key1 = Unit ){
-      eventsViewModel.getUserData(userId!!)
+      homeViewModel.getUserData(userId!!)
     }
     when(val response=directChatUser){
         is RequestState.Loading -> {
@@ -72,12 +72,12 @@ fun UserPublicProfile(eventsViewModel: EventsViewModel,navController:NavHostCont
                // bottomBar = {BottomBar(navController = navController, state = buttonsVisible)},
                 content = {
                     UserPublicProfileUI(
-                        eventsViewModel,
+                        homeViewModel,
                         navController,
                         paddingValues = it,
                         user = response.data,
                         onSendMessageClicked = {
-                            eventsViewModel.saveUserToChatList(
+                            homeViewModel.saveUserToChatList(
                                 currentUserId = user.user,
                                 otherUserUserId = response.data.user
                             )
@@ -101,8 +101,8 @@ fun UserPublicProfile(eventsViewModel: EventsViewModel,navController:NavHostCont
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun UserPublicProfileUI(eventsViewModel: EventsViewModel,navController: NavHostController,paddingValues: PaddingValues, user: User?,onSendMessageClicked:()->Unit,onBackPressed:()->Unit) {
-    val saveToChatListSuccess by eventsViewModel.saveUserToChatListResponseState.collectAsState()
+fun UserPublicProfileUI(homeViewModel: HomeViewModel, navController: NavHostController, paddingValues: PaddingValues, user: User?, onSendMessageClicked:()->Unit, onBackPressed:()->Unit) {
+    val saveToChatListSuccess by homeViewModel.saveUserToChatListResponseState.collectAsState()
     val userObject by UserObject.user.collectAsState()
     when(val response=saveToChatListSuccess){
         is RequestState.Error ->  {
@@ -118,7 +118,7 @@ fun UserPublicProfileUI(eventsViewModel: EventsViewModel,navController: NavHostC
                     chatListUserId = response.data.withUserId._id
                 )
             )
-            eventsViewModel.resetSaveToChatListSuccessToIdle()
+            homeViewModel.resetSaveToChatListSuccessToIdle()
         }
         is RequestState.Loading ->{
             CircularProgressIndicator()

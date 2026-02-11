@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import androidx.activity.ComponentActivity
@@ -36,7 +37,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.compose.runtime.setValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -49,6 +52,8 @@ import com.spint.app.viewmodels.SplashViewModel
 import com.spint.app.ui.API_KEY
 import com.spint.app.viewmodels.ChatViewModel
 import com.google.android.libraries.places.api.Places
+import com.spint.app.datastore.StoreLoginState
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 
@@ -63,10 +68,13 @@ class MainActivity : ComponentActivity() {
     private val chatViewModel:ChatViewModel by viewModels()
     @Inject
     lateinit var splashViewModel: SplashViewModel
-     @Inject
-     lateinit var storeUserState:StoreUserState
+    @Inject
+    lateinit var storeUserState:StoreUserState
+    @Inject
+    lateinit var loginState: StoreLoginState
 
 
+    @RequiresApi(Build.VERSION_CODES.R)
     override fun onCreate(savedInstanceState: Bundle?) {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         super.onCreate(savedInstanceState)
@@ -99,6 +107,10 @@ class MainActivity : ComponentActivity() {
                 // Handle deep link if app opened directly by link
                 LaunchedEffect(Unit) {
                     handleDeepLink(intent?.data, navController)
+                }
+                var isLoggedIn by remember { mutableStateOf(false) }
+                LaunchedEffect(Unit) {
+                    isLoggedIn=loginState.getLoginState.first() ?: false
                 }
 
                 if (authViewModel.permission.value) {

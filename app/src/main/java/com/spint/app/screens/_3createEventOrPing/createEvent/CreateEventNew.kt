@@ -45,7 +45,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -75,7 +74,7 @@ import com.spint.app.utils.UserObject
 import com.spint.app.utils.RequestState
 import com.spint.app.utils.UserLocationObject
 import com.spint.app.utils.constants.Constants
-import com.spint.app.viewmodels.EventsViewModel
+import com.spint.app.viewmodels.HomeViewModel
 import java.io.File
 import java.time.Instant
 import java.time.LocalDate
@@ -85,7 +84,7 @@ import java.time.ZoneId
 
 
 @Composable
-fun CreateEventMainScreen(parentEventId:String ?= null,navController: NavHostController, eventsViewModel: EventsViewModel) {
+fun CreateEventMainScreen(parentEventId:String ?= null, navController: NavHostController, homeViewModel: HomeViewModel) {
 
     var title by remember {
         mutableStateOf("")
@@ -122,7 +121,7 @@ fun CreateEventMainScreen(parentEventId:String ?= null,navController: NavHostCon
 
 
     val context = LocalContext.current
-    val createEvent by eventsViewModel.createEventResponse.collectAsState()
+    val createEvent by homeViewModel.createEventResponse.collectAsState()
 
     LaunchedEffect(createEvent) {
         when (createEvent) {
@@ -132,7 +131,7 @@ fun CreateEventMainScreen(parentEventId:String ?= null,navController: NavHostCon
                 navController.navigate(SCREENS.HOME.route) {
                     popUpTo(0)
                 }
-                eventsViewModel.resetEventResponseState()
+                homeViewModel.resetEventResponseState()
             }
 
             is RequestState.Success -> {
@@ -141,7 +140,7 @@ fun CreateEventMainScreen(parentEventId:String ?= null,navController: NavHostCon
                 navController.navigate(SCREENS.HOME.route) {
                     popUpTo(0)
                 }
-                eventsViewModel.resetEventResponseState()
+                homeViewModel.resetEventResponseState()
             }
             is RequestState.Loading ->{
                showLoading=true
@@ -162,7 +161,7 @@ fun CreateEventMainScreen(parentEventId:String ?= null,navController: NavHostCon
                 var imageFile by mutableStateOf<File?>(null)
                 if(uri != Uri.EMPTY) imageFile = uriToFile(uri!!, context )
                 imageFile?.let {
-                    eventsViewModel.uploadImageAndThenCreateEvent( user.user , it){ imageKey->
+                    homeViewModel.uploadImageAndThenCreateEvent( user.user , it){ imageKey->
                         val data=Event(
                             user = user.user ,
                             userName = user.userName,
@@ -173,7 +172,7 @@ fun CreateEventMainScreen(parentEventId:String ?= null,navController: NavHostCon
                             parentPostId =  null,
                             isChildPost = false,//!parentEventId.isNullOrEmpty(),
                             expirationTime = expiration)
-                        eventsViewModel.createEvent(data)
+                        homeViewModel.createEvent(data)
                         Log.i("TCreateEventMainScreenAG", "CreateEventMainScreen:$data ")
                     }
                 }

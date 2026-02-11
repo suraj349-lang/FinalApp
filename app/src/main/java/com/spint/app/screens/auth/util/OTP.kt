@@ -1,9 +1,11 @@
 package com.spint.app.screens.auth.util
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -16,6 +18,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -52,11 +55,11 @@ fun OtpInputField(
 
     val isShowWarning by remember(keyboardState) {
         derivedStateOf {
-            if (keyboardState.value == KeyboardStatus.Closed) {
-                if (otpValue.length != otpLength) {
+           // if (keyboardState.value == KeyboardStatus.Closed) {
+                if (otpValue.isNotEmpty() && otpValue.length != otpLength) {
                     return@derivedStateOf true
                 }
-            }
+           // }
             false
 
         }
@@ -65,18 +68,17 @@ fun OtpInputField(
     val focusRequester = remember { FocusRequester() }
 
     BasicTextField(
-        modifier = Modifier.focusRequester(focusRequester),
+        modifier = Modifier.focusRequester(focusRequester).background(color = Color.White),
         value = otpValue, onValueChange = { value ->
             if (value.length <= otpLength) {
                 otpValue = value
                 onOtpChanged(otpValue)
             }
         },
+
         decorationBox = {
             Row(horizontalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.fillMaxWidth()) {
                 repeat(otpLength) { index ->
-                    // 6
-                    // 4 5 2 <<< otpValue = "452
                     val char = when {
                         index >= otpValue.length -> ""
                         else -> otpValue[index].toString()
@@ -119,7 +121,7 @@ fun OtpCell(
         Color(0xFFB30707)
        // MaterialTheme.colorScheme.error
     } else if (isFocus) {
-        Color.Black
+        Color.DarkGray
 
        // MaterialTheme.colorScheme.primary
     } else {
@@ -127,39 +129,40 @@ fun OtpCell(
        // MaterialTheme.colorScheme.secondary
     }
 
-    Surface(
-        modifier = modifier.width(20.dp).height(60.dp).clip(shape = RoundedCornerShape(6.dp))
+    Box(
+        modifier = modifier.width(20.dp).height(60.dp).clip(shape = RoundedCornerShape(6.dp)).background(color = Color.White)
             .border(width = 2.dp, color = borderColor, shape = RoundedCornerShape(6.dp))
     ) {
         Text(
             text = char,
             fontFamily = Constants.FONT_MEDIUM,
             fontSize=16.sp,
-            modifier = Modifier.wrapContentSize(align = Alignment.Center)
+            color = Color.Black,
+            modifier = Modifier.align(Alignment.Center)
         )
     }
 }
 
 
-@Preview(showBackground = true)
-@Composable
-fun OtpInputFieldPreview() {
-    MaterialTheme {
-        Box(modifier = Modifier.padding(24.dp)) {
-            OtpInputField(otpLength = 6, onOtpChanged = {})
-        }
-    }
-}
-
-@Preview(name = "OptCell Focus", showBackground = true)
-@Composable
-fun OtpCellFocusPreview(
-) {
-
-    MaterialTheme {
-        Box(modifier = Modifier.padding(24.dp)) {
-            OtpCell(char = "6", isFocus = true, isShowWarning = false)
-        }
-    }
-
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun OtpInputFieldPreview() {
+//    MaterialTheme {
+//        Box(modifier = Modifier.padding(24.dp)) {
+//            OtpInputField(otpLength = 6, onOtpChanged = {})
+//        }
+//    }
+//}
+//
+//@Preview(name = "OptCell Focus", showBackground = true)
+//@Composable
+//fun OtpCellFocusPreview(
+//) {
+//
+//    MaterialTheme {
+//        Box(modifier = Modifier.padding(24.dp)) {
+//            OtpCell(char = "6", isFocus = true, isShowWarning = false)
+//        }
+//    }
+//
+//}

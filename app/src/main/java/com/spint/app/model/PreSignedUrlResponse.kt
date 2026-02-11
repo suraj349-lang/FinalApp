@@ -5,7 +5,7 @@ data class PreSignedUrlResponse(
     val url:String,
 )
 
-data class CreatePingResponse(
+data class CreateFlashPostResponse(
     val success:String,
     val message:String,
     val data:String

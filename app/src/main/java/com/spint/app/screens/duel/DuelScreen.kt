@@ -69,6 +69,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavHostController
 import com.spint.app.R
+import com.spint.app.navigation.SCREENS
 import com.spint.app.ui.theme.floatingActionBtnColor
 import com.spint.app.utils.UserLocationObject
 import com.spint.app.utils.UserObject
@@ -99,7 +100,9 @@ fun DuelScreen(navController: NavHostController) {
     val  isRemoteUserConnected by webRTCManager.isRemoteUserConnected.collectAsState()
 
     BackHandler(true) {
-     webRTCManager.release()
+        navController.navigate(SCREENS.HOME.route)
+      webRTCManager.release()
+
     }
 
 
@@ -269,6 +272,7 @@ fun DuelScreen(navController: NavHostController) {
         ) {
             BackHandler(true) {
                // webRTCManager.release()
+                navController.navigateUp()
                 isConnected=false
             }
             when {
@@ -334,33 +338,33 @@ fun DuelScreen(navController: NavHostController) {
                             (localView.parent as? ViewGroup)?.removeView(localView)
                             localView
                         } , modifier = Modifier.fillMaxSize())
-                        AnimatedVisibility(
-                            visible = isVisible,
-                            enter = fadeIn(animationSpec = tween(durationMillis = 500, easing = LinearEasing)),
-                            exit = fadeOut(
-                                animationSpec = tween(
-                                    durationMillis = 700, // fade-out duration
-                                    easing = LinearEasing
-                                )
-                            )
-                        ) {
-                        Column(modifier = Modifier
-                            .align(Alignment.TopStart)
-                            .wrapContentSize()
-                            .padding(16.dp), verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.dating),
-                                    contentDescription = "",
-                                    modifier = Modifier.size(34.dp)
-                                )
-                                Text(
-                                    text = "Mood",
-                                    fontFamily = Constants.FONT_LIGHT,
-                                    fontSize = 10.sp,
-                                    color = Color.White
-                                )
-                            }
-                        }
+//                        AnimatedVisibility(
+//                            visible = isVisible,
+//                            enter = fadeIn(animationSpec = tween(durationMillis = 500, easing = LinearEasing)),
+//                            exit = fadeOut(
+//                                animationSpec = tween(
+//                                    durationMillis = 700, // fade-out duration
+//                                    easing = LinearEasing
+//                                )
+//                            )
+//                        ) {
+//                        Column(modifier = Modifier
+//                            .align(Alignment.TopStart)
+//                            .wrapContentSize()
+//                            .padding(16.dp), verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally) {
+//                                Image(
+//                                    painter = painterResource(id = R.drawable.dating),
+//                                    contentDescription = "",
+//                                    modifier = Modifier.size(34.dp)
+//                                )
+//                                Text(
+//                                    text = "Mood",
+//                                    fontFamily = Constants.FONT_LIGHT,
+//                                    fontSize = 10.sp,
+//                                    color = Color.White
+//                                )
+//                            }
+                       // }
                     }
                 }
 
@@ -622,8 +626,6 @@ fun InterestSelector(categories: List<MatchCategory>,
 fun ScreenOptions(onScreenClicked: (screen:SCREEN) -> Unit) {
     val listOfScreenOrientation= listOf<ScreenOrientation>(
         ScreenOrientation(R.drawable.baseline_crop_24,SCREEN.HALF),
-//        ScreenOrientation(R.drawable.baseline_crop_24,SCREEN.THREE_FOUR),
-//        ScreenOrientation(R.drawable.baseline_crop_24,SCREEN.FULL),
         ScreenOrientation(R.drawable.baseline_crop_24,SCREEN.FLOAT),
     )
     Column(modifier = Modifier
@@ -648,15 +650,17 @@ enum class SCREEN(val screen_name:String,val flo:Double) {
 }
 data class DualScreenOptions(
     val id:Int,
-    val name:String
+    val name:String,
+    val color: Color=Color(0xFFFFFFFF)
 )
 @Composable
 fun DuelOptions(isVisible:Boolean,onCloseClicked:()->Unit,onScreenClicked:()->Unit) {
-    val listOfImages= listOf<DualScreenOptions>(DualScreenOptions(R.drawable.cross,"end"),
+    val listOfImages= listOf(
+        DualScreenOptions(R.drawable.close,"end", color =  Color.Unspecified),
         DualScreenOptions(R.drawable.add,"+friend"),
         DualScreenOptions(R.drawable.flip_camera_android_24,"flip"),
-        DualScreenOptions(R.drawable.add_photo_by_camera,"screenshot"),
-        DualScreenOptions(R.drawable.next,"next")
+       // DualScreenOptions(R.drawable.add_photo_by_camera,"screenshot"),
+        DualScreenOptions(R.drawable.next_person,"next", color = Color.Unspecified)
     )
     AnimatedVisibility(
         visible = isVisible,
@@ -679,16 +683,15 @@ fun DuelOptions(isVisible:Boolean,onCloseClicked:()->Unit,onScreenClicked:()->Un
         .padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
         listOfImages.forEach {
      //   Card(modifier = Modifier.wrapContentSize(), shape = CircleShape,backgroundColor= Color.Transparent) {
-            Column(modifier = Modifier.wrapContentSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(modifier = Modifier.wrapContentSize().padding(end = 20.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
                 Image(painter = painterResource(id =it.id), contentDescription = "", modifier = Modifier
                     .padding(horizontal = 10.dp)
                     .clickable {
                         if (it.name == "end") {
                             onCloseClicked()
                         }
-                    }
-                    .size(36.dp), colorFilter = ColorFilter.tint(Color.White))
-                Text(text = it.name, fontFamily = Constants.FONT_LIGHT, fontSize = 9.sp,color= Color.White)
+                    }.size(36.dp), colorFilter = if (it.color == Color.Unspecified) null else ColorFilter.tint(it.color))
+                Text(text = it.name, fontFamily = Constants.FONT_MEDIUM, fontSize = 12.sp,color=Color.White)
             }
     //   }
 

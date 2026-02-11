@@ -1,7 +1,5 @@
 package com.spint.app.screens._4profile.dropProfileUserProfile
 
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -29,6 +27,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -52,9 +51,11 @@ import com.spint.app.navigation.SCREENS
 import com.spint.app.screens._1home.commonUI.shareEventDeepLink
 import com.spint.app.ui.imagePrefix
 import com.spint.app.ui.theme.floatingActionBtnColor
+import com.spint.app.utils.UserObject
 import com.spint.app.utils.constants.Constants
 import com.spint.app.utils.formatDateTime
 import com.spint.app.viewmodels.ChatViewModel
+import com.spint.app.viewmodels.HomeViewModel
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
@@ -62,8 +63,9 @@ import java.nio.charset.StandardCharsets
 @OptIn(ExperimentalMaterial3Api::class)
 
 @Composable
-fun DropProfileUserProfile(navController: NavHostController, chatViewModel: ChatViewModel, dropProfileResponse: DropProfileResponse?) {
+fun DropProfileUserProfile(navController: NavHostController, chatViewModel: ChatViewModel, homeViewModel: HomeViewModel, dropProfileResponse: DropProfileResponse?) {
     val buttonsVisible = remember { mutableStateOf(true) }
+    val userObject= UserObject.user.collectAsState()
     if(dropProfileResponse!=null) {
         Scaffold(
             topBar = { },
@@ -77,6 +79,8 @@ fun DropProfileUserProfile(navController: NavHostController, chatViewModel: Chat
                         dropProfileResponse = dropProfileResponse,
                         onSendMessageClicked = {
                             chatViewModel.connectSocket()
+                            homeViewModel.saveUserToChatList(userObject.value.user, otherUserUserId = dropProfileResponse.createdBy.user)
+
                             val encodedImageUrl = URLEncoder.encode(dropProfileResponse.createdBy.profileImage, StandardCharsets.UTF_8.toString())
                             navController.navigate(
                                 SCREENS.SINGLE_CHAT.createPath(

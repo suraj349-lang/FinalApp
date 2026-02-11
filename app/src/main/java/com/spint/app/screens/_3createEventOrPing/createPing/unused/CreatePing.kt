@@ -66,7 +66,7 @@ import com.spint.app.R
 import com.spint.app.viewmodels.AuthViewModel
 import com.spint.app.model.Event
 import com.spint.app.navigation.SCREENS
-import com.spint.app.viewmodels.EventsViewModel
+import com.spint.app.viewmodels.HomeViewModel
 import com.spint.app.screens.dialogBox.GalleryPickerForDropProfile
 import com.spint.app.ui.theme.statusAndTopAppBarColor
 import com.spint.app.ui.theme.statusBarColor
@@ -77,7 +77,7 @@ import java.io.File
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun CreatePing(authViewModel: AuthViewModel, eventsViewModel: EventsViewModel, navController: NavHostController= NavHostController(LocalContext.current)) {
+fun CreatePing(authViewModel: AuthViewModel, homeViewModel: HomeViewModel, navController: NavHostController= NavHostController(LocalContext.current)) {
     val buttonsVisible = remember { mutableStateOf(true) }
     val context= LocalContext.current
     val address by authViewModel.address.collectAsState()
@@ -365,7 +365,7 @@ fun CreatePing(authViewModel: AuthViewModel, eventsViewModel: EventsViewModel, n
                                         Toast.LENGTH_SHORT
                                     ).show()
                                 } else {
-                                    eventsViewModel.premiumCreateEvent(
+                                    homeViewModel.premiumCreateEvent(
                                         event = Event(
                                           //  userId = "",
                                             //title = "",
@@ -384,7 +384,7 @@ fun CreatePing(authViewModel: AuthViewModel, eventsViewModel: EventsViewModel, n
                             Text("Create Event", color = Color.White)
 
                         }
-                        when (val result = eventsViewModel.premiumCreateEventResponse.value) {
+                        when (val result = homeViewModel.premiumCreateEventResponse.value) {
                             is RequestState.Idle -> {
 
                             }
@@ -412,7 +412,7 @@ fun CreatePing(authViewModel: AuthViewModel, eventsViewModel: EventsViewModel, n
                                     "Event Created successfully",
                                     Toast.LENGTH_SHORT
                                 ).show()
-                                eventsViewModel.premiumCreateEventResponse.value = RequestState.Idle
+                                homeViewModel.premiumCreateEventResponse.value = RequestState.Idle
                                 //  navController.navigate(SCREENS.PAST_OFFERS.route)
 
                             }

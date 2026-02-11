@@ -11,12 +11,14 @@ import com.spint.app.model.EventResponseDTO
 import com.spint.app.model.ImageUploadResponse
 import com.spint.app.model.AllEventsResponseDTO
 import com.spint.app.model.AllPingsResponseDTO
-import com.spint.app.model.CreatePingResponse
+import com.spint.app.model.CreateFlashPostResponse
 import com.spint.app.model.EventDetailsResponse
 import com.spint.app.model.PremiumEventResponseDTO
-import com.spint.app.model.pings.CommentData
-import com.spint.app.model.pings.PingRequestDto
-import com.spint.app.model.pings.FlashPostResponse
+import com.spint.app.model.flashPost.CommentData
+import com.spint.app.model.flashPost.FlashPostRequestDto
+import com.spint.app.model.flashPost.FlashPostResponse
+import com.spint.app.model.flashPost.PingsOnFlashPostRequest
+import com.spint.app.model.flashPost.PingsOnFlashPostResponse
 import com.spint.app.network.ApiService
 import com.spint.app.screens._4profile.uriToMultipart
 import com.spint.app.utils.PingsResponse
@@ -72,7 +74,7 @@ class EventsRepository @Inject constructor(private val api: ApiService) {
     }.flowOn(Dispatchers.IO)
 
     fun getUserPings(id:String): Flow<AllPingsResponseDTO> = flow {
-        emit(api.getUserPings(id))
+        emit(api.getUserFlashPosts(id))
     }.flowOn(Dispatchers.IO)
     fun getUserDropProfiles(id:String): Flow<GetDropProfileResponseModel> = flow {
         emit(api.getUserDropProfiles(id))
@@ -85,15 +87,20 @@ class EventsRepository @Inject constructor(private val api: ApiService) {
             api.uploadImage(filePart) })
     }.flowOn(Dispatchers.IO)
 
-    suspend fun createPing(data:PingRequestDto):Flow<CreatePingResponse> = flow {
-        emit(api.createPing(data))
+     fun createFlashPost(data:FlashPostRequestDto):Flow<CreateFlashPostResponse> = flow {
+        emit(api.createFlashPost(data))
     }.flowOn(Dispatchers.IO)
 
-    suspend fun getAllPings(page:Int): PingsResponse<List<FlashPostResponse>> {
-        return api.getAllPings(page)
+    suspend fun getAllFlashPosts(page:Int): PingsResponse<List<FlashPostResponse>> {
+        return api.getAllFlashPosts(page)
     }
-    suspend fun getPingComments(pingId: String): Flow<PingsResponse<List<CommentData>>> = flow {
-        emit(api.getPingComments())
+    suspend fun getFlashPostComments(flashPostId: String): Flow<PingsResponse<List<CommentData>>> = flow {
+        emit(api.getFlashPostComments())
+    }.flowOn(Dispatchers.IO)
+
+
+    suspend fun addPingToFlashPost(pingsOnFlashPostRequest: PingsOnFlashPostRequest):Flow<PingsOnFlashPostResponse> = flow {
+        emit(api.addPingToFlashPost(pingsOnFlashPostRequest))
     }.flowOn(Dispatchers.IO)
 
 

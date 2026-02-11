@@ -1,11 +1,14 @@
 package com.spint.app.repository
 
 import com.spint.app.fcm.stateObject.SendFcmTokenDto
+import com.spint.app.model.Email
 import com.spint.app.model.FCMTokenResponse
 import com.spint.app.model.SignupAPIResponse
 import com.spint.app.model.LoginModel
 import com.spint.app.model.RegisterUserModel
 import com.spint.app.model.LoginAPIResponse
+import com.spint.app.model.ResponseOfEmail
+import com.spint.app.model.VerifyEmailOtp
 import com.spint.app.network.NonAuthApiService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -15,6 +18,14 @@ import javax.inject.Inject
 
 
 class AuthRepository @Inject constructor(private val noAuthApi:NonAuthApiService){
+
+    fun getEmailOtp(email: Email): Flow<ResponseOfEmail> = flow  {
+        emit(noAuthApi.getEmailOtp(email))
+    }.flowOn(Dispatchers.IO)
+
+    fun verifyEmailOtp(emailOtp: VerifyEmailOtp): Flow<ResponseOfEmail> = flow  {
+        emit(noAuthApi.verifyEmailOtp(emailOtp))
+    }.flowOn(Dispatchers.IO)
     fun sendLoginData(loginData: LoginModel): Flow<LoginAPIResponse> = flow  {
         emit(noAuthApi.postLoginData(loginData))
     }.flowOn(Dispatchers.IO)

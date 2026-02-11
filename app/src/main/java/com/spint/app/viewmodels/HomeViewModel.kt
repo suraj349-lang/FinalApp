@@ -21,20 +21,22 @@ import com.spint.app.model.EventResponse
 import com.spint.app.model.GetDropProfileResponseModel
 import com.spint.app.model.PremiumEventResponseDTO
 import com.spint.app.model.User
-import com.spint.app.model.pings.PingRequestDto
-import com.spint.app.model.pings.FlashPostResponse
+import com.spint.app.model.flashPost.FlashPostRequestDto
+import com.spint.app.model.flashPost.FlashPostResponse
 import com.spint.app.paging.DirectChatUsersPagingSource
 import com.spint.app.paging.DropProfilePagingSource
 import com.spint.app.repository.ChatDatabaseRepository
 import com.spint.app.repository.EventsRepository
 import com.spint.app.repository.ProfileRepository
-import com.spint.app.screens._2pings.PingsPagingSource
+import com.spint.app.screens._2pings.FlashPostsPagingSource
 import com.spint.app.utils.UserObject
 import com.spint.app.utils.RequestState
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.AutocompletePrediction
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
-import com.spint.app.model.pings.CommentData
+import com.spint.app.model.flashPost.CommentData
+import com.spint.app.model.flashPost.PingsOnFlashPostRequest
+import com.spint.app.model.flashPost.PingsOnFlashPostResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -53,7 +55,7 @@ import kotlin.Exception
 
 
 @HiltViewModel
-class EventsViewModel @Inject constructor(
+class HomeViewModel @Inject constructor(
     private val eventsRepository: EventsRepository,
     private val chatDatabaseRepository: ChatDatabaseRepository,
     private val profileRepository: ProfileRepository,
@@ -311,28 +313,7 @@ class EventsViewModel @Inject constructor(
 
             }
     }
-    //----------------------------Get user events for Profile----------------------------------------------------------------------------------------//
-    private val _userPingsListResponse = MutableStateFlow<RequestState<List<FlashPostResponse>>>(RequestState.Idle)
-    val userPingsListResponse: StateFlow<RequestState<List<FlashPostResponse>>> = _userPingsListResponse.asStateFlow()
-    val canFetchPings = mutableStateOf(true)
 
-    fun getUserPings(id:String)=viewModelScope.launch(Dispatchers.IO) {
-        val TAG="GET_Pings_RESPONSE";
-        eventsRepository.getUserPings(id)
-            .onStart {
-                _userPingsListResponse.value = RequestState.Loading
-
-            }.catch {
-                _userPingsListResponse.value = RequestState.Error(it)
-                Log.d(TAG, "user events error ${_userPingsListResponse.value}")
-
-            }.collect {
-                _userPingsListResponse.value = RequestState.Success(it.data)
-                canFetchPings.value=false
-                Log.d(TAG, "user events data ${_userPingsListResponse.value}")
-
-            }
-    }
     //----------------------------Get user events for Profile----------------------------------------------------------------------------------------//
     private val _upvoteEvent = MutableStateFlow<RequestState<String>>(RequestState.Idle)
     val upvoteEvent: StateFlow<RequestState<String>> = _upvoteEvent.asStateFlow()
@@ -438,29 +419,59 @@ class EventsViewModel @Inject constructor(
             }
     }
    //----------------------------------------------------------------------------------------------------------------------------------//
+   //----------------------------------------FLASH POST----------------------------------------------------------------------------//
 
-    private var _createPingResponse:MutableStateFlow<RequestState<String>> = MutableStateFlow(RequestState.Idle)
-    var createPingResponse :StateFlow<RequestState<String>> = _createPingResponse
+    private val _location = MutableStateFlow<String?>(null)
 
-    fun createPing(ping:PingRequestDto)=viewModelScope.launch(Dispatchers.IO) {
+    val flashPostsFlow = Pager(config = PagingConfig(pageSize = 10, prefetchDistance = 1), pagingSourceFactory = { FlashPostsPagingSource(eventsRepository) }).flow.cachedIn(viewModelScope)
+
+    fun getAllFlashPosts(location: String) {
+        _location.value = location     // this is the ONLY change
+    }
+                                            ///--------------------------///
+   private val _userPingsListResponse = MutableStateFlow<RequestState<List<FlashPostResponse>>>(RequestState.Idle)
+    val userPingsListResponse: StateFlow<RequestState<List<FlashPostResponse>>> = _userPingsListResponse.asStateFlow()
+    val canFetchPings = mutableStateOf(true)
+
+    fun getUserFlashPosts(id:String)=viewModelScope.launch(Dispatchers.IO) {
+        val TAG="Get_Flash_Posts_Response";
+        eventsRepository.getUserPings(id)
+            .onStart {
+                _userPingsListResponse.value = RequestState.Loading
+
+            }.catch {
+                _userPingsListResponse.value = RequestState.Error(it)
+                Log.d(TAG, "user flash post error ${_userPingsListResponse.value}")
+
+            }.collect {
+                _userPingsListResponse.value = RequestState.Success(it.data)
+                canFetchPings.value=false
+                Log.d(TAG, "user flash post data ${_userPingsListResponse.value}")
+
+            }
+    }
+    private var _createFlashPostResponse:MutableStateFlow<RequestState<String>> = MutableStateFlow(RequestState.Idle)
+    var createFlashPostResponse :StateFlow<RequestState<String>> = _createFlashPostResponse
+
+    fun createFlashPost(ping:FlashPostRequestDto)=viewModelScope.launch(Dispatchers.IO) {
         val tag="CREATE_PING_RESPONSE"
 
-        eventsRepository.createPing(ping)
+        eventsRepository.createFlashPost(ping)
             .onStart {
-                _createPingResponse.value=RequestState.Loading;
+                _createFlashPostResponse.value=RequestState.Loading;
 
-                Log.d(tag,_createPingResponse.value.toString())
+                Log.d(tag,_createFlashPostResponse.value.toString())
             }
             .catch {
 
                 Log.e(tag,it.printStackTrace().toString())
-                _createPingResponse.value=RequestState.Error(it)
+                _createFlashPostResponse.value=RequestState.Error(it)
                 Log.e(tag,it.message.toString())
             }
             .collect {
                 if(it.success.uppercase() =="TRUE") {
                     Log.i(tag, "createPing: success")
-                    _createPingResponse.value = RequestState.Success(it.data);
+                    _createFlashPostResponse.value = RequestState.Success(it.data);
                 }else{
                     Log.e(tag, it.message)
                    // _createPingResponse.value = RequestState.Error(it);
@@ -470,28 +481,30 @@ class EventsViewModel @Inject constructor(
     }
 
     fun resetCreatePingResponseState(){
-        _createPingResponse.value=RequestState.Idle
+        _createFlashPostResponse.value=RequestState.Idle
+    }
+    private val _pingOnPostRequest=MutableStateFlow<RequestState<PingsOnFlashPostResponse>>(RequestState.Idle)
+    val pingOnPostRequest: StateFlow<RequestState<PingsOnFlashPostResponse>> = _pingOnPostRequest
+
+    fun addPingOnFlashPost(pingsOnFlashPostRequest: PingsOnFlashPostRequest){
+        viewModelScope.launch {
+            eventsRepository.addPingToFlashPost(pingsOnFlashPostRequest)
+                .onStart{}
+                .catch {error->
+                    Log.e(TAG, "addPingOnFlashPost: ${error.fillInStackTrace()}",error )
+                }
+                .collect {
+                    _pingOnPostRequest.value= RequestState.Success(it)
+                }
+        }
     }
 
-//--------------------------------------------------------------------------------------------------------------------//
-
-    private val _allPingsFlow = MutableStateFlow<Flow<PagingData<FlashPostResponse>>?>(null)
-    val allPingsFlow: StateFlow<Flow<PagingData<FlashPostResponse>>?> = _allPingsFlow.asStateFlow()
-//    private val _shouldLoadDroppedProfiles= MutableStateFlow(false)
-//    val shouldLoadDroppedProfiles:StateFlow<Boolean>  = _shouldLoadDroppedProfiles
-
-    fun getAllPings(location:String) {
-        _allPingsFlow.value = Pager(
-            config = PagingConfig(pageSize = 10, prefetchDistance = 5),
-            pagingSourceFactory = { PingsPagingSource(eventsRepository) }
-        ).flow.cachedIn(viewModelScope)
-    }
-
+//====================================================================================================================================//
     val _pingComments = MutableStateFlow<RequestState<List<CommentData>>> (RequestState.Idle)
     val pingComments: StateFlow<RequestState<List<CommentData>>> = _pingComments
 
     fun getPingComments(pingId:String)= viewModelScope.launch {
-            eventsRepository.getPingComments(pingId)
+            eventsRepository.getFlashPostComments(pingId)
                 .onStart {
                     _pingComments.value= RequestState.Loading
                 }
@@ -505,7 +518,7 @@ class EventsViewModel @Inject constructor(
 
 
 
-
+//--------------------------------------------------------------------------------------------------------------------//
 
     private val _saveUserToChatListResponseState= MutableStateFlow<RequestState<ChatList>>(RequestState.Idle)
     val saveUserToChatListResponseState: StateFlow<RequestState<ChatList>> = _saveUserToChatListResponseState

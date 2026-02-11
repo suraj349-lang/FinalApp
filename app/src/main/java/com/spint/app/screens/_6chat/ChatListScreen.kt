@@ -59,11 +59,14 @@ import androidx.compose.ui.graphics.computeHorizontalBounds
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
@@ -125,7 +128,7 @@ fun ChatListScreen(navController: NavHostController,chatViewModel: ChatViewModel
             darkIcons = false
         )
         systemUiController.setStatusBarColor(
-            color = Constants.HOME_BOTTOM_BAR_COLOR,     // Your desired color
+            color = Constants.HOME_TOP_BAR_COLOR, //0xFF221331    // Your desired color
             darkIcons = false        // true = dark icons (for light backgrounds)
         )
     }
@@ -148,7 +151,7 @@ fun ChatListScreen(navController: NavHostController,chatViewModel: ChatViewModel
     },
         bottomBar = {BottomBar(navController = navController, state =buttonsVisible, containerColor = Constants.HOME_BOTTOM_BAR_COLOR )}
     ) {
-        Surface(modifier = Modifier.fillMaxSize(), color = Color.Gray) {
+        Surface(modifier = Modifier.fillMaxSize(), color = Constants.CHAT_LIST_BKG) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -181,7 +184,7 @@ fun ChatListScreen(navController: NavHostController,chatViewModel: ChatViewModel
                         Column(modifier = Modifier.fillMaxHeight(0.99f)) {
                             LazyColumn(modifier = Modifier.padding(top=5.dp)) {
                                 item(){
-                                   ChatSections()
+                                  // ChatSections()
                                 }
                                 items(users) { user ->
                                     UserItem(navController, user) { imageUrl ->
@@ -196,8 +199,8 @@ fun ChatListScreen(navController: NavHostController,chatViewModel: ChatViewModel
 //                                )
                                 }
                             }
-                            AddPeopleFromContacts()
-                            ShareYourProfileInstead()
+//                            AddPeopleFromContacts()
+//                            ShareYourProfileInstead()
                         }
                     }
 
@@ -210,7 +213,15 @@ fun ChatListScreen(navController: NavHostController,chatViewModel: ChatViewModel
 
 @Composable
 fun ChatSections() {
-    val list=listOf("Connections","")
+    val list=listOf("Flash Posts","Drop Profile","NearBy","Duel")
+    val selected by remember { mutableStateOf(0) }
+    Row(modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth().wrapContentHeight(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+        list.forEachIndexed {index,text ->
+            Column(modifier = Modifier.wrapContentSize()) {
+                Text(text , fontFamily = Constants.FONT_MEDIUM, fontSize = 16.sp, color = Color.White, style = TextStyle(textDecoration = TextDecoration.Underline))
+            }
+        }
+    }
 }
 
 @Composable
@@ -298,9 +309,9 @@ fun ChatRowItem(item: String) {
 fun ChatTopBar(title: String,profileImage:String, navController: NavHostController,onSearchClicked:()->Unit) {
         TopAppBar(
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = Constants.HOME_BOTTOM_BAR_COLOR
+                containerColor = Constants.HOME_TOP_BAR_COLOR
             ),
-            modifier = Modifier.shadow(elevation = 10.dp),
+            modifier = Modifier.shadow(elevation = 3.dp, spotColor = Color.White),
             title = {
                 Text(
                     title,textAlign= TextAlign.Center, fontFamily = Constants.FONT_MEDIUM, modifier = Modifier.fillMaxWidth(0.6f), color = Color.White.copy(alpha = 0.8f), fontSize = 20.sp
@@ -371,7 +382,7 @@ fun UserItem(navController: NavHostController, user: ChatList,setProfileImage:(S
         },
         shape= RoundedCornerShape(0.dp),
         elevation=CardDefaults.cardElevation(defaultElevation = 2.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFF0ECE5)) //0xFFEEE9DD
+        colors = CardDefaults.cardColors(containerColor = Constants.CHAT_LIST_BKG) //0xFFEEE9DD
     ) {
         Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
 //            GlideImage(
@@ -397,11 +408,11 @@ fun UserItem(navController: NavHostController, user: ChatList,setProfileImage:(S
                 .fillMaxSize()
                 .padding(horizontal = 8.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.Start) {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text(text = user.withUserId.name, fontFamily = Constants.ROBOTO_CONDENSED,fontSize = 18.sp, color = Color.Black, lineHeight = 14.sp)
-                    Text(text = "08:38", fontSize = 12.sp, color = Color.Gray, lineHeight = 14.sp)
+                    Text(text = user.withUserId.name, fontFamily = Constants.ROBOTO_CONDENSED,fontSize = 18.sp, color = Color.White.copy(alpha = 0.9f), lineHeight = 14.sp)
+                    Text(text = "08:38", fontSize = 12.sp, color = Color.LightGray, lineHeight = 14.sp)
                 }
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
-                    Text(text =  "hello", fontSize = 14.sp,color= Color.Gray, fontFamily = Constants.FONT_LIGHT, lineHeight = 14.sp)
+                    Text(text =  "hello", fontSize = 14.sp,color= Color.LightGray, fontFamily = Constants.FONT_LIGHT, lineHeight = 14.sp)
                 }
 
             }

@@ -32,27 +32,27 @@ import com.spint.app.screens.loadingAndErrorScreen.loadingScreen.EventLoadingScr
 import com.spint.app.ui.theme.floatingActionBtnColor
 import com.spint.app.utils.RequestState
 import com.spint.app.utils.constants.Constants
-import com.spint.app.viewmodels.EventsViewModel
+import com.spint.app.viewmodels.HomeViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalFoundationApi::class)
 @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
 @Composable
 fun EventScreenWrapper(
-    eventsViewModel: EventsViewModel,
+    homeViewModel: HomeViewModel,
     modifier: Modifier = Modifier,
     initialPage: Int? = 0,
     navController: NavHostController,
     onRetryCalled:()->Unit
 ) {
     LaunchedEffect(key1 = true){
-        eventsViewModel.getAllEvents()
+        homeViewModel.getAllEvents()
     }
     val pagerState = rememberPagerState(
         initialPage = initialPage ?: 0,
-        pageCount = { (eventsViewModel.eventsListResponse.value as? RequestState.Success<List<Event>>)?.data?.size ?: 0 }
+        pageCount = { (homeViewModel.eventsListResponse.value as? RequestState.Success<List<Event>>)?.data?.size ?: 0 }
     )
-    val eventsState by eventsViewModel.eventsListResponse.collectAsState()
+    val eventsState by homeViewModel.eventsListResponse.collectAsState()
 
     when (eventsState) {
         is RequestState.Loading -> {
@@ -63,7 +63,7 @@ fun EventScreenWrapper(
             Column(modifier=Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
                 Log.e("Events", "EventsScreen:${(eventsState as RequestState.Error).error} ", )
                 CommonErrorScreen(error = "Unable to fetch events.",true){
-                    eventsViewModel.getAllEvents()
+                    homeViewModel.getAllEvents()
                 }
             }
         }
