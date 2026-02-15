@@ -58,10 +58,10 @@ import coil.compose.AsyncImage
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.spint.app.R
-import com.spint.app.screens._1home._1_1ExperimentScreenEvents.ActiveButton
-import com.spint.app.screens._1home._1_1ExperimentScreenEvents.DONGLE
-import com.spint.app.screens._1home._1_1ExperimentScreenEvents.SANS
-import com.spint.app.screens._1home._1_1ExperimentScreenEvents.images
+import com.spint.app.screens._1home.util._1_1ExperimentScreenEvents.ActiveButton
+import com.spint.app.screens._1home.util._1_1ExperimentScreenEvents.DONGLE
+import com.spint.app.screens._1home.util._1_1ExperimentScreenEvents.SANS
+import com.spint.app.screens._1home.util._1_1ExperimentScreenEvents.images
 import com.spint.app.utils.UserLocationObject
 import com.spint.app.utils.UserObject
 import com.spint.app.utils.constants.Constants

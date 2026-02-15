@@ -1,4 +1,4 @@
-package com.spint.app.screens._4profile.dropProfileUserProfile
+package com.spint.app.screens._1home._1FlashPosts.detailsScreen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -22,14 +22,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
-import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -46,87 +42,73 @@ import androidx.navigation.NavHostController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.spint.app.R
-import com.spint.app.model.DropProfileResponse
+import com.spint.app.model.flashPost.FlashPostResponse
 import com.spint.app.navigation.SCREENS
 import com.spint.app.screens._1home.commonUI.shareEventDeepLink
+import com.spint.app.testing.CommonTopBar
 import com.spint.app.ui.imagePrefix
 import com.spint.app.ui.theme.floatingActionBtnColor
-import com.spint.app.utils.UserObject
 import com.spint.app.utils.constants.Constants
 import com.spint.app.utils.formatDateTime
-import com.spint.app.viewmodels.ChatViewModel
-import com.spint.app.viewmodels.HomeViewModel
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
-// when the dropped profile is clicked then it is shown
-@OptIn(ExperimentalMaterial3Api::class)
 
 @Composable
-fun DropProfileUserProfile(navController: NavHostController, chatViewModel: ChatViewModel, homeViewModel: HomeViewModel, dropProfileResponse: DropProfileResponse?) {
-    val buttonsVisible = remember { mutableStateOf(true) }
-    val userObject= UserObject.user.collectAsState()
-    if(dropProfileResponse!=null) {
-        Scaffold(
-            topBar = { },
-          //  bottomBar = {BottomBar(navController = navController, state = buttonsVisible)},
+fun PingDetailsScreen(navController: NavHostController, flashPostResponse: FlashPostResponse?) {
+          Scaffold(
+            topBar = {CommonTopBar(title = "Ping") },
+            //  bottomBar = {BottomBar(navController = navController, state = buttonsVisible)},
             content = {
-                Surface(modifier = Modifier
-                    .background(Color.Transparent)
-                    .padding(it)
-                    .fillMaxSize()){
-                    DropProfileUserProfileUI(
-                        dropProfileResponse = dropProfileResponse,
-                        onUserProfileClicked = {navController.navigate(SCREENS.USER_PUBLIC_PROFILE.createPath(it))},
+                Surface(
+                    modifier = Modifier
+                        .background(Color.Transparent)
+                        .padding(it)
+                        .fillMaxSize()
+                ) {
+                    PingDetailsScreenUI(
+                        flashPostResponse = flashPostResponse,
                         onSendMessageClicked = {
-                            chatViewModel.connectSocket()
-                            homeViewModel.saveUserToChatList(userObject.value.user, otherUserUserId = dropProfileResponse.createdBy.user)
-
-                            val encodedImageUrl = URLEncoder.encode(dropProfileResponse.createdBy.profileImage, StandardCharsets.UTF_8.toString())
-                            navController.navigate(
-                                SCREENS.SINGLE_CHAT.createPath(
-                                    dropProfileResponse.createdBy.userName,
-                                    encodedImageUrl,
-                                    dropProfileResponse.createdBy.user
+                            if (flashPostResponse?.user != null) {
+                                val encodedImageUrl = URLEncoder.encode(flashPostResponse.user.profileImage, StandardCharsets.UTF_8.toString())
+                                navController.navigate(
+                                        SCREENS.SINGLE_CHAT.createPath(
+                                            userName = flashPostResponse.user.userName,
+                                            profileImage = encodedImageUrl,
+                                            chatListUserId = flashPostResponse.user.user
+                                        )
                                 )
-                            )
+                            }
                         },
                         onBackPressed = { navController.navigateUp() }
                     )
 
                 }
 
-        })
+            })
 
     }
-}
-
 
 
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun DropProfileUserProfileUI(dropProfileResponse: DropProfileResponse?,onUserProfileClicked:(String)->Unit,onSendMessageClicked:()->Unit,onBackPressed:()->Unit) {
+fun PingDetailsScreenUI(flashPostResponse: FlashPostResponse?, onSendMessageClicked:()->Unit, onBackPressed:()->Unit) {
     val context = LocalContext.current
-    if (dropProfileResponse != null) {
-        Box(modifier = Modifier
-            .fillMaxSize()
-            .statusBarsPadding()) {
+    if (flashPostResponse != null) {
+        Box(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
             Image(
                 painter = painterResource(id = R.drawable.baseline_arrow_back_24),
                 contentDescription = "Back",
-                modifier = Modifier
-                    .align(Alignment.TopStart)
-                    .clickable { onBackPressed() }
+                modifier = Modifier.align(Alignment.TopStart)
+                    .clickable {onBackPressed() }
                     .padding(8.dp)
-                    .shadow(elevation = 10.dp, spotColor = Color.White)
-                    .zIndex(4f)
+                    .shadow(elevation = 10.dp, spotColor = Color.White).zIndex(4f)
                     .size(30.dp),
                 colorFilter = ColorFilter.tint(Color.White)
             )
             Column(
-                modifier = Modifier
-                    .padding(bottom = 16.dp)
+                modifier = Modifier.padding(bottom = 16.dp)
                     .fillMaxSize()
                     .navigationBarsPadding()
                     .verticalScroll(rememberScrollState()),
@@ -143,7 +125,7 @@ fun DropProfileUserProfileUI(dropProfileResponse: DropProfileResponse?,onUserPro
                             .height(600.dp)
                     ) {
                         GlideImage(
-                            model = imagePrefix + dropProfileResponse.image,
+                            model = imagePrefix + flashPostResponse.image,
                             contentDescription = "",
                             contentScale = ContentScale.Crop,
                             modifier = Modifier.fillMaxSize()
@@ -152,23 +134,25 @@ fun DropProfileUserProfileUI(dropProfileResponse: DropProfileResponse?,onUserPro
                             modifier = Modifier
                                 .padding(start = 16.dp, bottom = 8.dp)
                                 .align(Alignment.BottomStart)
-                                .fillMaxWidth(0.8f),
+                                .fillMaxWidth(0.9f),
                             verticalArrangement = Arrangement.Bottom,
                             horizontalAlignment = Alignment.Start
                         ) {
+                                flashPostResponse.user?.name?.uppercase()?.let {
+                                    Text(
+                                        text = it,
+                                        fontFamily = Constants.FONT_MEDIUM,
+                                        fontWeight = FontWeight.SemiBold,
+                                        fontSize = 20.sp,
+                                        color = Color.White,
+                                        lineHeight = 12.sp,
+                                        modifier = Modifier
+                                            .shadow(elevation = 10.dp, spotColor = Color.White)
+                                            .zIndex(4f)
+                                    )
+                                }
                             Text(
-                                text = dropProfileResponse.createdBy.name.uppercase(),
-                                fontFamily = Constants.FONT_MEDIUM,
-                                fontWeight = FontWeight.SemiBold,
-                                fontSize = 20.sp,
-                                color = Color.White,
-                                lineHeight = 12.sp,
-                                modifier = Modifier
-                                    .shadow(elevation = 10.dp, spotColor = Color.White)
-                                    .zIndex(4f)
-                            )
-                            Text(
-                                text = dropProfileResponse.location,
+                                text = flashPostResponse.location,
                                 maxLines = 3,
                                 color = Color.White.copy(alpha = 0.95f),
                                 fontFamily = Constants.FONT_LIGHT,
@@ -182,12 +166,7 @@ fun DropProfileUserProfileUI(dropProfileResponse: DropProfileResponse?,onUserPro
                             modifier = Modifier
                                 .padding(end = 30.dp, bottom = 26.dp)
                                 .align(Alignment.BottomEnd)
-                                .clickable {
-                                    shareEventDeepLink(
-                                        context,
-                                        dropProfileResponse.id ?: ""
-                                    )
-                                }
+                                .clickable { shareEventDeepLink(context, flashPostResponse.user?.user ?: "") }
                                 .size(20.dp),
                             colorFilter = ColorFilter.tint(Color.White))
 
@@ -208,27 +187,29 @@ fun DropProfileUserProfileUI(dropProfileResponse: DropProfileResponse?,onUserPro
                             .wrapContentHeight()
                             .fillMaxWidth(0.6f), horizontalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
-                        Card(modifier = Modifier.clickable{onUserProfileClicked(dropProfileResponse.createdBy.user)}.wrapContentSize(), shape = CircleShape) {
+                        Card(modifier = Modifier.wrapContentSize(), shape = CircleShape) {
                             GlideImage(
-                                model = imagePrefix + dropProfileResponse.createdBy.profileImage,
+                                model = imagePrefix + flashPostResponse.user?.profileImage,
                                 contentDescription = "",
                                 modifier = Modifier.size(40.dp),
                                 contentScale = ContentScale.Crop
                             )
                         }
                         Column(
-                            modifier = Modifier.clickable{onUserProfileClicked(dropProfileResponse.createdBy.user)}
+                            modifier = Modifier
                                 .fillMaxWidth()
                                 .wrapContentHeight(),
                             verticalArrangement = Arrangement.Center,
                             horizontalAlignment = Alignment.Start
                         ) {
-                            Text(
-                                text = dropProfileResponse.createdBy.userName.lowercase(),
-                                fontFamily = Constants.USER_NAME_FONT,
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Bold
-                            )
+                            flashPostResponse.user?.userName?.lowercase()?.let {
+                                Text(
+                                    text = it,
+                                    fontFamily = Constants.USER_NAME_FONT,
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
                             Row() {
                                 Text(
                                     text = "dropped: ",
@@ -237,7 +218,7 @@ fun DropProfileUserProfileUI(dropProfileResponse: DropProfileResponse?,onUserPro
                                     fontSize = 12.sp
                                 )
                                 Text(
-                                    text = formatDateTime(dropProfileResponse.createdAt.toString()).lowercase(),
+                                    text = formatDateTime(flashPostResponse.expirationTime).lowercase(),
                                     color = floatingActionBtnColor,
                                     fontFamily = Constants.FONT_EXTRA_LIGHT,
                                     fontSize = 12.sp
@@ -285,7 +266,7 @@ fun DropProfileUserProfileUI(dropProfileResponse: DropProfileResponse?,onUserPro
                         fontSize = 14.sp
                     )
                     Text(
-                        text = formatDateTime(dropProfileResponse.validTill.toString()),
+                        text = formatDateTime(flashPostResponse.expirationTime),
                         modifier = Modifier,
                         color = floatingActionBtnColor,
                         fontFamily = Constants.FONT_MEDIUM,
@@ -295,7 +276,7 @@ fun DropProfileUserProfileUI(dropProfileResponse: DropProfileResponse?,onUserPro
                 }
 
                 Text(
-                    text = dropProfileResponse.message.capitalize(),
+                    text = flashPostResponse.offer.capitalize(),
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(start = 16.dp, top = 4.dp),

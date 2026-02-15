@@ -53,7 +53,9 @@ import com.spint.app.R
 import com.spint.app.viewmodels.AuthViewModel
 import com.spint.app.screens._1home.commonUI.HomeFloatingActionButton
 import com.spint.app.screens._1home.commonUI.HomeTopBar
-import com.spint.app.screens._2pings.FlashPostsScreen
+import com.spint.app.screens._1home._2directChat.DirectChatScreen
+import com.spint.app.screens._1home._3dropZone.DroppedProfilesUI
+import com.spint.app.screens._1home._1FlashPosts.FlashPostsScreen
 import com.spint.app.screens._3createEventOrPing.CreateEventOrPingBottomSheet
 import com.spint.app.viewmodels.HomeViewModel
 import com.spint.app.screens.dialogBox.ShowQRDialog
@@ -234,7 +236,7 @@ fun HomeScreenUI(navController: NavHostController, homeViewModel: HomeViewModel,
                                 scrollBehavior,
                                 authViewModel,
                                 homeViewModel,
-                                chatViewModel ,
+                                chatViewModel,
                                 navController
                             )
 

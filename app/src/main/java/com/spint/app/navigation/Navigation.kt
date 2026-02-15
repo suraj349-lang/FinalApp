@@ -22,31 +22,31 @@ import com.spint.app.model.RegisterUserModel
 import com.spint.app.model.flashPost.FlashPostResponse
 import com.spint.app.viewmodels.ChatViewModel
 import com.spint.app.viewmodels.AuthViewModel
-import com.spint.app.screens.auth.EnterOTPScreenUI
+import com.spint.app.screens.auth.createAccount.ChooseUserNameAndCreateAccountScreen
 
 import com.spint.app.screens.auth.SplashScreenUI
 import com.spint.app.screens.auth.util.OtpBox
 import com.spint.app.screens._6chat.SingleChatScreenUI
-import com.spint.app.screens.auth.FinalUserCreation
+import com.spint.app.screens.auth.notUsed.FinalUserCreation
 import com.spint.app.qrScanning.QRScannerScreen
-import com.spint.app.screens.EventAndPingDesigns.events.EventsScreenWrapper
-import com.spint.app.screens.EventAndPingDesigns.events.EventsDetailsVerticalWrapper
+import com.spint.app.screens._2Events.events.EventsScreenWrapper
+import com.spint.app.screens._2Events.events.EventsDetailsVerticalWrapper
 import com.spint.app.screens.pings.CameraPingScreen
 import com.spint.app.viewmodels.HomeViewModel
 import com.spint.app.screens._6chat.ChatListScreen
 import com.spint.app.screens._4profile.GalleryPicker
 import com.spint.app.screens._1home.HomeScreenUI
-import com.spint.app.screens._1home.eventWarScreen.CommentsScreen
+import com.spint.app.screens._2Events.events.eventWarScreen.CommentsScreen
 import com.spint.app.screens._8notification.NotificationScreenUI
 import com.spint.app.screens._3createEventOrPing.createEvent.CreateEventMainScreen
 import com.spint.app.screens._5settings.SettingsScreenUI
 import com.spint.app.testing.TabView
 import com.spint.app.screens._3createEventOrPing.PastRaisedOffer
-import com.spint.app.screens._2pings.PingDetailsScreen
-import com.spint.app.screens._2pings.FlashPostsScreen
+import com.spint.app.screens._1home._1FlashPosts.detailsScreen.PingDetailsScreen
+import com.spint.app.screens._1home._1FlashPosts.FlashPostsScreen
 import com.spint.app.screens._3createEventOrPing.createPing.CreatePingWrapper
 import com.spint.app.screens._4profile.ProfileScreenNew
-import com.spint.app.screens._4profile.UserPublicProfile
+import com.spint.app.screens._4profile.dropProfileUserProfile.UserPublicProfile
 import com.spint.app.screens._4profile.dropProfileUserProfile.DropProfileUserProfile
 import com.spint.app.screens._4profile.privateUsername.PrivateProfileScreenWrapper
 import com.spint.app.screens._5settings.BlockedUsers
@@ -65,8 +65,8 @@ import com.spint.app.screens._5settings.MyData
 import com.spint.app.screens._5settings.PermissionsUI
 import com.spint.app.screens._5settings.SafetyAndPrivacy
 import com.spint.app.screens._5settings.SavedLoginInfo
-import com.spint.app.screens.auth.LoginScreenWrapperNewUI
-import com.spint.app.screens.auth.SignupScreenNewUI
+import com.spint.app.screens.auth.login.LoginScreenWrapperNewUI
+import com.spint.app.screens.auth.createAccount.SignupScreenNewUI
 import com.spint.app.screens.common.CameraXScreen
 import com.spint.app.screens.common.ImagePreviewScreen
 import com.spint.app.screens.onboarding.screen.WelcomeScreen
@@ -80,7 +80,7 @@ import com.spint.app.viewmodels.SettingsViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.firebase.Firebase
 import com.google.firebase.messaging.messaging
-import com.spint.app.screens.EventAndPingDesigns.events.templates.xhmaslive.XHamsLiveScreenWrapper
+import com.spint.app.screens._2Events.events.templates.xhmaslive.XHamsLiveScreenWrapper
 import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.json.Json
 import java.net.URLDecoder
@@ -131,7 +131,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
             )
         }
         composable(SCREENS.OTP.route){
-           EnterOTPScreenUI(
+           ChooseUserNameAndCreateAccountScreen(
                authViewModel=authViewModel,
                navController = navController,
                userName = authViewModel.userName.value,

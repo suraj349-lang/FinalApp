@@ -13,7 +13,7 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.Firebase
 import com.google.firebase.messaging.messaging
 import com.spint.app.repository.AuthRepository
-import com.spint.app.screens.auth.RESPONSE
+import com.spint.app.screens.auth.notUsed.RESPONSE
 import com.spint.app.database.Profile
 import com.spint.app.datastore.StoreLoginState
 import com.spint.app.datastore.StoreUserState

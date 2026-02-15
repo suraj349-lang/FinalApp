@@ -28,7 +28,7 @@ import com.spint.app.paging.DropProfilePagingSource
 import com.spint.app.repository.ChatDatabaseRepository
 import com.spint.app.repository.EventsRepository
 import com.spint.app.repository.ProfileRepository
-import com.spint.app.screens._2pings.FlashPostsPagingSource
+import com.spint.app.screens._1home._1FlashPosts.FlashPostsPagingSource
 import com.spint.app.utils.UserObject
 import com.spint.app.utils.RequestState
 import com.google.android.libraries.places.api.Places

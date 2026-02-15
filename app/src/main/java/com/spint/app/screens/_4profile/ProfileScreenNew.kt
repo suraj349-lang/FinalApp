@@ -86,7 +86,7 @@ import com.spint.app.model.DropProfileResponse
 import com.spint.app.model.EventResponse
 import com.spint.app.navigation.SCREENS
 import com.spint.app.screens._3createEventOrPing.CreateEventOrPingBottomSheet
-import com.spint.app.screens._4profile.myPings.MyPings
+import com.spint.app.screens._4profile.userPings.MyPings
 import com.spint.app.screens._4profile.privateUsername.PasswordForPrivateUsername
 import com.spint.app.screens.dialogBox.DropProfileDialog
 import com.spint.app.screens.dialogBox.uriToFile
