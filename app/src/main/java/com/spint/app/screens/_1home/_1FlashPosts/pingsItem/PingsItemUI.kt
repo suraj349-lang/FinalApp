@@ -49,7 +49,7 @@ fun PingsItemUI(item: FlashPostResponse, onShareClicked: () -> Unit, onRespondCl
     ) {
         Column {
 
-            if(item.user !=null && item.user.userName.isNotEmpty() && item.user.profileImage.isNotEmpty()){
+            if(item.user !=null && item.user.userName.isNotEmpty() && item.user.profileImage?.isNotEmpty() == true){
                 UserImageNameTime2(item.user.userName,item.user.profileImage ?: "",item.expirationTime)
             }
             Column(

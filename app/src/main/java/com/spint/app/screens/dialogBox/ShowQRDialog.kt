@@ -93,7 +93,7 @@ fun ShowQRDialog(navController: NavHostController, onDismiss: () -> Unit) {
                     fontFamily = Constants.FONT_EXTRA_LIGHT
                 )
 
-                QRCode(userIMAGE = user.profileImage,userId = user.user)
+                QRCode(userIMAGE = user.profileImage ?: "",userId = user.user)
 
                 DynamicText(text = user.userName, color = Color.White, fontSize = 16.sp, fontFamily = Constants.FONT_MEDIUM, fontWeight = FontWeight.Bold)
 

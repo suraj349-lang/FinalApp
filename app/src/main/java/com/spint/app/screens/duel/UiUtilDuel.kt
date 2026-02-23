@@ -2,6 +2,7 @@ package com.spint.app.screens.duel
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -33,7 +35,7 @@ import com.spint.app.R
 import com.spint.app.utils.constants.Constants
 
 @Composable
-fun DuelTopBar(modifier: Modifier = Modifier) {
+fun DuelTopBar(modifier: Modifier = Modifier,onBackClicked:()-> Unit) {
     TopAppBar(
         title = {
             Row(
@@ -52,7 +54,7 @@ fun DuelTopBar(modifier: Modifier = Modifier) {
         backgroundColor = Constants.HOME_TOP_BAR_COLOR,
         // modifier = Modifier.shadow(elevation = 20.dp, spotColor =Color.White),
         navigationIcon = {
-            Image(painterResource(id = R.drawable.app_icon_dynamic), contentDescription = "", modifier = Modifier.size(44.dp))
+            Image(painterResource(id = R.drawable.baseline_arrow_back_24), contentDescription = "", colorFilter = ColorFilter.tint(Color.White), modifier = Modifier.size(24.dp).clickable{onBackClicked()})
             // Image(painter = painterResource(id = R.drawable.baseline_arrow_back_24), contentDescription ="", modifier = Modifier.size(24.dp) , colorFilter = ColorFilter.tint(Color.White) )
         },
         modifier = Modifier.shadow(elevation = 10.dp, spotColor = Color.White).statusBarsPadding(),

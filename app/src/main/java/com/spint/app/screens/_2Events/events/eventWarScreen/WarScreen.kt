@@ -4,11 +4,13 @@ package com.spint.app.screens._2Events.events.eventWarScreen
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -30,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
@@ -44,7 +47,7 @@ import com.spint.app.R
 
 @Preview(showBackground = true)
 @Composable
-fun CommentsScreen(comments:List<Comment> = com.spint.app.screens._2Events.events.eventWarScreen.comments) {
+fun     CommentsScreen(comments:List<Comment> = com.spint.app.screens._2Events.events.eventWarScreen.comments) {
     // Use mutable state list for top-level comments
     val commentsState = remember { mutableStateListOf<Comment>().apply { addAll(comments) } }
 
@@ -54,7 +57,7 @@ fun CommentsScreen(comments:List<Comment> = com.spint.app.screens._2Events.event
         if (!updated) println("Comment not found")
     }
 
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
+    LazyColumn(modifier = Modifier.fillMaxWidth().height(800.dp)) {
         items(commentsState) { comment ->
             CommentItem(
                 comment = comment,
@@ -105,7 +108,8 @@ fun CommentItem(
     }
 
     val displayText = buildAnnotatedString {
-        withStyle(SpanStyle(fontWeight = FontWeight.Bold, fontSize = 10.sp, color = Color.Black)) {
+        //username
+        withStyle(SpanStyle(fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Color(0xFFA6C8EA))) {
             append("@${comment.username} ")
         }
         withStyle(SpanStyle(fontSize = 13.sp, color = Color.White)) {
@@ -121,7 +125,7 @@ fun CommentItem(
         } else if (isExpanded && isLongComment) {
             pushStringAnnotation(tag = "LESS", annotation = "less")
             withStyle(SpanStyle(color = Color.Yellow)) {
-                append(" show less")
+                append(" ...Show less")
             }
             pop()
         }
@@ -133,11 +137,11 @@ fun CommentItem(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(4.dp)
-                .background(
-                    if (indentLevel == 0) Color(0xFF753CC5) else Color(0xFF0970CB), //0xFF753CC5
-                    shape = RoundedCornerShape(4.dp)
-                )
-                .padding(4.dp)
+//                .background(
+//                    if (indentLevel == 0) Color(0xFF20202D) else Color(0xFF182533), //0xFF753CC5  if (indentLevel == 0) Color(0xFF753CC5) else Color(0xFF0970CB),
+//                    shape = RoundedCornerShape(4.dp)
+//                )
+                .padding(4.dp), verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
                 painter = painterResource(id = comment.profileImageRes),
@@ -188,14 +192,26 @@ fun CommentItem(
         }
 
         // Reply Text
-        Text(
-            text = "Reply",
-            fontSize = 12.sp,
-            modifier = Modifier
-                .clickable { onToggleReplyBox(comment) }
-                .padding(start = 48.dp),
-            color = Color.Gray
-        )
+        Row(modifier = Modifier.padding(start = 48.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+            Image(painter = painterResource(R.drawable.like), contentDescription = "",modifier= Modifier.size(12.dp), colorFilter = ColorFilter.tint(Color.Gray))
+            Text(
+                text = "Reply",
+                fontSize = 12.sp,
+                lineHeight = 8.sp,
+                modifier = Modifier
+                    .clickable { onToggleReplyBox(comment) }
+                    ,
+                color = Color.Gray
+            )
+//            Text(
+//                text = "Report",
+//                fontSize = 12.sp,
+//                lineHeight = 8.sp,
+//                modifier = Modifier,
+//                color = Color.Gray
+//            )
+        }
+
 
         // Reply TextField
         if (comment.showReplyBox) {
@@ -283,5 +299,115 @@ val comments = listOf(
         username = "positron_piecerer",
         comment = "Best app in this genre!, this si the only thing that iw ant iin life to have and this is how i amg innna di tiin life iiiresoisretive of what will happend in the life withme. afjhdsj asoghouasd asghosaudhg agohdguohauhguoasd gaohgua",
         profileImageRes = R.drawable.profile_image_3
+    ),
+
+    Comment(
+        id = "3",
+        username = "techie_rohan",
+        comment = "UI feels super smooth. Loving the animations 🔥",
+        profileImageRes = R.drawable.profile_image_1,
+        replies = listOf(
+            Comment(
+                id = "3-1",
+                username = "ui_queen",
+                comment = "Yes! The transitions are clean.",
+                profileImageRes = R.drawable.profile_image_2
+            )
+        )
+    ),
+
+    Comment(
+        id = "4",
+        username = "wanderlust_avi",
+        comment = "Finally something different from regular social apps.",
+        profileImageRes = R.drawable.profile_image_2
+    ),
+
+    Comment(
+        id = "5",
+        username = "dev_suraj",
+        comment = "Bro this concept has potential to scale big time 🚀",
+        profileImageRes = R.drawable.profile_image_3,
+        replies = listOf(
+            Comment(
+                id = "5-1",
+                username = "startup_girl",
+                comment = "If executed properly, 100% yes.",
+                profileImageRes = R.drawable.profile_image_1,
+                replies = listOf(
+                    Comment(
+                        id = "5-1-1",
+                        username = "angel_investor",
+                        comment = "Monetization model?",
+                        profileImageRes = R.drawable.profile_image_2
+                    )
+                )
+            )
+        )
+    ),
+
+    Comment(
+        id = "6",
+        username = "random_user_77",
+        comment = "The debate dashboard idea is actually interesting.",
+        profileImageRes = R.drawable.profile_image_1
+    ),
+
+    Comment(
+        id = "7",
+        username = "night_coder",
+        comment = "Dark mode looks premium 💎",
+        profileImageRes = R.drawable.profile_image_3
+    ),
+
+    Comment(
+        id = "8",
+        username = "kritika_designs",
+        comment = "Spacing and typography are very clean. Good job!",
+        profileImageRes = R.drawable.profile_image_2,
+        replies = listOf(
+            Comment(
+                id = "8-1",
+                username = "font_nerd",
+                comment = "Which font are you using?",
+                profileImageRes = R.drawable.profile_image_3
+            )
+        )
+    ),
+
+    Comment(
+        id = "9",
+        username = "debate_master",
+        comment = "This could replace traditional comment sections.",
+        profileImageRes = R.drawable.profile_image_1
+    ),
+
+    Comment(
+        id = "10",
+        username = "akash_live",
+        comment = "Performance seems smooth even with nested replies 👌",
+        profileImageRes = R.drawable.profile_image_2
+    ),
+
+    Comment(
+        id = "11",
+        username = "future_ceo",
+        comment = "Add live polls and this becomes unstoppable.",
+        profileImageRes = R.drawable.profile_image_3,
+        replies = listOf(
+            Comment(
+                id = "11-1",
+                username = "product_thinker",
+                comment = "Yes, real-time engagement will boost retention.",
+                profileImageRes = R.drawable.profile_image_1
+            )
+        )
+    ),
+
+    Comment(
+        id = "12",
+        username = "minimalist_raj",
+        comment = "Clean. Focused. No unnecessary clutter.",
+        profileImageRes = R.drawable.profile_image_2
     )
 )

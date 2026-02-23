@@ -23,6 +23,7 @@ import com.spint.app.model.CreateFlashPostResponse
 import com.spint.app.model.Email
 import com.spint.app.model.EventDetailsResponse
 import com.spint.app.model.FCMTokenResponse
+import com.spint.app.model.FlashPostResponseDTO
 import com.spint.app.model.Message
 import com.spint.app.model.PremiumEventResponseDTO
 import com.spint.app.model.ResponseOfEmail
@@ -34,9 +35,12 @@ import com.spint.app.model.flashPost.PingsOnFlashPostRequest
 import com.spint.app.model.flashPost.PingsOnFlashPostResponse
 import com.spint.app.utils.PingsResponse
 import com.spint.app.utils.ApiResponse
+import com.spint.app.utils.constants.Constants
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
@@ -89,6 +93,9 @@ interface ApiService {
     @GET("/api/v1/flashPost/getUserFlashPosts/{id}")
     suspend fun getUserFlashPosts(@Path("id") id:String): AllPingsResponseDTO
 
+    @GET("/api/v1/flashPost/getFlashPostsDetails/{id}")
+    suspend fun getUserFlashPostDetails(@Path("id") id:String): FlashPostResponseDTO
+
     @POST("/api/v1/flashPost")
     suspend fun createFlashPost(@Body input:FlashPostRequestDto):CreateFlashPostResponse
 
@@ -116,6 +123,9 @@ interface ApiService {
     //---------------------------------------------------------------------//
     @GET("/api/v1/user/getUser")
     suspend fun getUserData(@Query("userId") userId: String): OkResponse
+
+    @DELETE("/api/v1/user/deleteUser")
+    suspend fun deleteUserAccount(@Query("userId") userId: String): OkResponse
 
     //---------------------------------------------------------------------//
     @PATCH("/api/v1/user/update")
@@ -150,6 +160,24 @@ interface ApiService {
 
 }
 
+interface ChatApiService {
+
+    @GET("api/chat/getMessages/{userId}/{otherUserId}/")
+    suspend fun getChats(
+        @Path("userId") userId: String,
+        @Path("otherUserId") otherUserId: String
+    ): ApiResponse<List<Message>>
+}
+object ChatRetrofitClient {
+
+    val chatApi: ChatApiService by lazy {
+        Retrofit.Builder()
+            .baseUrl(Constants.TEMP_SOCKET_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(ChatApiService::class.java)
+    }
+}
 
 interface NonAuthApiService{
 

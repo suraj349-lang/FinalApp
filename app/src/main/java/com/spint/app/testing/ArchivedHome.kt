@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +20,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
@@ -35,6 +37,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -44,16 +47,25 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
+import com.bumptech.glide.integration.compose.GlideImage
 import com.spint.app.R
+import com.spint.app.model.flashPost.FlashPostResponse
+import com.spint.app.ui.imagePrefix
+import com.spint.app.ui.theme.floatingActionBtnColor
+import com.spint.app.utils.constants.Constants
+import com.spint.app.utils.formatDateTime
 import kotlin.random.Random
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -108,16 +120,114 @@ fun HomeScreenUI2(navController: NavController= NavController(LocalContext.curre
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CommonTopBar(title:String) {
+fun CommonTopBar(flashPostResponse: FlashPostResponse, onUserProfileClicked:()->Unit,onSendMessageClicked:()-> Unit, onBackClicked:()-> Unit) {
     TopAppBar(
 
-        title ={ Text(text = title)},
+        title ={
+            Row(
+                modifier = Modifier
+                    .padding(start = 16.dp, end = 16.dp)
+                    .fillMaxWidth()
+                    .height(50.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(
+                    modifier = Modifier
+                        .clickable { onUserProfileClicked() }
+                        .wrapContentHeight()
+                        .fillMaxWidth(0.6f),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Card(
+                        modifier = Modifier.wrapContentSize(),
+                        shape = CircleShape
+                    ) {
+                        AsyncImage(
+                            model = imagePrefix + flashPostResponse.user?.profileImage,
+                            contentDescription = "",
+                            modifier = Modifier.size(40.dp),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentHeight(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.Start
+                    ) {
+                        flashPostResponse.user?.userName?.lowercase()?.let {
+                            Text(
+                                text = it,
+                                fontFamily = Constants.FONT_MEDIUM,
+                                fontSize = 16.sp,
+                                lineHeight = 8.sp,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                color = Color.LightGray,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        Row(modifier= Modifier.padding(0.dp),verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
+                            Text(
+                                text = "created: ",
+                                color = Color.LightGray,
+                                lineHeight = 8.sp,
+                                fontFamily = Constants.FONT_EXTRA_LIGHT,
+                                fontSize = 12.sp
+                            )
+                            Text(
+                                text = formatDateTime(flashPostResponse.expirationTime).lowercase(),
+                                color = Color.LightGray,
+                                lineHeight = 8.sp,
+                                fontFamily = Constants.FONT_EXTRA_LIGHT,
+                                fontSize = 12.sp
+                            )
+                        }
+                    }
+                }
+               Box(modifier= Modifier
+                   .wrapContentSize()
+                   .clickable { onSendMessageClicked() }
+                   .clip(shape = CircleShape)
+                   .background(Color(0xFF96053E))
+                     //0xFF96053E
+                ) {
+                    Column (
+                        modifier = Modifier
+                            .padding(6.dp)
+                            .wrapContentSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Image(
+                            painter = painterResource(id = R.drawable.chat_new),
+                            contentDescription = "",
+                            modifier = Modifier.size(18.dp),
+                            colorFilter = ColorFilter.tint(Color.White)
+                        )
+                        Text(
+                            text = "Message",
+                            color = Color.White,
+                            fontFamily = Constants.FONT_EXTRA_LIGHT,
+                            fontSize = 8.sp,
+                            lineHeight = 12.sp
+                        )
+                    }
+                }
+
+
+            }
+        },
         actions = {
-           // Icon(imageVector = Icons.Default.Add, contentDescription ="" )
         },
         navigationIcon = {
-          //  Icon(imageVector =Icons.Default.Person , contentDescription ="" )
-        }
+          Image(painter = painterResource(R.drawable.baseline_arrow_back_24), contentDescription = "",modifier=Modifier
+              .size(24.dp)
+              .clickable { onBackClicked() }, colorFilter = ColorFilter.tint(color = Color.LightGray))
+        },
+        colors = TopAppBarDefaults.topAppBarColors(containerColor = Constants.HOME_TOP_BAR_COLOR)
 
     )
 }

@@ -7,14 +7,19 @@ import com.spint.app.R
 
 object Constants {
 
+    const val APP_NAME="Spint"
+    val APP_ICON = R.drawable.app_icon_dynamic
+
+    const val TAG = APP_NAME
+
     const val IP_ADD ="192.168.1.46" //3.108.55.84" //  192.168.1.5
     const val BASE_URL = "http://${IP_ADD}:5000/"
     const val TEMP_SOCKET_URL = "http://${IP_ADD}:5001/"
+    const val SIGNAL_SERVER = "http://${IP_ADD}:5002/"
 
 
-    const val APP_NAME="Spint"
-    val APP_ICON = R.drawable.app_icon_dynamic
-    const val TAG = APP_NAME
+
+
 
 
 

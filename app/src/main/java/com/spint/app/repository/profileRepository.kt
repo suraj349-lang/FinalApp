@@ -82,6 +82,10 @@ class ProfileRepository @Inject constructor(private val api: ApiService,private 
         emit(api.updateUserName(UserObject.user.value.user,userName))
     }.flowOn(Dispatchers.IO)
 
+    fun deleteAccount(userId: String): Flow<OkResponse> = flow  {
+        emit(api.deleteUserAccount(userId))
+    }.flowOn(Dispatchers.IO)
+
 }
 
 

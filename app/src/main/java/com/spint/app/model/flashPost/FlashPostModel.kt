@@ -1,5 +1,6 @@
 package com.spint.app.model.flashPost
 
+import com.google.gson.annotations.SerializedName
 import com.spint.app.model.User
 import kotlinx.serialization.Serializable
 
@@ -57,6 +58,41 @@ data class FlashPostResponse(
     val totalUpVotes:Int=0,
     val totalShared:Int=0
 )
+@Serializable
+data class FlashPostDetailsResponse(
+    val _id:String="",
+    val user: User? = null,
+    val title: String? = null,
+    val description: String? = null,
+    val image: String = "",
+    val category: String = "",
+    val isPrivate: Boolean=false,
+    val location: String = "",
+    val offer: String = "",
+    val pings:List<PingsOnPost>? = listOf(),
+    val pingCount:Int=0,
+    val topPostsList:List<String>? = emptyList(),
+    val expirationTime: String = "",
+    val createdAt:String="",
+    val peopleJoined:Int=0,
+    val commentsCount:Int=0,
+    val topComments:List<CommentData> ? =null,
+    val totalChildPosts:Int =0,
+    val totalViews:Int=0,
+    val totalUpVotes:Int=0,
+    val totalShared:Int=0
+)
+
+@Serializable
+data class PingsOnPost(
+    @SerializedName("post_id")
+    val id:String,
+    @SerializedName("user_id")
+    val userId: User,
+    val message :String,
+    val pingCount: Int,
+)
+
 
 @Serializable
 data class CommentData(

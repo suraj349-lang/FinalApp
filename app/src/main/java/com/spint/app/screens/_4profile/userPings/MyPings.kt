@@ -28,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -46,6 +47,7 @@ import com.spint.app.utils.constants.Constants
 @Composable
 fun MyPings(
     items: List<FlashPostResponse> = emptyList(),
+    onFlashPostClicked: (String) -> Unit,
     onCreatePingClicked: () -> Unit = {}
 ) {
     val pingsList = remember { items }
@@ -138,7 +140,9 @@ fun MyPings(
                 horizontalArrangement = Arrangement.spacedBy(1.dp)
             ) {
                 items(pingsList) { item ->
-                    MyPingItem(item)
+                    MyPingItem(item){
+                        onFlashPostClicked(item._id)
+                    }
                 }
             }
         }
@@ -148,15 +152,19 @@ fun MyPings(
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun MyPingItem(item: FlashPostResponse) {
-    Box(modifier = Modifier
+fun MyPingItem(item: FlashPostResponse,onFlashPostClicked:()-> Unit) {
+    Box(modifier = Modifier.clickable{onFlashPostClicked()}
         .aspectRatio(9f/13f) //120 earlier
-        .clip(shape = RoundedCornerShape(2.dp))) {
+        .clip(shape = RoundedCornerShape(6.dp))) {
         GlideImage(model=  imagePrefix +item.image/*R.drawable.profile_image_1*/ , contentDescription = "", modifier = Modifier.fillMaxSize(), contentScale = ContentScale.Crop) //todo add imagePrefix when upload is happening
-        Box(modifier= Modifier.align(Alignment.TopEnd).wrapContentSize().clip(shape = CircleShape).background(color=Color.Red)) {
-            Text(item.pingCount.toString(),modifier= Modifier.padding(4.dp))
-
+        if(item.pingCount !=0){
+        Box(modifier= Modifier.padding(10.dp).background(color = Color.LightGray.copy(alpha = 0.2f)).align(Alignment.BottomStart).wrapContentSize()) {
+            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                Image(painter = painterResource(R.drawable.ping), contentDescription = "",modifier=Modifier.size(18.dp))
+                Text(item.pingCount.toString(), modifier = Modifier, color = Color.Black, fontSize = 14.sp, fontFamily = Constants.FONT_MEDIUM)
+            }
         }
+    }
     }
 }
 

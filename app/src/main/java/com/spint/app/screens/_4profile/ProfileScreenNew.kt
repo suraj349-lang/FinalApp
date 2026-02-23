@@ -175,8 +175,8 @@ fun ProfileScreenNew(navController: NavHostController, authViewModel:AuthViewMod
         }
     }
     val systemUiController = rememberSystemUiController()
-    val backgroundColor = Constants.HOME_TOP_BAR_COLOR//0xFF040A36 0xFFC7A246 0xFF90941D
-    val upperCardColor= Color.Black
+    val backgroundColor = Color.DarkGray//0xFF040A36 0xFFC7A246 0xFF90941D
+    val upperCardColor= Color(0xFF15011E)
     val navColor=Color.DarkGray
 
     SideEffect {
@@ -314,19 +314,19 @@ fun ProfileScreenNew(navController: NavHostController, authViewModel:AuthViewMod
                                 onDismissRequest = { expanded = false }
                             ) {
                                 DropdownMenuItem(
-                                    text = { Text(
+                                    text = {
+                                        Text(
                                         "Background",
                                         fontSize = 16.sp,
                                         fontFamily = Constants.FONT_MEDIUM,
-                                        color = Color.White
-                                    ) },
+                                        color = Color.White)
+                                           },
                                     modifier = Modifier.wrapContentSize(),
                                     leadingIcon = {
                                         Image(
                                             painterResource(id = R.drawable.edit_new),
                                             contentDescription = "settings",
-                                            modifier = Modifier
-                                                .size(20.dp),
+                                            modifier = Modifier.size(20.dp),
                                             contentScale = ContentScale.Crop,
                                             colorFilter = ColorFilter.tint(Color.White)
                                         )
@@ -349,8 +349,7 @@ fun ProfileScreenNew(navController: NavHostController, authViewModel:AuthViewMod
                                         Image(
                                             painterResource(id = R.drawable.settings_new),
                                             contentDescription = "settings",
-                                            modifier = Modifier
-                                                .size(20.dp),
+                                            modifier = Modifier.size(20.dp),
                                             contentScale = ContentScale.Crop,
                                             colorFilter = ColorFilter.tint(Color.White)
                                         )
@@ -361,12 +360,13 @@ fun ProfileScreenNew(navController: NavHostController, authViewModel:AuthViewMod
                                     }
                                 )
                                 DropdownMenuItem(
-                                    text = { Text(
+                                    text = {
+                                        Text(
                                         "Logout",
                                         fontSize = 16.sp,
                                         fontFamily = Constants.FONT_MEDIUM,
-                                        color = Color.White
-                                    ) },
+                                        color = Color.White)
+                                           },
                                     modifier = Modifier.wrapContentSize(),
                                     leadingIcon = {
                                         Image(
@@ -389,12 +389,38 @@ fun ProfileScreenNew(navController: NavHostController, authViewModel:AuthViewMod
                                         }
                                     }
                                 )
+                                DropdownMenuItem(
+                                    text = { Text(
+                                        "Delete Account",
+                                        fontSize = 16.sp,
+                                        fontFamily = Constants.FONT_MEDIUM,
+                                        color = Color.White
+                                    ) },
+                                    modifier = Modifier.wrapContentSize(),
+                                    leadingIcon = {
+                                        Image(
+                                            painterResource(id = R.drawable.delete),
+                                            contentDescription = "Delete account",
+                                            modifier = Modifier
+                                                .size(20.dp),
+                                            contentScale = ContentScale.Crop,
+                                        )
+                                    },
+                                    onClick = {
+                                        expanded = false
+                                        homeViewModel.deleteAccount(user.user) {
+                                            navController.navigate(SCREENS.SIGNUP.route) {
+                                                popUpTo(0) {
+                                                    inclusive = true
+                                                }
+                                                launchSingleTop = true
+                                            }
+                                        }
+                                    }
+                                )
                             }
                         }
-
                     }
-
-
 
                     Column(
                         modifier = Modifier
@@ -416,7 +442,7 @@ fun ProfileScreenNew(navController: NavHostController, authViewModel:AuthViewMod
                             ) {
                                 Card(
                                     modifier = Modifier
-                                        .size(60.dp)
+                                        .size(120.dp)
                                         .clickable {
                                             showSheetForImageUpdate =
                                                 true;/*showImageCropper = true*/
@@ -537,7 +563,7 @@ fun ProfileScreenNew(navController: NavHostController, authViewModel:AuthViewMod
             }
             item {
                 Column(
-                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 10.dp, bottom = 16.dp)
+                    modifier = Modifier.padding(horizontal = 4.dp, vertical = 8.dp)
                 ) {
                     Column(modifier = Modifier
                         .fillMaxWidth()
@@ -550,23 +576,23 @@ fun ProfileScreenNew(navController: NavHostController, authViewModel:AuthViewMod
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(
-                                text = "Recent Profile Drops",
+                                text = "Profile Drops",
                                 color = Color.White,
                                 fontSize=13.sp,
                                 fontFamily = Constants.FONT_LIGHT
                             )
-                            Image(
-                                painter = painterResource(id = R.drawable.showall),
-                                contentDescription = "",
-                                colorFilter = ColorFilter.tint(
-                                    Color(
-                                        0xFF041372
-                                    )
-                                ),
-                                modifier = Modifier.size(20.dp)
-                            )
+//                            Image(
+//                                painter = painterResource(id = R.drawable.showall),
+//                                contentDescription = "",
+//                                colorFilter = ColorFilter.tint(
+//                                    Color(
+//                                        0xFF041372
+//                                    )
+//                                ),
+//                                modifier = Modifier.size(20.dp)
+//                            )
                         }
-                        Divider(modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp), thickness = 0.5.dp, color = Color.LightGray)
+                        Divider(modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp), thickness = 0.25.dp, color = Color.Gray)
 
                     //--------------------------------------------------------------------------------
 
@@ -638,7 +664,7 @@ fun ProfileScreenNew(navController: NavHostController, authViewModel:AuthViewMod
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(bottom = 10.dp),
-                            backgroundColor = Color(0xFF1C1C1D),
+                            backgroundColor = Color.DarkGray, //0xFF1C1C1D
                             contentColor = Color.Black
                         ) {
                             tabs.forEachIndexed { index, title ->
@@ -712,10 +738,11 @@ fun ProfileScreenNew(navController: NavHostController, authViewModel:AuthViewMod
 
                                         }
                                     }
-                                    is RequestState.Error -> MyPings(emptyList()) {  }
+                                    is RequestState.Error -> MyPings(emptyList(),{}) {  }
 
                                     is RequestState.Success -> {
-                                        MyPings(response.data) {
+                                        MyPings(response.data, onFlashPostClicked = {navController.navigate(
+                                            SCREENS.MY_FLASH_POST_DETAILS_SCREEN.createPath(it))}) {
                                             navController.navigate(SCREENS.CREATE_PING.route)
                                         }
                                     }
@@ -956,7 +983,7 @@ fun RecentDrops(
         LazyRow(modifier = Modifier) {
             items(droppedProfilesList) { item ->
                 RecentProfileDropItem(item) { onItemClicked(item) }
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(4.dp))
             }
         }
     }
@@ -969,7 +996,7 @@ fun RecentProfileDropItem(item: DropProfileResponse,onItemClicked:(DropProfileRe
             modifier = Modifier
                 .clickable { onItemClicked(item) }
                 .width(120.dp)
-                .height(180.dp)
+                .height(180.dp).clip(RoundedCornerShape(6.dp))
         ) {
             Column(modifier = Modifier.background(brush = Brush.verticalGradient(colors = listOf(Color(0xFF4D056B), Color(0xFF9E0642))))) {
                 GlideImage(

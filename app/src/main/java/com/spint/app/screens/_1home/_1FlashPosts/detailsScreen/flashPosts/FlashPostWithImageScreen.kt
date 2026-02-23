@@ -22,9 +22,12 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
+import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -43,6 +46,7 @@ import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -64,6 +68,8 @@ import kotlinx.coroutines.delay
 @Composable
 fun FlashPostWithImageScreen(item:FlashPostResponse, onFlashPostClicked:()->Unit, onUserProfileClicked:()->Unit,onPingOfFlashPostClicked:(String, String)->Unit, onCommentButtonClicked: () -> Unit) {
     val context= LocalContext.current
+    var showJoinComment  by remember { mutableStateOf(false) }
+    var joinPingText by remember { mutableStateOf("") }
     Box(
         modifier = Modifier
             .padding(top = 4.dp).padding( 4.dp)
@@ -98,7 +104,7 @@ fun FlashPostWithImageScreen(item:FlashPostResponse, onFlashPostClicked:()->Unit
                                 spotColor = Color.White,
                                 ambientColor = Color.White
                             )) {
-                            AsyncImage(model = imagePrefix+item.user?.profileImage, contentDescription ="", modifier = Modifier
+                            AsyncImage(model = if(item.user?.profileImage.isNullOrEmpty()) R.drawable.profile_colored else imagePrefix+item.user.profileImage, contentDescription ="", modifier = Modifier
                                 .fillMaxSize(), contentScale = ContentScale.Crop , filterQuality = FilterQuality.High)
                         }
 
@@ -169,7 +175,7 @@ fun FlashPostWithImageScreen(item:FlashPostResponse, onFlashPostClicked:()->Unit
                     ViewRoundUI(item.totalViews)
                     CommentRoundUI(item.commentsCount,onCommentButtonClicked)
                     CountdownTimer(item.expirationTime)
-                    AddPingOnFlashPost(item.peopleJoined,item.pingCount,{ onPingOfFlashPostClicked(item._id,"I am interested")})
+                    AddPingOnFlashPost(item.peopleJoined,item.pingCount,{ showJoinComment=!showJoinComment})
                     ShareRoundUI(item.totalShared){
                         val deeplink="http://${Constants.APP_NAME}.com/ping/${item._id}"
                         sharePingDeepLink(context,deeplink)
@@ -177,22 +183,36 @@ fun FlashPostWithImageScreen(item:FlashPostResponse, onFlashPostClicked:()->Unit
 
 
                 }
-                Divider(
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp), thickness = 0.4.dp, color = Color.LightGray.copy(alpha = 0.3f))
+                if(showJoinComment) {
+                    Box(modifier=Modifier.padding(top = 10.dp).fillMaxWidth(0.8f)) {
+                        OutlinedTextField(
+                            value =joinPingText,
+                            onValueChange = {joinPingText=it},
+                            textStyle = TextStyle(fontFamily = Constants.FONT_MEDIUM, lineHeight = 12.sp, fontSize = 8.sp, color = Color.Black),
+                            modifier = Modifier.padding(end = 20.dp).zIndex(2f)
+                                .fillMaxWidth().height(40.dp).clip(RoundedCornerShape(12.dp)),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                unfocusedContainerColor = Color.White,
+                                focusedContainerColor = Color.White,
+                                focusedBorderColor = Color.White,
+                                unfocusedBorderColor = Color.White
+                            ),
+                            trailingIcon = {
+                                Image(
+                                    painter = painterResource(R.drawable.chat_new),
+                                    contentDescription = "",
+                                    modifier = Modifier.clickable{ onPingOfFlashPostClicked(item._id,joinPingText);showJoinComment = false }.size(20.dp),
+                                    colorFilter = ColorFilter.tint(Color.Black)
+                                )
+                            }
+                        )
+                    }
+                }
                 Box(modifier = Modifier
                     .padding(horizontal = 4.dp, vertical = 8.dp)
                     .fillMaxWidth()
                     .wrapContentHeight()
                     .clip(shape = RoundedCornerShape(6.dp))
-//                    .background(
-//                        brush = Brush.linearGradient(
-//                            colors = listOf(
-//                                Color.Gray.copy(alpha = 0.25f), Color.Gray.copy(alpha = 0.25f)
-//                            )
-//                        )
-//                    )
                 ){
                     Column(modifier = Modifier
                         .fillMaxWidth()
@@ -358,8 +378,8 @@ fun AddPingOnFlashPost(joinedCount: Int,pingCount:Int,onClick:()-> Unit={}) {
             Image(painter = painterResource(id = R.drawable.join_blue), contentDescription ="", modifier = Modifier.size(28.dp) )
             Spacer(modifier = Modifier.width(8.dp))
         Column(modifier = Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("PING", color = Color.White, fontFamily = Constants.FONT_LIGHT, fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                if(joinedCount !=0)Text("122k", color = Color.Gray, fontFamily = Constants.FONT_EXTRA_LIGHT, fontSize = 9.sp)
+                Text("JOIN", color = Color.White, fontFamily = Constants.FONT_LIGHT, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                if(joinedCount !=0)Text("122k", color = Color.White, fontFamily = Constants.FONT_EXTRA_LIGHT, fontSize = 9.sp)
             }
 
         }}}

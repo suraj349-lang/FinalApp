@@ -132,6 +132,7 @@ fun SingleChatScreenUI(
     var showError by remember { mutableStateOf(false) }
 
     val messages by chatViewModel.messagesFromServer.collectAsState(RequestState.Idle)
+    val getAllMessagesError by chatViewModel.getAllMessageError.collectAsState("")
     val recordAudioPermission = Manifest.permission.RECORD_AUDIO
     val hasMicPermission = remember {
         mutableStateOf(
@@ -205,17 +206,17 @@ fun SingleChatScreenUI(
 
     SideEffect {
         systemUiController.setNavigationBarColor(
-            color = Constants.HOME_BOTTOM_BAR_COLOR,
+            color = Color.Black,
             darkIcons = false
         )
         systemUiController.setStatusBarColor(
-            color = Constants.HOME_TOP_BAR_COLOR,     // Your desired color
+            color = Color(0xFF0B010E),     // Your desired color
             darkIcons = false        // true = dark icons (for light backgrounds)
         )
     }
 
     Scaffold(
-        topBar = { SingleChatTopBar(title = sentTo, profileImage, navController) },
+        topBar = { SingleChatTopBar(title = sentTo, userId=chatListUserId,profileImage, navController) },
         bottomBar = {
             // Input row with text field and mic button
             Row(
@@ -333,8 +334,8 @@ fun SingleChatScreenUI(
             }
         }
     ) {
-        Box(modifier = Modifier.fillMaxSize().background(Constants.HOME_TOP_BAR_COLOR)) {
-           // Image(painter = painterResource(id = R.drawable.whatsapp), contentDescription ="", modifier = Modifier.fillMaxSize(),contentScale = ContentScale.Crop )
+        Box(modifier = Modifier.fillMaxSize()) {
+            Image(painter = painterResource(id = R.drawable.whatsapp), contentDescription ="", modifier = Modifier.fillMaxSize(),contentScale = ContentScale.Crop )
             Column(
                 modifier = Modifier
                     .padding(it)
@@ -350,13 +351,14 @@ fun SingleChatScreenUI(
                 }
 
                 if (showError) {
-                    NoMessagesScreen(Modifier.weight(1f, true), "Error connecting to server")
+                    NoMessagesScreen(Modifier.weight(1f, true), getAllMessagesError)
                 }
 
                 when (messages) {
                     is RequestState.Success -> {
                         showLinearIndicator = false
                         val messageList = (messages as RequestState.Success<List<Message>>).data
+                        if (messageList.isNotEmpty()) {
                         val sortedMessages = messageList.sortedBy {
                             try {
                                 Instant.parse(it.timestamp).toEpochMilli()
@@ -367,7 +369,7 @@ fun SingleChatScreenUI(
 
 
 
-                        if (messageList.isNotEmpty()) {
+
 
                             LazyColumn(
                                 state = listState,
@@ -473,323 +475,13 @@ fun formatDate(timestamp: String?): String? {
     }
 }
 
-
-
-
-
-/*
-@RequiresApi(Build.VERSION_CODES.O)
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@Composable
-fun ChatScreenUI(sentTo: String,chatListUserId:String,navController: NavHostController,chatViewModel: ChatViewModel) {
-
-    val listState = rememberLazyListState()
-    val scope= rememberCoroutineScope()
-    var saveToDb by remember { mutableStateOf(false) }
-    var inputText by remember { mutableStateOf("") }
-    val userNumber= ProfileObject.profile?.number
-    val profileImage by remember {
-        mutableStateOf(chatViewModel.profileImage.value)
-    }
-    var isRecording by remember {
-        mutableStateOf(false)
-    }
-    var showLinearIndicator by remember {
-        mutableStateOf(false)
-    }
-    var showError by remember {
-        mutableStateOf(false)
-    }
-    val context= LocalContext.current
-    // Blinking red dot animation
-    val blinkAnim = rememberInfiniteTransition(label = "Mic Blink").animateFloat(
-        initialValue = 0.2f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(500, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "Blink Alpha"
-    )
-
-    val messages by chatViewModel.messagesFromServer.collectAsState(RequestState.Idle)
-    LaunchedEffect(chatViewModel.canFetch.value) {
-        if (chatViewModel.canFetch.value) {
-            chatViewModel.getAllMessages(ProfileObject.profile?.userId!!, chatListUserId)
-            chatViewModel.canFetch.value=false
-        }
-    }
-    LaunchedEffect(key1 = messages){
-        when(val state=messages){
-            is RequestState.Success->{
-                if (state.data.isNotEmpty()) {
-                    listState.animateScrollToItem(state.data.lastIndex)
-                }
-            }
-            else ->{}
-        }
-    }
-
-    val activity = LocalContext.current as Activity
-    val recordAudioPermission = Manifest.permission.RECORD_AUDIO
-
-    val hasMicPermission = remember {
-        mutableStateOf(
-            ContextCompat.checkSelfPermission(
-                context,
-                recordAudioPermission
-            ) == PackageManager.PERMISSION_GRANTED
-        )
-    }
-
-// Request permission if not granted
-    LaunchedEffect(Unit) {
-        if (!hasMicPermission.value) {
-            ActivityCompat.requestPermissions(activity, arrayOf(recordAudioPermission), 0)
-        }
-    }
-
-
-    val voiceRecognizer = remember {
-        VoiceRecognizerHelper(context, onResult = {
-            inputText = it
-            isRecording = false
-        }, onStart = {
-            isRecording = true
-        }, onEnd = {
-            isRecording = false
-        })
-    }
-
-
-    DisposableEffect(Unit) {
-        onDispose {
-            voiceRecognizer.destroy()
-        }
-    }
-
-
-
-    Scaffold(
-        topBar = { SingleChatTopBar(title = sentTo,profileImage, navController =navController ) }) {
-
-        Column(modifier = Modifier
-            .padding(it)
-        ) {
-            if(showLinearIndicator) {
-                Box(modifier = Modifier.weight(1f)) {
-                    LinearProgressIndicator(
-                        modifier = Modifier
-                            .align(Alignment.TopStart)
-                            .fillMaxWidth()
-                            .height(2.dp), color = floatingActionBtnColor
-                    )
-                }
-            }
-            if(showError) {
-                Box(modifier = Modifier.weight(1f)) {
-                    Text(text = "Error connecting to server", modifier = Modifier.align(Alignment.TopStart),fontFamily = Constants.FONT_MEDIUM, color = Color.Red)
-                }
-
-            }
-            //-------------------------------MESSAGE ITEM ---------------------------------------------------
-            when ( messages) {
-                is RequestState.Success -> {
-                    showLinearIndicator=false
-                    val messageList=(messages as RequestState.Success<List<Message>>).data
-                    if(messageList.isNotEmpty()) {
-                        LazyColumn(state = listState, modifier = Modifier.weight(1f)) {
-                            items(items = (messageList)) { message ->
-                                MessageItemUI(
-                                    msg = message.message,
-                                    sent = message.sent,
-                                    received = message.received,
-                                    message.timestamp,
-                                    isSentByLoggedInUser = message.senderId == ProfileObject.profile?.userId!!
-                                )
-                            }
-                        }
-                    }else{
-                        NoMessagesScreen(modifier = Modifier.weight(1f))
-                    }
-                }
-                is RequestState.Loading -> {
-                    showLinearIndicator=true
-                }
-                is RequestState.Error -> {
-                    Log.e("Splint_ERROR", "ChatScreenUI: ${(messages as RequestState.Error).error.message.toString()}", )
-                    showLinearIndicator=false;
-                    showError=true
-                }
-                else -> {
-                    Box(modifier = Modifier.weight(1f)) {}
-                }
-            }
-
-            //------------------------------------------------------------------------------------------------//
-
-
-            Row(modifier = Modifier
-                .padding(start = 16.dp, end = 16.dp)
-                .fillMaxWidth()
-                .heightIn(min = 56.dp, max = 150.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
-                OutlinedTextField(
-                    value = inputText,
-                    onValueChange = { inputText = it },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .defaultMinSize(minHeight = 48.dp)
-                        .heightIn(min = 48.dp, max = 150.dp),
-                    placeholder = {
-                        Text(
-                            text = "Type message....",
-                            fontSize = 14.sp,
-                            modifier = Modifier.align(Alignment.Top)
-                        )
-                    },
-                    trailingIcon={
-                                 Row(modifier = Modifier
-                                     .wrapContentSize()
-                                     .padding(end = 16.dp), verticalAlignment = Alignment.Bottom) {
-                                     if(inputText.isEmpty()) {
-                                         Row(modifier = Modifier.wrapContentWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                                             Row(
-                                                 verticalAlignment = Alignment.CenterVertically,
-                                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
-                                             ) {
-                                                 // Mic Icon
-                                                 Image(
-                                                     painter = painterResource(id = R.drawable.mic),
-                                                     contentDescription = "mic",
-                                                     colorFilter = ColorFilter.tint(color = Color.DarkGray),
-                                                     modifier = Modifier
-                                                         .size(28.dp)
-                                                         .clickable {
-                                                             voiceRecognizer.startListening()
-                                                         }
-                                                 )
-
-                                                 // Blinking Red Dot (only while recording)
-                                                 if (isRecording) {
-                                                     Box(
-                                                         modifier = Modifier
-                                                             .size(10.dp)
-                                                             .alpha(blinkAnim.value)
-                                                             .background(Color.Red, shape = CircleShape)
-                                                     )
-                                                 }
-                                             }
-                                             Image(
-                                                 painter = painterResource(id = R.drawable.cameranew),
-                                                 contentDescription = "",
-                                                 colorFilter = ColorFilter.tint(color = Color.DarkGray),
-                                                 alignment = Alignment.Center,
-                                                 modifier = Modifier
-                                                     .size(28.dp)
-                                                     .clickable {
-                                                         navController.navigate("camerax/singleChat")
-                                                     }
-                                             )
-                                         }
-                                     }else {
-                                         Text(text = "Send", modifier = Modifier.clickable {
-                                             if(inputText.trim().isNotEmpty()) {
-                                                 val tempId = System.currentTimeMillis().toString()
-                                                 val newChat = ChatItem(
-                                                     id = tempId,
-                                                     message = inputText.trim(),
-                                                     sentFrom = ProfileObject.profile?.userId!!,
-                                                     sentTo = chatListUserId,
-                                                     sent = 0,
-                                                     received = false,
-                                                     seen = false
-                                                 )
-                                                 scope.launch {
-                                                     /*
-                                                 saveToDb = chatViewModel.saveChatToDB(chat)
-
-                                                 Log.d("socketManager", "1: ChatScreenUI:$saveToDb ------->  $chat ")
-
-                                                 if (saveToDb) {
-                                                     chatViewModel.sendMessage(
-                                                         userNumber,
-                                                         sentTo,
-                                                         inputText.ifEmpty {
-                                                             "testing"
-                                                         }
-                                                     )
-                                                     inputText = ""
-                                                 }
-                                                 */
-                                                     chatViewModel.sendMessage(newChat)
-                                                     inputText = ""
-
-                                                 }
-                                             }
-                                         },fontFamily = DONGLE_BOLD, fontSize = 24.sp, color = Color.DarkGray)
-                                     }
-                                 }
-                    },
-                    textStyle = TextStyle(fontSize = 14.sp),
-                    shape = RoundedCornerShape(12.dp),
-                    maxLines=10,
-                    colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = Color.DarkGray, unfocusedBorderColor = Color.DarkGray, cursorColor = Color.Red)
-                )
-            }
-        }
-    }
-}
-
- Card(modifier = Modifier
-                    .size(48.dp)
-                    .clickable {
-                        val chat = Chat(
-                            sentTo = sentTo!!, //sentTo
-                            sentFrom = userNumber!!,//loggedInNumber.toString(),
-                            message = inputText,
-                            received = false,
-                            sent = 0,
-                            seen = false
-                        )
-                        scope.launch {
-                            saveToDb = chatViewModel.saveChatToDB(chat)
-
-                            Log.d("socketManager", "1: ChatScreenUI:$saveToDb ------->  $chat ")
-
-                            if (saveToDb) {
-                                chatViewModel.sendMessage(
-                                    userNumber,
-                                    sentTo,
-                                    inputText.ifEmpty {
-                                        "testing"
-                                    }
-                                )
-                                inputText = ""
-                            }
-                        }
-                    }, shape = RoundedCornerShape(20.dp), colors = CardDefaults.cardColors(containerColor = Color.LightGray)) {
-                    Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-                        Image(
-                            painter = painterResource(id = R.drawable.chat_new),
-                            contentDescription = "",
-                            colorFilter = ColorFilter.tint(color = Color.DarkGray),
-                            alignment = Alignment.Center,
-                            modifier = Modifier
-                                .size(35.dp)
-                                .padding(2.dp)
-                        )
-                    }
-
-                }
- */
-
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
 @Composable
-fun SingleChatTopBar(title: String,profileImage:String?, navController: NavHostController) {
+fun SingleChatTopBar(title: String,userId:String,profileImage:String?, navController: NavHostController) {
     TopAppBar(
         title = {
             Text(
-                title,textAlign= TextAlign.Start, overflow= TextOverflow.Ellipsis, fontFamily = Constants.FONT_LIGHT,color = Color.White.copy(alpha = 0.8f), fontSize = 20.sp
+                title,textAlign= TextAlign.Start, overflow= TextOverflow.Ellipsis, fontFamily = Constants.FONT_LIGHT,color = Color.White, fontSize = 20.sp
             )
         },
         navigationIcon = {
@@ -803,18 +495,16 @@ fun SingleChatTopBar(title: String,profileImage:String?, navController: NavHostC
                         .clickable { navController.navigateUp() }
 
                 )
-                GlideImage(
-                    model =  imagePrefix + profileImage ,
-                    contentDescription = "",
-                    contentScale=ContentScale.Crop,
-                    modifier = Modifier
-                        .clip(shape = CircleShape)
-                        .size(40.dp)
-                        .clickable { navController.navigate(SCREENS.PROFILE.route) }
-                )
-
-
-                    Log.i("IMagePrefix", "SingleChatTopBar: $imagePrefix + $profileImage")
+                Box(modifier = Modifier
+                    .clip(shape = CircleShape).size(40.dp).background(color = Color.LightGray)
+                    .clickable { navController.navigate(SCREENS.USER_PUBLIC_PROFILE.createPath(userId = userId))}) {
+                    GlideImage(
+                        model = if(profileImage.isNullOrEmpty()) R.drawable.person_blue else  imagePrefix + profileImage,
+                        contentDescription = "",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                    )
+                }
 
             }
         }, actions = {
@@ -838,7 +528,7 @@ fun SingleChatTopBar(title: String,profileImage:String?, navController: NavHostC
 
         },
         modifier = Modifier.shadow(elevation = 2.dp, spotColor = Color.LightGray),
-        colors = TopAppBarDefaults.mediumTopAppBarColors(containerColor = Constants.HOME_BOTTOM_BAR_COLOR)
+        colors = TopAppBarDefaults.mediumTopAppBarColors(containerColor = Color(0xFF0B010E))
     )
 }
 

@@ -65,6 +65,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -89,6 +90,7 @@ import com.spint.app.viewmodels.AuthViewModel
 import com.spint.app.viewmodels.ChatViewModel
 import com.spint.app.viewmodels.HomeViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.android.material.resources.CancelableFontCallback
 import com.spint.app.R
 import com.spint.app.screens._1home._3dropZone.DroppedProfileLocation
 import java.net.URLEncoder
@@ -228,7 +230,7 @@ fun DirectChatProfiles(
     when (val res = saveToChatResponse) {
         is RequestState.Success -> {
             chatViewModel.connectSocket()
-            val encodedImageUrl = URLEncoder.encode(res.data.withUserId.profileImage, StandardCharsets.UTF_8.toString())
+            val encodedImageUrl = URLEncoder.encode(res.data.withUserId.profileImage ?: "", StandardCharsets.UTF_8.toString())
             navController.navigate(
                 SCREENS.SINGLE_CHAT.createPath(
                     userName = res.data.withUserId.name,
@@ -338,91 +340,96 @@ fun DirectChatItem(
     onProfileClicked: () -> Unit,
     onSendMessageClicked: () -> Unit
 ) {
-    Column(
-        modifier = Modifier.wrapContentSize(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-
-        Card(
-            modifier = Modifier
-                .clickable {
-                    onProfileClicked()
-                }
-                .padding(horizontal = 16.dp)
-                .wrapContentWidth()
-                .height(300.dp),
-            shape = RoundedCornerShape(8.dp),
-          //  border = BorderStroke(width = 0.5.dp, color = Color.Gray)
+        Box(
+            modifier = Modifier.padding(10.dp).fillMaxWidth().wrapContentHeight()
         ) {
-            GlideImage(
-                model = if(directChatObject?.userId?.profileImage?.isNotEmpty()==true) imagePrefix+directChatObject.userId.profileImage else "",
-                contentDescription = "",
-                contentScale = ContentScale.Crop
-            )
-        }
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 10.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Top
-        ) {
-            Column(modifier = Modifier.wrapContentSize()) {
-                directChatObject?.userId?.name?.capitalize()?.let {
-                    Text(
-                        text = it,
-                        fontSize = 24.sp,lineHeight=8.sp,
-                        color = Color.White,
-                        fontFamily = Constants.FONT_MEDIUM, fontWeight = FontWeight.SemiBold
-                    )
-                }
-                directChatObject?.userId?.userName?.capitalize()?.let {
-                    Text(
-                        text = "@$it",
-                        fontSize = 12.sp,lineHeight=8.sp,
-                        color = Color.Gray,
-                        fontFamily = Constants.FONT_LIGHT, fontWeight = FontWeight.Normal
-                    )
-                }
+            Column() {
+            Box(modifier = Modifier.wrapContentSize().clip(RoundedCornerShape(2.dp)).background(color= Constants.HOME_TOP_BAR_COLOR.copy(alpha = 0.2f))) {
+                Text("50m away", color = Color.LightGray, fontSize = 10.sp, fontFamily = Constants.FONT_LIGHT, modifier = Modifier.padding(horizontal = 10.dp, vertical = 0.dp))
 
             }
-
-
-            Button(
-                onClick = { onSendMessageClicked() },
-                shape = RoundedCornerShape(6.dp),
-                modifier = Modifier
-                    .wrapContentWidth() //.wrapContentHeight().fillMaxWidth(0.8f)
-                    //.align(Alignment.CenterHorizontally),
-                ,colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.White,
-                )
+            Column(
+                modifier = Modifier.wrapContentSize().clip(RoundedCornerShape(bottomStart = 8.dp, bottomEnd = 8.dp, topEnd = 8.dp))
+                    .background(color = Color.DarkGray),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Row(
-                    modifier = Modifier.wrapContentWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+
+                Box(
+                    modifier = Modifier.clickable { onProfileClicked() }
+                        .fillMaxWidth()//.wrapContentWidth()
+                        .height(300.dp)
                 ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.chat_new),
+                    GlideImage(
+                        model = if (directChatObject?.userId?.profileImage?.isNotEmpty() == true) imagePrefix + directChatObject.userId.profileImage else "",
                         contentDescription = "",
-                        modifier = Modifier.size(16.dp),
-                        colorFilter = ColorFilter.tint(Color.Black)
-                    )
-                    Text(
-                        text = "Send Message",
-                        color = Color.Black,
-                        fontFamily = Constants.FONT_LIGHT
+                        contentScale = ContentScale.Crop
                     )
                 }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 10.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.Top
+                ) {
+                    Column(modifier = Modifier.wrapContentSize()) {
+                        directChatObject?.userId?.name?.capitalize()?.let {
+                            Text(
+                                text = it,
+                                fontSize = 24.sp, lineHeight = 8.sp,
+                                color = Color.White,
+                                fontFamily = Constants.FONT_MEDIUM, fontWeight = FontWeight.SemiBold
+                            )
+                        }
+                        directChatObject?.userId?.userName?.capitalize()?.let {
+                            Text(
+                                text = "@$it",
+                                fontSize = 12.sp, lineHeight = 8.sp,
+                                color = Color.Gray,
+                                fontFamily = Constants.FONT_LIGHT, fontWeight = FontWeight.Normal
+                            )
+                        }
+
+                    }
+
+
+                    Button(
+                        onClick = { onSendMessageClicked() },
+                        shape = RoundedCornerShape(6.dp),
+                        modifier = Modifier
+                            .wrapContentWidth() //.wrapContentHeight().fillMaxWidth(0.8f)
+                        //.align(Alignment.CenterHorizontally),
+                        , colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.White,
+                        )
+                    ) {
+                        Row(
+                            modifier = Modifier.wrapContentWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.chat_new),
+                                contentDescription = "",
+                                modifier = Modifier.size(16.dp),
+                                colorFilter = ColorFilter.tint(Color.Black)
+                            )
+                            Text(
+                                text = "Send Message",
+                                color = Color.Black,
+                                fontFamily = Constants.FONT_LIGHT
+                            )
+                        }
+
+                    }
+                }
+                Divider(color = floatingActionBtnColor.copy(alpha = 0.23f), thickness = 0.18.dp)
 
             }
         }
-        Divider(color = floatingActionBtnColor.copy(alpha = 0.23f), thickness = 0.18.dp)
 
-    }
+   }
 }
-
 
 
 @Composable

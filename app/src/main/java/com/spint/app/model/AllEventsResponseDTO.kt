@@ -1,5 +1,6 @@
 package com.spint.app.model
 
+import com.spint.app.model.flashPost.FlashPostDetailsResponse
 import com.spint.app.model.flashPost.FlashPostResponse
 
 data class AllEventsResponseDTO(
@@ -13,4 +14,9 @@ data class AllPingsResponseDTO(
     val success:Boolean,
     val code:Int,
     val data:List<FlashPostResponse>
+)
+data class FlashPostResponseDTO(
+    val success:Boolean,
+    val message:String,
+    val data:FlashPostDetailsResponse
 )

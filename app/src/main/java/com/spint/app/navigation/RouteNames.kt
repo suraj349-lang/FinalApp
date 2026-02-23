@@ -17,6 +17,12 @@ sealed class SCREENS(val route:String){
 
     object HOME:SCREENS("home_screen")
     object PROFILE:SCREENS("profile_screen")
+
+    object MY_FLASH_POST_DETAILS_SCREEN:SCREENS("myFlashPostDetailsScreen/{id}"){
+        fun createPath(id: String): String {
+            return "myFlashPostDetailsScreen/${id}"
+        }
+    }
     object SETTINGS:SCREENS("settings_screen")
     object FLASH_POSTS:SCREENS("personal")
     object EVENTS_SCREEN:SCREENS("events")

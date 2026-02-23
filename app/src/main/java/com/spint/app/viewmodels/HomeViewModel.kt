@@ -34,7 +34,9 @@ import com.spint.app.utils.RequestState
 import com.google.android.libraries.places.api.Places
 import com.google.android.libraries.places.api.model.AutocompletePrediction
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
+import com.spint.app.datastore.StoreLoginState
 import com.spint.app.model.flashPost.CommentData
+import com.spint.app.model.flashPost.FlashPostDetailsResponse
 import com.spint.app.model.flashPost.PingsOnFlashPostRequest
 import com.spint.app.model.flashPost.PingsOnFlashPostResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -61,6 +63,7 @@ class HomeViewModel @Inject constructor(
     private val profileRepository: ProfileRepository,
     private val s3Uploader: S3Uploader,
     private val storeUserState: StoreUserState,
+    private val storeLoginState: StoreLoginState,
     @ApplicationContext context: Context): ViewModel(){
 
     val TAG="GET_EVENTS_RESPONSE";
@@ -450,6 +453,27 @@ class HomeViewModel @Inject constructor(
 
             }
     }
+    //============================================================================================================//
+
+    private val _userFlashPostDetailsResponse = MutableStateFlow<RequestState<FlashPostDetailsResponse>>(RequestState.Idle)
+    val userFlashPostDetailsResponse: StateFlow<RequestState<FlashPostDetailsResponse>> = _userFlashPostDetailsResponse.asStateFlow()
+
+    fun getUserFlashPostDetails(id:String)=viewModelScope.launch(Dispatchers.IO) {
+        eventsRepository.getUserFlashPostDetails(id)
+            .onStart {
+                _userFlashPostDetailsResponse.value = RequestState.Loading
+
+            }.catch {
+                _userFlashPostDetailsResponse.value = RequestState.Error(it)
+                Log.d("getUserFlashPostDetails", "user flash post details error ${_userFlashPostDetailsResponse.value}",it)
+
+            }.collect {
+                _userFlashPostDetailsResponse.value = RequestState.Success(it.data)
+                canFetchPings.value=false
+                Log.d("getUserFlashPostDetails", "user flash post details data ${_userFlashPostDetailsResponse.value}")
+
+            }
+    }
     private var _createFlashPostResponse:MutableStateFlow<RequestState<String>> = MutableStateFlow(RequestState.Idle)
     var createFlashPostResponse :StateFlow<RequestState<String>> = _createFlashPostResponse
 
@@ -491,9 +515,10 @@ class HomeViewModel @Inject constructor(
             eventsRepository.addPingToFlashPost(pingsOnFlashPostRequest)
                 .onStart{}
                 .catch {error->
-                    Log.e(TAG, "addPingOnFlashPost: ${error.fillInStackTrace()}",error )
+                    Log.e("addPingOnFlashPost", "addPingOnFlashPost: ${error.fillInStackTrace()}",error )
                 }
                 .collect {
+                    Log.i("addPingOnFlashPost", "addPingOnFlashPost: $pingOnPostRequest")
                     _pingOnPostRequest.value= RequestState.Success(it)
                 }
         }
@@ -557,6 +582,21 @@ class HomeViewModel @Inject constructor(
             }
             .collect{
                 _userProfileResponse.value=RequestState.Success(it.data)
+            }
+    }
+
+    fun deleteAccount(userID: String,onSuccess: () -> Unit)=viewModelScope.launch{
+        profileRepository.deleteAccount(userID)
+            .onStart {
+
+            }
+            .catch {
+
+            }
+            .collect{
+                storeLoginState.saveLoginState(false)
+                storeLoginState.saveUserToken("")
+                onSuccess()
             }
     }
     //-------------------------------------------------------------------------------------------------------//

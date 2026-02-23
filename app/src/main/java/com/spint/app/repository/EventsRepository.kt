@@ -13,6 +13,7 @@ import com.spint.app.model.AllEventsResponseDTO
 import com.spint.app.model.AllPingsResponseDTO
 import com.spint.app.model.CreateFlashPostResponse
 import com.spint.app.model.EventDetailsResponse
+import com.spint.app.model.FlashPostResponseDTO
 import com.spint.app.model.PremiumEventResponseDTO
 import com.spint.app.model.flashPost.CommentData
 import com.spint.app.model.flashPost.FlashPostRequestDto
@@ -75,6 +76,10 @@ class EventsRepository @Inject constructor(private val api: ApiService) {
 
     fun getUserPings(id:String): Flow<AllPingsResponseDTO> = flow {
         emit(api.getUserFlashPosts(id))
+    }.flowOn(Dispatchers.IO)
+
+    fun getUserFlashPostDetails(id:String): Flow<FlashPostResponseDTO> = flow {
+        emit(api.getUserFlashPostDetails(id))
     }.flowOn(Dispatchers.IO)
     fun getUserDropProfiles(id:String): Flow<GetDropProfileResponseModel> = flow {
         emit(api.getUserDropProfiles(id))

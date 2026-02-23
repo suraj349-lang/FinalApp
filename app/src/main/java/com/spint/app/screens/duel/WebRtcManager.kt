@@ -43,6 +43,18 @@ class WebRTCManager(
     fun toggleBlur() {
         blurFlag.value = !blurFlag.value
     }
+    fun nextUser() {
+        try {
+            peerConnection?.close()
+            peerConnection = null
+            pendingRemoteCandidates.clear()
+            isRemoteDescriptionSet = false
+            partnerId = null
+            socket.emit("next")
+        } catch (e: Exception) {
+            Log.e(tag, "Failed to emit next: ${e.message}")
+        }
+    }
 
 
     /** Initialize factory + local tracks */
@@ -102,7 +114,7 @@ class WebRTCManager(
             reconnection = true
             }
 
-            socket = IO.socket("http://3.108.55.84", opts)
+            socket = IO.socket(Constants.SIGNAL_SERVER, opts)
 
 
             socket.connect()

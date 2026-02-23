@@ -35,7 +35,7 @@ data class User(
     val token: String,
     val address: String,
     val offers:List<String>?=null,
-    val profileImage:String ="",
+    val profileImage:String? ="",
     val backgroundImage:String=""
 ){
     constructor():this("","","","","","", emptyList(),"","")

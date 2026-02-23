@@ -143,7 +143,7 @@ fun ChatListScreen(navController: NavHostController,chatViewModel: ChatViewModel
     Scaffold(topBar = {
         ChatTopBar(
             title = "Chats",
-            user.profileImage,
+            user.profileImage ?: "",
             navController = navController
         ){
             showSearchBox=true
@@ -151,7 +151,7 @@ fun ChatListScreen(navController: NavHostController,chatViewModel: ChatViewModel
     },
         bottomBar = {BottomBar(navController = navController, state =buttonsVisible, containerColor = Constants.HOME_BOTTOM_BAR_COLOR )}
     ) {
-        Surface(modifier = Modifier.fillMaxSize(), color = Constants.CHAT_LIST_BKG) {
+        Surface(modifier = Modifier.fillMaxSize(), color = Color.DarkGray) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -371,7 +371,7 @@ fun UserItem(navController: NavHostController, user: ChatList,setProfileImage:(S
         .height(60.dp)
         .clickable {
            // setProfileImage(user.withUserId.profileImage)
-            val encodedImageUrl = URLEncoder.encode(user.withUserId.profileImage, StandardCharsets.UTF_8.toString())
+            val encodedImageUrl = URLEncoder.encode(user.withUserId.profileImage ?: "", StandardCharsets.UTF_8.toString())
             navController.navigate(
                 SCREENS.SINGLE_CHAT.createPath(
                     user.withUserId.name,
@@ -397,7 +397,7 @@ fun UserItem(navController: NavHostController, user: ChatList,setProfileImage:(S
 //                    .border(1.dp, Color.DarkGray, CircleShape)
 //            )
             Card(modifier = Modifier.size(56.dp), shape = CircleShape, colors = CardDefaults.cardColors(containerColor = Color.Transparent)) {
-                GlideImage(model =if(user.withUserId !=null || user.withUserId.profileImage.isNotEmpty()) imagePrefix+user.withUserId.profileImage else R.drawable.femaleprofile, contentDescription = "",modifier = Modifier
+                GlideImage(model = if(user.withUserId.profileImage.isNullOrEmpty()) R.drawable.profile_colored else  imagePrefix+user.withUserId.profileImage,  contentDescription = "",modifier = Modifier
                     .padding(2.dp)
                     .fillMaxSize()
                     .clip(CircleShape),

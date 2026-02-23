@@ -9,6 +9,7 @@ import com.spint.app.model.RegisterUserModel
 import com.spint.app.model.LoginAPIResponse
 import com.spint.app.model.ResponseOfEmail
 import com.spint.app.model.VerifyEmailOtp
+import com.spint.app.network.ApiService
 import com.spint.app.network.NonAuthApiService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -17,7 +18,7 @@ import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
 
-class AuthRepository @Inject constructor(private val noAuthApi:NonAuthApiService){
+class AuthRepository @Inject constructor(private val noAuthApi:NonAuthApiService,private val apiService: ApiService){
 
     fun getEmailOtp(email: Email): Flow<ResponseOfEmail> = flow  {
         emit(noAuthApi.getEmailOtp(email))
@@ -37,5 +38,6 @@ class AuthRepository @Inject constructor(private val noAuthApi:NonAuthApiService
     fun updateFcmToken(data: SendFcmTokenDto): Flow<FCMTokenResponse> = flow  {
         emit(noAuthApi.updateFcmToken(data))
     }.flowOn(Dispatchers.IO)
+
 }
 

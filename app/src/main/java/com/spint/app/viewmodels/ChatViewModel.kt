@@ -33,6 +33,7 @@ class ChatViewModel @Inject constructor(
 
     private val _messagesFromServer = MutableStateFlow<RequestState<List<Message>>>(RequestState.Idle)
     val messagesFromServer: StateFlow<RequestState<List<Message>>> = _messagesFromServer
+    val getAllMessageError=MutableStateFlow("")
 
     val profileImage = MutableStateFlow<String?>(null)
 
@@ -42,18 +43,6 @@ class ChatViewModel @Inject constructor(
 
     fun connectSocket() {
          val userId = UserObject.user.value.user
-
-//        var user=User()
-//        viewModelScope.async {
-//            user = UserObject.user
-//                .filter { it.user != null } // wait until user is non-null
-//                .first() // suspend until first valid user is emitted
-//        }
-//
-//        val userId = user.user
-
-
-
         if (isSocketConnected) {
             Log.d("SocketManager", "Socket already connected, skipping connect.")
             return
@@ -118,7 +107,9 @@ class ChatViewModel @Inject constructor(
             }
             .catch {
                 Log.e("Messageschat", "getAllMessages:${it.message}", it)
+                getAllMessageError.value= it.message.toString()
                 _messagesFromServer.value = RequestState.Error(it)
+
             }
             .collect { response ->
                 Log.d("Messageschat", "getAllMessages: $response")

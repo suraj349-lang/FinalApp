@@ -42,7 +42,7 @@ import com.spint.app.screens._3createEventOrPing.createEvent.CreateEventMainScre
 import com.spint.app.screens._5settings.SettingsScreenUI
 import com.spint.app.testing.TabView
 import com.spint.app.screens._3createEventOrPing.PastRaisedOffer
-import com.spint.app.screens._1home._1FlashPosts.detailsScreen.PingDetailsScreen
+import com.spint.app.screens._1home._1FlashPosts.detailsScreen.FlashPostDetailsScreen
 import com.spint.app.screens._1home._1FlashPosts.FlashPostsScreen
 import com.spint.app.screens._3createEventOrPing.createPing.CreatePingWrapper
 import com.spint.app.screens._4profile.ProfileScreenNew
@@ -81,6 +81,7 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.firebase.Firebase
 import com.google.firebase.messaging.messaging
 import com.spint.app.screens._2Events.events.templates.xhmaslive.XHamsLiveScreenWrapper
+import com.spint.app.screens._4profile.userPings.MyFlashPostDetailsScreen
 import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.json.Json
 import java.net.URLDecoder
@@ -162,6 +163,13 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
         composable(SCREENS.PROFILE.route){
            // ProfileScreenUI(navController,imageUploadViewModel,authViewModel)
             ProfileScreenNew(navController,authViewModel, homeViewModel, imageUploadViewModel)
+        }
+        composable(SCREENS.MY_FLASH_POST_DETAILS_SCREEN.route, arguments = listOf(
+            navArgument("id"){type= NavType.StringType}
+        )){navBackStackEntry->
+            val id=navBackStackEntry.arguments?.getString("id") ?: ""
+
+            MyFlashPostDetailsScreen(navController,id,homeViewModel)
         }
         composable(SCREENS.SETTINGS.route){
             SettingsScreenUI(navController,authViewModel)
@@ -261,7 +269,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
         composable(route=SCREENS.PING_DETAILS.route, arguments = listOf(navArgument("flashPostResponse"){ type= NavType.StringType })){navBackStackEntry ->
             val json=navBackStackEntry.arguments?.getString("flashPostResponse")
             val flashPostResponse=json?.let { Json.decodeFromString<FlashPostResponse>(it) }
-            PingDetailsScreen(navController,flashPostResponse)
+            FlashPostDetailsScreen(navController,flashPostResponse)
 
         }
         composable("camerax/{screen}"){backStackEntry->

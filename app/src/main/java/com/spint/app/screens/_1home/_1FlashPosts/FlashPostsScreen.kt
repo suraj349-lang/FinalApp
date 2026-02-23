@@ -325,10 +325,11 @@ fun FlashPostsScreen(
                                         FlashPostWithImageScreen(
                                             item,
                                             onFlashPostClicked = {navController.navigate(SCREENS.PING_DETAILS.createRoute(item))},
-                                            onUserProfileClicked = {navController.navigate(SCREENS.USER_PUBLIC_PROFILE.createPath(user.user))},
+                                            onUserProfileClicked = {item.user?.user?.let{userId->navController.navigate(SCREENS.USER_PUBLIC_PROFILE.createPath(userId))}},
                                             onPingOfFlashPostClicked = {postId,message->
                                                 homeViewModel.addPingOnFlashPost(
-                                                    PingsOnFlashPostRequest(userId = user.user,postId,message)
+                                                    PingsOnFlashPostRequest(userId = item.user?.user
+                                                        ?: "",postId,message)
                                                 )
                                             },
                                             onCommentButtonClicked = {

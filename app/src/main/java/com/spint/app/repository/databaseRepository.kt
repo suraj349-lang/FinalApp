@@ -8,6 +8,7 @@ import com.spint.app.database.ProfileDao
 import com.spint.app.model.ChatList
 import com.spint.app.model.Message
 import com.spint.app.network.ApiService
+import com.spint.app.network.ChatRetrofitClient
 import com.spint.app.utils.ApiResponse
 import com.spint.app.utils.constants.Constants
 import dagger.hilt.android.scopes.ViewModelScoped
@@ -58,6 +59,6 @@ class ChatDatabaseRepository @Inject constructor(private val chatDao: ChatDao,pr
      fun getMessages(userId: String, otherUserId: String): Flow<ApiResponse<List<Message>>> = flow {
         Log.d("Messageschat", "getAllMessages: called in repo")
         Log.i("Messageschat", "getMessages:$userId   $otherUserId ")
-            emit( apiService.getChats(userId = userId, otherUserId = otherUserId))
+         emit(ChatRetrofitClient.chatApi.getChats(userId, otherUserId))
         }.flowOn(Dispatchers.IO)
 }

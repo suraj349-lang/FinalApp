@@ -1,6 +1,5 @@
-package com.spint.app.screens._4profile.userPings
+package com.spint.app.screens._1home._1FlashPosts.detailsScreen
 
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -8,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -15,24 +15,20 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Surface
 import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
 import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material.Text
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,7 +36,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -49,15 +44,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.spint.app.R
-import com.spint.app.model.flashPost.FlashPostDetailsResponse
 import com.spint.app.model.flashPost.FlashPostResponse
-import com.spint.app.model.flashPost.PingsOnPost
 import com.spint.app.navigation.SCREENS
 import com.spint.app.screens._1home._1FlashPosts.detailsScreen.flashPosts.AddPingOnFlashPost
 import com.spint.app.screens._1home._1FlashPosts.detailsScreen.flashPosts.CommentRoundUI
@@ -66,53 +61,68 @@ import com.spint.app.screens._1home._1FlashPosts.detailsScreen.flashPosts.ShareR
 import com.spint.app.screens._1home._1FlashPosts.detailsScreen.flashPosts.ViewRoundUI
 import com.spint.app.screens._1home.commonUI.sharePingDeepLink
 import com.spint.app.screens._2Events.events.eventWarScreen.CommentsScreen
+import com.spint.app.testing.CommonTopBar
 import com.spint.app.ui.imagePrefix
 import com.spint.app.ui.theme.floatingActionBtnColor
-import com.spint.app.utils.RequestState
 import com.spint.app.utils.constants.Constants
-import com.spint.app.viewmodels.HomeViewModel
 import kotlinx.coroutines.launch
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
+
+
+@Composable
+fun FlashPostDetailsScreen(navController: NavHostController, flashPostResponse: FlashPostResponse?) {
+    Scaffold(
+        topBar = {
+            flashPostResponse?.let {
+                CommonTopBar(
+                    flashPostResponse = it,
+                    onUserProfileClicked = {navController.navigate(SCREENS.USER_PUBLIC_PROFILE.createPath(flashPostResponse.user?.user!!))},
+                    onSendMessageClicked = {
+                        if (flashPostResponse.user != null) {
+                            val encodedImageUrl = URLEncoder.encode(flashPostResponse.user.profileImage, StandardCharsets.UTF_8.toString())
+                            navController.navigate(SCREENS.SINGLE_CHAT.createPath(userName = flashPostResponse.user.userName, profileImage = encodedImageUrl, chatListUserId = flashPostResponse.user.user))
+                        }
+                     },
+                    onBackClicked = { navController.navigateUp() }
+                )
+            }
+        },
+              content = {
+                  Surface(
+                      modifier = Modifier
+                          .background(Color.Transparent)
+                          .padding(it)
+                          .fillMaxSize()
+                  ) {
+                      FlashPostDetailsScreenUI(
+                          flashPostResponse = flashPostResponse
+                      )
+
+                  }
+
+              })
+
+}
+
 
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun MyFlashPostDetailsScreen(navController: NavController,id:String,homeViewModel: HomeViewModel) {
+fun FlashPostDetailsScreenUI(flashPostResponse: FlashPostResponse?) {
     val context = LocalContext.current
     var showFullImage by remember { mutableStateOf(false) }
     val systemUiController = rememberSystemUiController()
+
+
+
     SideEffect {
         systemUiController.setNavigationBarColor(
             color = Color.DarkGray,
             darkIcons = false
         )
     }
-    LaunchedEffect(Unit) {
-        homeViewModel.getUserFlashPostDetails(id)
-    }
-    val flashPostResponse by homeViewModel.userFlashPostDetailsResponse.collectAsState()
-    when ( val response=flashPostResponse) {
-        is RequestState.Success -> {
-            MyFlashPostDetailsScreenUI(response.data,navController)
-        }
-
-        is RequestState.Error -> {
-            Toast.makeText(context, "Error getting Details", Toast.LENGTH_LONG).show()
-        }
-
-        is RequestState.Loading -> {
-            CircularProgressIndicator()
-        }
-
-        else -> {}
-    }
-
-
-}
-
-@OptIn(ExperimentalGlideComposeApi::class)
-@Composable
-fun MyFlashPostDetailsScreenUI(flashPostResponse: FlashPostDetailsResponse?,navController: NavController) {
-    val context=LocalContext.current
+    
     if (flashPostResponse != null) {
         Box(modifier = Modifier
             .background(color = Color.DarkGray)
@@ -127,20 +137,20 @@ fun MyFlashPostDetailsScreenUI(flashPostResponse: FlashPostDetailsResponse?,navC
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(400.dp)
-                ) {
-                    GlideImage(
-                        model = imagePrefix + flashPostResponse.image,
-                        contentDescription = "",
-                        contentScale = ContentScale.Crop,
                         modifier = Modifier
-                            .fillMaxSize()
-                            .clickable { /*showFullImage = true */ }
-                    )
+                            .fillMaxWidth()
+                            .height(400.dp)
+                    ) {
+                        GlideImage(
+                            model = imagePrefix + flashPostResponse.image,
+                            contentDescription = "",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clickable { showFullImage = true }
+                        )
 
-                }
+                    }
                 Row(
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment=Alignment.Bottom,
@@ -162,12 +172,8 @@ fun MyFlashPostDetailsScreenUI(flashPostResponse: FlashPostDetailsResponse?,navC
 
 
                 }
-                Row(modifier = Modifier
-                    .padding(top = 8.dp)
-                    .fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-                    Image(painter = painterResource(R.drawable.location_new), contentDescription = "",modifier= Modifier
-                        .padding(end = 6.dp)
-                        .size(8.dp))
+                Row(modifier = Modifier.padding(top=8.dp).fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+                    Image(painter = painterResource(R.drawable.location_new), contentDescription = "",modifier= Modifier.padding(end=6.dp).size(8.dp))
                     Text(
                         text = flashPostResponse.location,
                         maxLines = 1,
@@ -178,10 +184,7 @@ fun MyFlashPostDetailsScreenUI(flashPostResponse: FlashPostDetailsResponse?,navC
                         lineHeight = 12.sp,
                     )
                 }
-                Column(modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .background(color = Color.DarkGray)) {
+                Column(modifier = Modifier.fillMaxWidth().wrapContentHeight().background(color=Color.DarkGray)) {
                     Text(
                         text = flashPostResponse.title ?: "",
                         modifier = Modifier
@@ -203,30 +206,26 @@ fun MyFlashPostDetailsScreenUI(flashPostResponse: FlashPostDetailsResponse?,navC
                         fontWeight = FontWeight.SemiBold
                     )
                 }
-                UserFlashPostDetailsTabsScreen(flashPostResponse.pings ?: listOf()){
-                    navController.navigate(SCREENS.USER_PUBLIC_PROFILE.createPath(it))}
+                FlashPostDetailsTabsScreen()
             }
-//            if(showFullImage){
-//                FullScreenImageViewDialogBox(image =flashPostResponse.image ,onCloseClicked={showFullImage=false })
-//            }
+            if(showFullImage){
+                FullScreenImageViewDialogBox(image =flashPostResponse.image ,onCloseClicked={showFullImage=false })
+            }
 
         }
     }
 }
 
-
 @Composable
-fun UserFlashPostDetailsTabsScreen(ping: List<PingsOnPost>,onProfileClicked: (String) -> Unit) {
+fun FlashPostDetailsTabsScreen() {
 
-    val tabs = listOf("Comments", "Responses")
+    val tabs = listOf("Comments", "Pings", "Related")
     val pagerState = rememberPagerState(initialPage = 0) { tabs.size }
     val coroutineScope = rememberCoroutineScope()
 
     Column {
         TabRow(
-            modifier = Modifier
-                .height(40.dp)
-                .fillMaxWidth(),
+            modifier = Modifier.height(40.dp).fillMaxWidth(),
             selectedTabIndex = pagerState.currentPage,
             backgroundColor = Color.Gray,
             contentColor = Color.Black,
@@ -254,7 +253,6 @@ fun UserFlashPostDetailsTabsScreen(ping: List<PingsOnPost>,onProfileClicked: (St
                         Text(
                             text = title,
                             fontSize = 14.sp,
-                            color = if(pagerState.currentPage ==index) Color.White else Color.Black,
                             fontFamily = Constants.FONT_MEDIUM
                         )
                     }
@@ -265,45 +263,63 @@ fun UserFlashPostDetailsTabsScreen(ping: List<PingsOnPost>,onProfileClicked: (St
         // 🔥 Swipeable Content
         HorizontalPager(
             state = pagerState,
-            modifier = Modifier
-                .padding(top = 8.dp)
-                .fillMaxSize()
+            modifier = Modifier.padding(top=8.dp).fillMaxSize()
         ) { page ->
 
             when (page) {
                 0 -> CommentsScreen()
-                1 -> {RepliesScreen(ping){onProfileClicked(it)}}
+                1 -> {}
+                2 -> {}
             }
         }
     }
 }
 
+
 @Composable
-fun RepliesScreen(ping: List<PingsOnPost>,onProfileClicked:(String)-> Unit) {
-    Column(modifier=Modifier.fillMaxWidth().wrapContentHeight()) {
-        ping.forEach {it->
-            Column() {
-                Row(
-                    modifier = Modifier.fillMaxWidth().background(color = Color.White).padding(horizontal = 4.dp),
-                    horizontalArrangement = Arrangement.spacedBy(10.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    AsyncImage(
-                        model = imagePrefix + it.userId.profileImage,
-                        contentDescription = "",
-                        modifier = Modifier.clickable{onProfileClicked(it.userId.user)}.padding(vertical = 6.dp).size(50.dp).clip(shape = CircleShape),
-                        contentScale = ContentScale.Crop
-                    )
-                    Column(modifier = Modifier.wrapContentHeight(), verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.Start) {
-                        Text(it.userId.name, color = Color.DarkGray, fontSize = 10.sp, fontFamily = Constants.FONT_LIGHT)
-                        Text(it.message, color = Color.Black, fontSize = 14.sp, fontFamily = Constants.FONT_MEDIUM)
-                    }
+fun TabItem(
+    title: String,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    Text(
+        text = title,
+        color = if (isSelected) Color.Black else Color.DarkGray,
+        fontSize = 14.sp,
+        fontFamily = Constants.FONT_MEDIUM,
+        modifier = Modifier
+            .clickable { onClick() }
+            .padding(vertical = 6.dp)
+    )
+}
 
-                }
-                HorizontalDivider(modifier = Modifier.fillMaxWidth(), thickness = 0.25.dp, color = Color.LightGray)
+enum class DebateTab {
+    COMMENTS,
+    PINGS,
+    SECTION1,
+    SECTION2
+}
 
-            }
+
+@Composable
+fun FullScreenImageViewDialogBox(modifier: Modifier = Modifier,image: String,onCloseClicked:()-> Unit) {
+    Dialog(onDismissRequest = {onCloseClicked()}, properties = DialogProperties(dismissOnBackPress = true,dismissOnClickOutside = true)) {
+        Box(modifier= Modifier
+            .padding(vertical = 10.dp)
+            .fillMaxWidth()
+            .fillMaxHeight()){
+            AsyncImage(
+                model = imagePrefix + image,
+                contentDescription = "",
+                contentScale = ContentScale.Inside,
+                modifier = Modifier.fillMaxSize()
+            )
+            Image(painter = painterResource(R.drawable.cross), contentDescription = "",modifier=Modifier
+                .align(
+                    Alignment.TopEnd
+                )
+                .clickable { onCloseClicked() }
+                .size(24.dp))
         }
-
     }
 }

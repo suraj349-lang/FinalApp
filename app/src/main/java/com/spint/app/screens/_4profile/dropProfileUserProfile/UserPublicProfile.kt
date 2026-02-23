@@ -113,7 +113,7 @@ fun UserPublicProfileUI(homeViewModel: HomeViewModel, navController: NavHostCont
         }
         is RequestState.Success ->{
             Log.i("Userr", "DirectChatProfiles: ${response.data.withUserId.name} other user id ${response.data.withUserId._id}")
-            val encodedImageUrl = URLEncoder.encode(response.data.withUserId.profileImage, StandardCharsets.UTF_8.toString())
+            val encodedImageUrl = URLEncoder.encode(response.data.withUserId.profileImage ?: "", StandardCharsets.UTF_8.toString())
             navController.navigate(
                 SCREENS.SINGLE_CHAT.createPath(
                     userName = response.data.withUserId.name,
@@ -142,7 +142,7 @@ fun UserPublicProfileUI(homeViewModel: HomeViewModel, navController: NavHostCont
                     .fillMaxWidth()
                     .wrapContentHeight()){
                     GlideImage(
-                        model = imagePrefix + user.profileImage,
+                        model = if(user.profileImage.isNullOrEmpty()) R.drawable.profile_colored else imagePrefix + user.profileImage,
                         contentDescription = "",
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.padding(top = 80.dp).align(Alignment.TopCenter).clip(shape = CircleShape)

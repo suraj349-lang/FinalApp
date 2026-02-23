@@ -169,7 +169,7 @@ fun DuelScreen(navController: NavHostController) {
     Scaffold(
         topBar = {
             if (!isConnected) {
-                DuelTopBar()
+                DuelTopBar(){navController.navigateUp()}
             }
         },
         bottomBar = {
@@ -256,7 +256,8 @@ fun DuelScreen(navController: NavHostController) {
                         webRTCManager.release();
 
                         isConnected=false
-                    }) {
+                    },
+                    onNextClicked = {webRTCManager.nextUser()}) {
                     isVisible = true
                 }
             }},
@@ -654,7 +655,7 @@ data class DualScreenOptions(
     val color: Color=Color(0xFFFFFFFF)
 )
 @Composable
-fun DuelOptions(isVisible:Boolean,onCloseClicked:()->Unit,onScreenClicked:()->Unit) {
+fun DuelOptions(isVisible:Boolean, onCloseClicked:()->Unit, onNextClicked:()-> Unit, onScreenClicked:()->Unit) {
     val listOfImages= listOf(
         DualScreenOptions(R.drawable.close,"end", color =  Color.Unspecified),
         DualScreenOptions(R.drawable.add,"+friend"),
@@ -689,6 +690,9 @@ fun DuelOptions(isVisible:Boolean,onCloseClicked:()->Unit,onScreenClicked:()->Un
                     .clickable {
                         if (it.name == "end") {
                             onCloseClicked()
+                        }
+                        if(it.name=="next"){
+                            onNextClicked()
                         }
                     }.size(36.dp), colorFilter = if (it.color == Color.Unspecified) null else ColorFilter.tint(it.color))
                 Text(text = it.name, fontFamily = Constants.FONT_MEDIUM, fontSize = 12.sp,color=Color.White)
@@ -748,12 +752,12 @@ fun MoodSelector2(
                 modifier = Modifier
                     .clip(RoundedCornerShape(20.dp))
                     .background(
-                        if (isSelected) Color.White else Color(
-                            android.graphics.Color.parseColor(
-                                mood.colorHex
-                            )
-                        ).copy(alpha = 0.6f)
-                    )
+//                        if (isSelected) Color.White else Color(
+//                            android.graphics.Color.parseColor(
+//                                mood.colorHex
+//                            )
+//                        ).copy(alpha = 0.6f)
+                        if (isSelected) Color.White else Color.DarkGray            )
                     .clickable { onSelect(mood) }
                     .padding(horizontal = 8.dp, vertical = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
