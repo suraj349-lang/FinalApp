@@ -12,10 +12,10 @@ object Constants {
 
     const val TAG = APP_NAME
 
-    const val IP_ADD ="192.168.1.46" //3.108.55.84" //  192.168.1.5
+    const val IP_ADD ="192.168.1.40" //3.108.55.84" //  192.168.1.5
     const val BASE_URL = "http://${IP_ADD}:5000/"
     const val TEMP_SOCKET_URL = "http://${IP_ADD}:5001/"
-    const val SIGNAL_SERVER = "http://${IP_ADD}:5002/"
+    const val SIGNAL_SERVER = "http://192.168.1.40:5002/"
 
 
 
@@ -68,5 +68,5 @@ object Constants {
     val BOTTOM_BAR_INACTIVE_ICON_COLOR= Color.LightGray
     val BOTTOM_BAR_INACTIVE_TEXT_COLOR= Color.LightGray
 
-    val CHAT_LIST_BKG=Color(0xFF090115)
+    val CHAT_LIST_BKG=Color(0xFF3B079A)
 }

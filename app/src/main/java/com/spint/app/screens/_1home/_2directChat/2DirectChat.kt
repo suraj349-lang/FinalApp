@@ -134,7 +134,7 @@ fun DirectChatScreen(
         content = { paddingValues ->
             Box(
                 modifier = Modifier
-                    .background(Constants.HOME_TOP_BAR_COLOR)
+                    .background(Color.Black)
                     .fillMaxSize()
                     .padding(paddingValues)
             ) {

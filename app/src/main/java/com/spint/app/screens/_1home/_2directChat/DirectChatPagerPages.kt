@@ -4,7 +4,6 @@ import androidx.annotation.DrawableRes
 import com.spint.app.R
 
 sealed class DirectChatPagerPages(
-    @DrawableRes
     val image: Int,
     val title: String,
     val description: String

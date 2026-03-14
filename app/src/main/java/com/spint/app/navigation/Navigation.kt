@@ -80,6 +80,7 @@ import com.spint.app.viewmodels.SettingsViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.firebase.Firebase
 import com.google.firebase.messaging.messaging
+import com.spint.app.Duel.presentation.view.DuelScreen2
 import com.spint.app.screens._2Events.events.templates.xhmaslive.XHamsLiveScreenWrapper
 import com.spint.app.screens._4profile.userPings.MyFlashPostDetailsScreen
 import kotlinx.coroutines.tasks.await
@@ -337,7 +338,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
             CommentsScreen()
         }
         composable(SCREENS.DUEL.route){
-            DuelScreen(navController)
+            DuelScreen2(navController)
         }
 
 

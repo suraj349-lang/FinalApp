@@ -183,6 +183,7 @@ dependencies {
 
 
 
-
+//agora
+    implementation 'io.agora.rtc:full-sdk:4.2.2'
 
 }

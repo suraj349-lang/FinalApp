@@ -1,7 +1,6 @@
 package com.spint.app.screens._6chat
 
 
-
 import BottomBar
 import android.annotation.SuppressLint
 import android.util.Log
@@ -23,6 +22,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -69,6 +69,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.util.packInts
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavHostController
@@ -99,8 +100,8 @@ import java.nio.charset.StandardCharsets
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
-fun ChatListScreen(navController: NavHostController,chatViewModel: ChatViewModel) {
-    val lifecycleOwner= LocalLifecycleOwner.current
+fun ChatListScreen(navController: NavHostController, chatViewModel: ChatViewModel) {
+    val lifecycleOwner = LocalLifecycleOwner.current
     val user by UserObject.user.collectAsState()
     DisposableEffect(lifecycleOwner) {
         val observer = LifecycleEventObserver { _, event ->
@@ -140,18 +141,25 @@ fun ChatListScreen(navController: NavHostController,chatViewModel: ChatViewModel
     }
 
 
-    Scaffold(topBar = {
-        ChatTopBar(
-            title = "Chats",
-            user.profileImage ?: "",
-            navController = navController
-        ){
-            showSearchBox=true
+    Scaffold(
+        topBar = {
+            ChatTopBar(
+                title = "Chats",
+                user.profileImage ?: "",
+                navController = navController
+            ) {
+                showSearchBox = true
+            }
+        },
+        bottomBar = {
+            BottomBar(
+                navController = navController,
+                state = buttonsVisible,
+                containerColor = Constants.HOME_BOTTOM_BAR_COLOR
+            )
         }
-    },
-        bottomBar = {BottomBar(navController = navController, state =buttonsVisible, containerColor = Constants.HOME_BOTTOM_BAR_COLOR )}
     ) {
-        Surface(modifier = Modifier.fillMaxSize(), color = Color.DarkGray) {
+        Surface(modifier = Modifier.fillMaxSize(), color = Constants.HOME_TOP_BAR_COLOR) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -169,7 +177,7 @@ fun ChatListScreen(navController: NavHostController,chatViewModel: ChatViewModel
                     }
 
                     is RequestState.Error -> {
-                        CommonErrorScreen("Error getting users list"){
+                        CommonErrorScreen("Error getting users list") {
                             chatViewModel.getUserChatList(user.user)
                         }
                         Log.d(
@@ -182,9 +190,9 @@ fun ChatListScreen(navController: NavHostController,chatViewModel: ChatViewModel
                         val users =
                             remember { (chatListState as RequestState.Success<List<ChatList>>).data }
                         Column(modifier = Modifier.fillMaxHeight(0.99f)) {
-                            LazyColumn(modifier = Modifier.padding(top=5.dp)) {
-                                item(){
-                                  // ChatSections()
+                            LazyColumn(modifier = Modifier.padding(top = 1.dp)) {
+                                item() {
+                                    // ChatSections()
                                 }
                                 items(users) { user ->
                                     UserItem(navController, user) { imageUrl ->
@@ -192,11 +200,6 @@ fun ChatListScreen(navController: NavHostController,chatViewModel: ChatViewModel
                                             chatViewModel.profileImage.value = imageUrl
                                         }
                                     }
-                                    Spacer(modifier = Modifier.padding(top = 1.dp))
-//                                Divider(
-//                                    modifier = Modifier.fillMaxWidth(),
-//                                    color = Color(0xFFF1EAEA)
-//                                )
                                 }
                             }
 //                            AddPeopleFromContacts()
@@ -213,12 +216,25 @@ fun ChatListScreen(navController: NavHostController,chatViewModel: ChatViewModel
 
 @Composable
 fun ChatSections() {
-    val list=listOf("Flash Posts","Drop Profile","NearBy","Duel")
+    val list = listOf("Flash Posts", "Drop Profile", "NearBy", "Duel")
     val selected by remember { mutableStateOf(0) }
-    Row(modifier = Modifier.padding(horizontal = 16.dp).fillMaxWidth().wrapContentHeight(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-        list.forEachIndexed {index,text ->
+    Row(
+        modifier = Modifier
+            .padding(horizontal = 16.dp)
+            .fillMaxWidth()
+            .wrapContentHeight(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        list.forEachIndexed { index, text ->
             Column(modifier = Modifier.wrapContentSize()) {
-                Text(text , fontFamily = Constants.FONT_MEDIUM, fontSize = 16.sp, color = Color.White, style = TextStyle(textDecoration = TextDecoration.Underline))
+                Text(
+                    text,
+                    fontFamily = Constants.FONT_MEDIUM,
+                    fontSize = 16.sp,
+                    color = Color.White,
+                    style = TextStyle(textDecoration = TextDecoration.Underline)
+                )
             }
         }
     }
@@ -226,75 +242,151 @@ fun ChatSections() {
 
 @Composable
 fun AddPeopleFromContacts(modifier: Modifier = Modifier) {
-    Card(Modifier
-        .padding(top = 30.dp)
-        .padding(16.dp)
-        .fillMaxWidth()
-        .height(160.dp), shape = RoundedCornerShape(12.dp), colors = CardDefaults.cardColors(containerColor = Color(
-        0xFFEAE0D3
-    )
-    )) {
-        Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-            Text("Add more people!", fontFamily = Constants.ROBOTO_FLEX, fontSize = 20.sp, color = Color.Black, fontWeight = FontWeight.Bold)
+    Card(
+        Modifier
+            .padding(top = 30.dp)
+            .padding(16.dp)
+            .fillMaxWidth()
+            .height(160.dp), shape = RoundedCornerShape(12.dp), colors = CardDefaults.cardColors(
+            containerColor = Color(
+                0xFFEAE0D3
+            )
+        )
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                "Add more people!",
+                fontFamily = Constants.ROBOTO_FLEX,
+                fontSize = 20.sp,
+                color = Color.Black,
+                fontWeight = FontWeight.Bold
+            )
             Spacer(modifier = Modifier.height(6.dp))
-            Text("Get your friends from your contacts on ${Constants.APP_NAME}", fontFamily = Constants.ROBOTO_FLEX, fontSize = 12.sp, color = Color.DarkGray)
+            Text(
+                "Get your friends from your contacts on ${Constants.APP_NAME}",
+                fontFamily = Constants.ROBOTO_FLEX,
+                fontSize = 12.sp,
+                color = Color.DarkGray
+            )
             Spacer(modifier = Modifier.height(16.dp))
-            Button(onClick = {}, colors = ButtonDefaults.buttonColors(backgroundColor = floatingActionBtnColor)) {
-                Text("Get Contacts", fontFamily = Constants.FONT_LIGHT, fontSize = 16.sp, color = Color.White)
+            Button(
+                onClick = {},
+                colors = ButtonDefaults.buttonColors(backgroundColor = floatingActionBtnColor)
+            ) {
+                Text(
+                    "Get Contacts",
+                    fontFamily = Constants.FONT_LIGHT,
+                    fontSize = 16.sp,
+                    color = Color.White
+                )
             }
         }
 
     }
 }
+
 @Composable
-fun ShareYourProfileInstead(onShareProfileClicked:()-> Unit={}) {
-    val user= UserObject.user.collectAsState()
-    val qrPainter = rememberQrBitmapPainter("https://spint.com/profile/${user.value.user}", qrColor = Color.Black, backgroundColor = Color(0xFFE9F0F7).copy(alpha = 0.8f) )//0xFFEEF707
-    Card(Modifier
-        .padding(16.dp)
-        .fillMaxWidth()
-        .height(100.dp), shape = RoundedCornerShape(12.dp), colors = CardDefaults.cardColors(containerColor = Color(
-        0xFFC5B8E5
-    )
-    )) {
-            Row(modifier = Modifier.fillMaxWidth().wrapContentHeight(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
-                Box(modifier = Modifier.size(100.dp)) {
-                    Image(
-                        painter = qrPainter,
-                        contentDescription = null,
-                        modifier = Modifier.padding(4.dp).fillMaxSize(),
-                        contentScale = ContentScale.FillBounds,
-                        )
-                    AsyncImage(model = imagePrefix+user.value.profileImage, contentDescription = "", modifier = Modifier.align(Alignment.Center).clip(shape = CircleShape).size(30.dp), contentScale = ContentScale.Crop)
-                }
-                Column(modifier = Modifier.padding(vertical = 10.dp).fillMaxSize(), verticalArrangement = Arrangement.SpaceBetween, horizontalAlignment = Alignment.CenterHorizontally) {
+fun ShareYourProfileInstead(onShareProfileClicked: () -> Unit = {}) {
+    val user = UserObject.user.collectAsState()
+    val qrPainter = rememberQrBitmapPainter(
+        "https://spint.com/profile/${user.value.user}",
+        qrColor = Color.Black,
+        backgroundColor = Color(0xFFE9F0F7).copy(alpha = 0.8f)
+    )//0xFFEEF707
+    Card(
+        Modifier
+            .padding(16.dp)
+            .fillMaxWidth()
+            .height(100.dp), shape = RoundedCornerShape(12.dp), colors = CardDefaults.cardColors(
+            containerColor = Color(
+                0xFFC5B8E5
+            )
+        )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Box(modifier = Modifier.size(100.dp)) {
+                Image(
+                    painter = qrPainter,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .padding(4.dp)
+                        .fillMaxSize(),
+                    contentScale = ContentScale.FillBounds,
+                )
+                AsyncImage(
+                    model = imagePrefix + user.value.profileImage,
+                    contentDescription = "",
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .clip(shape = CircleShape)
+                        .size(30.dp),
+                    contentScale = ContentScale.Crop
+                )
+            }
+            Column(
+                modifier = Modifier
+                    .padding(vertical = 10.dp)
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.SpaceBetween,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
 
-                   Text("Share your Profile instead!", fontFamily = Constants.FONT_LIGHT, fontSize = 12.sp, color = Color.Black.copy(alpha = 0.9f), fontWeight = FontWeight.Bold)
-                   Button(onClick = {onShareProfileClicked()}, colors = ButtonDefaults.buttonColors(backgroundColor = floatingActionBtnColor)) {
-                     Image(painter = painterResource(R.drawable.share_event), contentDescription = "", modifier = Modifier.size(16.dp), colorFilter = ColorFilter.tint(Color.White))
-                     Spacer(modifier = Modifier.width(10.dp))
-                     Text("Share", fontFamily = Constants.FONT_LIGHT, fontSize = 16.sp, color = Color.White)
+                Text(
+                    "Share your Profile instead!",
+                    fontFamily = Constants.FONT_LIGHT,
+                    fontSize = 12.sp,
+                    color = Color.Black.copy(alpha = 0.9f),
+                    fontWeight = FontWeight.Bold
+                )
+                Button(
+                    onClick = { onShareProfileClicked() },
+                    colors = ButtonDefaults.buttonColors(backgroundColor = floatingActionBtnColor)
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.share_event),
+                        contentDescription = "",
+                        modifier = Modifier.size(16.dp),
+                        colorFilter = ColorFilter.tint(Color.White)
+                    )
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Text(
+                        "Share",
+                        fontFamily = Constants.FONT_LIGHT,
+                        fontSize = 16.sp,
+                        color = Color.White
+                    )
                 }
             }
 
         }
     }
 }
-
 
 
 @Composable
 fun ChatRowItem(item: String) {
-    Card(modifier = Modifier
-        .wrapContentSize()
-        .padding(8.dp), colors = CardDefaults.cardColors(containerColor = Color.White)) {
+    Card(
+        modifier = Modifier
+            .wrapContentSize()
+            .padding(8.dp), colors = CardDefaults.cardColors(containerColor = Color.White)
+    ) {
         Column(
             Modifier.wrapContentSize(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text =item,
+                text = item,
                 color = Color.Black,
                 fontFamily = FontFamily(Font(R.font.dongle_bold)),
                 fontSize = 16.sp,
@@ -306,119 +398,145 @@ fun ChatRowItem(item: String) {
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalGlideComposeApi::class)
 @Composable
-fun ChatTopBar(title: String,profileImage:String, navController: NavHostController,onSearchClicked:()->Unit) {
-        TopAppBar(
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = Constants.HOME_TOP_BAR_COLOR
-            ),
-            modifier = Modifier.shadow(elevation = 3.dp, spotColor = Color.White),
-            title = {
-                Text(
-                    title,textAlign= TextAlign.Center, fontFamily = Constants.FONT_MEDIUM, modifier = Modifier.fillMaxWidth(0.6f), color = Color.White.copy(alpha = 0.8f), fontSize = 20.sp
+fun ChatTopBar(
+    title: String,
+    profileImage: String,
+    navController: NavHostController,
+    onSearchClicked: () -> Unit
+) {
+    TopAppBar(
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = Constants.HOME_TOP_BAR_COLOR
+        ),
+        // modifier = Modifier.shadow(elevation = 20.dp, spotColor = Color.White),
+        title = {
+            Text(
+                title,
+                textAlign = TextAlign.Center,
+                fontFamily = Constants.FONT_MEDIUM,
+                modifier = Modifier.fillMaxWidth(0.6f),
+                color = Color.White.copy(alpha = 0.8f),
+                fontSize = 20.sp
+            )
+        },
+        navigationIcon = {
+            Row(
+                modifier = Modifier,
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                Image(
+                    painterResource(id = R.drawable.baseline_arrow_back_24),
+                    contentDescription = "",
+                    colorFilter = ColorFilter.tint(Color.White.copy(alpha = 0.8f)),
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clickable { navController.navigateUp() }
+
                 )
-            },
-            navigationIcon = {
-                Row(modifier = Modifier, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Image(
-                        painterResource(id = R.drawable.baseline_arrow_back_24),
-                        contentDescription = "",
-                        colorFilter = ColorFilter.tint(Color.White.copy(alpha = 0.8f)),
-                        modifier = Modifier
-                            .size(24.dp)
-                            .clickable { navController.navigateUp() }
-
-                    )
-//                    Card(
-//                        modifier = Modifier.size(45.dp),
-//                        shape = CircleShape,
-//                    ) {
-//                        GlideImage(
-//                            model= imagePrefix+ profileImage,
-//                            contentDescription = "",
-//                            contentScale=ContentScale.Crop,
-//                            modifier = Modifier
-//                                .fillMaxSize()
-//                                .clickable { navController.navigate(SCREENS.PROFILE.route) }
-//
-//                        )
-//                    }
-
-                }
-            }, actions = {
-                Row(modifier = Modifier.padding(end = 16.dp)) {
-                    Image(
-                        painterResource(id = R.drawable.menu),
-                        contentDescription = "",
-                        colorFilter = ColorFilter.tint(Color.DarkGray),
-                        modifier = Modifier
-                            .size(24.dp)
-                            .clickable {/* onSearchClicked() TODO: "  */ }
-
-                                )
-                            }
-
-
             }
-        )
-    }
+        }, actions = {
+            Row(modifier = Modifier.padding(end = 16.dp)) {
+                Image(
+                    painterResource(id = R.drawable.menu),
+                    contentDescription = "",
+                    colorFilter = ColorFilter.tint(Color.DarkGray),
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clickable {/* onSearchClicked() TODO: "  */ }
+
+                )
+            }
+
+
+        }
+    )
+}
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun UserItem(navController: NavHostController, user: ChatList,setProfileImage:(String?)->Unit){
+fun UserItem(navController: NavHostController, user: ChatList, setProfileImage: (String?) -> Unit) {
 
-    Card(modifier = Modifier
-        .fillMaxWidth()
-        .height(60.dp)
-        .clickable {
-           // setProfileImage(user.withUserId.profileImage)
-            val encodedImageUrl = URLEncoder.encode(user.withUserId.profileImage ?: "", StandardCharsets.UTF_8.toString())
-            navController.navigate(
-                SCREENS.SINGLE_CHAT.createPath(
-                    user.withUserId.name,
-                    encodedImageUrl,
-                    user.withUserId._id
+    Card(
+        modifier = Modifier
+            .padding(vertical = 5.dp, horizontal = 4.dp)
+            .fillMaxWidth()
+            .height(60.dp)
+            .clickable {
+                val encodedImageUrl = URLEncoder.encode(
+                    user.withUserId.profileImage ?: "",
+                    StandardCharsets.UTF_8.toString()
                 )
-            )
-        },
-        shape= RoundedCornerShape(0.dp),
-        elevation=CardDefaults.cardElevation(defaultElevation = 2.dp),
-        colors = CardDefaults.cardColors(containerColor = Constants.CHAT_LIST_BKG) //0xFFEEE9DD
+                navController.navigate(
+                    SCREENS.SINGLE_CHAT.createPath(
+                        user.withUserId.name,
+                        encodedImageUrl,
+                        user.withUserId._id
+                    )
+                )
+            },
+        shape = RoundedCornerShape(0.dp),
+        colors = CardDefaults.cardColors(containerColor = Constants.HOME_TOP_BAR_COLOR) //0xFFEEE9DD
     ) {
-        Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Start) {
-//            GlideImage(
-//                model =if("${Constants.BASE_URL}${imageUrl}".isNotEmpty()) "" else R.drawable.profile_image_1 ,
-//                contentDescription ="",
-//                transition= CrossFade,
-//                contentScale = ContentScale.FillBounds,
-//                modifier = Modifier
-//                    .padding(2.dp)
-//                    .size(40.dp)
-//                    .clip(CircleShape)
-//                    .border(1.dp, Color.DarkGray, CircleShape)
-//            )
-            Card(modifier = Modifier.size(56.dp), shape = CircleShape, colors = CardDefaults.cardColors(containerColor = Color.Transparent)) {
-                GlideImage(model = if(user.withUserId.profileImage.isNullOrEmpty()) R.drawable.profile_colored else  imagePrefix+user.withUserId.profileImage,  contentDescription = "",modifier = Modifier
-                    .padding(2.dp)
-                    .fillMaxSize()
-                    .clip(CircleShape),
+        Row(
+            modifier = Modifier.fillMaxSize(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Card(
+                modifier = Modifier.size(50.dp),
+                shape = CircleShape,
+                colors = CardDefaults.cardColors(containerColor = Color.Transparent)
+            ) {
+                GlideImage(
+                    model = if (user.withUserId.profileImage.isNullOrEmpty()) R.drawable.profile_colored else imagePrefix + user.withUserId.profileImage,
+                    contentDescription = "",
+                    modifier = Modifier
+                        .padding(2.dp)
+                        .fillMaxSize()
+                        .clip(CircleShape),
                     contentScale = ContentScale.Crop
                 )
             }
-            Column(modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 8.dp), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.Start) {
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text(text = user.withUserId.name, fontFamily = Constants.ROBOTO_CONDENSED,fontSize = 18.sp, color = Color.White.copy(alpha = 0.9f), lineHeight = 14.sp)
-                    Text(text = "08:38", fontSize = 12.sp, color = Color.LightGray, lineHeight = 14.sp)
+            Row(
+                modifier = Modifier
+                    .padding(horizontal = 10.dp)
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .wrapContentWidth(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    Text(
+                        text = user.withUserId.name,
+                        fontFamily = Constants.USER_NAME_FONT,
+                        fontSize = 12.sp,
+                        color = Color.White.copy(alpha = 0.9f),
+                        lineHeight = 14.sp
+                    )
+                    Text(
+                        text = "hello",
+                        fontSize = 14.sp,
+                        color = Color.LightGray,
+                        fontFamily = Constants.FONT_LIGHT,
+                        lineHeight = 14.sp
+                    )
                 }
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
-                    Text(text =  "hello", fontSize = 14.sp,color= Color.LightGray, fontFamily = Constants.FONT_LIGHT, lineHeight = 14.sp)
-                }
-
+                Image(
+                    painter = painterResource(R.drawable.cameranew),
+                    contentDescription = "",
+                    colorFilter = ColorFilter.tint(Color.White),
+                    modifier = Modifier
+                        .size(20.dp)
+                        .shadow(elevation = 10.dp)
+                )
             }
-
         }
-
     }
 }
 
