@@ -28,6 +28,7 @@ import androidx.compose.material.TabRow
 import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material.Text
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -42,11 +43,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -72,6 +75,7 @@ import com.spint.app.utils.RequestState
 import com.spint.app.utils.constants.Constants
 import com.spint.app.viewmodels.HomeViewModel
 import kotlinx.coroutines.launch
+import java.util.function.IntConsumer
 
 
 @OptIn(ExperimentalGlideComposeApi::class)
@@ -282,9 +286,9 @@ fun UserFlashPostDetailsTabsScreen(ping: List<PingsOnPost>,onProfileClicked: (St
 fun RepliesScreen(ping: List<PingsOnPost>,onProfileClicked:(String)-> Unit) {
     Column(modifier=Modifier.fillMaxWidth().wrapContentHeight()) {
         ping.forEach {it->
-            Column() {
+            Row(modifier = Modifier.fillMaxWidth().background(color = Color.White),verticalAlignment = Alignment.CenterVertically) {
                 Row(
-                    modifier = Modifier.fillMaxWidth().background(color = Color.White).padding(horizontal = 4.dp),
+                    modifier = Modifier.fillMaxWidth(0.8f).padding(horizontal = 4.dp),
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -300,7 +304,12 @@ fun RepliesScreen(ping: List<PingsOnPost>,onProfileClicked:(String)-> Unit) {
                     }
 
                 }
-                HorizontalDivider(modifier = Modifier.fillMaxWidth(), thickness = 0.25.dp, color = Color.LightGray)
+                Column(modifier = Modifier.fillMaxWidth().wrapContentHeight(), verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally) {
+                    Image(painter = painterResource(R.drawable.cameranew),contentDescription = null, modifier = Modifier.size(18.dp))
+                    Text("Duel", fontSize = 12.sp, fontFamily = Constants.FONT_LIGHT, color = Color.Black)
+                }
+
+//                HorizontalDivider(modifier = Modifier.fillMaxWidth(), thickness = 0.25.dp, color = Color.LightGray)
 
             }
         }

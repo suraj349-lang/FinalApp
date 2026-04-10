@@ -20,6 +20,7 @@ import com.spint.app.model.flashPost.FlashPostRequestDto
 import com.spint.app.model.flashPost.FlashPostResponse
 import com.spint.app.model.flashPost.PingsOnFlashPostRequest
 import com.spint.app.model.flashPost.PingsOnFlashPostResponse
+import com.spint.app.model.places.Place
 import com.spint.app.network.ApiService
 import com.spint.app.screens._4profile.uriToMultipart
 import com.spint.app.utils.PingsResponse
@@ -107,6 +108,23 @@ class EventsRepository @Inject constructor(private val api: ApiService) {
     suspend fun addPingToFlashPost(pingsOnFlashPostRequest: PingsOnFlashPostRequest):Flow<PingsOnFlashPostResponse> = flow {
         emit(api.addPingToFlashPost(pingsOnFlashPostRequest))
     }.flowOn(Dispatchers.IO)
+
+    suspend fun getPlaces(query: String): List<Place> {
+        if (query.length < 3) return emptyList()
+
+        return try {
+            api.getAutocomplete(query).map {
+                Place(
+                    name = it.name,
+                    address = it.address,
+                    lat = it.lat,
+                    lng = it.lng
+                )
+            }
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
 
 
 }

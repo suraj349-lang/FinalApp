@@ -1,18 +1,5 @@
 package com.spint.app.Duel.data
 
-import com.spint.app.utils.constants.Constants
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
-
-object ApiClient {
-
-    private val retrofit = Retrofit.Builder()
-        .baseUrl("http://192.168.1.40:5002/")
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-
-    val webRtcApi: WebRtcApi = retrofit.create(WebRtcApi::class.java)
-}
 
 object SocketManager {
 

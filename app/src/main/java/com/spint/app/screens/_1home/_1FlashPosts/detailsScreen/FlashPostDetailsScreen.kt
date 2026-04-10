@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Surface
 import androidx.compose.material.Tab
@@ -36,6 +37,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -136,7 +138,8 @@ fun FlashPostDetailsScreenUI(flashPostResponse: FlashPostResponse?) {
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Box(
+                if(flashPostResponse.image.isNotEmpty()) {
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(400.dp)
@@ -151,6 +154,34 @@ fun FlashPostDetailsScreenUI(flashPostResponse: FlashPostResponse?) {
                         )
 
                     }
+                }
+                else if(flashPostResponse.user?.profileImage !=null){
+                    Box(
+                        modifier = Modifier.size(300.dp).clip(CircleShape)
+                    ) {
+                        GlideImage(
+                            model = imagePrefix + flashPostResponse.user.profileImage,
+                            contentDescription = "",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop,
+
+                        )
+                    }
+
+                }else{
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                    ) {
+                        Image(
+                            painter =painterResource(R.drawable.alien) ,
+                            contentDescription = "",
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.align(Alignment.Center)
+                        )
+                    }
+                }
                 Row(
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment=Alignment.Bottom,

@@ -56,7 +56,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.spint.app.viewmodels.HomeViewModel
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.alpha
@@ -81,10 +80,11 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
-import com.google.android.libraries.places.api.model.AutocompletePrediction
 import com.spint.app.R
 import com.spint.app.model.DropProfileResponse
+import com.spint.app.model.places.Place
 import com.spint.app.navigation.SCREENS
+import com.spint.app.screens.common.DroppedProfileLoadingScreen
 import com.spint.app.ui.imagePrefix
 import com.spint.app.screens.common.NoProfilesFoundScreen
 import com.spint.app.ui.theme.floatingActionBtnColor
@@ -95,7 +95,6 @@ import com.spint.app.utils.formatDateTime
 import com.spint.app.utils.getFormattedTimeAndFlag
 import com.spint.app.utils.testdata.Item
 import com.spint.app.utils.testdata.items
-import kotlinx.coroutines.launch
 
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -120,7 +119,7 @@ fun DroppedProfilesUI(
     }
     val userLocation by UserLocationObject.userLocation.collectAsState()
 
-    val predictions by homeViewModel.getAutocompletePredictions(query).collectAsState(emptyList())
+    val predictions = remember { homeViewModel.results}
     val shouldLoadDroppedProfiles by homeViewModel.shouldLoadDroppedProfiles.collectAsState()
     LaunchedEffect(pagerState.currentPage) {
         // if page is not checked then on scrolling it will make the api call i.e. in the direct screen itself
@@ -216,61 +215,64 @@ fun DroppedProfilesUI(
                     }
                 }
             }else{
+
                 Column(
                     modifier = Modifier
-                        .zIndex(0f)
                         .fillMaxSize()
+                        .zIndex(0f)
+
                 ) {
-                    LazyVerticalStaggeredGrid(
-                        modifier = Modifier
-                            .zIndex(0f)
-                           // .nestedScroll(scrollBehavior.nestedScrollConnection),
-                       , columns = StaggeredGridCells.Fixed(2),
-                        contentPadding = PaddingValues(2.dp),
-                        verticalItemSpacing = 3.dp,
-                        horizontalArrangement = Arrangement.spacedBy(3.dp)
-                    ) {
-                        droppedProfilesList?.itemCount?.let {
-                            items(it) { index ->
-                                val item = droppedProfilesList[index]
-                                if (item != null) {
-                                    DroppedProfileItem(item){
-                                        try {
-                                            val route= item.let {
-                                                SCREENS.DROP_PROFILE_USER_PROFILE.createRoute(it)
+                    if (droppedProfilesList?.loadState?.refresh is LoadState.Error) {
+                        val error = (droppedProfilesList.loadState.refresh as LoadState.Error).error
+                        Log.e("DroppedProfiles", "DroppedProfilesUI: $error", error.fillInStackTrace())
+
+                        showLoader=false
+                        NoProfilesFoundScreen{ homeViewModel.getDefaultDropProfiles("") }
+                    } else {
+                        LazyVerticalStaggeredGrid(
+                            modifier = Modifier
+                                .zIndex(0f)
+                            , columns = StaggeredGridCells.Fixed(2),
+                            contentPadding = PaddingValues(2.dp),
+                            verticalItemSpacing = 3.dp,
+                            horizontalArrangement = Arrangement.spacedBy(3.dp)
+                        ) {
+                            droppedProfilesList?.itemCount?.let {
+                                items(it) { index ->
+                                    val item = droppedProfilesList[index]
+                                    if (item != null) {
+                                        DroppedProfileItem(item) {
+                                            try {
+                                                val route = item.let {
+                                                    SCREENS.DROP_PROFILE_USER_PROFILE.createRoute(it)
+                                                }
+                                                navController.navigate(route)
+                                            } catch (e: Exception) {
+                                                Log.d(
+                                                    "DropProfileTesting",
+                                                    "DroppedProfilesNew:${e.message} "
+                                                )
                                             }
-                                            navController.navigate(route)
-                                        }catch (e:Exception){
-                                            Log.d("DropProfileTesting", "DroppedProfilesNew:${e.message} ")
+
+
                                         }
-
-
                                     }
                                 }
                             }
-                        }
-                        droppedProfilesList?.apply {
-                            when {
-                                loadState.refresh is LoadState.Loading -> {
-                                    item {
-                                        showLoader=true
+                            droppedProfilesList?.apply {
+                                when {
+                                    loadState.refresh is LoadState.Loading -> {
+                                        items(10) {
+                                            DroppedProfileLoadingScreen()
+                                            showLoader = true
+                                        }
                                     }
-                                }
 
-                                loadState.append is LoadState.Loading -> {
-                                    item {
-                                        showLoader=true
-                                    }
-                                }
-
-                                loadState.refresh is LoadState.Error -> {
-                                    showLoader=false
-                                    val error = (loadState.refresh as LoadState.Error).error
-                                    item {
-                                        Log.e("Error in dropped profiles", "DroppedProfilesUI: $error ", )
-                                            NoProfilesFoundScreen(error = "Error getting profiles.",) {
-                                                homeViewModel.getDefaultDropProfiles("")
-                                            }
+                                    loadState.append is LoadState.Loading -> {
+                                        items(10) {
+                                            DroppedProfileLoadingScreen()
+                                            showLoader = true
+                                        }
                                     }
                                 }
                             }
@@ -287,7 +289,19 @@ fun DroppedProfilesUI(
     }
 }
 
-
+/*
+*   loadState.refresh is LoadState.Error -> {
+                                    showLoader=false
+                                    val error = (loadState.refresh as LoadState.Error).error
+                                    item {
+                                        Log.e("Error in dropped profiles", "DroppedProfilesUI: $error ", )
+                                        Box(modifier= Modifier.fillMaxSize()) {
+                                            NoProfilesFoundScreen(error = "Error getting profiles.",) {
+                                                homeViewModel.getDefaultDropProfiles("")
+                                            }
+                                        }
+                                    }
+                                }*/
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun LazyRowItem(item: Item) {
@@ -476,9 +490,9 @@ fun LocationAndNameSearchDialogBox(
     onNameChange: (String) -> Unit,
     query: String,
     onQueryChange: (String) -> Unit,
-    predictions: List<AutocompletePrediction>,
-    onDismiss:()-> Unit,
-    onSearchClicked:()-> Unit
+    predictions: List<Place>,
+    onDismiss: () -> Unit,
+    onSearchClicked: () -> Unit
 ) {
     var showPredictionBoxForSearch by remember { mutableStateOf(false) }
 
@@ -487,12 +501,16 @@ fun LocationAndNameSearchDialogBox(
         properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true)
     ) {
         Box(
-            modifier = Modifier.padding(8.dp)
+            modifier = Modifier
+                .padding(8.dp)
                 .fillMaxWidth()
-                .wrapContentHeight().background(color=Color.DarkGray)
+                .wrapContentHeight()
+                .background(color = Color.DarkGray)
 
         ) {
-            Column(modifier = Modifier.padding(20.dp).wrapContentSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+            Column(modifier = Modifier
+                .padding(20.dp)
+                .wrapContentSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
 
                 OutlinedTextField(
                     value = name,
@@ -550,14 +568,12 @@ fun LocationAndNameSearchDialogBox(
                         LazyColumn(modifier = Modifier) {
                             items(predictions) { prediction ->
                                 Text(
-                                    text = prediction.getPrimaryText(null).toString(),
+                                    text = prediction.address,
                                     modifier = Modifier
                                         .padding(16.dp)
                                         .clickable {
                                             // Handle click on prediction
-                                            onQueryChange( prediction
-                                                .getPrimaryText(null)
-                                                .toString())
+                                            onQueryChange(prediction.address)
                                             showPredictionBoxForSearch = false
                                         }
                                 )

@@ -47,7 +47,7 @@ import com.spint.app.R
 
 @Preview(showBackground = true)
 @Composable
-fun     CommentsScreen(comments:List<Comment> = com.spint.app.screens._2Events.events.eventWarScreen.comments) {
+fun  CommentsScreen(comments:List<Comment> =  com.spint.app.screens._2Events.events.eventWarScreen.comments) {
     // Use mutable state list for top-level comments
     val commentsState = remember { mutableStateListOf<Comment>().apply { addAll(comments) } }
 

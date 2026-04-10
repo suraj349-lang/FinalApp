@@ -24,8 +24,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -44,9 +46,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
@@ -54,7 +58,6 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
-import com.spint.app.Duel.data.ApiClient
 import com.spint.app.Duel.data.CallState
 import com.spint.app.Duel.data.MatchRequest
 import com.spint.app.Duel.data.SocketManager
@@ -78,7 +81,6 @@ fun DuelScreen2(
     viewModel: CallViewModel = viewModel()
 ) {
     val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
 
     val cameraPermission = Manifest.permission.CAMERA
     val micPermission = Manifest.permission.RECORD_AUDIO
@@ -90,6 +92,8 @@ fun DuelScreen2(
     val localView = remember { RtcEngine.CreateRendererView(context) }
     val remoteView = remember { RtcEngine.CreateRendererView(context) }
     val remoteUid = viewModel.remoteUid
+
+
 
     LaunchedEffect(Unit) {
         localView.setZOrderMediaOverlay(true)
@@ -179,6 +183,62 @@ fun DuelScreen2(
             SocketManager.socket.off("matchFound", listener)
         }
     }
+
+
+
+
+    if (viewModel.showPostCallDialog) {
+
+        AlertDialog(
+            onDismissRequest = {},
+            title = { Text("What do you want to do?") },
+            text = { Text("Do you want to send a friend request or report?") },
+
+            confirmButton = {
+                Button(onClick = {
+
+                    // send friend request
+                    // ApiClient.sendFriendRequest(otherUserId)
+
+                    viewModel.showPostCallDialog = false
+                    viewModel.callState = CallState.Matching
+
+                    SocketManager.socket.emit(
+                        "findMatch",
+                        JSONObject().apply {
+                            put("userId", UserObject.user.value.user)
+                            put("name", UserObject.user.value.name)
+                            put("profileImage", UserObject.user.value.profileImage)
+                        }
+                    )
+
+                }) {
+                    Text("Send Friend Request")
+                }
+            },
+
+            dismissButton = {
+                Button(onClick = {
+
+                    viewModel.showPostCallDialog = false
+                    viewModel.callState = CallState.Matching
+
+                    SocketManager.socket.emit(
+                        "findMatch",
+                        JSONObject().apply {
+                            put("userId", UserObject.user.value.user)
+                            put("name", UserObject.user.value.name)
+                            put("profileImage", UserObject.user.value.profileImage)
+                        }
+                    )
+
+                }) {
+                    Text("Skip")
+                }
+            }
+        )
+    }
+
 
 
     /* ------------------------------------------------------ */
@@ -289,78 +349,136 @@ fun DuelScreen2(
                 is CallState.InCall -> {
 
                     /* ------------------ REMOTE (TOP) ------------------ */
+                    Column(modifier= Modifier.fillMaxSize()) {
 
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight(0.5f)
-                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .fillMaxHeight(0.5f)
+                        ) {
 
-                        AndroidView(
-                            factory = { remoteView },
-                            modifier = Modifier.fillMaxSize()
-                        )
-                        Row(modifier = Modifier
-                            .padding(start = 10.dp)
-                            .align(Alignment.TopStart), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                            Box(modifier=Modifier
-                                .size(36.dp)
-                                .clip(shape = CircleShape)) {
-                                AsyncImage(
-                                    model = imagePrefix + otherUserImage,
-                                    contentDescription = "",
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentScale = ContentScale.Crop
-                                )
-                            }
-                            Text(otherUserName, fontSize = 16.sp, fontFamily = Constants.USER_NAME_FONT, color = Color.White)
-                            Box(modifier=Modifier
-                                .wrapContentSize()
-                                .clip(shape = RoundedCornerShape(4.dp))
-                                .background(color = floatingActionBtnColor)) {
-                                Text("+Friend", fontSize = 12.sp, fontFamily = Constants.FONT_LIGHT, color = Color.White, modifier = Modifier.padding(horizontal = 4.dp))
-                            }
-                        }
-
-
-                    }
-
-                    /* ------------------ LOCAL (BOTTOM) ------------------ */
-
-                    Box(
-                        modifier = Modifier
-                            .align(Alignment.BottomCenter)
-                            .fillMaxWidth()
-                            .fillMaxHeight(0.5f)
-                    ) {
-                        AndroidView(
-                            factory = { localView },
-                            modifier = Modifier.fillMaxSize()
-                        )
-
-                        Box(modifier = Modifier.padding(bottom = 30.dp).align(Alignment.BottomCenter)
-                            .fillMaxWidth()
-                            .height(60.dp)) {
+                            AndroidView(
+                                factory = { remoteView },
+                                modifier = Modifier.fillMaxWidth().fillMaxHeight()
+                            )
                             Row(
-                                modifier = Modifier.fillMaxSize(),
+                                modifier = Modifier
+                                    .padding(bottom = 10.dp)
+                                    .align(Alignment.BottomCenter).clip(shape = RoundedCornerShape(5.dp)).background(color=Color.DarkGray),
                                 verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.SpaceEvenly
+                                horizontalArrangement = Arrangement.spacedBy(16.dp)
                             ) {
-                                Image(
-                                    painter = painterResource(R.drawable.close),
-                                    contentDescription = null,
-                                    modifier = Modifier
-                                        .size(40.dp)
-                                        .clickable { viewModel.endCall() })
-                                Box(modifier=Modifier.wrapContentSize().padding(horizontal = 4.dp).clip(shape = RoundedCornerShape(4.dp)).background(color=floatingActionBtnColor)) {
-                                    Text(
-                                        "Next",
-                                        modifier = Modifier,
-                                        fontSize = 14.sp,
-                                        color = Color.White
+                                Box(
+                                    modifier = Modifier.padding(start=6.dp)
+                                        .size(36.dp)
+                                        .clip(shape = CircleShape)
+                                ) {
+                                    AsyncImage(
+                                        model = imagePrefix + otherUserImage,
+                                        contentDescription = "",
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentScale = ContentScale.Crop
                                     )
                                 }
+                                Text(
+                                    otherUserName,
+                                    fontSize = 16.sp,
+                                    fontFamily = Constants.FONT_LIGHT,
+                                    color = Color.White
+                                )
+                                Box(
+                                    modifier = Modifier.padding(end=6.dp)
+                                        .wrapContentSize()
+                                        .clip(shape = RoundedCornerShape(4.dp))
+                                        .background(color = floatingActionBtnColor)
+                                ) {
+                                    Text(
+                                        "+Friend",
+                                        fontSize = 12.sp,
+                                        fontFamily = Constants.FONT_LIGHT,
+                                        color = Color.White,
+                                        modifier = Modifier.padding(horizontal = 4.dp)
+                                    )
+                                }
+                            }
+                            Box(
+                                modifier = Modifier.padding(bottom = 20.dp,end=16.dp)
+                                    .align(Alignment.BottomEnd)
+                                    .wrapContentSize()
+                            ) {
+                                Text(
+                                    text = "${viewModel.remainingTime}s",
+                                    color = Color.Red,
+                                    fontSize = 18.sp,
+                                    modifier = Modifier
+                                )
 
+
+                            }
+
+
+                        }
+
+                        /* ------------------ LOCAL (BOTTOM) ------------------ */
+
+                        Box(
+                            modifier = Modifier
+                               // .align(Alignment.BottomCenter)
+                                .fillMaxWidth()
+                                .fillMaxHeight()
+                        ) {
+                            AndroidView(
+                                factory = { localView },
+                                modifier = Modifier.fillMaxSize()
+                            )
+
+                            Box(
+                                modifier = Modifier.padding(bottom = 30.dp)
+                                    .align(Alignment.BottomCenter)
+                                    .fillMaxWidth()
+                                    .height(60.dp)
+                            ) {
+                                Row(
+                                    modifier = Modifier.fillMaxSize(),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.SpaceEvenly
+                                ) {
+                                    Image(
+                                        painter = painterResource(R.drawable.close),
+                                        contentDescription = null,
+                                        modifier = Modifier
+                                            .size(32.dp)
+                                            .clickable { viewModel.callState= CallState.Idle })
+                                    Box(
+                                        modifier = Modifier.height(32.dp).wrapContentWidth()
+                                            .clip(shape = RoundedCornerShape(4.dp))
+                                            .background(color = floatingActionBtnColor)
+                                    ) {
+                                        Row(modifier= Modifier.padding(horizontal = 4.dp).fillMaxHeight().wrapContentWidth().clickable{
+                                            viewModel.endCall()
+
+                                            SocketManager.socket.emit(
+                                                "skipMatch",
+                                                JSONObject().apply {
+                                                    put("userId", UserObject.user.value.user)
+                                                    put("name", UserObject.user.value.name)
+                                                    put("profileImage", UserObject.user.value.profileImage)
+                                                }
+                                            )
+
+                                        }, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                                            Text(
+                                                "Next",
+                                                modifier = Modifier,
+                                                fontSize = 18.sp,
+                                                fontFamily = Constants.FONT_LIGHT,
+                                                color = Color.White
+                                            )
+                                            Image(painter = painterResource(R.drawable.next),contentDescription = null,modifier= Modifier.size(22.dp), colorFilter = ColorFilter.tint(color=Color.White))
+                                        }
+                                    }
+
+                                }
                             }
                         }
                     }
@@ -376,6 +494,7 @@ fun DuelScreen2(
     DisposableEffect(Unit) {
         onDispose {
             viewModel.endCall()
+            SocketManager.disconnect()
         }
     }
 }

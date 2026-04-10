@@ -140,16 +140,18 @@ fun CommonTopBar(flashPostResponse: FlashPostResponse, onUserProfileClicked:()->
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Card(
-                        modifier = Modifier.wrapContentSize(),
-                        shape = CircleShape
-                    ) {
-                        AsyncImage(
-                            model = imagePrefix + flashPostResponse.user?.profileImage,
-                            contentDescription = "",
-                            modifier = Modifier.size(40.dp),
-                            contentScale = ContentScale.Crop
-                        )
+                    if(flashPostResponse.user?.profileImage?.isNotEmpty() ==true) {
+                        Card(
+                            modifier = Modifier.wrapContentSize(),
+                            shape = CircleShape
+                        ) {
+                            AsyncImage(
+                                model = imagePrefix +flashPostResponse.user.profileImage,
+                                contentDescription = "",
+                                modifier = Modifier.size(40.dp),
+                                contentScale = ContentScale.Crop
+                            )
+                        }
                     }
                     Column(
                         modifier = Modifier

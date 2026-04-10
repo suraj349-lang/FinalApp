@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -27,6 +28,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Divider
 import androidx.compose.material.Tab
+import androidx.compose.material.TabRow
 import androidx.compose.material.TabRowDefaults
 import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Card
@@ -72,7 +74,7 @@ fun PrivateProfileScreenWrapper(navController: NavHostController) {
                     Modifier
                         .fillMaxWidth()
                         .height(320.dp)
-                        .background(floatingActionBtnColor)) {//0xFF1976D2
+                        .background(Color(0xFF790505))) {//0xFF1976D2
                     Image(painter = painterResource(id = R.drawable.baseline_arrow_back_24),
                         contentDescription = "",
                         modifier = Modifier
@@ -94,7 +96,7 @@ fun PrivateProfileScreenWrapper(navController: NavHostController) {
                                 .size(24.dp)
                                 .clickable { },
                         )
-                        dynamicText(text = "Private-SPINT", fontSize = 10)
+                        dynamicText(text = "Private-SPINT", fontSize = 16)
 
                     }
                     Image(painter = painterResource(id = R.drawable.settings_new),
@@ -155,62 +157,76 @@ val titlesAndDescriptions = listOf(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun PrivateUserNameScreen() {
-    val icons = arrayOf(R.drawable.ping, R.drawable.drop_profile_filled_2, R.drawable.chat_new)
+    val tabItems = arrayOf(Pair("Posts",R.drawable.ping),Pair("Drops",R.drawable.drop_profile_filled_2),Pair("Chats",R.drawable.chat_new) )
     val pagerState = rememberPagerState(initialPage = 0, pageCount = { 4 })
     val scope = rememberCoroutineScope()
 
     var selectedIndex by remember { mutableStateOf(pagerState.currentPage) }
 
     Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
-        androidx.compose.material.TabRow(
+        TabRow(
             selectedTabIndex = selectedIndex,
+//            indicator = { tabPositions ->
+//                TabRowDefaults.Indicator(
+//                    Modifier.tabIndicatorOffset(tabPositions[selectedIndex]),
+//                    color = Constants.TAB_ROW_INDICATOR_COLOR,
+//                    height = 0.5.dp
+//                )
+//            },
             indicator = { tabPositions ->
-                TabRowDefaults.Indicator(
-                    Modifier.tabIndicatorOffset(tabPositions[selectedIndex]),
-                    color = Constants.TAB_ROW_INDICATOR_COLOR,
-                    height = 0.5.dp
-                )
+                val currentTabPosition = tabPositions[selectedIndex]
+
+                Box(
+                    modifier = Modifier
+                        .tabIndicatorOffset(currentTabPosition)
+                        .fillMaxWidth(), // take full tab width
+                    contentAlignment = Alignment.Center
+                ) {
+                    TabRowDefaults.Indicator(
+                        modifier = Modifier.width(80.dp),
+                        color = Color.LightGray.copy(alpha = 1f),
+                        height = 1.dp
+                    )
+                }
             },
             backgroundColor = Color.Black,
-            modifier = Modifier
+            modifier = Modifier.padding(bottom = 4.dp)
                 .fillMaxWidth()
-                .height(45.dp)
+                .height(50.dp)
         ) {
-            icons.forEachIndexed { index, item ->
+            tabItems.forEachIndexed { index, itemData ->
                 Tab(
                     selected = selectedIndex == index,
                     onClick = {
                         selectedIndex = index
                         scope.launch { pagerState.animateScrollToPage(index) }
                     },
-                    icon = {
-                        Box(modifier = Modifier.size(50.dp)){
-                            Card(
-                                Modifier
-                                    .align(Alignment.TopEnd)
-                                    .size(16.dp), shape = CircleShape, colors = CardDefaults.cardColors(containerColor = Color(
-                                    0xFF770707
-                                )
-                                )) {
-                                Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Top) {
-                                    Text(text = "12", fontFamily = Constants.USER_NAME_FONT, fontSize = 10.sp,color= Color(
-                                        0xFFF8F4ED
-                                    ), lineHeight = 2.sp, modifier = Modifier.padding(2.dp))
+                    text = {
+                        Row(modifier = Modifier.wrapContentSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                            Box(modifier = Modifier.size(40.dp)){
+                                Card(
+                                    Modifier.align(Alignment.TopEnd)
+                                        .size(16.dp), shape = CircleShape, colors = CardDefaults.cardColors(containerColor = Color(0xFF770707)
+                                    )) {
+                                    Column(modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Top) {
+                                        Text(text = "12", fontFamily = Constants.USER_NAME_FONT, fontSize = 10.sp,color= Color(
+                                            0xFFF8F4ED
+                                        ), lineHeight = 2.sp, modifier = Modifier.padding(2.dp))
+                                    }
+
                                 }
-
+                                Image(painter = painterResource(id = itemData.second), contentDescription = "", modifier = Modifier
+                                    .align(Alignment.Center)
+                                    .size(14.dp), colorFilter = ColorFilter.tint(color = Color.White))
                             }
-                            Image(painter = painterResource(id = item), contentDescription = "", modifier = Modifier
-                                .align(Alignment.Center)
-                                .size(24.dp))
+                            Text(itemData.first, fontSize = 10.sp,color=Color.White, fontFamily = Constants.FONT_LIGHT)}
                         }
-
-                    }
                 )
             }
         }
         Box(
             modifier = Modifier
-                .fillMaxSize().background(Color(0xFFB2D0EE))  //0xFFAFB42B
+                .fillMaxSize().background(Color.Black)  //0xFFAFB42B
         ) {
             HorizontalPager(
                 state = pagerState,
@@ -289,7 +305,7 @@ fun PrivatePingRowItem(title:String,des:String) {
     val list= arrayOf(R.drawable.view,R.drawable.comment,R.drawable.thumbsup,R.drawable.add_link)
     Box(
         Modifier
-            .padding(horizontal = 1.dp).padding(top=1.dp)
+            .padding(vertical = 4.dp, horizontal = 8.dp)
             .fillMaxWidth()
             .height(200.dp)
             .clip(RoundedCornerShape(5.dp))
@@ -299,7 +315,7 @@ fun PrivatePingRowItem(title:String,des:String) {
 //                        Color(0xFFC2185B), Color(0xFF9B808B) //0xFFAFB42B 0xFF443307
 //                    )
 //                )
-            color = Color(0xFF12011A)
+            color = Constants.HOME_TOP_BAR_COLOR
             )) {
         Column(modifier = Modifier
             .padding(horizontal = 6.dp, vertical = 4.dp)
@@ -317,7 +333,7 @@ fun PrivatePingRowItem(title:String,des:String) {
                 ActiveButton()
 
             }
-            Divider(Modifier.fillMaxWidth(), thickness = 0.3.dp, color = floatingActionBtnColor)
+            Divider(Modifier.fillMaxWidth(), thickness = 0.3.dp, color = Color.DarkGray)
             dynamicText(text = title, fontSize = 18, fontFamily = Constants.FONT_MEDIUM, color = Color.White)
             dynamicText(text = des, fontSize = 10, fontFamily = Constants.FONT_LIGHT, color = Color.LightGray)
             Row(modifier = Modifier

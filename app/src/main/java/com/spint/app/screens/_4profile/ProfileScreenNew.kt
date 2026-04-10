@@ -50,6 +50,7 @@ import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -61,6 +62,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -99,6 +101,9 @@ import com.spint.app.viewmodels.AuthViewModel
 import com.spint.app.viewmodels.HomeViewModel
 import com.spint.app.viewmodels.ImageUploadViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.spint.app.screens.dialogBox.ShowDialog
+import com.spint.app.screens.dialogBox.ShowQRDialog
+import com.spint.app.screens.duel.SCREEN
 import kotlinx.coroutines.delay
 import java.io.File
 
@@ -110,7 +115,7 @@ fun ProfileScreenNew(navController: NavHostController, authViewModel:AuthViewMod
         mutableStateOf(false)
     }
     var expanded by remember { mutableStateOf(false) }
-    val tabs = listOf("Posts", "Pings")
+    val tabs = listOf(Pair("Events",R.drawable.event), Pair("Flash Posts",R.drawable.ping))
     var selectedTabIndex by remember { mutableStateOf(0) }
     val lazyListState = rememberLazyListState()
     val user by UserObject.user.collectAsState()
@@ -175,9 +180,13 @@ fun ProfileScreenNew(navController: NavHostController, authViewModel:AuthViewMod
         }
     }
     val systemUiController = rememberSystemUiController()
-    val backgroundColor = Color.DarkGray//0xFF040A36 0xFFC7A246 0xFF90941D
-    val upperCardColor= Color(0xFF15011E)
+    val backgroundColor = Constants.HOME_TOP_BAR_COLOR//0xFF040A36 0xFFC7A246 0xFF90941D
+    val upperCardColor= Color(0xFF121212)
     val navColor=Color.DarkGray
+    var showQR by remember { mutableStateOf(ShowDialog.CLOSE) }
+    var dropCount by remember { mutableStateOf(0) }
+    var postCount by remember { mutableStateOf(0) }
+    var pingCount by remember { mutableStateOf(0) }
 
     SideEffect {
         systemUiController.setNavigationBarColor(
@@ -218,6 +227,19 @@ fun ProfileScreenNew(navController: NavHostController, authViewModel:AuthViewMod
             isRefreshing = false
         }
     }
+    if (showQR == ShowDialog.OPEN) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.3f)) // optional dim
+                .blur(16.dp) // actual blur
+        )
+
+        ShowQRDialog(
+            navController = navController,
+            onDismiss = { showQR = ShowDialog.CLOSE }
+        )
+    }
 
 
     val pullRefreshState = rememberPullRefreshState(
@@ -246,23 +268,23 @@ fun ProfileScreenNew(navController: NavHostController, authViewModel:AuthViewMod
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(250.dp)
+                        .height(300.dp)
                         .background(color = upperCardColor)
                 ) { // 0xFF1B1A1A
-                    AsyncImage(
-                        model = imagePrefix + user.backgroundImage,
-                        contentDescription = "",
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .align(Alignment.Center),
-                        contentScale = ContentScale.Crop
-                    )
+//                    AsyncImage(
+//                        model = imagePrefix + user.backgroundImage,
+//                        contentDescription = "",
+//                        modifier = Modifier
+//                            .fillMaxSize()
+//                            .align(Alignment.Center),
+//                        contentScale = ContentScale.Crop
+//                    )
                     Image(
                         painterResource(id = R.drawable.baseline_arrow_back_24),
                         contentDescription = "",
                         modifier = Modifier
                             .padding(16.dp)
-                            .size(30.dp)
+                            .size(24.dp)
                             .clickable { navController.navigate(SCREENS.HOME.route) }
                             .align(Alignment.TopStart),
                         contentScale = ContentScale.Crop,
@@ -284,18 +306,32 @@ fun ProfileScreenNew(navController: NavHostController, authViewModel:AuthViewMod
                             fontFamily = Constants.FONT_MEDIUM,
                             color = Color.White
                         )
+                        */
+
                         Image(
-                            painterResource(id = R.drawable.edit_new),
+                            painterResource(id = R.drawable.profile_colored),
                             contentDescription = "",
                             modifier = Modifier
                                 .clickable {
-                                    pickMedia.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+                                    showPasswordDialog = true
                                 }
                                 .padding(16.dp)
-                                .size(30.dp),
+                                .size(28.dp),
+                            contentScale = ContentScale.Crop,
+                           // colorFilter = ColorFilter.tint(Color.White.copy(alpha = 0.8f))
+                        )
+                        Image(
+                            painterResource(id = R.drawable.new_qr),
+                            contentDescription = "",
+                            modifier = Modifier
+                                .clickable {
+                                    showQR = ShowDialog.OPEN
+                                }
+                                .padding(16.dp)
+                                .size(24.dp),
                             contentScale = ContentScale.Crop,
                             colorFilter = ColorFilter.tint(Color.White.copy(alpha = 0.9f))
-                        )*/
+                        )
                         Box {
                             Image(
                                 painterResource(id = R.drawable.settings_new),
@@ -305,12 +341,13 @@ fun ProfileScreenNew(navController: NavHostController, authViewModel:AuthViewMod
                                     .padding(16.dp)
                                     .size(30.dp),
                                 contentScale = ContentScale.Crop,
-                                colorFilter = ColorFilter.tint(Color.White.copy(alpha = 0.9f))
+                                colorFilter = ColorFilter.tint(Color.White.copy(alpha = 0.8f))
                             )
 
                             DropdownMenu(
                                 expanded = expanded,
                                 modifier = Modifier.wrapContentSize(),
+                                containerColor = Color.White,
                                 onDismissRequest = { expanded = false }
                             ) {
                                 DropdownMenuItem(
@@ -319,7 +356,7 @@ fun ProfileScreenNew(navController: NavHostController, authViewModel:AuthViewMod
                                         "Background",
                                         fontSize = 16.sp,
                                         fontFamily = Constants.FONT_MEDIUM,
-                                        color = Color.White)
+                                        color = Color.Black)
                                            },
                                     modifier = Modifier.wrapContentSize(),
                                     leadingIcon = {
@@ -328,7 +365,7 @@ fun ProfileScreenNew(navController: NavHostController, authViewModel:AuthViewMod
                                             contentDescription = "settings",
                                             modifier = Modifier.size(20.dp),
                                             contentScale = ContentScale.Crop,
-                                            colorFilter = ColorFilter.tint(Color.White)
+                                            colorFilter = ColorFilter.tint(Color.Black)
                                         )
                                     },
                                     onClick = {
@@ -342,7 +379,7 @@ fun ProfileScreenNew(navController: NavHostController, authViewModel:AuthViewMod
                                         "Settings",
                                         fontSize = 16.sp,
                                         fontFamily = Constants.FONT_MEDIUM,
-                                        color = Color.White
+                                        color = Color.Black
                                     ) },
                                     modifier = Modifier.wrapContentSize(),
                                     leadingIcon = {
@@ -351,7 +388,7 @@ fun ProfileScreenNew(navController: NavHostController, authViewModel:AuthViewMod
                                             contentDescription = "settings",
                                             modifier = Modifier.size(20.dp),
                                             contentScale = ContentScale.Crop,
-                                            colorFilter = ColorFilter.tint(Color.White)
+                                            colorFilter = ColorFilter.tint(Color.Black)
                                         )
                                     },
                                     onClick = {
@@ -365,7 +402,7 @@ fun ProfileScreenNew(navController: NavHostController, authViewModel:AuthViewMod
                                         "Logout",
                                         fontSize = 16.sp,
                                         fontFamily = Constants.FONT_MEDIUM,
-                                        color = Color.White)
+                                        color = Color.Black)
                                            },
                                     modifier = Modifier.wrapContentSize(),
                                     leadingIcon = {
@@ -394,7 +431,7 @@ fun ProfileScreenNew(navController: NavHostController, authViewModel:AuthViewMod
                                         "Delete Account",
                                         fontSize = 16.sp,
                                         fontFamily = Constants.FONT_MEDIUM,
-                                        color = Color.White
+                                        color = Color.Black
                                     ) },
                                     modifier = Modifier.wrapContentSize(),
                                     leadingIcon = {
@@ -442,7 +479,7 @@ fun ProfileScreenNew(navController: NavHostController, authViewModel:AuthViewMod
                             ) {
                                 Card(
                                     modifier = Modifier
-                                        .size(120.dp)
+                                        .size(80.dp)
                                         .clickable {
                                             showSheetForImageUpdate =
                                                 true;/*showImageCropper = true*/
@@ -500,23 +537,25 @@ fun ProfileScreenNew(navController: NavHostController, authViewModel:AuthViewMod
                                         text = user.userName,
                                         fontWeight = FontWeight.SemiBold,
                                         color = Color.White,
-                                        fontSize = 10.sp
+                                        fontSize = 14.sp
                                     )
                                 }
                             }
                             Spacer(modifier = Modifier.height(10.dp))
+                            ActivityCountUI(dropCount,postCount,pingCount)
                             Row(
-                                modifier = Modifier
+                                modifier = Modifier.padding(top=10.dp)
                                     .fillMaxWidth()
                                     .wrapContentHeight()
                             ) {
                                 Card(
                                     modifier = Modifier
+                                        .clickable { navController.navigate(SCREENS.SETTINGS.route) }
                                         .fillMaxWidth(0.5f)
                                         .height(36.dp),
-                                    backgroundColor = Color.LightGray,
+                                    backgroundColor = Constants.HOME_TOP_BAR_COLOR,
                                    // border = BorderStroke(width = 2.dp, color = Color.White),
-                                    shape = RoundedCornerShape(30.dp)
+                                    shape = RoundedCornerShape(12.dp)
                                 ) {
                                     Column(
                                         Modifier.fillMaxSize(),
@@ -525,7 +564,7 @@ fun ProfileScreenNew(navController: NavHostController, authViewModel:AuthViewMod
                                     ) {
                                         Text(
                                             text = "Edit account",
-                                            color = Color.Black,
+                                            color = Color.White.copy(alpha = 0.8f),
                                             fontFamily = Constants.FONT_LIGHT
                                         )
                                     }
@@ -536,16 +575,16 @@ fun ProfileScreenNew(navController: NavHostController, authViewModel:AuthViewMod
                                     .clickable { showPasswordDialog = true }
                                     .fillMaxWidth(1f)
                                     .height(36.dp),
-                                    backgroundColor = Color.DarkGray,
-                                    shape = RoundedCornerShape(30.dp)) {
+                                    backgroundColor = Constants.HOME_TOP_BAR_COLOR,
+                                    shape = RoundedCornerShape(12.dp)) {
                                     Column(
                                         Modifier.fillMaxSize(),
                                         verticalArrangement = Arrangement.Center,
                                         horizontalAlignment = Alignment.CenterHorizontally
                                     ) {
                                         Text(
-                                            text = "Private profile",
-                                            color = Color.White,
+                                            text = "Share account",
+                                            color = Color.White.copy(alpha = 0.8f),
                                             fontFamily = Constants.FONT_LIGHT
                                         )
                                     }
@@ -576,7 +615,7 @@ fun ProfileScreenNew(navController: NavHostController, authViewModel:AuthViewMod
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(
-                                text = "Profile Drops",
+                                text = "Profile Drops:",
                                 color = Color.White,
                                 fontSize=13.sp,
                                 fontFamily = Constants.FONT_LIGHT
@@ -592,7 +631,9 @@ fun ProfileScreenNew(navController: NavHostController, authViewModel:AuthViewMod
 //                                modifier = Modifier.size(20.dp)
 //                            )
                         }
-                        Divider(modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp), thickness = 0.25.dp, color = Color.Gray)
+//                        Divider(modifier = Modifier
+//                            .fillMaxWidth()
+//                            .padding(bottom = 10.dp), thickness = 0.25.dp, color = Color.Gray)
 
                     //--------------------------------------------------------------------------------
 
@@ -633,6 +674,7 @@ fun ProfileScreenNew(navController: NavHostController, authViewModel:AuthViewMod
 //                        }
 
                         is RequestState.Success -> {
+                            dropCount= response.data.data.size
                             RecentDrops(
                                 response.data.data,
                                 onDropProfileClicked = { showDropProfileDialog = !showDropProfileDialog },
@@ -654,26 +696,40 @@ fun ProfileScreenNew(navController: NavHostController, authViewModel:AuthViewMod
                         .height(800.dp)) {
                         TabRow(
                             indicator = { tabPositions ->
-                                TabRowDefaults.Indicator(
-                                    Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
-                                    color = Color.LightGray.copy(alpha =1f),
-                                    height = 2.dp
-                                )
+                                val currentTabPosition = tabPositions[selectedTabIndex]
+
+                                Box(
+                                    modifier = Modifier
+                                        .tabIndicatorOffset(currentTabPosition)
+                                        .fillMaxWidth(), // take full tab width
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    TabRowDefaults.Indicator(
+                                        modifier = Modifier.width(80.dp),
+                                        color = Color.LightGray.copy(alpha = 1f),
+                                        height = 1.dp
+                                    )
+                                }
                             },
                             selectedTabIndex = selectedTabIndex,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(bottom = 10.dp),
-                            backgroundColor = Color.DarkGray, //0xFF1C1C1D
+                                .padding(bottom = 4.dp),
+                            backgroundColor = Constants.HOME_TOP_BAR_COLOR, //0xFF1C1C1D
                             contentColor = Color.Black
                         ) {
-                            tabs.forEachIndexed { index, title ->
+                            tabs.forEachIndexed { index, tabItem ->
                                 Tab(
                                     selected = selectedTabIndex == index,
                                     onClick = { selectedTabIndex = index },
+                                    modifier = Modifier.height(36.dp),
                                     selectedContentColor = Color.White,
                                     unselectedContentColor = Color.Gray,
-                                    text = { Text(title, fontFamily = Constants.FONT_MEDIUM, fontSize = 14.sp) }
+                                    text = {
+                                        Row(modifier=Modifier.wrapContentSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                                            Image(painter=painterResource(tabItem.second),contentDescription = null,modifier=Modifier.size(12.dp))
+                                            Text(tabItem.first, fontFamily = Constants.FONT_MEDIUM, fontSize = 14.sp) }
+                                    }
                                 )
                             }
                         }
@@ -700,13 +756,16 @@ fun ProfileScreenNew(navController: NavHostController, authViewModel:AuthViewMod
                                         }
                                     }
                                     is RequestState.Error ->
-                                        MyPosts(emptyList()) {}
+                                        MyPosts(emptyList()) {
+                                            navController.navigate(SCREENS.CREATE_EVENT.route)
+                                        }
 //                                        CommonErrorScreen(
 //                                            error = "Error getting events!",
 //                                            onRetryClicked = { eventsViewModel.getUserEvents(user.user) }
 //                                        )
 
                                     is RequestState.Success -> {
+                                        postCount=response.data.size
                                         Log.i("USER EVENTS", "ProfileScreenNew: ${response.data}")
 
                                         MyPosts(response.data) {
@@ -738,9 +797,10 @@ fun ProfileScreenNew(navController: NavHostController, authViewModel:AuthViewMod
 
                                         }
                                     }
-                                    is RequestState.Error -> MyPings(emptyList(),{}) {  }
+                                    is RequestState.Error -> MyPings(emptyList(),{ navController.navigate(SCREENS.CREATE_PING.route)}) {  }
 
                                     is RequestState.Success -> {
+                                        pingCount=response.data.size
                                         MyPings(response.data, onFlashPostClicked = {navController.navigate(
                                             SCREENS.MY_FLASH_POST_DETAILS_SCREEN.createPath(it))}) {
                                             navController.navigate(SCREENS.CREATE_PING.route)
@@ -996,7 +1056,8 @@ fun RecentProfileDropItem(item: DropProfileResponse,onItemClicked:(DropProfileRe
             modifier = Modifier
                 .clickable { onItemClicked(item) }
                 .width(120.dp)
-                .height(180.dp).clip(RoundedCornerShape(6.dp))
+                .height(180.dp)
+                .clip(RoundedCornerShape(6.dp))
         ) {
             Column(modifier = Modifier.background(brush = Brush.verticalGradient(colors = listOf(Color(0xFF4D056B), Color(0xFF9E0642))))) {
                 GlideImage(
@@ -1047,4 +1108,86 @@ fun LogoutUser(onLogoutClicked:()->Unit={}) {
             .padding(bottom = 16.dp), thickness = 0.5.dp, color = Color.Gray)
     }
 
+}
+
+@Composable
+fun ActivityCountUI(dropCount:Int,postCount:Int,pingCount: Int) {
+    Row(modifier= Modifier.padding( vertical = 8.dp, horizontal = 8.dp).fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+        Box(modifier = Modifier.wrapContentSize()) {
+            Column(modifier = Modifier.wrapContentSize(), verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    dropCount.toString(),
+                    fontSize = 20.sp,
+                    fontFamily = Constants.FONT_MEDIUM,
+                    color = Color.White
+                )
+                HorizontalDivider(modifier=Modifier.padding(bottom = 4.dp).width(60.dp), thickness = 0.4.dp, color = Color.DarkGray)
+                Row(modifier = Modifier.wrapContentSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Image(
+                        painter = painterResource(R.drawable.drop_profile_filled_2),
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                        colorFilter = ColorFilter.tint(floatingActionBtnColor)
+                    )
+                    Text(
+                        "Drops", fontSize = 14.sp,
+                        fontFamily = Constants.FONT_LIGHT,
+                        color = Color.White
+                    )
+                }
+            }
+
+
+        }
+        Box(modifier = Modifier.wrapContentSize()) {
+            Column(modifier = Modifier.wrapContentSize(), verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    postCount.toString(),
+                    fontSize = 20.sp,
+                    fontFamily = Constants.FONT_MEDIUM,
+                    color = Color.White
+                )
+                HorizontalDivider(modifier=Modifier.padding(bottom = 4.dp).width(60.dp), thickness = 0.4.dp, color = Color.DarkGray)
+                Row(modifier = Modifier.wrapContentSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Image(
+                        painter = painterResource(R.drawable.event),
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                       // colorFilter = ColorFilter.tint(Color.White)
+                    )
+                    Text(
+                        "Events", fontSize = 14.sp,
+                        fontFamily = Constants.FONT_LIGHT,
+                        color = Color.White
+                    )
+                }
+            }
+
+
+        }
+        Box(modifier = Modifier.wrapContentSize()) {
+            Column(modifier = Modifier.wrapContentSize(), verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    pingCount.toString(),
+                    fontSize = 20.sp,
+                    fontFamily = Constants.FONT_MEDIUM,
+                    color = Color.White
+                )
+                HorizontalDivider(modifier=Modifier.padding(bottom = 4.dp).width(60.dp), thickness = 0.4.dp, color = Color.DarkGray)
+                Row(modifier = Modifier.wrapContentSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Image(
+                        painter = painterResource(R.drawable.ping),
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                       // colorFilter = ColorFilter.tint(Color.White)
+                    )
+                    Text(
+                        "Posts", fontSize = 14.sp,
+                        fontFamily = Constants.FONT_LIGHT,
+                        color = Color.White
+                    )
+                }
+            }
+        }
+    }
 }

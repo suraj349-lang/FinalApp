@@ -25,6 +25,11 @@ class CallViewModel : ViewModel() {
         private set
     private var rtcEngine: RtcEngine? = null
 
+    var showPostCallDialog by mutableStateOf(false)
+    var remainingTime by mutableStateOf(0)
+        private set
+
+
 
     fun initAgora(context: Context, appId: String) {
         if (rtcEngine != null) return
@@ -47,7 +52,7 @@ class CallViewModel : ViewModel() {
                 }
 
                 override fun onLeaveChannel(stats: RtcStats?) {
-                    callState = CallState.Idle
+                    callState = CallState.Matching
                 }
             }
         )
@@ -94,9 +99,19 @@ class CallViewModel : ViewModel() {
 
         // 🔥 60 second auto leave
         viewModelScope.launch {
-            delay(expiresIn * 1000L)
+
+            remainingTime = expiresIn
+
+            while (remainingTime > 0) {
+                delay(1000)
+                remainingTime--
+            }
+
             endCall()
+            showPostCallDialog = true
         }
+
+
     }
 
     fun setupLocalVideo(surfaceView: SurfaceView) {
@@ -119,22 +134,11 @@ class CallViewModel : ViewModel() {
         )
     }
 
-
-
     fun endCall() {
         rtcEngine?.leaveChannel()
         remoteUid = null
-        callState = CallState.Searching
-
-        SocketManager.socket.emit(
-            "findMatch",
-            JSONObject().apply {
-                put("userId", UserObject.user.value.user)
-                put("name", UserObject.user.value.name)
-                put("profileImage", UserObject.user.value.profileImage)
-            }
-        )
     }
+
 
 
 

@@ -12,6 +12,7 @@ import androidx.compose.foundation.text.BasicTextField
 
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,6 +36,7 @@ import com.spint.app.navigation.SCREENS
 import com.spint.app.screens._1home._1FlashPosts.detailsScreen.flashPosts.FlashPostWithImageScreen
 import com.spint.app.screens._1home._1FlashPosts.detailsScreen.flashPosts.NoImageFlashPosts
 import com.spint.app.screens._1home._1FlashPosts.detailsScreen.flashPosts.PrivateFlashPostScreen
+import com.spint.app.screens.common.NoProfilesFoundScreen
 import com.spint.app.utils.UserObject
 
 
@@ -295,8 +297,11 @@ fun FlashPostsScreen(
                                             .padding(top = 200.dp)
                                             .fillMaxWidth()
                                             .fillMaxHeight(0.9f), verticalArrangement = Arrangement.Center) {
-                                        NoPingsFoundScreen(error = "Error getting pings.") {
-                                            homeViewModel.getAllFlashPosts("")
+//                                        NoPingsFoundScreen(error = "Error getting pings.") {
+//                                            homeViewModel.getAllFlashPosts("")
+//                                        }
+                                        NoProfilesFoundScreen(error = "Error getting flash posts"){
+                                            allPingsState.refresh()
                                         }
                                     }
 

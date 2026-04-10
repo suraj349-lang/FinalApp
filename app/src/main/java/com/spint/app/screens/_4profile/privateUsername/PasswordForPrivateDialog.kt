@@ -64,6 +64,7 @@ fun PasswordForPrivateUsername(onEnterClicked:(String)->Unit={},onDismiss:()->Un
                 .padding(16.dp)
                 .fillMaxWidth()
                 .wrapContentHeight(),
+            colors = CardDefaults.cardColors(containerColor = Color(0xFFF6F3F3))
         ) {
             Column(
                 Modifier
@@ -73,7 +74,7 @@ fun PasswordForPrivateUsername(onEnterClicked:(String)->Unit={},onDismiss:()->Un
                     shape = RoundedCornerShape(topEnd = 6.dp, topStart = 6.dp),
                     modifier = Modifier.padding(bottom = 16.dp)
                         .fillMaxWidth()
-                        .height(70.dp),
+                        .height(60.dp),
                     colors = CardDefaults.cardColors(containerColor = floatingActionBtnColor)
                 ) {
                     Text(
@@ -89,11 +90,11 @@ fun PasswordForPrivateUsername(onEnterClicked:(String)->Unit={},onDismiss:()->Un
                 OutlinedTextField(
                     value = password,
                     onValueChange = {
-                        if (password.length <= 5) {
+                        if (it.length <= 6) {
                             password = it
                         }
                     },
-                    modifier = Modifier.padding(horizontal = 16.dp),
+                    modifier = Modifier.padding(horizontal = 16.dp).padding(top=20.dp),
                     placeholder = {
                         Text(
                             text = "******",
@@ -103,7 +104,7 @@ fun PasswordForPrivateUsername(onEnterClicked:(String)->Unit={},onDismiss:()->Un
                             letterSpacing = 16.sp
                         )
                     },
-                    textStyle = TextStyle(letterSpacing = 16.sp),
+                    textStyle = TextStyle(letterSpacing = 16.sp, color = Color.Black, fontSize = 20.sp, fontFamily = Constants.FONT_MEDIUM),
                     trailingIcon = {
                         if (password.isNotEmpty()) {
                             IconButton(onClick = { passwordVisibility = !passwordVisibility }) {
@@ -121,21 +122,22 @@ fun PasswordForPrivateUsername(onEnterClicked:(String)->Unit={},onDismiss:()->Un
                     visualTransformation = if (passwordVisibility) VisualTransformation.None
                     else PasswordVisualTransformation()
                 )
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                Row(modifier = Modifier.padding(bottom = 20.dp).fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
                     Button(
                         onClick = { onEnterClicked(password) },
-                        modifier=Modifier.clip(RoundedCornerShape(6.dp)).padding(top=16.dp),
+                        shape = RoundedCornerShape(6.dp),
+                        modifier=Modifier.padding(top=16.dp),
                         enabled= password.length==6,
                         colors = ButtonDefaults
                             .buttonColors(
-                                containerColor = Color(0xFF022C04),
+                                containerColor = Color(0xFF689F38),
                                 contentColor = Color.White,
                                 disabledContainerColor = Color.DarkGray,
                                 disabledContentColor = Color.White
                             )
                     ) {
                         Text(
-                            text = "Enter ->", fontFamily = Constants.FONT_MEDIUM,
+                            text = "Enter", fontFamily = Constants.FONT_LIGHT, fontSize = 14.sp,color=Color.White
                         )
                     }
                 }

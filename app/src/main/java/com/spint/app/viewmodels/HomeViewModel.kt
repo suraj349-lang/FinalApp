@@ -4,7 +4,9 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
@@ -39,6 +41,7 @@ import com.spint.app.model.flashPost.CommentData
 import com.spint.app.model.flashPost.FlashPostDetailsResponse
 import com.spint.app.model.flashPost.PingsOnFlashPostRequest
 import com.spint.app.model.flashPost.PingsOnFlashPostResponse
+import com.spint.app.model.places.Place
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -48,6 +51,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import java.io.File
@@ -216,23 +220,32 @@ class HomeViewModel @Inject constructor(
 //-----------------------------------------------------------------------------------------------------------------------------------------------//
 
 
-    fun getAutocompletePredictions(query: String): Flow<List<AutocompletePrediction>> {
-        val results = MutableStateFlow<List<AutocompletePrediction>>(emptyList())
+//    fun getAutocompletePredictions(query: String): Flow<List<AutocompletePrediction>> {
+//        val results = MutableStateFlow<List<AutocompletePrediction>>(emptyList())
+//
+//        val request = FindAutocompletePredictionsRequest.builder()
+//            .setQuery(query)
+//            .build()
+//
+//        placesClient.findAutocompletePredictions(request)
+//            .addOnSuccessListener { response ->
+//                Log.i("PlacesViewModel", "Autocomplete prediction request success $response")
+//                results.value = response.autocompletePredictions
+//            }
+//            .addOnFailureListener { exception ->
+//                Log.e("PlacesViewModel", "Autocomplete prediction request failed: ${exception.message}")
+//            }
+//
+//        return results
+//    }
 
-        val request = FindAutocompletePredictionsRequest.builder()
-            .setQuery(query)
-            .build()
+    var results by mutableStateOf<List<Place>>(emptyList())
+        private set
 
-        placesClient.findAutocompletePredictions(request)
-            .addOnSuccessListener { response ->
-                Log.i("PlacesViewModel", "Autocomplete prediction request success $response")
-                results.value = response.autocompletePredictions
-            }
-            .addOnFailureListener { exception ->
-                Log.e("PlacesViewModel", "Autocomplete prediction request failed: ${exception.message}")
-            }
-
-        return results
+    fun getAutocompletePredictions(query: String) {
+        viewModelScope.launch {
+            results = eventsRepository.getPlaces(query)
+        }
     }
 
 

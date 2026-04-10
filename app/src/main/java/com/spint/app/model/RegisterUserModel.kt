@@ -32,13 +32,16 @@ data class User(
     val name:String,
     val number:String,
     val userName: String,
+    val gender:String,
+    val email:String,
+    val dateOfBirth:String,
     val token: String,
     val address: String,
     val offers:List<String>?=null,
     val profileImage:String? ="",
     val backgroundImage:String=""
 ){
-    constructor():this("","","","","","", emptyList(),"","")
+    constructor():this("","","","","","","","","", emptyList(),"","")
 }
 
 data class ProfileResponse(

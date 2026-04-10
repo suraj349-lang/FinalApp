@@ -33,6 +33,7 @@ import com.spint.app.model.flashPost.FlashPostRequestDto
 import com.spint.app.model.flashPost.FlashPostResponse
 import com.spint.app.model.flashPost.PingsOnFlashPostRequest
 import com.spint.app.model.flashPost.PingsOnFlashPostResponse
+import com.spint.app.model.places.PlaceDto
 import com.spint.app.utils.PingsResponse
 import com.spint.app.utils.ApiResponse
 import com.spint.app.utils.constants.Constants
@@ -111,6 +112,11 @@ interface ApiService {
 
     @POST("/api/v1/flashPost/addPingOnPost")
     suspend fun addPingToFlashPost(@Body pingsOnFlashPostRequest: PingsOnFlashPostRequest) : PingsOnFlashPostResponse
+
+    @GET("api/v1/event/autocomplete")
+    suspend fun getAutocomplete(
+        @Query("q") query: String
+    ): List<PlaceDto>
 
 
 

@@ -69,9 +69,12 @@ fun SettingsScreenUI(navController: NavHostController,authViewModel: AuthViewMod
     window.navigationBarColor = Color.DarkGray.toArgb()
     val list= listOf(
          MyAccount("Name", user.name,SCREENS.EDIT_NAME.route) ,
-         MyAccount("Username", user.userName,SCREENS.EDIT_USER_NAME.route) ,
-         MyAccount("Phone Number", user.number,SCREENS.PHONE_NUMBER.route) ,
-         MyAccount("Password","",SCREENS.PASSWORD.route) ,
+         MyAccount("UserName", user.userName,SCREENS.EDIT_USER_NAME.route) ,
+         MyAccount("Phone Number", user.number.ifEmpty { "Update" },SCREENS.PHONE_NUMBER.route) ,
+         MyAccount("Gender",user.gender.ifEmpty { "Update" },SCREENS.PASSWORD.route) ,
+         MyAccount("Email",user.email.ifEmpty { "Update" },SCREENS.PASSWORD.route) ,
+         MyAccount("Date of birth",user.dateOfBirth.ifEmpty { "Update" },SCREENS.PASSWORD.route) ,
+         MyAccount("Password","Update",SCREENS.PASSWORD.route) ,
         // TODO later enable it
         // MyAccount("Delete Account","",SCREENS.DELETE_ACCOUNT.route)
     )

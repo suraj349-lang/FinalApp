@@ -41,12 +41,12 @@ sealed class Destinations(
         inactiveIcon=R.drawable.home_new,
         name = "Home"
     )
-    object Beta : Destinations(
-        route = SCREENS.EVENTS_SCREEN.route,
-        activeIcon = R.drawable.ping,
-        inactiveIcon=R.drawable.ping,
-        name = "Events"
-    )
+//    object Beta : Destinations(
+//        route = SCREENS.EVENTS_SCREEN.route,
+//        activeIcon = R.drawable.ping,
+//        inactiveIcon=R.drawable.ping,
+//        name = "Events"
+//    )
     object CreateEvent : Destinations(
         route = "",
         activeIcon = R.drawable.create_colored,
@@ -74,7 +74,7 @@ sealed class Destinations(
 fun BottomBar(
     navController: NavHostController, state: MutableState<Boolean> = mutableStateOf(true),modifier: Modifier=Modifier, containerColor:Color= Color.DarkGray, highlightedTextColor:Color=Color.White, inactiveIconColor: Color= Color.White, inactiveTextColor:Color= Color.LightGray, onCreateEventClick: () -> Unit={}) {
     val screens = listOf(
-        Destinations.HomeScreen, Destinations.Beta,Destinations.CreateEvent,Destinations.ProfileScreen,Destinations.Settings
+        Destinations.HomeScreen, /*Destinations.Beta,*/Destinations.CreateEvent,Destinations.ProfileScreen,Destinations.Settings
     )
 //0xFFE4E4F1   0xFFF9F9FF -> screen color
     NavigationBar(containerColor = containerColor, modifier = Modifier.navigationBarsPadding().fillMaxWidth().height(50.dp)){
