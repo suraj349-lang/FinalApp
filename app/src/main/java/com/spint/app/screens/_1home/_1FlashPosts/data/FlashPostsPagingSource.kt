@@ -1,4 +1,4 @@
-package com.spint.app.screens._1home._1FlashPosts
+package com.spint.app.screens._1home._1FlashPosts.data
 
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
@@ -31,11 +31,10 @@ class FlashPostsPagingSource(private  val eventsRepository: EventsRepository):
             else{
                 LoadResult.Error(Exception())
             }
-        }catch (e:IOException){
+        }catch (e: IOException){
             LoadResult.Error(e)
-        }catch (e:HttpException){
+        }catch (e: HttpException){
             LoadResult.Error(e)
         }
     }
 }
-

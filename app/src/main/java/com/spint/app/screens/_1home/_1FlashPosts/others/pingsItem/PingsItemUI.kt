@@ -1,4 +1,4 @@
-package com.spint.app.screens._1home._1FlashPosts.pingsItem
+package com.spint.app.screens._1home._1FlashPosts.others.pingsItem
 
 
 import androidx.compose.foundation.Image

@@ -1,4 +1,4 @@
-package com.spint.app.screens._1home._1FlashPosts.old
+package com.spint.app.screens._1home._1FlashPosts.others.old
 
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.LinearEasing

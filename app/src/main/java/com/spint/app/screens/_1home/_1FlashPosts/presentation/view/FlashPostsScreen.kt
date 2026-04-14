@@ -1,4 +1,4 @@
-package com.spint.app.screens._1home._1FlashPosts
+package com.spint.app.screens._1home._1FlashPosts.presentation.view
 
 import android.util.Log
 import androidx.compose.foundation.background
@@ -12,7 +12,6 @@ import androidx.compose.foundation.text.BasicTextField
 
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,7 +24,6 @@ import androidx.navigation.NavHostController
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.spint.app.screens._3createEventOrPing.CreateEventOrPingBottomSheet
-import com.spint.app.screens.common.NoPingsFoundScreen
 import com.spint.app.ui.theme.floatingActionBtnColor
 import com.spint.app.utils.UserLocationObject
 import com.spint.app.utils.constants.Constants
@@ -33,11 +31,9 @@ import com.spint.app.viewmodels.HomeViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.spint.app.model.flashPost.PingsOnFlashPostRequest
 import com.spint.app.navigation.SCREENS
-import com.spint.app.screens._1home._1FlashPosts.detailsScreen.flashPosts.FlashPostWithImageScreen
-import com.spint.app.screens._1home._1FlashPosts.detailsScreen.flashPosts.NoImageFlashPosts
-import com.spint.app.screens._1home._1FlashPosts.detailsScreen.flashPosts.PrivateFlashPostScreen
 import com.spint.app.screens.common.NoProfilesFoundScreen
 import com.spint.app.utils.UserObject
+import kotlinx.coroutines.delay
 
 
 @Composable
@@ -109,7 +105,121 @@ fun FlashPostsScreen(
                             }
                         }
                     }
-                    //        StatsCard(examplePingStats)
+
+                    allPingsState?.apply {
+                        when {
+                            loadState.refresh is LoadState.Loading -> {
+                                item {
+                                    Surface(Modifier.fillMaxSize()) {
+                                        Column(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .fillMaxHeight(0.9f)
+                                                .padding(top = 2.dp),
+                                            horizontalAlignment = Alignment.CenterHorizontally
+                                        ) {
+                                            LinearProgressIndicator(modifier = Modifier.fillMaxWidth(), color = floatingActionBtnColor, strokeCap = StrokeCap.Round, trackColor = Color.Yellow)
+                                        }
+                                        showLoader = true
+                                    }
+                                }
+                            }
+
+                            loadState.append is LoadState.Loading -> {
+                                item {
+                                    Surface(Modifier.fillMaxSize()) {
+                                        Column(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .fillMaxHeight(0.9f)
+                                                .padding(top = 2.dp),
+                                            horizontalAlignment = Alignment.CenterHorizontally
+                                        ) {
+                                            LinearProgressIndicator(modifier = Modifier.fillMaxWidth(), color = floatingActionBtnColor, strokeCap = StrokeCap.Round, trackColor = Color.Yellow)
+                                        }
+                                        showLoader = true
+                                    }
+                                }
+                            }
+
+                            loadState.refresh is LoadState.Error -> {
+                                showLoader = false
+                                val error = (loadState.refresh as LoadState.Error).error
+                                item {
+                                    Log.e("Error in getting pings", "PingsScreenUI: $error ")
+                                    Column(
+                                        Modifier
+                                            .padding(top = 200.dp)
+                                            .fillMaxWidth()
+                                            .fillMaxHeight(0.9f), verticalArrangement = Arrangement.Center) {
+//                                        NoPingsFoundScreen(error = "Error getting pings.") {
+//                                            homeViewModel.getAllFlashPosts("")
+//                                        }
+                                        NoProfilesFoundScreen(error = "Error getting flash posts"){
+                                            allPingsState.refresh()
+                                        }
+                                    }
+
+                                }
+                            }
+                        }
+                    }
+                        allPingsState?.itemCount?.let {count->
+                            items(count) { index ->
+                                val item = allPingsState[index]
+                                Log.i("item", "FlashPostsScreen:$item ")
+                                if (item != null) {
+//                                    PingItemCard(
+//                                        item,
+//                                        onShareClicked = {},
+//                                        onRespondClicked = {}
+//                                    )
+                                    //   PingItem1(item)
+                                    // PingItem2(item = item)
+
+
+                                  //  PingItem3(item)
+                                  //  PingItem1()
+                                    LaunchedEffect(item._id) {
+                                        delay(500) //  user stayed on item
+                                        homeViewModel.registerView(item._id,user.user)
+                                    }
+
+                                    if(item.image.isNotEmpty() && !item.isPrivate){
+                                        FlashPostWithImageScreen(
+                                            item,
+                                            onFlashPostClicked = {navController.navigate(SCREENS.PING_DETAILS.createRoute(item))},
+                                            onUserProfileClicked = {item.user?.user?.let{userId->navController.navigate(SCREENS.USER_PUBLIC_PROFILE.createPath(userId))}},
+                                            onPingOfFlashPostClicked = {postId,message->
+                                                homeViewModel.addPingOnFlashPost(
+                                                    PingsOnFlashPostRequest(userId = item.user?.user
+                                                        ?: "",postId,message)
+                                                )
+                                            },
+                                            onCommentButtonClicked = {
+                                                navController.navigate(SCREENS.COMMENT.createPath(item._id))
+                                            }
+                                        )
+                                    }else if (item.image.isEmpty() && !item.isPrivate ){
+                                       NoImageFlashPosts(flashPostResponse = item){
+                                           navController.navigate(SCREENS.PING_DETAILS.createRoute(item))
+                                       }
+                                    }else{
+                                        PrivateFlashPostScreen(item){
+                                            navController.navigate(SCREENS.PING_DETAILS.createRoute(item))
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+        })
+    CreateEventOrPingBottomSheet(showSheet = showSheet, onDismiss = { showSheet=!showSheet }, navHostController =navController )
+}
+
+/*
+*                //        StatsCard(examplePingStats)
 //        StatsGrid(examplePingStats)
                     //VerticalBarStats(examplePingStats)
 //        StatsChipsRow(examplePingStats)
@@ -250,120 +360,7 @@ fun FlashPostsScreen(
 //                    }
                         //PingsScreenUI(navController = navController, eventsViewModel = eventsViewModel)
 
-                        // val number=Random.nextInt()
-                    allPingsState?.apply {
-                        when {
-                            loadState.refresh is LoadState.Loading -> {
-                                item {
-                                    Surface(Modifier.fillMaxSize()) {
-                                        Column(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .fillMaxHeight(0.9f)
-                                                .padding(top = 2.dp),
-                                            horizontalAlignment = Alignment.CenterHorizontally
-                                        ) {
-                                            LinearProgressIndicator(modifier = Modifier.fillMaxWidth(), color = floatingActionBtnColor, strokeCap = StrokeCap.Round, trackColor = Color.Yellow)
-                                        }
-                                        showLoader = true
-                                    }
-                                }
-                            }
-
-                            loadState.append is LoadState.Loading -> {
-                                item {
-                                    Surface(Modifier.fillMaxSize()) {
-                                        Column(
-                                            modifier = Modifier
-                                                .fillMaxWidth()
-                                                .fillMaxHeight(0.9f)
-                                                .padding(top = 2.dp),
-                                            horizontalAlignment = Alignment.CenterHorizontally
-                                        ) {
-                                            LinearProgressIndicator(modifier = Modifier.fillMaxWidth(), color = floatingActionBtnColor, strokeCap = StrokeCap.Round, trackColor = Color.Yellow)
-                                        }
-                                        showLoader = true
-                                    }
-                                }
-                            }
-
-                            loadState.refresh is LoadState.Error -> {
-                                showLoader = false
-                                val error = (loadState.refresh as LoadState.Error).error
-                                item {
-                                    Log.e("Error in getting pings", "PingsScreenUI: $error ")
-                                    Column(
-                                        Modifier
-                                            .padding(top = 200.dp)
-                                            .fillMaxWidth()
-                                            .fillMaxHeight(0.9f), verticalArrangement = Arrangement.Center) {
-//                                        NoPingsFoundScreen(error = "Error getting pings.") {
-//                                            homeViewModel.getAllFlashPosts("")
-//                                        }
-                                        NoProfilesFoundScreen(error = "Error getting flash posts"){
-                                            allPingsState.refresh()
-                                        }
-                                    }
-
-                                }
-                            }
-                        }
-                    }
-                        allPingsState?.itemCount?.let {count->
-                            items(count) { index ->
-                                val item = allPingsState[index]
-                                Log.i("item", "FlashPostsScreen:$item ")
-                                if (item != null) {
-//                                    PingItemCard(
-//                                        item,
-//                                        onShareClicked = {},
-//                                        onRespondClicked = {}
-//                                    )
-                                    //   PingItem1(item)
-                                    // PingItem2(item = item)
-
-
-                                  //  PingItem3(item)
-                                  //  PingItem1()
-                                   
-                                    if(item.image.isNotEmpty() && !item.isPrivate){
-                                        FlashPostWithImageScreen(
-                                            item,
-                                            onFlashPostClicked = {navController.navigate(SCREENS.PING_DETAILS.createRoute(item))},
-                                            onUserProfileClicked = {item.user?.user?.let{userId->navController.navigate(SCREENS.USER_PUBLIC_PROFILE.createPath(userId))}},
-                                            onPingOfFlashPostClicked = {postId,message->
-                                                homeViewModel.addPingOnFlashPost(
-                                                    PingsOnFlashPostRequest(userId = item.user?.user
-                                                        ?: "",postId,message)
-                                                )
-                                            },
-                                            onCommentButtonClicked = {
-                                                navController.navigate(SCREENS.COMMENT.route)
-                                            }
-                                        )
-                                    }else if (item.image.isEmpty() && !item.isPrivate ){
-                                       NoImageFlashPosts(flashPostResponse = item){
-                                           navController.navigate(SCREENS.PING_DETAILS.createRoute(item))
-                                       }
-                                    }else{
-                                        PrivateFlashPostScreen(item){
-                                            navController.navigate(SCREENS.PING_DETAILS.createRoute(item))
-                                        }
-                                    }
-                                  
-
-                                  //  Spacer(modifier = Modifier.height(6.dp))
-                                 //  Divider(modifier = Modifier.fillMaxWidth(), thickness = 0.5.dp, color = Color.Gray.copy(alpha = 0.6f))
-                                }
-                            }
-                        }
-                    }
-                }
-        })
-    CreateEventOrPingBottomSheet(showSheet = showSheet, onDismiss = { showSheet=!showSheet }, navHostController =navController )
-}
-
-
+                        // val number=Random.nextInt()*/
 
 //
 //@Composable

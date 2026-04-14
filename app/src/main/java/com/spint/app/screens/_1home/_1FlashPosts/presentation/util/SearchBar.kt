@@ -1,4 +1,4 @@
-package com.spint.app.screens._1home._1FlashPosts
+package com.spint.app.screens._1home._1FlashPosts.presentation.util
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,11 +20,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.spint.app.R
 import com.spint.app.utils.constants.Constants
 
 
+@Preview(showBackground = true)
 @Composable
 fun SearchBar() {
     var searchText by remember {

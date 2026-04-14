@@ -74,7 +74,7 @@ fun EventsDetailsVerticalWrapper(id:String, navController: NavHostController, ho
                             navController,
                             { navController.navigateUp() }
                         ){
-                            navController.navigate(SCREENS.COMMENT.route)
+                            navController.navigate(SCREENS.COMMENT.createPath(response.data._id))
                         }
                     }
                 }

@@ -1,4 +1,4 @@
-package com.spint.app.screens._1home._1FlashPosts.detailsScreen.flashPosts
+package com.spint.app.screens._1home._1FlashPosts.presentation.view
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -116,13 +116,13 @@ fun PrivateFlashPostScreen(flashPostResponse: FlashPostResponse,onFlashPostClick
                     .background(color = Color.Transparent)
             ) {
 
-                ViewRoundUI(flashPostResponse.totalViews)
+                ViewRoundUI(flashPostResponse.viewsCount)
                 CommentRoundUI(flashPostResponse.commentsCount)
                 CountdownTimerForPrivate(flashPostResponse.expirationTime)
-                AddPingOnFlashPost(flashPostResponse.peopleJoined,flashPostResponse.pingCount)
-                ShareRoundUI(flashPostResponse.totalShared){
-                    val deeplink="http://socail.com/ping/${flashPostResponse._id}"
-                    sharePingDeepLink(context,deeplink)
+                AddPingOnFlashPost(flashPostResponse.peopleJoined, flashPostResponse.pingCount)
+                ShareRoundUI(flashPostResponse.totalShared) {
+                    val deeplink = "http://socail.com/ping/${flashPostResponse._id}"
+                    sharePingDeepLink(context, deeplink)
                 }
 
 

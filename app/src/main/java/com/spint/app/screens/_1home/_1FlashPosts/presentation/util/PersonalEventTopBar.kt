@@ -1,4 +1,4 @@
-package com.spint.app.screens._1home._1FlashPosts
+package com.spint.app.screens._1home._1FlashPosts.presentation.util
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

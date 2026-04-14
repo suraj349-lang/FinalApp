@@ -78,7 +78,11 @@ sealed class SCREENS(val route:String){
         }
     }
 
-    object COMMENT:SCREENS("comment")
+    object COMMENT:SCREENS("comment/{postId}"){
+        fun createPath(postId: String):String{
+            return "comment/$postId"
+        }
+    }
 
     object DUEL:SCREENS("omegle")
     object IMAGE_CROPPER:SCREENS("auto_image_cropper")

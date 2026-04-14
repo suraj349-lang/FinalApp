@@ -102,7 +102,7 @@ fun PublicEventDetailsScreenWrapper(id:String, navController: NavHostController,
                         .padding(it)
                         .fillMaxSize(), color = Color.Black) {
                         PublicEventDetailsScreen(response.data, authViewModel ,homeViewModel, navController,{ navController.navigateUp() }) {
-                            navController.navigate(SCREENS.COMMENT.route)
+                            navController.navigate(SCREENS.COMMENT.createPath(response.data._id))
                         }
                     }
                 }

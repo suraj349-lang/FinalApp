@@ -1,4 +1,4 @@
-package com.spint.app.screens._1home._1FlashPosts.detailsScreen.flashPosts
+package com.spint.app.screens._1home._1FlashPosts.presentation.view
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -96,11 +96,11 @@ fun NoImageFlashPosts(flashPostResponse: FlashPostResponse,onFlashPostClicked:()
                     .background(color = Color.Transparent)
             ) {
 
-                ViewRoundUI(flashPostResponse.totalViews)
+                ViewRoundUI(flashPostResponse.viewsCount)
                 CommentRoundUI(flashPostResponse.commentsCount)
                 CountdownTimer(flashPostResponse.expirationTime)
-                AddPingOnFlashPost(flashPostResponse.peopleJoined,flashPostResponse.pingCount)
-                ShareRoundUI(flashPostResponse.totalShared){
+                AddPingOnFlashPost(flashPostResponse.peopleJoined, flashPostResponse.pingCount)
+                ShareRoundUI(flashPostResponse.totalShared) {
 //                    val deeplink="http://socail.com/ping/${item._id}"
 //                    sharePingDeepLink(context,deeplink)
                 }

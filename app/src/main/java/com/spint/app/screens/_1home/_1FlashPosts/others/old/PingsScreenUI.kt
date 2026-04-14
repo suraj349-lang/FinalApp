@@ -1,4 +1,4 @@
-package com.spint.app.screens._1home._1FlashPosts.old
+package com.spint.app.screens._1home._1FlashPosts.others.old
 
 import BottomBar
 import android.util.Log
@@ -50,10 +50,10 @@ import androidx.navigation.NavHostController
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.spint.app.model.DropProfileResponse
-import com.spint.app.screens._1home._1FlashPosts.Category
-import com.spint.app.screens._1home._1FlashPosts.PingsTopBar
-import com.spint.app.screens._1home._1FlashPosts.SearchBar
-import com.spint.app.screens._1home._1FlashPosts.categories
+import com.spint.app.screens._1home._1FlashPosts.others.Category
+import com.spint.app.screens._1home._1FlashPosts.presentation.util.PingsTopBar
+import com.spint.app.screens._1home._1FlashPosts.presentation.util.SearchBar
+import com.spint.app.screens._1home._1FlashPosts.others.categories
 import com.spint.app.screens._3createEventOrPing.CreateEventOrPingBottomSheet
 import com.spint.app.screens.common.NoPingsFoundScreen
 import com.spint.app.ui.theme.floatingActionBtnColor
@@ -61,7 +61,7 @@ import com.spint.app.utils.UserLocationObject
 import com.spint.app.utils.constants.Constants.DONGLE_BOLD
 import com.spint.app.viewmodels.HomeViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import com.spint.app.screens._1home._1FlashPosts.detailsScreen.flashPosts.PingItem3
+import com.spint.app.screens._1home._1FlashPosts.others.flashPosts.PingItem3
 
 @Composable
 fun PingsScreenUI(navController:NavHostController, homeViewModel: HomeViewModel) {

@@ -1,4 +1,4 @@
-package com.spint.app.screens._1home._1FlashPosts.detailsScreen.flashPosts
+package com.spint.app.screens._1home._1FlashPosts.others.flashPosts
 
 
 import androidx.compose.foundation.BorderStroke
@@ -35,6 +35,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -44,9 +45,9 @@ import com.spint.app.model.flashPost.FlashPostResponse
 import com.spint.app.ui.imagePrefix
 import com.spint.app.utils.constants.Constants
 
-
+@Preview(showBackground = true)
 @Composable
-fun PingItem2(item: FlashPostResponse) {
+fun PingItem2(item: FlashPostResponse = FlashPostResponse()) {
     Box(
         modifier = Modifier
             .padding(10.dp)

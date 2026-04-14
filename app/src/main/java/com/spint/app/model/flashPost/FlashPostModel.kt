@@ -54,7 +54,7 @@ data class FlashPostResponse(
     val commentsCount:Int=0,
     val topComments:List<CommentData> ? =null,
     val totalChildPosts:Int =0,
-    val totalViews:Int=0,
+    val viewsCount:Int=0,
     val totalUpVotes:Int=0,
     val totalShared:Int=0
 )
@@ -99,6 +99,24 @@ data class CommentData(
     val userName:String,
     val profileImage:String,
     val commentText:String
+)
+@Serializable
+data class CommentRequest(
+    val userId:String,
+    val comment:String,
+    val flashPostId:String
+)
+
+@Serializable
+data class CommentResponse(
+    val id: String,
+    val flashPostId: String,
+    val userId: User,
+    val comment: String,
+    val replies: List<CommentResponse> = emptyList(),
+    val isExpanded: Boolean = false,
+    val showReplyBox: Boolean = false,
+    val replyText: String = ""
 )
 
 

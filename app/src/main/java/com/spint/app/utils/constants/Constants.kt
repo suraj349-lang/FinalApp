@@ -12,7 +12,7 @@ object Constants {
 
     const val TAG = APP_NAME
 
-    const val IP_ADD ="192.168.0.108" //3.108.55.84" //  192.168.1.5
+    const val IP_ADD ="192.168.1.6" //3.108.55.84" //  192.168.1.5
     const val BASE_URL = "http://${IP_ADD}:5000/"
     const val TEMP_SOCKET_URL = "http://${IP_ADD}:5001/"
     const val SIGNAL_SERVER = "http://192.168.1.40:5002/"

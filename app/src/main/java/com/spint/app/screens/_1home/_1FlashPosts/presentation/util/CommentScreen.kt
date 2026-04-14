@@ -1,10 +1,11 @@
-package com.spint.app.screens._2Events.events.eventWarScreen
+package com.spint.app.screens._1home._1FlashPosts.presentation.util
 
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -20,9 +21,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -31,6 +36,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
@@ -40,19 +46,86 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
+import com.bumptech.glide.integration.compose.GlideImage
 import com.spint.app.R
+import com.spint.app.model.flashPost.CommentRequest
+import com.spint.app.model.flashPost.CommentResponse
+import com.spint.app.screens._4profile.privateUsername.dynamicText
+import com.spint.app.ui.imagePrefix
+import com.spint.app.ui.theme.floatingActionBtnColor
+import com.spint.app.utils.RequestState
+import com.spint.app.utils.UserObject
+import com.spint.app.viewmodels.HomeViewModel
+import kotlin.collections.List
 
-@Preview(showBackground = true)
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun  CommentsScreen(comments:List<Comment> =  com.spint.app.screens._2Events.events.eventWarScreen.comments) {
+fun  FlashPostCommentScreen(postId: String,viewModel: HomeViewModel) { // com.spint.app.screens._1home._1FlashPosts.presentation.util.comments
+    val comments by viewModel.flashPostComments.collectAsState()
+    LaunchedEffect(Unit) {
+        viewModel.getFlashPostComments(postId)
+    }
+    val user by UserObject.user.collectAsState()
+    var comment by remember { mutableStateOf("") }
+    Box(modifier = Modifier.fillMaxSize()) {
+        when (val data = comments) {
+            is RequestState.Success -> {
+                CommentScreenUI(data.data)
+            }
+
+            is RequestState.Error -> {
+                Box(modifier = Modifier.fillMaxSize().background(color = Color.Black)) {
+                    Column(modifier = Modifier.align(Alignment.Center)) {
+                        Text("Error getting comments")
+                        Button(
+                            onClick = { viewModel.getFlashPostComments(postId) },
+                            colors = ButtonDefaults.buttonColors(containerColor = floatingActionBtnColor),
+                            modifier=Modifier.clip(RoundedCornerShape(20.dp))
+                        ) {
+                            Text("Retry", modifier = Modifier.padding(horizontal = 10.dp))
+                        }
+                    }
+                }
+            }
+
+            is RequestState.Loading -> {
+                Box(modifier = Modifier.fillMaxSize().background(color = Color.Black)) {
+                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+                }
+            }
+
+            else -> {}
+
+        }
+        Row(modifier = Modifier.fillMaxWidth().height(80.dp).align(Alignment.BottomCenter)) {
+            OutlinedTextField(
+                value = comment,
+                onValueChange={comment=it},
+                modifier=Modifier.clip(RoundedCornerShape(50)).padding(10.dp).fillMaxWidth(),
+                placeholder = { dynamicText("add comment") },
+                trailingIcon = {Image(painter = painterResource(R.drawable.send_24), contentDescription = "", colorFilter = ColorFilter.tint(Color.White), modifier = Modifier.rotate(-45f).clickable{viewModel.addFlashPostComments(
+                    CommentRequest(
+                        userId = user.user,
+                        comment=comment,
+                        flashPostId = postId
+                    )
+                )})}
+            )
+        }
+    }
+
+}
+
+@Composable
+fun CommentScreenUI(comments: List<CommentResponse>) {
     // Use mutable state list for top-level comments
-    val commentsState = remember { mutableStateListOf<Comment>().apply { addAll(comments) } }
+    val commentsState = remember { mutableStateListOf<CommentResponse>().apply { addAll(comments) } }
 
     // Function to toggle expand/collapse for any comment (recursive update)
-    fun toggleExpand(target: Comment) {
+    fun toggleExpand(target: CommentResponse) {
         val updated = updateCommentExpandState(commentsState, target)
         if (!updated) println("Comment not found")
     }
@@ -72,7 +145,7 @@ fun  CommentsScreen(comments:List<Comment> =  com.spint.app.screens._2Events.eve
 }
 
 // Recursive function to update expansion state
-fun updateCommentExpandState(comments: MutableList<Comment>, target: Comment): Boolean {
+fun updateCommentExpandState(comments: MutableList<CommentResponse>, target: CommentResponse): Boolean {
     for (i in comments.indices) {
         val current = comments[i]
         if (current.id == target.id) {
@@ -88,14 +161,15 @@ fun updateCommentExpandState(comments: MutableList<Comment>, target: Comment): B
     }
     return false
 }
+@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun CommentItem(
-    comment: Comment,
+    comment: CommentResponse,
     indentLevel: Int = 0,
-    onToggleExpand: (Comment) -> Unit,
-    onToggleReplyBox: (Comment) -> Unit,
-    onReplyTextChange: (Comment, String) -> Unit,
-    onSendReply: (Comment) -> Unit
+    onToggleExpand: (CommentResponse) -> Unit,
+    onToggleReplyBox: (CommentResponse) -> Unit,
+    onReplyTextChange: (CommentResponse, String) -> Unit,
+    onSendReply: (CommentResponse) -> Unit
 ) {
     var isExpanded by remember { mutableStateOf(comment.isExpanded) }
 
@@ -110,7 +184,7 @@ fun CommentItem(
     val displayText = buildAnnotatedString {
         //username
         withStyle(SpanStyle(fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Color(0xFFA6C8EA))) {
-            append("@${comment.username} ")
+            append("@${comment.userId.userName} ")
         }
         withStyle(SpanStyle(fontSize = 13.sp, color = Color.White)) {
             append(displayCommentText)
@@ -143,8 +217,8 @@ fun CommentItem(
 //                )
                 .padding(4.dp), verticalAlignment = Alignment.CenterVertically
         ) {
-            Image(
-                painter = painterResource(id = comment.profileImageRes),
+            GlideImage(
+                model = imagePrefix+comment.userId.profileImage,
                 contentDescription = null,
                 modifier = Modifier
                     .padding(top = 4.dp)
@@ -192,7 +266,9 @@ fun CommentItem(
         }
 
         // Reply Text
-        Row(modifier = Modifier.padding(start = 48.dp).fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(20.dp)) {
+        Row(modifier = Modifier
+            .padding(start = 48.dp)
+            .fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(20.dp)) {
             Image(painter = painterResource(R.drawable.like), contentDescription = "",modifier= Modifier.size(12.dp), colorFilter = ColorFilter.tint(Color.Gray))
             Text(
                 text = "Reply",
@@ -253,18 +329,8 @@ fun CommentItem(
 }
 
 
-data class Comment(
-    val id: String,
-    val username: String,
-    val comment: String,
-    val profileImageRes: Int,
-    val replies: List<Comment> = emptyList(),
-    val isExpanded: Boolean = false,
-    val showReplyBox: Boolean = false,
-    val replyText: String = ""
-)
 
-
+/*
 val comments = listOf(
     Comment(
         id = "1",
@@ -411,3 +477,4 @@ val comments = listOf(
         profileImageRes = R.drawable.profile_image_2
     )
 )
+*/

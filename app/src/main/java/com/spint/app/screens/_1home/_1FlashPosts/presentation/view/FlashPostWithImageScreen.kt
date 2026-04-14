@@ -1,4 +1,4 @@
-package com.spint.app.screens._1home._1FlashPosts.detailsScreen.flashPosts
+package com.spint.app.screens._1home._1FlashPosts.presentation.view
 
 import android.util.Log
 import androidx.compose.foundation.Image
@@ -21,8 +21,6 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Divider
-import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -172,7 +170,7 @@ fun FlashPostWithImageScreen(item:FlashPostResponse, onFlashPostClicked:()->Unit
                         .background(color = Color.Transparent)
                 ) {
 
-                    ViewRoundUI(item.totalViews)
+                    ViewRoundUI(item.viewsCount)
                     CommentRoundUI(item.commentsCount,onCommentButtonClicked)
                     CountdownTimer(item.expirationTime)
                     AddPingOnFlashPost(item.peopleJoined,item.pingCount,{ showJoinComment=!showJoinComment})
@@ -416,7 +414,7 @@ fun ViewRoundUI(viewCount: Int) {
         Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
             Image(painter = painterResource(id = R.drawable.view), contentDescription ="", modifier = Modifier.size(20.dp), colorFilter = ColorFilter.tint(
                 Color.White.copy(alpha = 0.954f)) )
-           if(viewCount !=0) Text("24k", color = Color.White, fontFamily = Constants.FONT_EXTRA_LIGHT, fontSize = 9.sp)
+          Text(viewCount.toString(), color = Color.White, fontFamily = Constants.FONT_EXTRA_LIGHT, fontSize = 9.sp)
     }
         }
 }

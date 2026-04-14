@@ -1,4 +1,4 @@
-package com.spint.app.screens._1home._1FlashPosts.detailsScreen
+package com.spint.app.screens._1home._1FlashPosts.presentation.view.detailsScreen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -56,24 +56,25 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.spint.app.R
 import com.spint.app.model.flashPost.FlashPostResponse
 import com.spint.app.navigation.SCREENS
-import com.spint.app.screens._1home._1FlashPosts.detailsScreen.flashPosts.AddPingOnFlashPost
-import com.spint.app.screens._1home._1FlashPosts.detailsScreen.flashPosts.CommentRoundUI
-import com.spint.app.screens._1home._1FlashPosts.detailsScreen.flashPosts.CountdownTimer
-import com.spint.app.screens._1home._1FlashPosts.detailsScreen.flashPosts.ShareRoundUI
-import com.spint.app.screens._1home._1FlashPosts.detailsScreen.flashPosts.ViewRoundUI
+import com.spint.app.screens._1home._1FlashPosts.presentation.view.AddPingOnFlashPost
+import com.spint.app.screens._1home._1FlashPosts.presentation.view.CommentRoundUI
+import com.spint.app.screens._1home._1FlashPosts.presentation.view.CountdownTimer
+import com.spint.app.screens._1home._1FlashPosts.presentation.view.ShareRoundUI
+import com.spint.app.screens._1home._1FlashPosts.presentation.view.ViewRoundUI
 import com.spint.app.screens._1home.commonUI.sharePingDeepLink
-import com.spint.app.screens._2Events.events.eventWarScreen.CommentsScreen
+import com.spint.app.screens._1home._1FlashPosts.presentation.util.FlashPostCommentScreen
 import com.spint.app.testing.CommonTopBar
 import com.spint.app.ui.imagePrefix
 import com.spint.app.ui.theme.floatingActionBtnColor
 import com.spint.app.utils.constants.Constants
+import com.spint.app.viewmodels.HomeViewModel
 import kotlinx.coroutines.launch
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
 
 @Composable
-fun FlashPostDetailsScreen(navController: NavHostController, flashPostResponse: FlashPostResponse?) {
+fun FlashPostDetailsScreen(navController: NavHostController, flashPostResponse: FlashPostResponse?,homeViewModel: HomeViewModel) {
     Scaffold(
         topBar = {
             flashPostResponse?.let {
@@ -98,7 +99,8 @@ fun FlashPostDetailsScreen(navController: NavHostController, flashPostResponse: 
                           .fillMaxSize()
                   ) {
                       FlashPostDetailsScreenUI(
-                          flashPostResponse = flashPostResponse
+                          flashPostResponse = flashPostResponse,
+                          homeViewModel
                       )
 
                   }
@@ -111,7 +113,7 @@ fun FlashPostDetailsScreen(navController: NavHostController, flashPostResponse: 
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun FlashPostDetailsScreenUI(flashPostResponse: FlashPostResponse?) {
+fun FlashPostDetailsScreenUI(flashPostResponse: FlashPostResponse?,homeViewModel: HomeViewModel) {
     val context = LocalContext.current
     var showFullImage by remember { mutableStateOf(false) }
     val systemUiController = rememberSystemUiController()
@@ -192,7 +194,7 @@ fun FlashPostDetailsScreenUI(flashPostResponse: FlashPostResponse?) {
                         .background(color = Color.Transparent)
                 ) {
 
-                    ViewRoundUI(flashPostResponse.totalViews)
+                    ViewRoundUI(flashPostResponse.viewsCount)
                     CommentRoundUI(flashPostResponse.commentsCount,{})
                     CountdownTimer(flashPostResponse.expirationTime)
                     AddPingOnFlashPost(flashPostResponse.peopleJoined,flashPostResponse.pingCount,{ /*onPingOfFlashPostClicked(flashPostResponse._id,"I am interested")*/})
@@ -237,7 +239,7 @@ fun FlashPostDetailsScreenUI(flashPostResponse: FlashPostResponse?) {
                         fontWeight = FontWeight.SemiBold
                     )
                 }
-                FlashPostDetailsTabsScreen()
+                FlashPostDetailsTabsScreen(homeViewModel)
             }
             if(showFullImage){
                 FullScreenImageViewDialogBox(image =flashPostResponse.image ,onCloseClicked={showFullImage=false })
@@ -248,7 +250,7 @@ fun FlashPostDetailsScreenUI(flashPostResponse: FlashPostResponse?) {
 }
 
 @Composable
-fun FlashPostDetailsTabsScreen() {
+fun FlashPostDetailsTabsScreen(homeViewModel: HomeViewModel) {
 
     val tabs = listOf("Comments", "Pings", "Related")
     val pagerState = rememberPagerState(initialPage = 0) { tabs.size }
@@ -298,7 +300,7 @@ fun FlashPostDetailsTabsScreen() {
         ) { page ->
 
             when (page) {
-                0 -> CommentsScreen()
+                0 -> FlashPostCommentScreen("",homeViewModel)
                 1 -> {}
                 2 -> {}
             }

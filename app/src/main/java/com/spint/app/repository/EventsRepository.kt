@@ -15,7 +15,8 @@ import com.spint.app.model.CreateFlashPostResponse
 import com.spint.app.model.EventDetailsResponse
 import com.spint.app.model.FlashPostResponseDTO
 import com.spint.app.model.PremiumEventResponseDTO
-import com.spint.app.model.flashPost.CommentData
+import com.spint.app.model.flashPost.CommentRequest
+import com.spint.app.model.flashPost.CommentResponse
 import com.spint.app.model.flashPost.FlashPostRequestDto
 import com.spint.app.model.flashPost.FlashPostResponse
 import com.spint.app.model.flashPost.PingsOnFlashPostRequest
@@ -100,8 +101,19 @@ class EventsRepository @Inject constructor(private val api: ApiService) {
     suspend fun getAllFlashPosts(page:Int): PingsResponse<List<FlashPostResponse>> {
         return api.getAllFlashPosts(page)
     }
-    suspend fun getFlashPostComments(flashPostId: String): Flow<PingsResponse<List<CommentData>>> = flow {
-        emit(api.getFlashPostComments())
+    suspend fun registerFlashPostView(postId: String, userId: String): Response<String> {
+        return api.registerView(postId, userId)
+    }
+    suspend fun getFlashPostComments(flashPostId: String): Flow<ApiResponse<List<CommentResponse>>> = flow {
+        emit(api.getComments(flashPostId))
+    }.flowOn(Dispatchers.IO)
+
+    suspend fun addFlashPostComments(commentRequest: CommentRequest): Flow<ApiResponse<String>> = flow {
+        emit(api.addComment(commentRequest))
+    }.flowOn(Dispatchers.IO)
+
+    suspend fun deleteFlashPostComments(flashPostId: String): Flow<ApiResponse<String>> = flow {
+        emit(api.deleteComment(flashPostId))
     }.flowOn(Dispatchers.IO)
 
 

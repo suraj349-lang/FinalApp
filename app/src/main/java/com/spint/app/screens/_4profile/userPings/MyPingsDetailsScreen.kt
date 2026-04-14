@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -27,8 +26,6 @@ import androidx.compose.material.Tab
 import androidx.compose.material.TabRow
 import androidx.compose.material.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material.Text
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -43,13 +40,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -59,23 +54,21 @@ import com.bumptech.glide.integration.compose.GlideImage
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.spint.app.R
 import com.spint.app.model.flashPost.FlashPostDetailsResponse
-import com.spint.app.model.flashPost.FlashPostResponse
 import com.spint.app.model.flashPost.PingsOnPost
 import com.spint.app.navigation.SCREENS
-import com.spint.app.screens._1home._1FlashPosts.detailsScreen.flashPosts.AddPingOnFlashPost
-import com.spint.app.screens._1home._1FlashPosts.detailsScreen.flashPosts.CommentRoundUI
-import com.spint.app.screens._1home._1FlashPosts.detailsScreen.flashPosts.CountdownTimer
-import com.spint.app.screens._1home._1FlashPosts.detailsScreen.flashPosts.ShareRoundUI
-import com.spint.app.screens._1home._1FlashPosts.detailsScreen.flashPosts.ViewRoundUI
+import com.spint.app.screens._1home._1FlashPosts.presentation.view.AddPingOnFlashPost
+import com.spint.app.screens._1home._1FlashPosts.presentation.view.CommentRoundUI
+import com.spint.app.screens._1home._1FlashPosts.presentation.view.CountdownTimer
+import com.spint.app.screens._1home._1FlashPosts.presentation.view.ShareRoundUI
+import com.spint.app.screens._1home._1FlashPosts.presentation.view.ViewRoundUI
 import com.spint.app.screens._1home.commonUI.sharePingDeepLink
-import com.spint.app.screens._2Events.events.eventWarScreen.CommentsScreen
+import com.spint.app.screens._1home._1FlashPosts.presentation.util.FlashPostCommentScreen
 import com.spint.app.ui.imagePrefix
 import com.spint.app.ui.theme.floatingActionBtnColor
 import com.spint.app.utils.RequestState
 import com.spint.app.utils.constants.Constants
 import com.spint.app.viewmodels.HomeViewModel
 import kotlinx.coroutines.launch
-import java.util.function.IntConsumer
 
 
 @OptIn(ExperimentalGlideComposeApi::class)
@@ -96,7 +89,11 @@ fun MyFlashPostDetailsScreen(navController: NavController,id:String,homeViewMode
     val flashPostResponse by homeViewModel.userFlashPostDetailsResponse.collectAsState()
     when ( val response=flashPostResponse) {
         is RequestState.Success -> {
-            MyFlashPostDetailsScreenUI(response.data,navController)
+            MyFlashPostDetailsScreenUI(
+                flashPostResponse = response.data,
+                navController = navController,
+                homeViewModel = homeViewModel
+            )
         }
 
         is RequestState.Error -> {
@@ -115,7 +112,7 @@ fun MyFlashPostDetailsScreen(navController: NavController,id:String,homeViewMode
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun MyFlashPostDetailsScreenUI(flashPostResponse: FlashPostDetailsResponse?,navController: NavController) {
+fun MyFlashPostDetailsScreenUI(flashPostResponse: FlashPostDetailsResponse?,navController: NavController,homeViewModel: HomeViewModel) {
     val context=LocalContext.current
     if (flashPostResponse != null) {
         Box(modifier = Modifier
@@ -207,7 +204,7 @@ fun MyFlashPostDetailsScreenUI(flashPostResponse: FlashPostDetailsResponse?,navC
                         fontWeight = FontWeight.SemiBold
                     )
                 }
-                UserFlashPostDetailsTabsScreen(flashPostResponse.pings ?: listOf()){
+                UserFlashPostDetailsTabsScreen(flashPostResponse.pings ?: listOf(), homeViewModel ){
                     navController.navigate(SCREENS.USER_PUBLIC_PROFILE.createPath(it))}
             }
 //            if(showFullImage){
@@ -220,7 +217,7 @@ fun MyFlashPostDetailsScreenUI(flashPostResponse: FlashPostDetailsResponse?,navC
 
 
 @Composable
-fun UserFlashPostDetailsTabsScreen(ping: List<PingsOnPost>,onProfileClicked: (String) -> Unit) {
+fun UserFlashPostDetailsTabsScreen(ping: List<PingsOnPost>,homeViewModel: HomeViewModel,onProfileClicked: (String) -> Unit) {
 
     val tabs = listOf("Comments", "Responses")
     val pagerState = rememberPagerState(initialPage = 0) { tabs.size }
@@ -275,7 +272,7 @@ fun UserFlashPostDetailsTabsScreen(ping: List<PingsOnPost>,onProfileClicked: (St
         ) { page ->
 
             when (page) {
-                0 -> CommentsScreen()
+                0 -> FlashPostCommentScreen("",homeViewModel)
                 1 -> {RepliesScreen(ping){onProfileClicked(it)}}
             }
         }
@@ -284,18 +281,28 @@ fun UserFlashPostDetailsTabsScreen(ping: List<PingsOnPost>,onProfileClicked: (St
 
 @Composable
 fun RepliesScreen(ping: List<PingsOnPost>,onProfileClicked:(String)-> Unit) {
-    Column(modifier=Modifier.fillMaxWidth().wrapContentHeight()) {
+    Column(modifier=Modifier
+        .fillMaxWidth()
+        .wrapContentHeight()) {
         ping.forEach {it->
-            Row(modifier = Modifier.fillMaxWidth().background(color = Color.White),verticalAlignment = Alignment.CenterVertically) {
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .background(color = Color.White),verticalAlignment = Alignment.CenterVertically) {
                 Row(
-                    modifier = Modifier.fillMaxWidth(0.8f).padding(horizontal = 4.dp),
+                    modifier = Modifier
+                        .fillMaxWidth(0.8f)
+                        .padding(horizontal = 4.dp),
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     AsyncImage(
                         model = imagePrefix + it.userId.profileImage,
                         contentDescription = "",
-                        modifier = Modifier.clickable{onProfileClicked(it.userId.user)}.padding(vertical = 6.dp).size(50.dp).clip(shape = CircleShape),
+                        modifier = Modifier
+                            .clickable { onProfileClicked(it.userId.user) }
+                            .padding(vertical = 6.dp)
+                            .size(50.dp)
+                            .clip(shape = CircleShape),
                         contentScale = ContentScale.Crop
                     )
                     Column(modifier = Modifier.wrapContentHeight(), verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.Start) {
@@ -304,7 +311,9 @@ fun RepliesScreen(ping: List<PingsOnPost>,onProfileClicked:(String)-> Unit) {
                     }
 
                 }
-                Column(modifier = Modifier.fillMaxWidth().wrapContentHeight(), verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally) {
+                Column(modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight(), verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.CenterHorizontally) {
                     Image(painter = painterResource(R.drawable.cameranew),contentDescription = null, modifier = Modifier.size(18.dp))
                     Text("Duel", fontSize = 12.sp, fontFamily = Constants.FONT_LIGHT, color = Color.Black)
                 }

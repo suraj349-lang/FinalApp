@@ -30,14 +30,13 @@ import com.spint.app.paging.DropProfilePagingSource
 import com.spint.app.repository.ChatDatabaseRepository
 import com.spint.app.repository.EventsRepository
 import com.spint.app.repository.ProfileRepository
-import com.spint.app.screens._1home._1FlashPosts.FlashPostsPagingSource
+import com.spint.app.screens._1home._1FlashPosts.data.FlashPostsPagingSource
 import com.spint.app.utils.UserObject
 import com.spint.app.utils.RequestState
 import com.google.android.libraries.places.api.Places
-import com.google.android.libraries.places.api.model.AutocompletePrediction
-import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
 import com.spint.app.datastore.StoreLoginState
-import com.spint.app.model.flashPost.CommentData
+import com.spint.app.model.flashPost.CommentRequest
+import com.spint.app.model.flashPost.CommentResponse
 import com.spint.app.model.flashPost.FlashPostDetailsResponse
 import com.spint.app.model.flashPost.PingsOnFlashPostRequest
 import com.spint.app.model.flashPost.PingsOnFlashPostResponse
@@ -51,7 +50,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import java.io.File
@@ -468,6 +466,27 @@ class HomeViewModel @Inject constructor(
     }
     //============================================================================================================//
 
+    // 🔥 Prevent multiple calls per post in session
+    private val viewedPosts = mutableSetOf<String>()
+
+    fun registerView(postId: String,userId: String) {
+
+        //  Already viewed → skip
+        if (viewedPosts.contains(postId)) return
+
+        viewedPosts.add(postId)
+
+        viewModelScope.launch {
+            try {
+                eventsRepository.registerFlashPostView(postId,userId)
+            } catch (e: Exception) {
+                // optional: retry or log
+            }
+        }
+    }
+
+    //============================================================================================================//
+
     private val _userFlashPostDetailsResponse = MutableStateFlow<RequestState<FlashPostDetailsResponse>>(RequestState.Idle)
     val userFlashPostDetailsResponse: StateFlow<RequestState<FlashPostDetailsResponse>> = _userFlashPostDetailsResponse.asStateFlow()
 
@@ -538,20 +557,52 @@ class HomeViewModel @Inject constructor(
     }
 
 //====================================================================================================================================//
-    val _pingComments = MutableStateFlow<RequestState<List<CommentData>>> (RequestState.Idle)
-    val pingComments: StateFlow<RequestState<List<CommentData>>> = _pingComments
+    val _flashPostComments = MutableStateFlow<RequestState<List<CommentResponse>>> (RequestState.Idle)
+    val flashPostComments: StateFlow<RequestState<List<CommentResponse>>> = _flashPostComments
 
-    fun getPingComments(pingId:String)= viewModelScope.launch {
+    fun getFlashPostComments(pingId:String)= viewModelScope.launch {
             eventsRepository.getFlashPostComments(pingId)
                 .onStart {
-                    _pingComments.value= RequestState.Loading
+                    _flashPostComments.value= RequestState.Loading
                 }
                 .catch {ex->
-                    _pingComments.value= RequestState.Error(ex)
+                    _flashPostComments.value= RequestState.Error(ex)
                 }
                 .collect { value ->
-                    _pingComments.value= RequestState.Success(value.data)
+                    _flashPostComments.value= RequestState.Success(value.data)
                 }
+    }
+    //====================================================================================================================================//
+    val _addFlashPostComment = MutableStateFlow<RequestState<String>> (RequestState.Idle)
+    val addFlashPostComment: StateFlow<RequestState<String>> = _addFlashPostComment
+
+    fun addFlashPostComments(commentRequest: CommentRequest)= viewModelScope.launch {
+        eventsRepository.addFlashPostComments(commentRequest)
+            .onStart {
+                _addFlashPostComment.value= RequestState.Loading
+            }
+            .catch {ex->
+                _addFlashPostComment.value= RequestState.Error(ex)
+            }
+            .collect { value ->
+                _addFlashPostComment.value= RequestState.Success(value.data)
+            }
+    }
+    //====================================================================================================================================//
+    val _deleteFlashPostComment = MutableStateFlow<RequestState<String>> (RequestState.Idle)
+    val deleteFlashPostComment: StateFlow<RequestState<String>> = _deleteFlashPostComment
+
+    fun deleteFlashPostComments(pingId:String)= viewModelScope.launch {
+        eventsRepository.deleteFlashPostComments(pingId)
+            .onStart {
+                _deleteFlashPostComment.value= RequestState.Loading
+            }
+            .catch {ex->
+                _deleteFlashPostComment.value= RequestState.Error(ex)
+            }
+            .collect { value ->
+                _deleteFlashPostComment.value= RequestState.Success(value.data)
+            }
     }
 
 

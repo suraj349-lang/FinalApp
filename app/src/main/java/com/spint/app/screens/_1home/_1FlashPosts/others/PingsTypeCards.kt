@@ -1,4 +1,4 @@
-package com.spint.app.screens._1home._1FlashPosts
+package com.spint.app.screens._1home._1FlashPosts.others
 
 
 import androidx.compose.foundation.layout.Arrangement

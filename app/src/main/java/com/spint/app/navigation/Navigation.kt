@@ -36,14 +36,14 @@ import com.spint.app.viewmodels.HomeViewModel
 import com.spint.app.screens._6chat.ChatListScreen
 import com.spint.app.screens._4profile.GalleryPicker
 import com.spint.app.screens._1home.HomeScreenUI
-import com.spint.app.screens._2Events.events.eventWarScreen.CommentsScreen
+import com.spint.app.screens._1home._1FlashPosts.presentation.util.FlashPostCommentScreen
 import com.spint.app.screens._8notification.NotificationScreenUI
 import com.spint.app.screens._3createEventOrPing.createEvent.CreateEventMainScreen
 import com.spint.app.screens._5settings.SettingsScreenUI
 import com.spint.app.testing.TabView
 import com.spint.app.screens._3createEventOrPing.PastRaisedOffer
-import com.spint.app.screens._1home._1FlashPosts.detailsScreen.FlashPostDetailsScreen
-import com.spint.app.screens._1home._1FlashPosts.FlashPostsScreen
+import com.spint.app.screens._1home._1FlashPosts.presentation.view.detailsScreen.FlashPostDetailsScreen
+import com.spint.app.screens._1home._1FlashPosts.presentation.view.FlashPostsScreen
 import com.spint.app.screens._3createEventOrPing.createPing.CreatePingWrapper
 import com.spint.app.screens._4profile.ProfileScreenNew
 import com.spint.app.screens._4profile.dropProfileUserProfile.UserPublicProfile
@@ -73,7 +73,6 @@ import com.spint.app.screens.onboarding.screen.WelcomeScreen
 import com.spint.app.screens.pings.EditScreen
 import com.spint.app.screens.pings.templates.PingTemplateSelector
 import com.spint.app.screens.pings.templates.visualPingTemplates
-import com.spint.app.screens.duel.DuelScreen
 import com.spint.app.viewmodels.ImageUploadViewModel
 import com.spint.app.viewmodels.NotificationViewModel
 import com.spint.app.viewmodels.SettingsViewModel
@@ -270,8 +269,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
         composable(route=SCREENS.PING_DETAILS.route, arguments = listOf(navArgument("flashPostResponse"){ type= NavType.StringType })){navBackStackEntry ->
             val json=navBackStackEntry.arguments?.getString("flashPostResponse")
             val flashPostResponse=json?.let { Json.decodeFromString<FlashPostResponse>(it) }
-            FlashPostDetailsScreen(navController,flashPostResponse)
-
+            FlashPostDetailsScreen(navController,flashPostResponse,homeViewModel)
         }
         composable("camerax/{screen}"){backStackEntry->
             val lastScreen=backStackEntry.arguments?.getString("screen") ?: ""
@@ -334,8 +332,12 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
         }
 
 
-        composable(SCREENS.COMMENT.route){
-            CommentsScreen()
+        composable(
+            route = SCREENS.COMMENT.route,
+            arguments = listOf(navArgument("postId") { type = NavType.StringType })
+        ) { navBackStackEntry ->
+            val postId = navBackStackEntry.arguments?.getString("postId") ?: ""
+            FlashPostCommentScreen(postId,homeViewModel)
         }
         composable(SCREENS.DUEL.route){
             DuelScreen2(navController)

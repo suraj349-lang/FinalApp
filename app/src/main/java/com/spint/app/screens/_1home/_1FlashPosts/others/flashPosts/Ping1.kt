@@ -1,4 +1,4 @@
-package com.spint.app.screens._1home._1FlashPosts.detailsScreen.flashPosts
+package com.spint.app.screens._1home._1FlashPosts.others.flashPosts
 
 import android.os.Build
 import androidx.annotation.RequiresApi
@@ -43,7 +43,7 @@ import com.spint.app.utils.formatDateTime
 
 
 @RequiresApi(Build.VERSION_CODES.O)
-@Preview
+@Preview(showBackground = true)
 @Composable
 fun PingItem1() {
     val item = FlashPostResponse(
@@ -64,7 +64,7 @@ fun PingItem1() {
             CommentData("c2", "I’m in!", "Bob")
         ),
         totalChildPosts = 5,
-        totalViews = 120,
+        viewsCount = 120,
         totalUpVotes = 35
     )
 
