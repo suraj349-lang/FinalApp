@@ -109,7 +109,7 @@ interface ApiService {
     suspend fun registerView(@Query("postId") postId: String,@Query("userId") userId: String): Response<String>
 
     @POST("/api/v1/flashPost/comment")
-    suspend fun addComment(@Body commentData: CommentRequest): ApiResponse<String>
+    suspend fun addComment(@Body commentData: CommentRequest): ApiResponse<CommentResponse>
 
     @DELETE("/api/v1/flashPost/comment")
     suspend fun deleteComment(@Query("postId")postId: String): ApiResponse<String>

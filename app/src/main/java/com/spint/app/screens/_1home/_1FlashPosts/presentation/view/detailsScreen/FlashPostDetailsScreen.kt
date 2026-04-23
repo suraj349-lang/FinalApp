@@ -74,39 +74,56 @@ import java.nio.charset.StandardCharsets
 
 
 @Composable
-fun FlashPostDetailsScreen(navController: NavHostController, flashPostResponse: FlashPostResponse?,homeViewModel: HomeViewModel) {
+fun FlashPostDetailsScreen(
+    navController: NavHostController,
+    flashPostResponse: FlashPostResponse?,
+    homeViewModel: HomeViewModel
+) {
     Scaffold(
         topBar = {
             flashPostResponse?.let {
                 CommonTopBar(
                     flashPostResponse = it,
-                    onUserProfileClicked = {navController.navigate(SCREENS.USER_PUBLIC_PROFILE.createPath(flashPostResponse.user?.user!!))},
+                    onUserProfileClicked = {
+                        navController.navigate(
+                            SCREENS.USER_PUBLIC_PROFILE.createPath(
+                                flashPostResponse.user?.user!!
+                            )
+                        )
+                    },
                     onSendMessageClicked = {
                         if (flashPostResponse.user != null) {
-                            val encodedImageUrl = URLEncoder.encode(flashPostResponse.user.profileImage, StandardCharsets.UTF_8.toString())
-                            navController.navigate(SCREENS.SINGLE_CHAT.createPath(userName = flashPostResponse.user.userName, profileImage = encodedImageUrl, chatListUserId = flashPostResponse.user.user))
+                            val encodedImageUrl = URLEncoder.encode(
+                                flashPostResponse.user.profileImage,
+                                StandardCharsets.UTF_8.toString()
+                            )
+                            navController.navigate(
+                                SCREENS.SINGLE_CHAT.createPath(
+                                    userName = flashPostResponse.user.userName,
+                                    profileImage = encodedImageUrl,
+                                    chatListUserId = flashPostResponse.user.user
+                                )
+                            )
                         }
-                     },
+                    },
                     onBackClicked = { navController.navigateUp() }
                 )
             }
         },
-              content = {
-                  Surface(
-                      modifier = Modifier
-                          .background(Color.Transparent)
-                          .padding(it)
-                          .fillMaxSize()
-                  ) {
-                      FlashPostDetailsScreenUI(
-                          flashPostResponse = flashPostResponse,
-                          homeViewModel
-                      )
-
-                  }
-
-              })
-
+        content = {
+            Surface(
+                modifier = Modifier
+                    .background(Color.Transparent)
+                    .padding(it)
+                    .fillMaxSize()
+            ) {
+                FlashPostDetailsScreenUI(
+                    flashPostResponse = flashPostResponse,
+                    homeViewModel
+                )
+            }
+        }
+    )
 }
 
 
@@ -117,8 +134,6 @@ fun FlashPostDetailsScreenUI(flashPostResponse: FlashPostResponse?,homeViewModel
     val context = LocalContext.current
     var showFullImage by remember { mutableStateOf(false) }
     val systemUiController = rememberSystemUiController()
-
-
 
     SideEffect {
         systemUiController.setNavigationBarColor(
@@ -159,7 +174,9 @@ fun FlashPostDetailsScreenUI(flashPostResponse: FlashPostResponse?,homeViewModel
                 }
                 else if(flashPostResponse.user?.profileImage !=null){
                     Box(
-                        modifier = Modifier.size(300.dp).clip(CircleShape)
+                        modifier = Modifier
+                            .size(300.dp)
+                            .clip(CircleShape)
                     ) {
                         GlideImage(
                             model = imagePrefix + flashPostResponse.user.profileImage,
@@ -205,8 +222,12 @@ fun FlashPostDetailsScreenUI(flashPostResponse: FlashPostResponse?,homeViewModel
 
 
                 }
-                Row(modifier = Modifier.padding(top=8.dp).fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
-                    Image(painter = painterResource(R.drawable.location_new), contentDescription = "",modifier= Modifier.padding(end=6.dp).size(8.dp))
+                Row(modifier = Modifier
+                    .padding(top = 8.dp)
+                    .fillMaxWidth(), horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically) {
+                    Image(painter = painterResource(R.drawable.location_new), contentDescription = "",modifier= Modifier
+                        .padding(end = 6.dp)
+                        .size(8.dp))
                     Text(
                         text = flashPostResponse.location,
                         maxLines = 1,
@@ -217,7 +238,10 @@ fun FlashPostDetailsScreenUI(flashPostResponse: FlashPostResponse?,homeViewModel
                         lineHeight = 12.sp,
                     )
                 }
-                Column(modifier = Modifier.fillMaxWidth().wrapContentHeight().background(color=Color.DarkGray)) {
+                Column(modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .background(color = Color.DarkGray)) {
                     Text(
                         text = flashPostResponse.title ?: "",
                         modifier = Modifier
@@ -239,7 +263,7 @@ fun FlashPostDetailsScreenUI(flashPostResponse: FlashPostResponse?,homeViewModel
                         fontWeight = FontWeight.SemiBold
                     )
                 }
-                FlashPostDetailsTabsScreen(homeViewModel)
+                FlashPostDetailsTabsScreen(flashPostResponse._id,homeViewModel)
             }
             if(showFullImage){
                 FullScreenImageViewDialogBox(image =flashPostResponse.image ,onCloseClicked={showFullImage=false })
@@ -250,7 +274,7 @@ fun FlashPostDetailsScreenUI(flashPostResponse: FlashPostResponse?,homeViewModel
 }
 
 @Composable
-fun FlashPostDetailsTabsScreen(homeViewModel: HomeViewModel) {
+fun FlashPostDetailsTabsScreen(postId:String,homeViewModel: HomeViewModel) {
 
     val tabs = listOf("Comments", "Pings", "Related")
     val pagerState = rememberPagerState(initialPage = 0) { tabs.size }
@@ -258,7 +282,9 @@ fun FlashPostDetailsTabsScreen(homeViewModel: HomeViewModel) {
 
     Column {
         TabRow(
-            modifier = Modifier.height(40.dp).fillMaxWidth(),
+            modifier = Modifier
+                .height(40.dp)
+                .fillMaxWidth(),
             selectedTabIndex = pagerState.currentPage,
             backgroundColor = Color.Gray,
             contentColor = Color.Black,
@@ -296,11 +322,13 @@ fun FlashPostDetailsTabsScreen(homeViewModel: HomeViewModel) {
         // 🔥 Swipeable Content
         HorizontalPager(
             state = pagerState,
-            modifier = Modifier.padding(top=8.dp).fillMaxSize()
+            modifier = Modifier
+                .padding(top = 8.dp)
+                .fillMaxSize()
         ) { page ->
 
             when (page) {
-                0 -> FlashPostCommentScreen("",homeViewModel)
+                0 -> FlashPostCommentScreen(postId,homeViewModel)
                 1 -> {}
                 2 -> {}
             }

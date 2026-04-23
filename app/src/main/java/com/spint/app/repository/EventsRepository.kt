@@ -108,7 +108,7 @@ class EventsRepository @Inject constructor(private val api: ApiService) {
         emit(api.getComments(flashPostId))
     }.flowOn(Dispatchers.IO)
 
-    suspend fun addFlashPostComments(commentRequest: CommentRequest): Flow<ApiResponse<String>> = flow {
+    suspend fun addFlashPostComments(commentRequest: CommentRequest): Flow<ApiResponse<CommentResponse>> = flow {
         emit(api.addComment(commentRequest))
     }.flowOn(Dispatchers.IO)
 

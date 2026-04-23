@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -24,6 +25,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -58,32 +60,41 @@ import com.spint.app.ui.imagePrefix
 import com.spint.app.ui.theme.floatingActionBtnColor
 import com.spint.app.utils.RequestState
 import com.spint.app.utils.UserObject
+import com.spint.app.utils.constants.Constants
 import com.spint.app.viewmodels.HomeViewModel
 import kotlin.collections.List
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun  FlashPostCommentScreen(postId: String,viewModel: HomeViewModel) { // com.spint.app.screens._1home._1FlashPosts.presentation.util.comments
+fun FlashPostCommentScreen(
+    postId: String,
+    viewModel: HomeViewModel
+) { // com.spint.app.screens._1home._1FlashPosts.presentation.util.comments
     val comments by viewModel.flashPostComments.collectAsState()
     LaunchedEffect(Unit) {
-        viewModel.getFlashPostComments(postId)
+        if (comments !is RequestState.Success) {
+            viewModel.getFlashPostComments(postId)
+        }
     }
+
     val user by UserObject.user.collectAsState()
     var comment by remember { mutableStateOf("") }
-    Box(modifier = Modifier.fillMaxSize()) {
+    /*Box(modifier = Modifier.fillMaxSize()) {
         when (val data = comments) {
             is RequestState.Success -> {
                 CommentScreenUI(data.data)
             }
 
             is RequestState.Error -> {
-                Box(modifier = Modifier.fillMaxSize().background(color = Color.Black)) {
+                Box(modifier = Modifier
+                    .fillMaxSize()
+                    .background(color = Color.Black)) {
                     Column(modifier = Modifier.align(Alignment.Center)) {
                         Text("Error getting comments")
                         Button(
                             onClick = { viewModel.getFlashPostComments(postId) },
                             colors = ButtonDefaults.buttonColors(containerColor = floatingActionBtnColor),
-                            modifier=Modifier.clip(RoundedCornerShape(20.dp))
+                            modifier = Modifier.clip(RoundedCornerShape(20.dp))
                         ) {
                             Text("Retry", modifier = Modifier.padding(horizontal = 10.dp))
                         }
@@ -92,7 +103,9 @@ fun  FlashPostCommentScreen(postId: String,viewModel: HomeViewModel) { // com.sp
             }
 
             is RequestState.Loading -> {
-                Box(modifier = Modifier.fillMaxSize().background(color = Color.Black)) {
+                Box(modifier = Modifier
+                    .fillMaxSize()
+                    .background(color = Color.Black)) {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 }
             }
@@ -100,44 +113,169 @@ fun  FlashPostCommentScreen(postId: String,viewModel: HomeViewModel) { // com.sp
             else -> {}
 
         }
-        Row(modifier = Modifier.fillMaxWidth().height(80.dp).align(Alignment.BottomCenter)) {
+        Row(modifier = Modifier
+            .fillMaxWidth()
+            .height(80.dp)
+            .align(Alignment.BottomCenter)) {
             OutlinedTextField(
                 value = comment,
-                onValueChange={comment=it},
-                modifier=Modifier.clip(RoundedCornerShape(50)).padding(10.dp).fillMaxWidth(),
+                onValueChange = { comment = it },
+                modifier = Modifier
+                    .clip(RoundedCornerShape(50))
+                    .padding(10.dp)
+                    .fillMaxWidth(),
                 placeholder = { dynamicText("add comment") },
-                trailingIcon = {Image(painter = painterResource(R.drawable.send_24), contentDescription = "", colorFilter = ColorFilter.tint(Color.White), modifier = Modifier.rotate(-45f).clickable{viewModel.addFlashPostComments(
-                    CommentRequest(
-                        userId = user.user,
-                        comment=comment,
-                        flashPostId = postId
-                    )
-                )})}
+                colors = OutlinedTextFieldDefaults.colors(focusedContainerColor = Color.Black),
+                trailingIcon = {
+                    Image(
+                        painter = painterResource(R.drawable.send_24),
+                        contentDescription = "",
+                        colorFilter = ColorFilter.tint(Color.White),
+                        modifier = Modifier
+                            .rotate(-45f)
+                            .clickable {
+                                viewModel.addFlashPostComments(
+                                    CommentRequest(
+                                        userId = user.user,
+                                        comment = comment,
+                                        flashPostId = postId
+                                    )
+                                )
+                                comment = ""
+                            })
+                }
+            )
+        }*/
+
+    Column(modifier = Modifier.fillMaxSize()) {
+
+        // COMMENTS LIST
+        Box(
+            modifier = Modifier
+                .weight(1f) // 🔥 THIS FIXES SCROLL
+        ) {
+            when (val data = comments) {
+                is RequestState.Success -> {
+                    CommentScreenUI(data.data)
+                }
+
+                is RequestState.Error -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(color = Color.Black)
+                    ) {
+                        Column(modifier = Modifier.align(Alignment.Center)) {
+                            Text("Error getting comments")
+                            Button(
+                                onClick = { viewModel.getFlashPostComments(postId) }
+                            ) {
+                                Text("Retry")
+                            }
+                        }
+                    }
+                }
+
+                is RequestState.Loading -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(color = Color.Black)
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.align(Alignment.Center)
+                        )
+                    }
+                }
+
+                else -> {}
+            }
+        }
+
+        // INPUT BOX
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(80.dp)
+        ) {
+//            OutlinedTextField(
+//                value = comment,
+//                onValueChange = { comment = it },
+//                modifier = Modifier
+//                    .padding(10.dp)
+//                    .fillMaxWidth(),
+//                trailingIcon = {
+//                    Image(
+//                        painter = painterResource(R.drawable.send_24),
+//                        contentDescription = "",
+//                        modifier = Modifier.clickable {
+//                            viewModel.addFlashPostComments(
+//                                CommentRequest(
+//                                    userId = user.user,
+//                                    comment = comment,
+//                                    flashPostId = postId
+//                                )
+//                            )
+//                            comment = ""
+//                        }
+//                    )
+//                }
+//            )
+            OutlinedTextField(
+                value = comment,
+                onValueChange = { comment = it },
+                modifier = Modifier
+                    .clip(RoundedCornerShape(50))
+                    .padding(10.dp)
+                    .fillMaxWidth(),
+                placeholder = { dynamicText("Add comment", fontFamily = Constants.FONT_LIGHT, fontSize = 14, color =Color.LightGray ) },
+                shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(focusedContainerColor = Color.Black),
+                trailingIcon = {
+                    Image(
+                        painter = painterResource(R.drawable.send_24),
+                        contentDescription = "",
+                        colorFilter = ColorFilter.tint(Color.White),
+                        modifier = Modifier
+                            .rotate(-35f)
+                            .clickable {
+                                viewModel.addFlashPostComments(
+                                    CommentRequest(
+                                        userId = user.user,
+                                        comment = comment,
+                                        flashPostId = postId
+                                    )
+                                )
+                                comment = ""
+                            })
+                }
             )
         }
-    }
 
+    }
 }
 
 @Composable
 fun CommentScreenUI(comments: List<CommentResponse>) {
-    // Use mutable state list for top-level comments
-    val commentsState = remember { mutableStateListOf<CommentResponse>().apply { addAll(comments) } }
+//    // Use mutable state list for top-level comments
+//    val commentsState =
+//        remember { mutableStateListOf<CommentResponse>().apply { addAll(comments) } }
+//
+//    // Function to toggle expand/collapse for any comment (recursive update)
+//    fun toggleExpand(target: CommentResponse) {
+//        val updated = updateCommentExpandState(commentsState, target)
+//        if (!updated) println("Comment not found")
+//    }
 
-    // Function to toggle expand/collapse for any comment (recursive update)
-    fun toggleExpand(target: CommentResponse) {
-        val updated = updateCommentExpandState(commentsState, target)
-        if (!updated) println("Comment not found")
-    }
-
-    LazyColumn(modifier = Modifier.fillMaxWidth().height(800.dp)) {
-        items(commentsState) { comment ->
+    LazyColumn(modifier = Modifier.padding(top=16.dp, start = 8.dp)
+        .fillMaxSize()) {
+        items(comments) { comment ->
             CommentItem(
                 comment = comment,
                 indentLevel = 0,
-                onToggleExpand = ::toggleExpand,
+                onToggleExpand = {  },
                 onToggleReplyBox = {},
-                onReplyTextChange = {_,_->},
+                onReplyTextChange = { _, _ -> },
                 onSendReply = {}
             )
         }
@@ -145,7 +283,10 @@ fun CommentScreenUI(comments: List<CommentResponse>) {
 }
 
 // Recursive function to update expansion state
-fun updateCommentExpandState(comments: MutableList<CommentResponse>, target: CommentResponse): Boolean {
+fun updateCommentExpandState(
+    comments: MutableList<CommentResponse>,
+    target: CommentResponse
+): Boolean {
     for (i in comments.indices) {
         val current = comments[i]
         if (current.id == target.id) {
@@ -161,6 +302,7 @@ fun updateCommentExpandState(comments: MutableList<CommentResponse>, target: Com
     }
     return false
 }
+
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun CommentItem(
@@ -183,7 +325,13 @@ fun CommentItem(
 
     val displayText = buildAnnotatedString {
         //username
-        withStyle(SpanStyle(fontWeight = FontWeight.Bold, fontSize = 14.sp, color = Color(0xFFA6C8EA))) {
+        withStyle(
+            SpanStyle(
+                fontWeight = FontWeight.Bold,
+                fontSize = 14.sp,
+                color = Color(0xFFA6C8EA)
+            )
+        ) {
             append("@${comment.userId.userName} ")
         }
         withStyle(SpanStyle(fontSize = 13.sp, color = Color.White)) {
@@ -218,7 +366,7 @@ fun CommentItem(
                 .padding(4.dp), verticalAlignment = Alignment.CenterVertically
         ) {
             GlideImage(
-                model = imagePrefix+comment.userId.profileImage,
+                model = imagePrefix + comment.userId.profileImage,
                 contentDescription = null,
                 modifier = Modifier
                     .padding(top = 4.dp)
@@ -229,9 +377,11 @@ fun CommentItem(
 
             Spacer(modifier = Modifier.width(8.dp))
 
-            Column(modifier = Modifier
-                .padding(top = 4.dp)
-                .weight(1f)) {
+            Column(
+                modifier = Modifier
+                    .padding(top = 4.dp)
+                    .weight(1f)
+            ) {
                 ClickableText(
                     text = displayText,
                     style = TextStyle(fontSize = 13.sp),
@@ -249,34 +399,42 @@ fun CommentItem(
                 )
             }
 
-            if (comment.replies.isNotEmpty()) {
-                Image(
-                    painter = painterResource(
-                        id = if (comment.isExpanded)
-                            R.drawable.baseline_expand_less_24
-                        else
-                            R.drawable.baseline_expand_more_24
-                    ),
-                    contentDescription = "Toggle replies",
-                    modifier = Modifier
-                        .padding(end = 4.dp)
-                        .clickable { onToggleExpand(comment) }
-                )
-            }
+//            if (comment.replies.isNotEmpty()) {
+//                Image(
+//                    painter = painterResource(
+//                        id = if (comment.isExpanded)
+//                            R.drawable.baseline_expand_less_24
+//                        else
+//                            R.drawable.baseline_expand_more_24
+//                    ),
+//                    contentDescription = "Toggle replies",
+//                    modifier = Modifier
+//                        .padding(end = 4.dp)
+//                        .clickable { onToggleExpand(comment) }
+//                )
+//            }
         }
 
         // Reply Text
-        Row(modifier = Modifier
-            .padding(start = 48.dp)
-            .fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(20.dp)) {
-            Image(painter = painterResource(R.drawable.like), contentDescription = "",modifier= Modifier.size(12.dp), colorFilter = ColorFilter.tint(Color.Gray))
+        Row(
+            modifier = Modifier
+                .padding(start = 48.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(20.dp)
+        ) {
+            Image(
+                painter = painterResource(R.drawable.like),
+                contentDescription = "",
+                modifier = Modifier.size(12.dp),
+                colorFilter = ColorFilter.tint(Color.Gray)
+            )
             Text(
                 text = "Reply",
                 fontSize = 12.sp,
                 lineHeight = 8.sp,
                 modifier = Modifier
-                    .clickable { onToggleReplyBox(comment) }
-                    ,
+                    .clickable { onToggleReplyBox(comment) },
                 color = Color.Gray
             )
 //            Text(
@@ -327,7 +485,6 @@ fun CommentItem(
         }
     }
 }
-
 
 
 /*

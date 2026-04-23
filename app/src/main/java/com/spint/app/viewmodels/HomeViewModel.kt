@@ -573,8 +573,8 @@ class HomeViewModel @Inject constructor(
                 }
     }
     //====================================================================================================================================//
-    val _addFlashPostComment = MutableStateFlow<RequestState<String>> (RequestState.Idle)
-    val addFlashPostComment: StateFlow<RequestState<String>> = _addFlashPostComment
+    val _addFlashPostComment = MutableStateFlow<RequestState<CommentResponse>> (RequestState.Idle)
+    val addFlashPostComment: StateFlow<RequestState<CommentResponse>> = _addFlashPostComment
 
     fun addFlashPostComments(commentRequest: CommentRequest)= viewModelScope.launch {
         eventsRepository.addFlashPostComments(commentRequest)
@@ -586,7 +586,26 @@ class HomeViewModel @Inject constructor(
             }
             .collect { value ->
                 _addFlashPostComment.value= RequestState.Success(value.data)
+                val currentState = _flashPostComments.value
+
+                if (currentState is RequestState.Success) {
+                    val updatedList = listOf(value.data) + currentState.data
+                    _flashPostComments.value = RequestState.Success(updatedList)
+                }
             }
+    }
+
+    fun sendReply(commentRequest: CommentRequest) {
+        viewModelScope.launch {
+            eventsRepository.addFlashPostComments(commentRequest)
+                .onStart {
+
+                }
+                .catch {  }
+                .collect {
+
+                }
+        }
     }
     //====================================================================================================================================//
     val _deleteFlashPostComment = MutableStateFlow<RequestState<String>> (RequestState.Idle)
