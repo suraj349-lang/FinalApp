@@ -66,14 +66,16 @@ class HomeViewModel @Inject constructor(
     private val s3Uploader: S3Uploader,
     private val storeUserState: StoreUserState,
     private val storeLoginState: StoreLoginState,
-    @ApplicationContext context: Context): ViewModel(){
+    @ApplicationContext context: Context
+) : ViewModel() {
 
-    val TAG="GET_EVENTS_RESPONSE";
+    val TAG = "GET_EVENTS_RESPONSE";
 
 
     private val placesClient by lazy { Places.createClient(context) }
-    var checked= mutableStateOf(false)
-    var shareProfileClicked= MutableStateFlow(false)
+    var checked = mutableStateOf(false)
+    var shareProfileClicked = MutableStateFlow(false)
+
     init {
         viewModelScope.launch {
             val user = storeUserState.getUserFromDataStore.firstOrNull()
@@ -89,20 +91,22 @@ class HomeViewModel @Inject constructor(
     }
 
     //-------------------------------------------------------------------------------------------------------//
-    val dropProfileUploadUri= mutableStateOf(Uri.EMPTY)
-    val showDropDialog= mutableStateOf(false)
+    val dropProfileUploadUri = mutableStateOf(Uri.EMPTY)
+    val showDropDialog = mutableStateOf(false)
 
     //--------------------------------------------------------------------------------------------------------------------------------------------//
     private val _triggerFetch = MutableStateFlow(false)
     val triggerFetch: StateFlow<Boolean> = _triggerFetch.asStateFlow()
 
     // Create Pager but don't collect initially
-    private val _droppedProfilesFlow = MutableStateFlow<Flow<PagingData<DropProfileResponse>>?>(null)
-    val droppedProfiles: StateFlow<Flow<PagingData<DropProfileResponse>>?> = _droppedProfilesFlow.asStateFlow()
-    private val _shouldLoadDroppedProfiles= MutableStateFlow(false)
-    val shouldLoadDroppedProfiles:StateFlow<Boolean>  = _shouldLoadDroppedProfiles
+    private val _droppedProfilesFlow =
+        MutableStateFlow<Flow<PagingData<DropProfileResponse>>?>(null)
+    val droppedProfiles: StateFlow<Flow<PagingData<DropProfileResponse>>?> =
+        _droppedProfilesFlow.asStateFlow()
+    private val _shouldLoadDroppedProfiles = MutableStateFlow(false)
+    val shouldLoadDroppedProfiles: StateFlow<Boolean> = _shouldLoadDroppedProfiles
 
-    fun getDefaultDropProfiles(location:String) {
+    fun getDefaultDropProfiles(location: String) {
         _droppedProfilesFlow.value = Pager(
             config = PagingConfig(pageSize = 10, prefetchDistance = 5),
             pagingSourceFactory = { DropProfilePagingSource(eventsRepository) }
@@ -111,8 +115,8 @@ class HomeViewModel @Inject constructor(
         _triggerFetch.value = true
     }
 
-    fun resetShouldLoadDroppedProfiles(){
-        _shouldLoadDroppedProfiles.value=true
+    fun resetShouldLoadDroppedProfiles() {
+        _shouldLoadDroppedProfiles.value = true
     }
 
     //-------------------------------------------DIRECT CHAT--------------------------------------------------------------------------------------//
@@ -150,7 +154,8 @@ class HomeViewModel @Inject constructor(
 */
     // Request state tracking for Direct Chat
     private val _directChatRequestState = MutableStateFlow<RequestState<String>>(RequestState.Idle)
-    val directChatRequestState: StateFlow<RequestState<String>> = _directChatRequestState.asStateFlow()
+    val directChatRequestState: StateFlow<RequestState<String>> =
+        _directChatRequestState.asStateFlow()
 
     // Response state tracking
     private val _directChatResponse = MutableStateFlow<RequestState<DirectChat>>(RequestState.Idle)
@@ -173,7 +178,7 @@ class HomeViewModel @Inject constructor(
             .collect { response ->
                 _directChatResponse.value = RequestState.Success(response.data)
                 // Fetch nearby users after successful chat request
-                loadDirectChatUsers(data.userId,data.lat, data.long)
+                loadDirectChatUsers(data.userId, data.lat, data.long)
             }
     }
 
@@ -181,7 +186,14 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             Pager(
                 config = PagingConfig(pageSize = 10, prefetchDistance = 5),
-                pagingSourceFactory = { DirectChatUsersPagingSource(eventsRepository, userId,lat, long) }
+                pagingSourceFactory = {
+                    DirectChatUsersPagingSource(
+                        eventsRepository,
+                        userId,
+                        lat,
+                        long
+                    )
+                }
             ).flow
                 .cachedIn(viewModelScope)
                 .onStart {
@@ -201,13 +213,13 @@ class HomeViewModel @Inject constructor(
     private val _removeUserResponse = MutableStateFlow<RequestState<String>>(RequestState.Idle)
     val removeUserResponse: StateFlow<RequestState<String>> = _removeUserResponse.asStateFlow()
 
-    fun removeUserFromDirectChat(id:String) = viewModelScope.launch(Dispatchers.IO) {
+    fun removeUserFromDirectChat(id: String) = viewModelScope.launch(Dispatchers.IO) {
         eventsRepository.removeUserFromDirectChat(id)
             .onStart {
                 _removeUserResponse.value = RequestState.Loading
             }
             .catch { exception ->
-                Log.e("Data received remove", "Error found: ${exception.message}",exception)
+                Log.e("Data received remove", "Error found: ${exception.message}", exception)
                 _removeUserResponse.value = RequestState.Error(exception)
             }
             .collect { response ->
@@ -266,13 +278,14 @@ class HomeViewModel @Inject constructor(
 //    }
 
 
-
     //--------------------------------------------------------------------------------------------------------------------//
-    private val _eventsListResponse = MutableStateFlow<RequestState<List<EventResponse>>>(RequestState.Idle)
-    val eventsListResponse: StateFlow<RequestState<List<EventResponse>>> = _eventsListResponse.asStateFlow()
+    private val _eventsListResponse =
+        MutableStateFlow<RequestState<List<EventResponse>>>(RequestState.Idle)
+    val eventsListResponse: StateFlow<RequestState<List<EventResponse>>> =
+        _eventsListResponse.asStateFlow()
 
-    fun getAllEvents()=viewModelScope.launch(Dispatchers.IO) {
-        val TAG="GET_ALL_EVENTS_RESPONSE";
+    fun getAllEvents() = viewModelScope.launch(Dispatchers.IO) {
+        val TAG = "GET_ALL_EVENTS_RESPONSE";
         eventsRepository.getAllEvents()
             .onStart {
                 _eventsListResponse.value = RequestState.Loading
@@ -287,12 +300,14 @@ class HomeViewModel @Inject constructor(
     }
 
     //----------------------------Get user events for Profile----------------------------------------------------------------------------------------//
-    private val _userEventsListResponse = MutableStateFlow<RequestState<List<EventResponse>>>(RequestState.Idle)
-    val userEventsListResponse: StateFlow<RequestState<List<EventResponse>>> = _userEventsListResponse.asStateFlow()
+    private val _userEventsListResponse =
+        MutableStateFlow<RequestState<List<EventResponse>>>(RequestState.Idle)
+    val userEventsListResponse: StateFlow<RequestState<List<EventResponse>>> =
+        _userEventsListResponse.asStateFlow()
     val canFetchEvents = mutableStateOf(true)
 
-    fun getUserEvents(id:String)=viewModelScope.launch(Dispatchers.IO) {
-        val TAG="GET_EVENTS_RESPONSE";
+    fun getUserEvents(id: String) = viewModelScope.launch(Dispatchers.IO) {
+        val TAG = "GET_EVENTS_RESPONSE";
         eventsRepository.getUserEvents(id)
             .onStart {
                 _userEventsListResponse.value = RequestState.Loading
@@ -303,23 +318,26 @@ class HomeViewModel @Inject constructor(
 
             }.collect {
                 _userEventsListResponse.value = RequestState.Success(it.data)
-                canFetchEvents.value=false
+                canFetchEvents.value = false
                 Log.d(TAG, "user events data ${_userEventsListResponse.value}")
 
             }
     }
-    //----------------------------Get user events for Profile----------------------------------------------------------------------------------------//
-    private val _eventDetailsResponse = MutableStateFlow<RequestState<EventResponse>>(RequestState.Idle)
-    val eventDetailsResponse: StateFlow<RequestState<EventResponse>> = _eventDetailsResponse.asStateFlow()
 
-    fun getEventDetails(id:String)=viewModelScope.launch(Dispatchers.IO) {
+    //----------------------------Get user events for Profile----------------------------------------------------------------------------------------//
+    private val _eventDetailsResponse =
+        MutableStateFlow<RequestState<EventResponse>>(RequestState.Idle)
+    val eventDetailsResponse: StateFlow<RequestState<EventResponse>> =
+        _eventDetailsResponse.asStateFlow()
+
+    fun getEventDetails(id: String) = viewModelScope.launch(Dispatchers.IO) {
         eventsRepository.getEventDetails(id)
             .onStart {
                 _eventDetailsResponse.value = RequestState.Loading
 
-            }.catch { e->
+            }.catch { e ->
                 _eventDetailsResponse.value = RequestState.Error(e)
-                Log.e(TAG, "user events error ${_eventDetailsResponse.value}, ${e.message}",e)
+                Log.e(TAG, "user events error ${_eventDetailsResponse.value}, ${e.message}", e)
 
             }.collect {
                 _eventDetailsResponse.value = RequestState.Success(it.data)
@@ -331,8 +349,8 @@ class HomeViewModel @Inject constructor(
     //----------------------------Get user events for Profile----------------------------------------------------------------------------------------//
     private val _upvoteEvent = MutableStateFlow<RequestState<String>>(RequestState.Idle)
     val upvoteEvent: StateFlow<RequestState<String>> = _upvoteEvent.asStateFlow()
-    fun upvoteEvent(id:String)=viewModelScope.launch(Dispatchers.IO) {
-        val TAG="";
+    fun upvoteEvent(id: String) = viewModelScope.launch(Dispatchers.IO) {
+        val TAG = "";
         eventsRepository.upvoteEvent(id)
             .onStart {
                 _upvoteEvent.value = RequestState.Loading
@@ -349,11 +367,13 @@ class HomeViewModel @Inject constructor(
     }
 
     //----------------------------------Get users Dropped Profiles----------------------------------------------------------------------------------//
-    private val _userDropProfilesListResponse = MutableStateFlow<RequestState<GetDropProfileResponseModel>>(RequestState.Idle)
-    val userDropProfilesListResponse: StateFlow<RequestState<GetDropProfileResponseModel>> = _userDropProfilesListResponse.asStateFlow()
-    val canFetchDroppedProfiles= mutableStateOf(true)
-    fun getUserDropProfiles(id:String)=viewModelScope.launch(Dispatchers.IO) {
-        val TAG="GET_EVENTS_RESPONSE_drop";
+    private val _userDropProfilesListResponse =
+        MutableStateFlow<RequestState<GetDropProfileResponseModel>>(RequestState.Idle)
+    val userDropProfilesListResponse: StateFlow<RequestState<GetDropProfileResponseModel>> =
+        _userDropProfilesListResponse.asStateFlow()
+    val canFetchDroppedProfiles = mutableStateOf(true)
+    fun getUserDropProfiles(id: String) = viewModelScope.launch(Dispatchers.IO) {
+        val TAG = "GET_EVENTS_RESPONSE_drop";
         eventsRepository.getUserDropProfiles(id)
             .onStart {
                 _userDropProfilesListResponse.value = RequestState.Loading
@@ -364,16 +384,21 @@ class HomeViewModel @Inject constructor(
 
             }.collect {
                 _userDropProfilesListResponse.value = RequestState.Success(it)
-                canFetchDroppedProfiles.value=false
+                canFetchDroppedProfiles.value = false
                 Log.d(TAG, "user drop profile data ${_userDropProfilesListResponse.value}")
 
             }
     }
-//---------------------------------Create event ----------------------------------------------//
-    private val _imageUploadStatus=MutableStateFlow<RequestState<String>>(RequestState.Idle )
-    val imageUploadStatus:StateFlow<RequestState<String>> = _imageUploadStatus
 
-    fun uploadImageAndThenCreateEvent(userId: String, file: File, onSuccess: (url:String) -> Unit) {
+    //---------------------------------Create event ----------------------------------------------//
+    private val _imageUploadStatus = MutableStateFlow<RequestState<String>>(RequestState.Idle)
+    val imageUploadStatus: StateFlow<RequestState<String>> = _imageUploadStatus
+
+    fun uploadImageAndThenCreateEvent(
+        userId: String,
+        file: File,
+        onSuccess: (url: String) -> Unit
+    ) {
         viewModelScope.launch {
             try {
                 _imageUploadStatus.value = RequestState.Loading
@@ -393,62 +418,70 @@ class HomeViewModel @Inject constructor(
     }
 
     var createEventResponse = MutableStateFlow<RequestState<String>>(RequestState.Idle)
-    fun createEvent(data:Event){
-        createEventResponse.value=RequestState.Loading
-        viewModelScope.launch(Dispatchers.IO){
+    fun createEvent(data: Event) {
+        createEventResponse.value = RequestState.Loading
+        viewModelScope.launch(Dispatchers.IO) {
             eventsRepository.createEvent(data)
                 .catch {
-                    Log.e(TAG, "createEvent: ${it.printStackTrace()}",it )
-                    createEventResponse.value=RequestState.Error(it)
-                }.collect{
-                    createEventResponse.value=RequestState.Success(it.data)
+                    Log.e(TAG, "createEvent: ${it.printStackTrace()}", it)
+                    createEventResponse.value = RequestState.Error(it)
+                }.collect {
+                    createEventResponse.value = RequestState.Success(it.data)
                 }
         }
     }
-    fun resetEventResponseState(){
-        createEventResponse.value=RequestState.Idle
-    }
 
+    fun resetEventResponseState() {
+        createEventResponse.value = RequestState.Idle
+    }
 
 
 //----------------------------------------------------------------------------------------------------------------------------------//
 
-    val premiumCreateEventResponse:MutableState<RequestState<PremiumEventResponseDTO>> = mutableStateOf(RequestState.Idle)
-    var premiumCreateEventKey :MutableState<Int> = mutableStateOf(0);
-    fun premiumCreateEvent(event:Event)=viewModelScope.launch(Dispatchers.IO) {
-        val TAG="PREMIUM_CREATE_EVENT_RESPONSE"
+    val premiumCreateEventResponse: MutableState<RequestState<PremiumEventResponseDTO>> =
+        mutableStateOf(RequestState.Idle)
+    var premiumCreateEventKey: MutableState<Int> = mutableStateOf(0);
+    fun premiumCreateEvent(event: Event) = viewModelScope.launch(Dispatchers.IO) {
+        val TAG = "PREMIUM_CREATE_EVENT_RESPONSE"
         eventsRepository.sendPremiumCreateEventData(event)
             .onStart {
-                premiumCreateEventResponse.value=RequestState.Loading;
-                Log.d(TAG,premiumCreateEventResponse.value.toString())
+                premiumCreateEventResponse.value = RequestState.Loading;
+                Log.d(TAG, premiumCreateEventResponse.value.toString())
             }
             .catch {
-                Log.d(TAG,"error found")
-                premiumCreateEventResponse.value=RequestState.Error(it)
-                Log.d(TAG,premiumCreateEventResponse.value.toString())
+                Log.d(TAG, "error found")
+                premiumCreateEventResponse.value = RequestState.Error(it)
+                Log.d(TAG, premiumCreateEventResponse.value.toString())
             }
             .collect {
                 premiumCreateEventResponse.value = RequestState.Success(it);
-                Log.d(TAG,premiumCreateEventResponse.value.toString())
+                Log.d(TAG, premiumCreateEventResponse.value.toString())
             }
     }
-   //----------------------------------------------------------------------------------------------------------------------------------//
-   //----------------------------------------FLASH POST----------------------------------------------------------------------------//
+    //----------------------------------------------------------------------------------------------------------------------------------//
+    //----------------------------------------FLASH POST----------------------------------------------------------------------------//
 
     private val _location = MutableStateFlow<String?>(null)
 
-    val flashPostsFlow = Pager(config = PagingConfig(pageSize = 10, prefetchDistance = 1), pagingSourceFactory = { FlashPostsPagingSource(eventsRepository) }).flow.cachedIn(viewModelScope)
+    val flashPostsFlow = Pager(
+        config = PagingConfig(pageSize = 10, prefetchDistance = 1),
+        pagingSourceFactory = { FlashPostsPagingSource(eventsRepository) }).flow.cachedIn(
+        viewModelScope
+    )
 
     fun getAllFlashPosts(location: String) {
         _location.value = location     // this is the ONLY change
     }
-                                            ///--------------------------///
-   private val _userPingsListResponse = MutableStateFlow<RequestState<List<FlashPostResponse>>>(RequestState.Idle)
-    val userPingsListResponse: StateFlow<RequestState<List<FlashPostResponse>>> = _userPingsListResponse.asStateFlow()
+
+    ///--------------------------///
+    private val _userPingsListResponse =
+        MutableStateFlow<RequestState<List<FlashPostResponse>>>(RequestState.Idle)
+    val userPingsListResponse: StateFlow<RequestState<List<FlashPostResponse>>> =
+        _userPingsListResponse.asStateFlow()
     val canFetchPings = mutableStateOf(true)
 
-    fun getUserFlashPosts(id:String)=viewModelScope.launch(Dispatchers.IO) {
-        val TAG="Get_Flash_Posts_Response";
+    fun getUserFlashPosts(id: String) = viewModelScope.launch(Dispatchers.IO) {
+        val TAG = "Get_Flash_Posts_Response";
         eventsRepository.getUserPings(id)
             .onStart {
                 _userPingsListResponse.value = RequestState.Loading
@@ -459,7 +492,7 @@ class HomeViewModel @Inject constructor(
 
             }.collect {
                 _userPingsListResponse.value = RequestState.Success(it.data)
-                canFetchPings.value=false
+                canFetchPings.value = false
                 Log.d(TAG, "user flash post data ${_userPingsListResponse.value}")
 
             }
@@ -469,7 +502,7 @@ class HomeViewModel @Inject constructor(
     // 🔥 Prevent multiple calls per post in session
     private val viewedPosts = mutableSetOf<String>()
 
-    fun registerView(postId: String,userId: String) {
+    fun registerView(postId: String, userId: String) {
 
         //  Already viewed → skip
         if (viewedPosts.contains(postId)) return
@@ -478,7 +511,7 @@ class HomeViewModel @Inject constructor(
 
         viewModelScope.launch {
             try {
-                eventsRepository.registerFlashPostView(postId,userId)
+                eventsRepository.registerFlashPostView(postId, userId)
             } catch (e: Exception) {
                 // optional: retry or log
             }
@@ -487,113 +520,227 @@ class HomeViewModel @Inject constructor(
 
     //============================================================================================================//
 
-    private val _userFlashPostDetailsResponse = MutableStateFlow<RequestState<FlashPostDetailsResponse>>(RequestState.Idle)
-    val userFlashPostDetailsResponse: StateFlow<RequestState<FlashPostDetailsResponse>> = _userFlashPostDetailsResponse.asStateFlow()
+    private val _userFlashPostDetailsResponse =
+        MutableStateFlow<RequestState<FlashPostDetailsResponse>>(RequestState.Idle)
+    val userFlashPostDetailsResponse: StateFlow<RequestState<FlashPostDetailsResponse>> =
+        _userFlashPostDetailsResponse.asStateFlow()
 
-    fun getUserFlashPostDetails(id:String)=viewModelScope.launch(Dispatchers.IO) {
+    fun getUserFlashPostDetails(id: String) = viewModelScope.launch(Dispatchers.IO) {
         eventsRepository.getUserFlashPostDetails(id)
             .onStart {
                 _userFlashPostDetailsResponse.value = RequestState.Loading
 
             }.catch {
                 _userFlashPostDetailsResponse.value = RequestState.Error(it)
-                Log.d("getUserFlashPostDetails", "user flash post details error ${_userFlashPostDetailsResponse.value}",it)
+                Log.d(
+                    "getUserFlashPostDetails",
+                    "user flash post details error ${_userFlashPostDetailsResponse.value}",
+                    it
+                )
 
             }.collect {
                 _userFlashPostDetailsResponse.value = RequestState.Success(it.data)
-                canFetchPings.value=false
-                Log.d("getUserFlashPostDetails", "user flash post details data ${_userFlashPostDetailsResponse.value}")
+                canFetchPings.value = false
+                Log.d(
+                    "getUserFlashPostDetails",
+                    "user flash post details data ${_userFlashPostDetailsResponse.value}"
+                )
 
             }
     }
-    private var _createFlashPostResponse:MutableStateFlow<RequestState<String>> = MutableStateFlow(RequestState.Idle)
-    var createFlashPostResponse :StateFlow<RequestState<String>> = _createFlashPostResponse
 
-    fun createFlashPost(ping:FlashPostRequestDto)=viewModelScope.launch(Dispatchers.IO) {
-        val tag="CREATE_PING_RESPONSE"
+    private var _createFlashPostResponse: MutableStateFlow<RequestState<String>> =
+        MutableStateFlow(RequestState.Idle)
+    var createFlashPostResponse: StateFlow<RequestState<String>> = _createFlashPostResponse
+
+    fun createFlashPost(ping: FlashPostRequestDto) = viewModelScope.launch(Dispatchers.IO) {
+        val tag = "CREATE_PING_RESPONSE"
 
         eventsRepository.createFlashPost(ping)
             .onStart {
-                _createFlashPostResponse.value=RequestState.Loading;
+                _createFlashPostResponse.value = RequestState.Loading;
 
-                Log.d(tag,_createFlashPostResponse.value.toString())
+                Log.d(tag, _createFlashPostResponse.value.toString())
             }
             .catch {
 
-                Log.e(tag,it.printStackTrace().toString())
-                _createFlashPostResponse.value=RequestState.Error(it)
-                Log.e(tag,it.message.toString())
+                Log.e(tag, it.printStackTrace().toString())
+                _createFlashPostResponse.value = RequestState.Error(it)
+                Log.e(tag, it.message.toString())
             }
             .collect {
-                if(it.success.uppercase() =="TRUE") {
+                if (it.success.uppercase() == "TRUE") {
                     Log.i(tag, "createPing: success")
                     _createFlashPostResponse.value = RequestState.Success(it.data);
-                }else{
+                } else {
                     Log.e(tag, it.message)
-                   // _createPingResponse.value = RequestState.Error(it);
+                    // _createPingResponse.value = RequestState.Error(it);
                 }
 
             }
     }
 
-    fun resetCreatePingResponseState(){
-        _createFlashPostResponse.value=RequestState.Idle
+    fun resetCreatePingResponseState() {
+        _createFlashPostResponse.value = RequestState.Idle
     }
-    private val _pingOnPostRequest=MutableStateFlow<RequestState<PingsOnFlashPostResponse>>(RequestState.Idle)
+
+    private val _pingOnPostRequest =
+        MutableStateFlow<RequestState<PingsOnFlashPostResponse>>(RequestState.Idle)
     val pingOnPostRequest: StateFlow<RequestState<PingsOnFlashPostResponse>> = _pingOnPostRequest
 
-    fun addPingOnFlashPost(pingsOnFlashPostRequest: PingsOnFlashPostRequest){
+    fun addPingOnFlashPost(pingsOnFlashPostRequest: PingsOnFlashPostRequest) {
         viewModelScope.launch {
             eventsRepository.addPingToFlashPost(pingsOnFlashPostRequest)
-                .onStart{}
-                .catch {error->
-                    Log.e("addPingOnFlashPost", "addPingOnFlashPost: ${error.fillInStackTrace()}",error )
+                .onStart {}
+                .catch { error ->
+                    Log.e(
+                        "addPingOnFlashPost",
+                        "addPingOnFlashPost: ${error.fillInStackTrace()}",
+                        error
+                    )
                 }
                 .collect {
                     Log.i("addPingOnFlashPost", "addPingOnFlashPost: $pingOnPostRequest")
-                    _pingOnPostRequest.value= RequestState.Success(it)
+                    _pingOnPostRequest.value = RequestState.Success(it)
                 }
         }
     }
 
-//====================================================================================================================================//
-    val _flashPostComments = MutableStateFlow<RequestState<List<CommentResponse>>> (RequestState.Idle)
+    //====================================================================================================================================//
+    val _flashPostComments =
+        MutableStateFlow<RequestState<List<CommentResponse>>>(RequestState.Idle)
     val flashPostComments: StateFlow<RequestState<List<CommentResponse>>> = _flashPostComments
 
-    fun getFlashPostComments(pingId:String)= viewModelScope.launch {
-            eventsRepository.getFlashPostComments(pingId)
-                .onStart {
-                    _flashPostComments.value= RequestState.Loading
-                }
-                .catch {ex->
-                    _flashPostComments.value= RequestState.Error(ex)
-                }
-                .collect { value ->
-                    _flashPostComments.value= RequestState.Success(value.data)
-                }
-    }
-    //====================================================================================================================================//
-    val _addFlashPostComment = MutableStateFlow<RequestState<CommentResponse>> (RequestState.Idle)
-    val addFlashPostComment: StateFlow<RequestState<CommentResponse>> = _addFlashPostComment
-
-    fun addFlashPostComments(commentRequest: CommentRequest)= viewModelScope.launch {
-        eventsRepository.addFlashPostComments(commentRequest)
+    fun getFlashPostComments(pingId: String) = viewModelScope.launch {
+        eventsRepository.getFlashPostComments(pingId)
             .onStart {
-                _addFlashPostComment.value= RequestState.Loading
+                _flashPostComments.value = RequestState.Loading
             }
-            .catch {ex->
-                _addFlashPostComment.value= RequestState.Error(ex)
+            .catch { ex ->
+                _flashPostComments.value = RequestState.Error(ex)
             }
             .collect { value ->
-                _addFlashPostComment.value= RequestState.Success(value.data)
-                val currentState = _flashPostComments.value
+                _flashPostComments.value = RequestState.Success(value.data)
+            }
+    }
 
-                if (currentState is RequestState.Success) {
-                    val updatedList = listOf(value.data) + currentState.data
+    //====================================================================================================================================//
+    val _addFlashPostComment = MutableStateFlow<RequestState<CommentResponse>>(RequestState.Idle)
+    val addFlashPostComment: StateFlow<RequestState<CommentResponse>> = _addFlashPostComment
+
+    fun addFlashPostComments(commentRequest: CommentRequest) = viewModelScope.launch {
+        eventsRepository.addFlashPostComments(commentRequest)
+            .onStart {
+                _addFlashPostComment.value = RequestState.Loading
+            }
+            .catch { ex ->
+                _addFlashPostComment.value = RequestState.Error(ex)
+            }
+//            .collect { value ->
+//                _addFlashPostComment.value = RequestState.Success(value.data)
+//                val currentState = _flashPostComments.value
+//
+//                if (currentState is RequestState.Success) {
+//                    val updatedList = listOf(value.data) + currentState.data
+//                    _flashPostComments.value = RequestState.Success(updatedList)
+//                }
+//            }
+            .collect { value ->
+
+                val newComment = value.data
+                val current = _flashPostComments.value
+
+                if (current is RequestState.Success) {
+
+                    val updatedList = if (newComment.parentCommentId == null) {
+                        listOf(newComment) + current.data
+                    } else {
+                        insertReplyIntoTree(
+                            current.data,
+                            newComment.parentCommentId,
+                            newComment,
+                            closeReplyBox = true // 🔥 NEW
+                        )
+                    }
+
+
                     _flashPostComments.value = RequestState.Success(updatedList)
                 }
             }
     }
+    fun insertReplyIntoTree(
+        comments: List<CommentResponse>,
+        parentId: String,
+        newReply: CommentResponse,
+        closeReplyBox: Boolean = false
+    ): List<CommentResponse> {
+        return comments.map { comment ->
+            if (comment.id == parentId) {
+                comment.copy(
+                    replies = listOf(newReply) + (comment.replies ?: emptyList()),
+                    repliesCount = comment.repliesCount + 1,
+                    isExpanded = true,
+                    showReplyBox = if (closeReplyBox) false else comment.showReplyBox, // 🔥 CLOSE
+                    replyText = if (closeReplyBox) "" else comment.replyText // 🔥 CLEAR
+                )
+            } else {
+                comment.copy(
+                    replies = insertReplyIntoTree(
+                        comment.replies ?: emptyList(),
+                        parentId,
+                        newReply,
+                        closeReplyBox
+                    )
+                )
+            }
+        }
+    }
+
+
+
+    fun loadReplies(commentId: String) = viewModelScope.launch {
+        eventsRepository.getFlashPostCommentReplies(commentId)
+            .collect { response ->
+
+                Log.d("REPLIES_API", response.data.toString())
+
+                val current = _flashPostComments.value
+                if (current is RequestState.Success) {
+
+                    val updatedList = insertReplies(
+                        current.data,
+                        commentId,
+                        response.data
+                    )
+
+                    _flashPostComments.value = RequestState.Success(updatedList)
+                }
+            }
+    }
+
+    fun insertReplies(
+        comments: List<CommentResponse>,
+        parentId: String,
+        replies: List<CommentResponse>
+    ): List<CommentResponse> {
+        return comments.map { comment ->
+            if (comment.id == parentId) {
+                comment.copy(
+                    replies = replies,
+                    isExpanded = true // 🔥 MUST
+                )
+            } else {
+                comment.copy(
+                    replies = insertReplies(
+                        comment.replies ?: emptyList(),
+                        parentId,
+                        replies
+                    )
+                )
+            }
+        }
+    }
+
 
     fun sendReply(commentRequest: CommentRequest) {
         viewModelScope.launch {
@@ -601,74 +748,167 @@ class HomeViewModel @Inject constructor(
                 .onStart {
 
                 }
-                .catch {  }
+                .catch { }
                 .collect {
 
                 }
         }
     }
+
     //====================================================================================================================================//
-    val _deleteFlashPostComment = MutableStateFlow<RequestState<String>> (RequestState.Idle)
+    val _deleteFlashPostComment = MutableStateFlow<RequestState<String>>(RequestState.Idle)
     val deleteFlashPostComment: StateFlow<RequestState<String>> = _deleteFlashPostComment
 
-    fun deleteFlashPostComments(pingId:String)= viewModelScope.launch {
+    fun deleteFlashPostComments(pingId: String) = viewModelScope.launch {
         eventsRepository.deleteFlashPostComments(pingId)
             .onStart {
-                _deleteFlashPostComment.value= RequestState.Loading
+                _deleteFlashPostComment.value = RequestState.Loading
             }
-            .catch {ex->
-                _deleteFlashPostComment.value= RequestState.Error(ex)
+            .catch { ex ->
+                _deleteFlashPostComment.value = RequestState.Error(ex)
             }
             .collect { value ->
-                _deleteFlashPostComment.value= RequestState.Success(value.data)
+                _deleteFlashPostComment.value = RequestState.Success(value.data)
             }
     }
 
 
+    fun toggleCommentExpand(target: CommentResponse) {
+        val current = _flashPostComments.value
+
+        if (current is RequestState.Success) {
+
+            if (target.isExpanded) {
+                // collapse
+                val updated = updateExpandState(current.data.toMutableList(), target)
+                _flashPostComments.value = RequestState.Success(updated)
+            } else {
+                // 🔥 fetch replies
+                loadReplies(target.id)
+            }
+        }
+    }
+
+
+    fun toggleReplyBox(target: CommentResponse) {
+        val current = _flashPostComments.value
+        if (current is RequestState.Success) {
+            val updated = updateReplyBoxState(current.data.toMutableList(), target)
+            _flashPostComments.value = RequestState.Success(updated)
+        }
+    }
+
+    fun updateReplyText(target: CommentResponse, text: String) {
+        val current = _flashPostComments.value
+        if (current is RequestState.Success) {
+            val updated = updateReplyTextState(current.data.toMutableList(), target, text)
+            _flashPostComments.value = RequestState.Success(updated)
+        }
+    }
+
+    fun updateExpandState(
+        comments: MutableList<CommentResponse>,
+        target: CommentResponse
+    ): MutableList<CommentResponse> {
+        return comments.map { comment ->
+            if (comment.id == target.id) {
+                comment.copy(isExpanded = !comment.isExpanded)
+            } else {
+                comment.copy(
+                    replies = updateExpandState(
+                        (comment.replies ?: emptyList()).toMutableList(),
+                        target
+                    )
+                )
+            }
+        }.toMutableList()
+    }
+
+    fun updateReplyBoxState(
+        comments: MutableList<CommentResponse>,
+        target: CommentResponse
+    ): MutableList<CommentResponse> {
+        return comments.map { comment ->
+            if (comment.id == target.id) {
+                comment.copy(showReplyBox = !comment.showReplyBox)
+            } else {
+                comment.copy(
+                    replies = updateReplyBoxState(
+                        (comment.replies ?: emptyList()).toMutableList(),
+                        target
+                    )
+                )
+            }
+        }.toMutableList()
+    }
+
+    fun updateReplyTextState(
+        comments: MutableList<CommentResponse>,
+        target: CommentResponse,
+        text: String
+    ): MutableList<CommentResponse> {
+        return comments.map { comment ->
+            if (comment.id == target.id) {
+                comment.copy(replyText = text)
+            } else {
+                comment.copy(
+                    replies = updateReplyTextState(
+                        (comment.replies ?: emptyList()).toMutableList(),
+                        target,
+                        text
+                    )
+                )
+            }
+        }.toMutableList()
+    }
+
 
 //--------------------------------------------------------------------------------------------------------------------//
 
-    private val _saveUserToChatListResponseState= MutableStateFlow<RequestState<ChatList>>(RequestState.Idle)
-    val saveUserToChatListResponseState: StateFlow<RequestState<ChatList>> = _saveUserToChatListResponseState
-    val saveToChatListSuccess= MutableStateFlow<Boolean>(false)
+    private val _saveUserToChatListResponseState =
+        MutableStateFlow<RequestState<ChatList>>(RequestState.Idle)
+    val saveUserToChatListResponseState: StateFlow<RequestState<ChatList>> =
+        _saveUserToChatListResponseState
+    val saveToChatListSuccess = MutableStateFlow<Boolean>(false)
 
-    fun saveUserToChatList(currentUserId:String,otherUserUserId:String)=viewModelScope.launch {
-        chatDatabaseRepository.saveUserChatList(currentUserId,otherUserUserId)
+    fun saveUserToChatList(currentUserId: String, otherUserUserId: String) = viewModelScope.launch {
+        chatDatabaseRepository.saveUserChatList(currentUserId, otherUserUserId)
             .onStart {
-                _saveUserToChatListResponseState.value=RequestState.Loading
+                _saveUserToChatListResponseState.value = RequestState.Loading
             }
             .catch {
-                _saveUserToChatListResponseState.value=RequestState.Error(it)
+                _saveUserToChatListResponseState.value = RequestState.Error(it)
             }
             .collect {
                 Log.i("Userr", "saveUserToChatList: ${it.data}")
                 _saveUserToChatListResponseState.value = RequestState.Success(it.data)
             }
     }
-    fun resetSaveToChatListSuccessToIdle(){
-        _saveUserToChatListResponseState.value=RequestState.Idle
+
+    fun resetSaveToChatListSuccessToIdle() {
+        _saveUserToChatListResponseState.value = RequestState.Idle
     }
 
     //-------------------------------------------------------------------------------------------------------//
 
-    private val _userProfileResponse= MutableStateFlow<RequestState<User>>(RequestState.Idle)
-    val userProfileResponse: StateFlow<RequestState<User>>  = _userProfileResponse
+    private val _userProfileResponse = MutableStateFlow<RequestState<User>>(RequestState.Idle)
+    val userProfileResponse: StateFlow<RequestState<User>> = _userProfileResponse
 
-    fun getUserData(userID: String)=viewModelScope.launch{
-        _userProfileResponse.value=RequestState.Loading
+    fun getUserData(userID: String) = viewModelScope.launch {
+        _userProfileResponse.value = RequestState.Loading
         profileRepository.getUserData(userID)
             .onStart {
-                _userProfileResponse.value=RequestState.Loading
+                _userProfileResponse.value = RequestState.Loading
             }
             .catch {
-                _userProfileResponse.value=RequestState.Error(it)
+                _userProfileResponse.value = RequestState.Error(it)
             }
-            .collect{
-                _userProfileResponse.value=RequestState.Success(it.data)
+            .collect {
+                _userProfileResponse.value = RequestState.Success(it.data)
             }
     }
 
-    fun deleteAccount(userID: String,onSuccess: () -> Unit)=viewModelScope.launch{
+    fun deleteAccount(userID: String, onSuccess: () -> Unit) = viewModelScope.launch {
         profileRepository.deleteAccount(userID)
             .onStart {
 
@@ -676,7 +916,7 @@ class HomeViewModel @Inject constructor(
             .catch {
 
             }
-            .collect{
+            .collect {
                 storeLoginState.saveLoginState(false)
                 storeLoginState.saveUserToken("")
                 onSuccess()
@@ -698,7 +938,7 @@ class HomeViewModel @Inject constructor(
                 _userDetailsUpdateResponse.value = RequestState.Error(it)
             }
             .collect { result ->
-                 val updated=UserObject.user.value.copy(backgroundImage = backgroundImage)
+                val updated = UserObject.user.value.copy(backgroundImage = backgroundImage)
                 storeUserState.saveUserInDataStore(updated)
                 _userDetailsUpdateResponse.value = RequestState.Success(result.data)
             }

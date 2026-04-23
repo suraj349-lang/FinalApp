@@ -112,6 +112,10 @@ class EventsRepository @Inject constructor(private val api: ApiService) {
         emit(api.addComment(commentRequest))
     }.flowOn(Dispatchers.IO)
 
+    suspend fun getFlashPostCommentReplies(commentId:String): Flow<ApiResponse<List<CommentResponse>>> = flow {
+        emit(api.getReplies(commentId))
+    }.flowOn(Dispatchers.IO)
+
     suspend fun deleteFlashPostComments(flashPostId: String): Flow<ApiResponse<String>> = flow {
         emit(api.deleteComment(flashPostId))
     }.flowOn(Dispatchers.IO)

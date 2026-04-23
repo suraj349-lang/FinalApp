@@ -113,15 +113,17 @@ data class CommentRequest(
 
 @Serializable
 data class CommentResponse(
+    @SerializedName("_id")
     val id: String,
     val flashPostId: String,
     val userId: User,
     val comment: String,
     val replies: List<CommentResponse> = emptyList(),
+    val repliesCount:Int=0,
     val parentCommentId: String? = null,
     val isExpanded: Boolean = false,
     val showReplyBox: Boolean = false,
-    val replyText: String = ""
+    val replyText: String? = ""
 )
 
 

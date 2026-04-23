@@ -111,6 +111,9 @@ interface ApiService {
     @POST("/api/v1/flashPost/comment")
     suspend fun addComment(@Body commentData: CommentRequest): ApiResponse<CommentResponse>
 
+    @GET("/api/v1/flashPost/replies")
+    suspend fun getReplies(@Query("commentId") commentId:String): ApiResponse<List<CommentResponse>>
+
     @DELETE("/api/v1/flashPost/comment")
     suspend fun deleteComment(@Query("postId")postId: String): ApiResponse<String>
 

@@ -69,94 +69,22 @@ import kotlin.collections.List
 fun FlashPostCommentScreen(
     postId: String,
     viewModel: HomeViewModel
-) { // com.spint.app.screens._1home._1FlashPosts.presentation.util.comments
+) {
     val comments by viewModel.flashPostComments.collectAsState()
     LaunchedEffect(Unit) {
-        if (comments !is RequestState.Success) {
-            viewModel.getFlashPostComments(postId)
-        }
+        viewModel.getFlashPostComments(postId)
     }
 
     val user by UserObject.user.collectAsState()
     var comment by remember { mutableStateOf("") }
-    /*Box(modifier = Modifier.fillMaxSize()) {
-        when (val data = comments) {
-            is RequestState.Success -> {
-                CommentScreenUI(data.data)
-            }
-
-            is RequestState.Error -> {
-                Box(modifier = Modifier
-                    .fillMaxSize()
-                    .background(color = Color.Black)) {
-                    Column(modifier = Modifier.align(Alignment.Center)) {
-                        Text("Error getting comments")
-                        Button(
-                            onClick = { viewModel.getFlashPostComments(postId) },
-                            colors = ButtonDefaults.buttonColors(containerColor = floatingActionBtnColor),
-                            modifier = Modifier.clip(RoundedCornerShape(20.dp))
-                        ) {
-                            Text("Retry", modifier = Modifier.padding(horizontal = 10.dp))
-                        }
-                    }
-                }
-            }
-
-            is RequestState.Loading -> {
-                Box(modifier = Modifier
-                    .fillMaxSize()
-                    .background(color = Color.Black)) {
-                    CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-                }
-            }
-
-            else -> {}
-
-        }
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .height(80.dp)
-            .align(Alignment.BottomCenter)) {
-            OutlinedTextField(
-                value = comment,
-                onValueChange = { comment = it },
-                modifier = Modifier
-                    .clip(RoundedCornerShape(50))
-                    .padding(10.dp)
-                    .fillMaxWidth(),
-                placeholder = { dynamicText("add comment") },
-                colors = OutlinedTextFieldDefaults.colors(focusedContainerColor = Color.Black),
-                trailingIcon = {
-                    Image(
-                        painter = painterResource(R.drawable.send_24),
-                        contentDescription = "",
-                        colorFilter = ColorFilter.tint(Color.White),
-                        modifier = Modifier
-                            .rotate(-45f)
-                            .clickable {
-                                viewModel.addFlashPostComments(
-                                    CommentRequest(
-                                        userId = user.user,
-                                        comment = comment,
-                                        flashPostId = postId
-                                    )
-                                )
-                                comment = ""
-                            })
-                }
-            )
-        }*/
-
     Column(modifier = Modifier.fillMaxSize()) {
-
-        // COMMENTS LIST
         Box(
             modifier = Modifier
-                .weight(1f) // 🔥 THIS FIXES SCROLL
+                .weight(1f)
         ) {
-            when (val data = comments) {
+            when (val state = comments) {
                 is RequestState.Success -> {
-                    CommentScreenUI(data.data)
+                    CommentScreenUI(state.data,viewModel,postId,user.user)
                 }
 
                 is RequestState.Error -> {
@@ -192,35 +120,11 @@ fun FlashPostCommentScreen(
             }
         }
 
-        // INPUT BOX
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(80.dp)
         ) {
-//            OutlinedTextField(
-//                value = comment,
-//                onValueChange = { comment = it },
-//                modifier = Modifier
-//                    .padding(10.dp)
-//                    .fillMaxWidth(),
-//                trailingIcon = {
-//                    Image(
-//                        painter = painterResource(R.drawable.send_24),
-//                        contentDescription = "",
-//                        modifier = Modifier.clickable {
-//                            viewModel.addFlashPostComments(
-//                                CommentRequest(
-//                                    userId = user.user,
-//                                    comment = comment,
-//                                    flashPostId = postId
-//                                )
-//                            )
-//                            comment = ""
-//                        }
-//                    )
-//                }
-//            )
             OutlinedTextField(
                 value = comment,
                 onValueChange = { comment = it },
@@ -255,32 +159,68 @@ fun FlashPostCommentScreen(
     }
 }
 
-@Composable
-fun CommentScreenUI(comments: List<CommentResponse>) {
-//    // Use mutable state list for top-level comments
-//    val commentsState =
-//        remember { mutableStateListOf<CommentResponse>().apply { addAll(comments) } }
+//@Composable
+//fun CommentScreenUI(comments: List<CommentResponse>) {
+////    // Use mutable state list for top-level comments
+////    val commentsState =
+////        remember { mutableStateListOf<CommentResponse>().apply { addAll(comments) } }
+////
+////    // Function to toggle expand/collapse for any comment (recursive update)
+////    fun toggleExpand(target: CommentResponse) {
+////        val updated = updateCommentExpandState(commentsState, target)
+////        if (!updated) println("Comment not found")
+////    }
 //
-//    // Function to toggle expand/collapse for any comment (recursive update)
-//    fun toggleExpand(target: CommentResponse) {
-//        val updated = updateCommentExpandState(commentsState, target)
-//        if (!updated) println("Comment not found")
+//    LazyColumn(modifier = Modifier.padding(top=16.dp, start = 8.dp)
+//        .fillMaxSize()) {
+//        items(comments) { comment ->
+//            CommentItem(
+//                comment = comment,
+//                indentLevel = 0,
+//                onToggleExpand = {  },
+//                onToggleReplyBox = {},
+//                onReplyTextChange = { _, _ -> },
+//                onSendReply = {}
+//            )
+//        }
 //    }
-
-    LazyColumn(modifier = Modifier.padding(top=16.dp, start = 8.dp)
-        .fillMaxSize()) {
+//}
+@Composable
+fun CommentScreenUI(
+    comments: List<CommentResponse>,
+    viewModel: HomeViewModel,
+    postId: String,
+    userId: String
+) {
+    LazyColumn(
+        modifier = Modifier
+            .padding(top = 16.dp, start = 8.dp)
+            .fillMaxSize()
+    ) {
         items(comments) { comment ->
             CommentItem(
                 comment = comment,
                 indentLevel = 0,
-                onToggleExpand = {  },
-                onToggleReplyBox = {},
-                onReplyTextChange = { _, _ -> },
-                onSendReply = {}
+                onToggleExpand = { viewModel.toggleCommentExpand(it) },
+                onToggleReplyBox = { viewModel.toggleReplyBox(it) },
+                onReplyTextChange = { c, text ->
+                    viewModel.updateReplyText(c, text)
+                },
+                onSendReply = { parent ->
+                    viewModel.addFlashPostComments(
+                        CommentRequest(
+                            userId = userId,
+                            comment = parent.replyText ?: "",
+                            flashPostId = postId,
+                            parentCommentId = parent.id
+                        )
+                    )
+                }
             )
         }
     }
 }
+
 
 // Recursive function to update expansion state
 fun updateCommentExpandState(
@@ -293,7 +233,7 @@ fun updateCommentExpandState(
             comments[i] = current.copy(isExpanded = !current.isExpanded)
             return true
         } else {
-            val childReplies = current.replies.toMutableList()
+            val childReplies = (current.replies ?: emptyList()).toMutableList()
             if (updateCommentExpandState(childReplies, target)) {
                 comments[i] = current.copy(replies = childReplies)
                 return true
@@ -313,7 +253,8 @@ fun CommentItem(
     onReplyTextChange: (CommentResponse, String) -> Unit,
     onSendReply: (CommentResponse) -> Unit
 ) {
-    var isExpanded by remember { mutableStateOf(comment.isExpanded) }
+    var isExpanded = comment.isExpanded
+
 
     val maxChars = 135
     val isLongComment = comment.comment.length > maxChars
@@ -399,20 +340,21 @@ fun CommentItem(
                 )
             }
 
-//            if (comment.replies.isNotEmpty()) {
-//                Image(
-//                    painter = painterResource(
-//                        id = if (comment.isExpanded)
-//                            R.drawable.baseline_expand_less_24
-//                        else
-//                            R.drawable.baseline_expand_more_24
-//                    ),
-//                    contentDescription = "Toggle replies",
-//                    modifier = Modifier
-//                        .padding(end = 4.dp)
-//                        .clickable { onToggleExpand(comment) }
-//                )
-//            }
+            if (!comment.replies.isNullOrEmpty()) {
+                Image(
+                    painter = painterResource(
+                        id = if (comment.isExpanded)
+                            R.drawable.baseline_expand_less_24
+                        else
+                            R.drawable.baseline_expand_more_24
+                    ),
+                    contentDescription = "Toggle replies",
+                    modifier = Modifier
+                        .padding(end = 4.dp)
+                        .clickable { onToggleExpand(comment) }
+                )
+            }
+
         }
 
         // Reply Text
@@ -429,21 +371,38 @@ fun CommentItem(
                 modifier = Modifier.size(12.dp),
                 colorFilter = ColorFilter.tint(Color.Gray)
             )
+            if (comment.repliesCount > 0) {
+                Text(
+                    text = if (comment.isExpanded)
+                        "Hide replies"
+                    else
+                        "View replies (${comment.repliesCount})",
+                    fontSize = 12.sp,
+                    color = Color.Gray,
+                    modifier = Modifier.clickable {
+                        onToggleExpand(comment)
+                    }
+                )
+            }
             Text(
                 text = "Reply",
                 fontSize = 12.sp,
                 lineHeight = 8.sp,
-                modifier = Modifier
-                    .clickable { onToggleReplyBox(comment) },
+                modifier = Modifier.clickable {
+                    onToggleReplyBox(comment)
+                },
                 color = Color.Gray
             )
-//            Text(
-//                text = "Report",
-//                fontSize = 12.sp,
-//                lineHeight = 8.sp,
-//                modifier = Modifier,
-//                color = Color.Gray
-//            )
+
+
+
+            Text(
+                text = "Report",
+                fontSize = 12.sp,
+                lineHeight = 8.sp,
+                modifier = Modifier,
+                color = Color.Gray
+            )
         }
 
 
@@ -453,26 +412,24 @@ fun CommentItem(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 4.dp)
+                    .padding(horizontal = 16.dp, vertical = 4.dp).padding(start = 32.dp)
             ) {
                 OutlinedTextField(
-                    value = comment.replyText,
+                    value = comment.replyText ?: "",
                     onValueChange = { onReplyTextChange(comment, it) },
-                    placeholder = { Text("Write a reply...") },
+                    placeholder = { dynamicText("Write a reply...", fontSize = 14) },
                     modifier = Modifier.weight(1f),
                     shape = RoundedCornerShape(12.dp),
-                    singleLine = true
+                    singleLine = true,
+                    trailingIcon = {Image(painter = painterResource(R.drawable.send_24), contentDescription = "", modifier = Modifier.size(20.dp).rotate(-35f).clickable{onSendReply(comment)})}
                 )
-                Spacer(modifier = Modifier.width(8.dp))
-                Button(onClick = { onSendReply(comment) }) {
-                    Text("Send")
-                }
+
             }
         }
 
         // Recursively show replies
         if (comment.isExpanded) {
-            comment.replies.forEach { reply ->
+            (comment.replies ?: emptyList()).forEach { reply ->
                 CommentItem(
                     comment = reply,
                     indentLevel = indentLevel + 1,
@@ -485,153 +442,3 @@ fun CommentItem(
         }
     }
 }
-
-
-/*
-val comments = listOf(
-    Comment(
-        id = "1",
-        username = "suraj_3494",
-        comment = "This app is amazing!Best app in this genre!, this si the only thing that iw ant iin life to have and this is how i amg innna",
-        profileImageRes = R.drawable.profile_image_1,
-        replies = listOf(
-            Comment(
-                id = "1-1",
-                username = "sakshi7687",
-                comment = "Absolutely agree!",
-                profileImageRes = R.drawable.profile_image_2,
-                replies = listOf(
-                    Comment(
-                        id = "1-1-1",
-                        username = "jayesh_123",
-                        comment = "Same here. UI is top-notch!",
-                        profileImageRes = R.drawable.profile_image_3
-                    )
-                )
-            ),
-            Comment(
-                id = "1-2",
-                username = "anupam_mittal",
-                comment = "10/10 design 👌",
-                profileImageRes = R.drawable.profile_image_2
-            )
-        )
-    ),
-    Comment(
-        id = "2",
-        username = "positron_piecerer",
-        comment = "Best app in this genre!, this si the only thing that iw ant iin life to have and this is how i amg innna di tiin life iiiresoisretive of what will happend in the life withme. afjhdsj asoghouasd asghosaudhg agohdguohauhguoasd gaohgua",
-        profileImageRes = R.drawable.profile_image_3
-    ),
-
-    Comment(
-        id = "3",
-        username = "techie_rohan",
-        comment = "UI feels super smooth. Loving the animations 🔥",
-        profileImageRes = R.drawable.profile_image_1,
-        replies = listOf(
-            Comment(
-                id = "3-1",
-                username = "ui_queen",
-                comment = "Yes! The transitions are clean.",
-                profileImageRes = R.drawable.profile_image_2
-            )
-        )
-    ),
-
-    Comment(
-        id = "4",
-        username = "wanderlust_avi",
-        comment = "Finally something different from regular social apps.",
-        profileImageRes = R.drawable.profile_image_2
-    ),
-
-    Comment(
-        id = "5",
-        username = "dev_suraj",
-        comment = "Bro this concept has potential to scale big time 🚀",
-        profileImageRes = R.drawable.profile_image_3,
-        replies = listOf(
-            Comment(
-                id = "5-1",
-                username = "startup_girl",
-                comment = "If executed properly, 100% yes.",
-                profileImageRes = R.drawable.profile_image_1,
-                replies = listOf(
-                    Comment(
-                        id = "5-1-1",
-                        username = "angel_investor",
-                        comment = "Monetization model?",
-                        profileImageRes = R.drawable.profile_image_2
-                    )
-                )
-            )
-        )
-    ),
-
-    Comment(
-        id = "6",
-        username = "random_user_77",
-        comment = "The debate dashboard idea is actually interesting.",
-        profileImageRes = R.drawable.profile_image_1
-    ),
-
-    Comment(
-        id = "7",
-        username = "night_coder",
-        comment = "Dark mode looks premium 💎",
-        profileImageRes = R.drawable.profile_image_3
-    ),
-
-    Comment(
-        id = "8",
-        username = "kritika_designs",
-        comment = "Spacing and typography are very clean. Good job!",
-        profileImageRes = R.drawable.profile_image_2,
-        replies = listOf(
-            Comment(
-                id = "8-1",
-                username = "font_nerd",
-                comment = "Which font are you using?",
-                profileImageRes = R.drawable.profile_image_3
-            )
-        )
-    ),
-
-    Comment(
-        id = "9",
-        username = "debate_master",
-        comment = "This could replace traditional comment sections.",
-        profileImageRes = R.drawable.profile_image_1
-    ),
-
-    Comment(
-        id = "10",
-        username = "akash_live",
-        comment = "Performance seems smooth even with nested replies 👌",
-        profileImageRes = R.drawable.profile_image_2
-    ),
-
-    Comment(
-        id = "11",
-        username = "future_ceo",
-        comment = "Add live polls and this becomes unstoppable.",
-        profileImageRes = R.drawable.profile_image_3,
-        replies = listOf(
-            Comment(
-                id = "11-1",
-                username = "product_thinker",
-                comment = "Yes, real-time engagement will boost retention.",
-                profileImageRes = R.drawable.profile_image_1
-            )
-        )
-    ),
-
-    Comment(
-        id = "12",
-        username = "minimalist_raj",
-        comment = "Clean. Focused. No unnecessary clutter.",
-        profileImageRes = R.drawable.profile_image_2
-    )
-)
-*/
