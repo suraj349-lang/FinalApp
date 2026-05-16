@@ -29,12 +29,14 @@ import com.spint.app.model.PremiumEventResponseDTO
 import com.spint.app.model.ResponseOfEmail
 import com.spint.app.model.VerifyEmailOtp
 import com.spint.app.model.flashPost.CommentData
+import com.spint.app.model.flashPost.CommentPaginationResponse
 import com.spint.app.model.flashPost.CommentRequest
 import com.spint.app.model.flashPost.CommentResponse
 import com.spint.app.model.flashPost.FlashPostRequestDto
 import com.spint.app.model.flashPost.FlashPostResponse
 import com.spint.app.model.flashPost.PingsOnFlashPostRequest
 import com.spint.app.model.flashPost.PingsOnFlashPostResponse
+import com.spint.app.model.flashPost.SingleCommentResponse
 import com.spint.app.model.places.PlaceDto
 import com.spint.app.utils.PingsResponse
 import com.spint.app.utils.ApiResponse
@@ -109,7 +111,7 @@ interface ApiService {
     suspend fun registerView(@Query("postId") postId: String,@Query("userId") userId: String): Response<String>
 
     @POST("/api/v1/flashPost/comment")
-    suspend fun addComment(@Body commentData: CommentRequest): ApiResponse<CommentResponse>
+    suspend fun addComment(@Body commentData: CommentRequest): ApiResponse<SingleCommentResponse>
 
     @GET("/api/v1/flashPost/replies")
     suspend fun getReplies(@Query("commentId") commentId:String): ApiResponse<List<CommentResponse>>
@@ -118,7 +120,10 @@ interface ApiService {
     suspend fun deleteComment(@Query("postId")postId: String): ApiResponse<String>
 
     @GET("/api/v1/flashPost/comment")
-    suspend fun getComments(@Query("postId") postId: String): ApiResponse<List<CommentResponse>>
+    suspend fun getComments(
+        @Query("postId") postId: String,
+        @Query("cursor") cursor: String?
+    ): CommentPaginationResponse
 
     @GET("api/v1/flashPostComments")
     suspend fun getFlashPostComments(): PingsResponse<List<CommentData>>

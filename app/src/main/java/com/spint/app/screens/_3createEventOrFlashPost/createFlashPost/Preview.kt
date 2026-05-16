@@ -1,4 +1,4 @@
-package com.spint.app.screens._3createEventOrPing.createPing
+package com.spint.app.screens._3createEventOrFlashPost.createFlashPost
 
 
 import android.net.Uri

@@ -92,10 +92,7 @@ class ChatViewModel @Inject constructor(
     }
 
     fun sendMessage(newChatItem: ChatItem) {
-        Log.d(
-            "SocketManager",
-            "sendMessage in viewmodel: ${newChatItem.sentFrom}, ${newChatItem.sentTo}, ${newChatItem.message}"
-        )
+        Log.d("SocketManager", "sendMessage in viewmodel: ${newChatItem.sentFrom}, ${newChatItem.sentTo}, ${newChatItem.message}")
         socketManager.sendMessage(newChatItem)
     }
 

@@ -28,6 +28,7 @@ import androidx.compose.material.Text
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -65,6 +66,8 @@ import java.nio.charset.StandardCharsets
 @Composable
 fun DropProfileUserProfile(navController: NavHostController, chatViewModel: ChatViewModel, homeViewModel: HomeViewModel, dropProfileResponse: DropProfileResponse?) {
     val buttonsVisible = remember { mutableStateOf(true) }
+    val user = UserObject.user.collectAsState()
+    val self by remember { mutableStateOf(dropProfileResponse?.createdBy?.user == user.value.user) }
     val userObject= UserObject.user.collectAsState()
     if(dropProfileResponse!=null) {
         Scaffold(
@@ -76,6 +79,7 @@ fun DropProfileUserProfile(navController: NavHostController, chatViewModel: Chat
                     .padding(it)
                     .fillMaxSize()){
                     DropProfileUserProfileUI(
+                        self,
                         dropProfileResponse = dropProfileResponse,
                         onUserProfileClicked = {navController.navigate(SCREENS.USER_PUBLIC_PROFILE.createPath(it))},
                         onSendMessageClicked = {
@@ -106,7 +110,7 @@ fun DropProfileUserProfile(navController: NavHostController, chatViewModel: Chat
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun DropProfileUserProfileUI(dropProfileResponse: DropProfileResponse?,onUserProfileClicked:(String)->Unit,onSendMessageClicked:()->Unit,onBackPressed:()->Unit) {
+fun DropProfileUserProfileUI(self:Boolean,dropProfileResponse: DropProfileResponse?,onUserProfileClicked:(String)->Unit,onSendMessageClicked:()->Unit,onBackPressed:()->Unit) {
     val context = LocalContext.current
     if (dropProfileResponse != null) {
         Box(modifier = Modifier
@@ -197,7 +201,7 @@ fun DropProfileUserProfileUI(dropProfileResponse: DropProfileResponse?,onUserPro
 
                 Row(
                     modifier = Modifier
-                        .padding(start = 16.dp, end = 16.dp)
+                        .padding(start = 16.dp, end = 16.dp, top = 10.dp)
                         .fillMaxWidth()
                         .wrapContentHeight(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -206,7 +210,8 @@ fun DropProfileUserProfileUI(dropProfileResponse: DropProfileResponse?,onUserPro
                     Row(
                         modifier = Modifier
                             .wrapContentHeight()
-                            .fillMaxWidth(0.6f), horizontalArrangement = Arrangement.spacedBy(10.dp)
+                            .fillMaxWidth(0.6f),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
                         Card(modifier = Modifier.clickable{onUserProfileClicked(dropProfileResponse.createdBy.user)}.wrapContentSize(), shape = CircleShape) {
                             GlideImage(
@@ -217,7 +222,8 @@ fun DropProfileUserProfileUI(dropProfileResponse: DropProfileResponse?,onUserPro
                             )
                         }
                         Column(
-                            modifier = Modifier.clickable{onUserProfileClicked(dropProfileResponse.createdBy.user)}
+                            modifier = Modifier
+                                .clickable{onUserProfileClicked(dropProfileResponse.createdBy.user)}
                                 .fillMaxWidth()
                                 .wrapContentHeight(),
                             verticalArrangement = Arrangement.Center,
@@ -245,26 +251,28 @@ fun DropProfileUserProfileUI(dropProfileResponse: DropProfileResponse?,onUserPro
                             }
                         }
                     }
-                    Button(
-                        onClick = { onSendMessageClicked() },
-                        colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF96053E))
-                    ) {
-                        Row(
-                            modifier = Modifier.wrapContentSize(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    if(!self) {
+                        Button(
+                            onClick = { onSendMessageClicked() },
+                            colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF96053E))
                         ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.chat_new),
-                                contentDescription = "",
-                                modifier = Modifier.size(18.dp),
-                                colorFilter = ColorFilter.tint(Color.White)
-                            )
-                            Text(
-                                text = "Chat",
-                                color = Color.White,
-                                fontFamily = Constants.FONT_MEDIUM,
-                                fontSize = 16.sp
-                            )
+                            Row(
+                                modifier = Modifier.wrapContentSize(),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.chat_new),
+                                    contentDescription = "",
+                                    modifier = Modifier.size(18.dp),
+                                    colorFilter = ColorFilter.tint(Color.White)
+                                )
+                                Text(
+                                    text = "Chat",
+                                    color = Color.White,
+                                    fontFamily = Constants.FONT_MEDIUM,
+                                    fontSize = 16.sp
+                                )
+                            }
                         }
                     }
 

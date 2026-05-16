@@ -37,7 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.spint.app.navigation.SCREENS
-import com.spint.app.screens._3createEventOrPing.CreateEventOrPingBottomSheet
+import com.spint.app.screens._3createEventOrFlashPost.CreateEventOrPingBottomSheet
 import com.spint.app.screens.common.BackImage
 import com.spint.app.ui.theme.LIGHT_GREEN
 import com.spint.app.ui.theme.LIGHT_GREY_BG_COLOR

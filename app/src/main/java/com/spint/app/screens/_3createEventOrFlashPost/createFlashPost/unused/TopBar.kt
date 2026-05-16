@@ -1,4 +1,4 @@
-package com.spint.app.screens._3createEventOrPing.createPing.unused
+package com.spint.app.screens._3createEventOrFlashPost.createFlashPost.unused
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.size

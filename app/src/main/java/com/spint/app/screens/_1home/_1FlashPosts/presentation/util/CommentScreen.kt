@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
@@ -35,6 +36,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -192,22 +194,62 @@ fun CommentScreenUI(
     postId: String,
     userId: String
 ) {
+
+    val listState = rememberLazyListState()
+
+    // PAGINATION TRIGGER
+    LaunchedEffect(listState) {
+
+        snapshotFlow {
+
+            listState.layoutInfo
+                .visibleItemsInfo
+                .lastOrNull()
+                ?.index
+
+        }.collect { lastVisibleIndex ->
+
+            val totalItems = listState.layoutInfo.totalItemsCount
+
+            // Near bottom
+            if (lastVisibleIndex != null && lastVisibleIndex >= totalItems - 2 && viewModel.hasMore && !viewModel.isLoading) {
+                viewModel.getFlashPostComments(postId)
+            }
+        }
+    }
+
     LazyColumn(
+        state = listState,
         modifier = Modifier
             .padding(top = 16.dp, start = 8.dp)
             .fillMaxSize()
     ) {
-        items(comments) { comment ->
+
+        items(
+            items = comments,
+            key = { it.id }
+        ) { comment ->
+
             CommentItem(
                 comment = comment,
                 indentLevel = 0,
-                onToggleExpand = { viewModel.toggleCommentExpand(it) },
-                onToggleReplyBox = { viewModel.toggleReplyBox(it) },
+
+                onToggleExpand = {
+                    viewModel.toggleCommentExpand(it)
+                },
+
+                onToggleReplyBox = {
+                    viewModel.toggleReplyBox(it)
+                },
+
                 onReplyTextChange = { c, text ->
                     viewModel.updateReplyText(c, text)
                 },
+
                 onSendReply = { parent ->
+
                     viewModel.addFlashPostComments(
+
                         CommentRequest(
                             userId = userId,
                             comment = parent.replyText ?: "",
@@ -217,6 +259,23 @@ fun CommentScreenUI(
                     )
                 }
             )
+        }
+
+        // PAGINATION LOADER
+        if (viewModel.isLoading) {
+
+            item {
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+
+                    CircularProgressIndicator()
+                }
+            }
         }
     }
 }

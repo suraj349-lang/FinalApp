@@ -15,3 +15,6 @@ dependencyResolutionManagement {
 }
 rootProject.name = "app"
 include ':app'
+include ':feature'
+include ':feature:flashPost'
+include ':feature:home'

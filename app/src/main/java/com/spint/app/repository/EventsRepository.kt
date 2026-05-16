@@ -15,12 +15,14 @@ import com.spint.app.model.CreateFlashPostResponse
 import com.spint.app.model.EventDetailsResponse
 import com.spint.app.model.FlashPostResponseDTO
 import com.spint.app.model.PremiumEventResponseDTO
+import com.spint.app.model.flashPost.CommentPaginationResponse
 import com.spint.app.model.flashPost.CommentRequest
 import com.spint.app.model.flashPost.CommentResponse
 import com.spint.app.model.flashPost.FlashPostRequestDto
 import com.spint.app.model.flashPost.FlashPostResponse
 import com.spint.app.model.flashPost.PingsOnFlashPostRequest
 import com.spint.app.model.flashPost.PingsOnFlashPostResponse
+import com.spint.app.model.flashPost.SingleCommentResponse
 import com.spint.app.model.places.Place
 import com.spint.app.network.ApiService
 import com.spint.app.screens._4profile.uriToMultipart
@@ -104,11 +106,21 @@ class EventsRepository @Inject constructor(private val api: ApiService) {
     suspend fun registerFlashPostView(postId: String, userId: String): Response<String> {
         return api.registerView(postId, userId)
     }
-    suspend fun getFlashPostComments(flashPostId: String): Flow<ApiResponse<List<CommentResponse>>> = flow {
-        emit(api.getComments(flashPostId))
+    suspend fun getFlashPostComments(
+        flashPostId: String,
+        cursor: String?
+    ): Flow<CommentPaginationResponse> = flow {
+
+        emit(
+            api.getComments(
+                postId = flashPostId,
+                cursor = cursor
+            )
+        )
+
     }.flowOn(Dispatchers.IO)
 
-    suspend fun addFlashPostComments(commentRequest: CommentRequest): Flow<ApiResponse<CommentResponse>> = flow {
+    suspend fun addFlashPostComments(commentRequest: CommentRequest): Flow<ApiResponse<SingleCommentResponse>> = flow {
         emit(api.addComment(commentRequest))
     }.flowOn(Dispatchers.IO)
 

@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -26,6 +27,8 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -46,19 +49,22 @@ import com.spint.app.model.User
 import com.spint.app.ui.imagePrefix
 import com.spint.app.viewmodels.HomeViewModel
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.platform.LocalContext
 import com.spint.app.navigation.SCREENS
+import com.spint.app.screens._1home.commonUI.shareProfileDeepLink
 import com.spint.app.utils.RequestState
 import com.spint.app.utils.UserObject
 import com.spint.app.utils.constants.Constants
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
-// when the dropped profile is clicked then it is shown
+// when the dropped profile and direct chat profile is clicked then it is shown
 @Composable
 fun UserPublicProfile(homeViewModel: HomeViewModel, navController:NavHostController, userId: String?) {
-    val buttonsVisible = remember { mutableStateOf(false) }
     val directChatUser by  homeViewModel.userProfileResponse.collectAsState()
     val user by UserObject.user.collectAsState()
     LaunchedEffect(key1 = Unit ){
@@ -107,6 +113,7 @@ fun UserPublicProfile(homeViewModel: HomeViewModel, navController:NavHostControl
 fun UserPublicProfileUI(homeViewModel: HomeViewModel, navController: NavHostController, paddingValues: PaddingValues, user: User?, onSendMessageClicked:()->Unit, onBackPressed:()->Unit) {
     val saveToChatListSuccess by homeViewModel.saveUserToChatListResponseState.collectAsState()
     val userObject by UserObject.user.collectAsState()
+    val context= LocalContext.current
     when(val response=saveToChatListSuccess){
         is RequestState.Error ->  {
             androidx.compose.material3.Text(text = response.error.toString())
@@ -149,7 +156,7 @@ fun UserPublicProfileUI(homeViewModel: HomeViewModel, navController: NavHostCont
                             .size(250.dp)
                     )
                     Image(
-                        painter = painterResource(id = R.drawable.baseline_arrow_back_24),
+                        painter = painterResource(id = R.drawable.back),
                         contentDescription = "Back",
                         modifier = Modifier
                             .align(Alignment.TopStart)
@@ -158,6 +165,57 @@ fun UserPublicProfileUI(homeViewModel: HomeViewModel, navController: NavHostCont
                             .size(32.dp), // small icon size
                         colorFilter = ColorFilter.tint(Color.Black)
                     )
+                    var showMenu by remember {
+                        mutableStateOf(false)
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(end = 8.dp,top=16.dp)
+                            .wrapContentWidth()
+                            .wrapContentHeight()
+                    ) {
+
+                        Row(
+                            modifier = Modifier
+                                .wrapContentSize()
+                                .clickable {
+                                    showMenu = true
+                                },
+
+                            verticalAlignment = Alignment.CenterVertically,
+
+                            horizontalArrangement =
+                                Arrangement.spacedBy(30.dp)
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.menu),
+                                contentDescription = "",
+                                modifier = Modifier.rotate(90f).size(20.dp),
+                                colorFilter = ColorFilter.tint(Color.Black)
+                            )
+                        }
+
+                        DropdownMenu(
+                            expanded = showMenu,
+                            onDismissRequest = { showMenu = false },
+                            modifier = Modifier.background(Color.DarkGray)
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text(text = "Report", color = Color.White) },
+                                onClick = { showMenu = false }
+                            )
+                            DropdownMenuItem(
+                                text = { Text(text = "Hide", color = Color.White) },
+                                onClick = { showMenu = false }
+                            )
+                            DropdownMenuItem(
+                                text = { Text(text = "Share", color = Color.White) },
+                                onClick = { showMenu = false }
+                            )
+                        }
+                    }
 
                     }
                 Row(modifier = Modifier
@@ -181,16 +239,15 @@ fun UserPublicProfileUI(homeViewModel: HomeViewModel, navController: NavHostCont
                         )
 
                     }
-
-                    Image(painter = painterResource(id = R.drawable.share), contentDescription ="", modifier = Modifier
+                    Image(painter = painterResource(id = R.drawable.share), contentDescription ="", modifier = Modifier.clickable{
+                        val link="https://www.spint.com/user_profile/share/${userObject.user}"
+                        shareProfileDeepLink(context,link)
+                    }
                         .size(20.dp), colorFilter = ColorFilter.tint(Color.DarkGray)
                     )
-
                     Button(onClick = { onSendMessageClicked() }, colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF96053E))) {
                         Text(text = "Send Message", color = Color.White, fontFamily = Constants.FONT_LIGHT, fontSize = 12.sp)
                     }
-
-
                 }
                 Divider(Modifier.fillMaxWidth(), thickness = 0.5.dp, color = Color.Gray)
 

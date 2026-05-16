@@ -30,7 +30,7 @@ import com.spint.app.R
 import com.spint.app.model.Event
 import com.spint.app.model.EventResponse
 import com.spint.app.screens._2Events.events.templates.debate.DebateDetailsScreen
-import com.spint.app.screens._3createEventOrPing.CreateEventOrPingBottomSheet
+import com.spint.app.screens._3createEventOrFlashPost.CreateEventOrPingBottomSheet
 import com.spint.app.screens.common.NoDataFound
 import com.spint.app.screens.common.CommonErrorScreen
 import com.spint.app.screens.loadingAndErrorScreen.loadingScreen.EventLoadingScreen

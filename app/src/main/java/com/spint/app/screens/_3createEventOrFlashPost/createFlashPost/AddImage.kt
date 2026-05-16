@@ -1,4 +1,4 @@
-package com.spint.app.screens._3createEventOrPing.createEvent
+package com.spint.app.screens._3createEventOrFlashPost.createFlashPost
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -12,6 +12,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -21,6 +22,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -29,6 +31,8 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -38,6 +42,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
@@ -59,7 +64,7 @@ import java.io.File
 
 
 @Composable
-fun AddImageCreateEvent(onImageUriChange:(Uri?)->Unit, onNextClicked:()->Unit) {
+fun AddImageCreatePing(onImageUriChange:(Uri?)->Unit, onNextClicked:()->Unit) {
     val context = LocalContext.current
 
     var bitmap by remember { mutableStateOf<Bitmap?>(null) }
@@ -167,22 +172,62 @@ fun AddImageCreateEvent(onImageUriChange:(Uri?)->Unit, onNextClicked:()->Unit) {
                     }
                 }
             } else {
+                val floatingActionBtnColor = Color(0xFF00D26A)
 
-                Column(modifier = Modifier
-                    .fillMaxSize()
-                    .padding(20.dp), verticalArrangement = Arrangement.Top, horizontalAlignment = Alignment.Start) {
-                    Text(text = "Click to add image.", fontFamily = Constants.FONT_MEDIUM, fontSize = 24.sp, fontWeight = FontWeight.Bold)
-                    Row(modifier = Modifier
-                        .padding(top = 30.dp)
-                        .fillMaxWidth()
-                        .wrapContentHeight(), verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.spacedBy(40.dp)) {
-                        Column(
-                            modifier = Modifier.wrapContentSize().clickable {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 24.dp, vertical = 16.dp),
+                    verticalArrangement = Arrangement.SpaceBetween,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Top,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "Add an Image to Your Ping",
+                            fontSize = 22.sp,
+                            fontWeight = FontWeight.Bold,
+                            fontFamily = Constants.FONT_MEDIUM
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+
+                        // Image placeholder
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(180.dp)
+                                .clip(RoundedCornerShape(16.dp))
+                                .background(Color.DarkGray.copy(alpha = 0.3f))
+                                .border(2.dp, Color.Gray, RoundedCornerShape(16.dp)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                "Image Preview",
+                                fontSize = 14.sp,
+                                color = Color.LightGray,
+                                fontFamily = Constants.FONT_EXTRA_LIGHT
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(32.dp))
+
+                        // Camera and Gallery options
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            ImageOption(
+                                title = "Camera",
+                                icon = R.drawable.camera_colored
+                            ) {
                                 if (ContextCompat.checkSelfPermission(
                                         context,
                                         Manifest.permission.CAMERA
-                                    )
-                                    == PackageManager.PERMISSION_GRANTED
+                                    ) == PackageManager.PERMISSION_GRANTED
                                 ) {
                                     val uri = FileProvider.getUriForFile(
                                         context,
@@ -194,52 +239,66 @@ fun AddImageCreateEvent(onImageUriChange:(Uri?)->Unit, onNextClicked:()->Unit) {
                                 } else {
                                     cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
                                 }
-                                showChooser = false
-                            },
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.camera_colored),
-                                contentDescription = "",
-                                modifier = Modifier.size(50.dp)
-                            )
-                            Text(
-                                "Camera",
-                                fontSize = 12.sp,
-                                fontFamily = Constants.FONT_MEDIUM,
-                                fontWeight = FontWeight.SemiBold,
-                                modifier = Modifier
-                                    .wrapContentSize())
+                            }
 
-                        }
-                        Column(
-                            modifier = Modifier.wrapContentSize().clickable {
+                            ImageOption(
+                                title = "Gallery",
+                                icon = R.drawable.gallery_colored
+                            ) {
                                 galleryLauncher.launch("image/*")
-                                showChooser = false
-                            },
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.gallery_colored),
-                                contentDescription = "",
-                                modifier = Modifier.size(50.dp)
-                            )
-
-                            Text(
-                                "Gallery",
-                                fontSize = 12.sp,
-                                fontFamily = Constants.FONT_MEDIUM,
-                                fontWeight = FontWeight.SemiBold,
-                                modifier = Modifier
-                                    .wrapContentSize()
-                            )
+                            }
                         }
+                    }
 
+                    // Skip button aligned bottom right
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 24.dp),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        Button(
+                            onClick = onNextClicked,
+                            colors = ButtonDefaults.buttonColors(containerColor = floatingActionBtnColor),
+                            shape = RoundedCornerShape(8.dp)
+                        ) {
+                            Text("Skip", fontFamily = Constants.FONT_MEDIUM)
+                        }
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun ImageOption(title: String, icon: Int, onClick: () -> Unit) {
+    Card(
+        modifier = Modifier
+            .size(100.dp)
+            .clickable { onClick() },
+        elevation = CardDefaults.cardElevation(6.dp),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(8.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Image(
+                painter = painterResource(id = icon),
+                contentDescription = title,
+                modifier = Modifier.size(40.dp)
+            )
+            Spacer(modifier = Modifier.height(6.dp))
+            Text(
+                title,
+                fontSize = 12.sp,
+                fontFamily = Constants.FONT_MEDIUM,
+                fontWeight = FontWeight.SemiBold
+            )
         }
     }
 }

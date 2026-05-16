@@ -109,7 +109,17 @@ data class CommentRequest(
     val flashPostId: String,
     val parentCommentId: String? = null
 )
+@Serializable
+data class CommentPaginationResponse(
 
+    val success: Boolean,
+
+    val data: List<CommentResponse>,
+
+    val nextCursor: String?,
+
+    val hasMore: Boolean
+)
 
 @Serializable
 data class CommentResponse(
@@ -125,7 +135,11 @@ data class CommentResponse(
     val showReplyBox: Boolean = false,
     val replyText: String? = ""
 )
-
+@Serializable
+data class SingleCommentResponse(
+    val success: Boolean,
+    val data: CommentResponse
+)
 
 @Serializable
 data class PingsOnFlashPostRequest(

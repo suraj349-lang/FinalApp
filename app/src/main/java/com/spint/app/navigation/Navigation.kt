@@ -38,13 +38,13 @@ import com.spint.app.screens._4profile.GalleryPicker
 import com.spint.app.screens._1home.HomeScreenUI
 import com.spint.app.screens._1home._1FlashPosts.presentation.util.FlashPostCommentScreen
 import com.spint.app.screens._8notification.NotificationScreenUI
-import com.spint.app.screens._3createEventOrPing.createEvent.CreateEventMainScreen
+import com.spint.app.screens._3createEventOrFlashPost.createEvent.CreateEventMainScreen
 import com.spint.app.screens._5settings.SettingsScreenUI
 import com.spint.app.testing.TabView
-import com.spint.app.screens._3createEventOrPing.PastRaisedOffer
+import com.spint.app.screens._3createEventOrFlashPost.PastRaisedOffer
 import com.spint.app.screens._1home._1FlashPosts.presentation.view.detailsScreen.FlashPostDetailsScreen
 import com.spint.app.screens._1home._1FlashPosts.presentation.view.FlashPostsScreen
-import com.spint.app.screens._3createEventOrPing.createPing.CreatePingWrapper
+import com.spint.app.screens._3createEventOrFlashPost.createFlashPost.CreateFlashPostWrapper
 import com.spint.app.screens._4profile.ProfileScreenNew
 import com.spint.app.screens._4profile.dropProfileUserProfile.UserPublicProfile
 import com.spint.app.screens._4profile.dropProfileUserProfile.DropProfileUserProfile
@@ -233,7 +233,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
           //  CreateEvent(eventsViewModel, navController)
             //CreatePing(authViewModel, eventsViewModel, navController)
            // CreatePingMainScreen(navController,eventsViewModel)
-            CreatePingWrapper(navController,homeViewModel)
+            CreateFlashPostWrapper(navController,homeViewModel)
         }
         composable(SCREENS.CREATE_EVENT.route, arguments = listOf(navArgument("parentEventId"){
             type= NavType.StringType

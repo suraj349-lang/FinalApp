@@ -3,6 +3,7 @@ package com.spint.app.screens._1home._1FlashPosts.presentation.view
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -19,11 +20,15 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Text
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.Composable
@@ -44,10 +49,15 @@ import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.capitalize
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
@@ -64,13 +74,14 @@ import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
-fun FlashPostWithImageScreen(item:FlashPostResponse, onFlashPostClicked:()->Unit, onUserProfileClicked:()->Unit,onPingOfFlashPostClicked:(String, String)->Unit, onCommentButtonClicked: () -> Unit) {
+fun FlashPostWithImageScreen2(item:FlashPostResponse, onFlashPostClicked:()->Unit, onUserProfileClicked:()->Unit,onPingOfFlashPostClicked:(String, String)->Unit, onCommentButtonClicked: () -> Unit) {
     val context= LocalContext.current
     var showJoinComment  by remember { mutableStateOf(false) }
     var joinPingText by remember { mutableStateOf("") }
     Box(
         modifier = Modifier
-            .padding(top = 4.dp).padding( 4.dp)
+            .padding(top = 4.dp)
+            .padding(4.dp)
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
@@ -94,7 +105,8 @@ fun FlashPostWithImageScreen(item:FlashPostResponse, onFlashPostClicked:()->Unit
                         .padding(start = 10.dp)
                         .fillMaxWidth()
                         .wrapContentHeight(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                        Box(modifier = Modifier.clickable{onUserProfileClicked()}
+                        Box(modifier = Modifier
+                            .clickable { onUserProfileClicked() }
                             .size(40.dp)
                             .clip(CircleShape)
                             .shadow(
@@ -113,31 +125,103 @@ fun FlashPostWithImageScreen(item:FlashPostResponse, onFlashPostClicked:()->Unit
                                     0xFF689F38
                                 ).copy(alpha = 0.9f), lineHeight = 12.sp)
                             }
-                            Row(modifier = Modifier.wrapContentSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(0.dp)) {
-                                Text(text = item.location, fontWeight = FontWeight.Normal, fontSize = 9.sp, fontFamily = Constants.FONT_LIGHT, color = Color.Gray, lineHeight = 1.sp, modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            Row(
+                                modifier = Modifier
+                                    .wrapContentHeight()
+                                    .fillMaxWidth(0.8f),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(2.dp)
+                            ) {
+                                Text(
+                                    text = "0.4 km.",
+                                    fontWeight = FontWeight.Normal,
+                                    fontSize = 9.sp,
+                                    fontFamily = Constants.FONT_LIGHT,
+                                    color = Color.White.copy(alpha = 0.9f),
+                                    lineHeight = 1.sp,
+                                    modifier = Modifier.padding( vertical = 1.dp),
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                                Text(
+                                    text = "Indiranagar",
+                                    fontWeight = FontWeight.Normal,
+                                    fontSize = 9.sp,
+                                    fontFamily = Constants.FONT_LIGHT,
+                                    color = Color.White.copy(alpha = 0.9f),
+                                    lineHeight = 1.sp,
+                                    modifier = Modifier.padding( vertical = 1.dp),
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
                             }
                         }
 
 
                     }
 
-                    Box(modifier = Modifier
-                        .align(Alignment.CenterEnd)
-                        .padding(end = 8.dp)
-                        .wrapContentWidth()
-                        .wrapContentHeight()
-                        .background(color = Color(0x00000000))) {  //
-                        Row(modifier = Modifier.wrapContentSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(30.dp)) {
-                           // Text(item.category, color = Color(0xFFFAB815),fontFamily = Constants.USER_NAME_FONT, fontSize = 16.sp, fontWeight = FontWeight.Bold, modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp))
-                            Image(painter = painterResource(id = R.drawable.menu), contentDescription ="", modifier = Modifier
-                                .rotate(90f)
-                                .size(15.dp), colorFilter = ColorFilter.tint(
-                                Color.White) )
+                    var showMenu by remember {
+                        mutableStateOf(false)
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.CenterEnd)
+                            .padding(end = 8.dp)
+                            .wrapContentWidth()
+                            .wrapContentHeight()
+                    ) {
+
+                        Row(
+                            modifier = Modifier
+                                .wrapContentSize()
+                                .clickable {
+                                    showMenu = true
+                                },
+
+                            verticalAlignment = Alignment.CenterVertically,
+
+                            horizontalArrangement =
+                                Arrangement.spacedBy(30.dp)
+                        ) {
+
+                            Image(
+                                painter = painterResource(id = R.drawable.menu),
+
+                                contentDescription = "",
+
+                                modifier = Modifier
+                                    .rotate(90f)
+                                    .size(15.dp),
+
+                                colorFilter =
+                                    ColorFilter.tint(Color.White)
+                            )
+                        }
+
+                        DropdownMenu(
+                            expanded = showMenu,
+                            onDismissRequest = { showMenu = false },
+                            modifier = Modifier.background(Color.DarkGray)
+                        ) {
+                            DropdownMenuItem(
+                                text = { Text(text = "Report", color = Color.White) },
+                                onClick = { showMenu = false }
+                            )
+                            DropdownMenuItem(
+                                text = { Text(text = "Hide", color = Color.White) },
+                                onClick = { showMenu = false }
+                            )
+                            DropdownMenuItem(
+                                text = { Text(text = "Share", color = Color.White) },
+                                onClick = { showMenu = false }
+                            )
                         }
                     }
 
                 }
-                Box(modifier = Modifier.clickable{onFlashPostClicked()}
+                Box(modifier = Modifier
+                    .clickable { onFlashPostClicked() }
                     .background(
                         brush = Brush.verticalGradient(
                             colors = listOf(
@@ -154,9 +238,9 @@ fun FlashPostWithImageScreen(item:FlashPostResponse, onFlashPostClicked:()->Unit
                         modifier = Modifier
                             .padding(horizontal = 4.dp)
                             .fillMaxWidth()
-                            .height(500.dp)
+                            .height(400.dp)
                             .clip(RoundedCornerShape(2.dp)),
-                        contentScale = ContentScale.Crop
+                        contentScale = ContentScale.Fit
                     )
 
                 }
@@ -165,7 +249,7 @@ fun FlashPostWithImageScreen(item:FlashPostResponse, onFlashPostClicked:()->Unit
                     verticalAlignment=Alignment.Bottom,
                     modifier = Modifier
                         .padding(top = 10.dp)
-                       // .align(Alignment.BottomCenter)
+                        // .align(Alignment.BottomCenter)
                         .fillMaxWidth()
                         .background(color = Color.Transparent)
                 ) {
@@ -182,13 +266,19 @@ fun FlashPostWithImageScreen(item:FlashPostResponse, onFlashPostClicked:()->Unit
 
                 }
                 if(showJoinComment) {
-                    Box(modifier=Modifier.padding(top = 10.dp).fillMaxWidth(0.8f)) {
+                    Box(modifier=Modifier
+                        .padding(top = 10.dp)
+                        .fillMaxWidth(0.8f)) {
                         OutlinedTextField(
                             value =joinPingText,
                             onValueChange = {joinPingText=it},
                             textStyle = TextStyle(fontFamily = Constants.FONT_MEDIUM, lineHeight = 12.sp, fontSize = 8.sp, color = Color.Black),
-                            modifier = Modifier.padding(end = 20.dp).zIndex(2f)
-                                .fillMaxWidth().height(40.dp).clip(RoundedCornerShape(12.dp)),
+                            modifier = Modifier
+                                .padding(end = 20.dp)
+                                .zIndex(2f)
+                                .fillMaxWidth()
+                                .height(40.dp)
+                                .clip(RoundedCornerShape(12.dp)),
                             colors = OutlinedTextFieldDefaults.colors(
                                 unfocusedContainerColor = Color.White,
                                 focusedContainerColor = Color.White,
@@ -199,7 +289,14 @@ fun FlashPostWithImageScreen(item:FlashPostResponse, onFlashPostClicked:()->Unit
                                 Image(
                                     painter = painterResource(R.drawable.chat_new),
                                     contentDescription = "",
-                                    modifier = Modifier.clickable{ onPingOfFlashPostClicked(item._id,joinPingText);showJoinComment = false }.size(20.dp),
+                                    modifier = Modifier
+                                        .clickable {
+                                            onPingOfFlashPostClicked(
+                                                item._id,
+                                                joinPingText
+                                            ); showJoinComment = false
+                                        }
+                                        .size(20.dp),
                                     colorFilter = ColorFilter.tint(Color.Black)
                                 )
                             }
@@ -207,7 +304,8 @@ fun FlashPostWithImageScreen(item:FlashPostResponse, onFlashPostClicked:()->Unit
                     }
                 }
                 Box(modifier = Modifier
-                    .padding(horizontal = 4.dp, vertical = 8.dp)
+                    .padding(horizontal = 4.dp)
+                    .padding(top = 8.dp)
                     .fillMaxWidth()
                     .wrapContentHeight()
                     .clip(shape = RoundedCornerShape(6.dp))
@@ -215,33 +313,472 @@ fun FlashPostWithImageScreen(item:FlashPostResponse, onFlashPostClicked:()->Unit
                     Column(modifier = Modifier
                         .fillMaxWidth()
                         .wrapContentHeight()
-                        .padding(4.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-//                        Row(
-//                            modifier = Modifier //.padding(horizontal = 4.dp)
-//                                .fillMaxWidth()
-//                                .wrapContentHeight(),
-//                            verticalAlignment = Alignment.CenterVertically,
-//                            horizontalArrangement = Arrangement.spacedBy(10.dp)
-//                        ) {
-//                           // Image(painter = painterResource(id = R.drawable.ping), contentDescription ="",modifier=Modifier.size(24.dp) )
-//
-//
-//                        }
-                      ///  Text(text = item.location.capitalize(), fontWeight = FontWeight.Normal, fontSize = 11.sp, fontFamily = Constants.FONT_LIGHT, color = Color(0xFFC9D106))
-                        Text(text = item.title.toString().capitalize(), fontWeight = FontWeight.Normal, fontFamily = Constants.FONT_LIGHT,fontSize = 17.sp, color = Color(0xFFECE6E1).copy(alpha = 01f), modifier = Modifier
-                            .padding(top = 4.dp)
-                            .padding(start = 0.dp))
-                        item.description?.let {  Text(text = item.description.capitalize(), fontWeight = FontWeight.Normal, fontSize = 13.sp, fontFamily = Constants.FONT_LIGHT, color = Color.White.copy(alpha=0.8f), modifier = Modifier.padding(top=4.dp))}
+                        .padding(4.dp)) {
+                        // annotated string with title and username
+                        Text(
+                            text = buildAnnotatedString {
+
+                                withStyle(
+                                    style = SpanStyle(
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color.White,
+                                        fontSize = 14.sp
+                                    )
+                                ) {
+                                    append("${item.user?.userName} ")
+                                }
+                                withStyle(
+                                    style = SpanStyle(
+                                        fontWeight = FontWeight.Normal,
+                                        color = Color(0xFFECE6E1).copy(alpha = 1f)
+                                    )
+                                ) {
+                                    append(": ")
+                                }
+
+                                withStyle(
+                                    style = SpanStyle(
+                                        fontWeight = FontWeight.Normal,
+                                        color = Color(0xFFECE6E1).copy(alpha = 1f)
+                                    )
+                                ) {
+                                    append(item.title.toString().capitalize())
+                                }
+                            },
+
+                            fontFamily = Constants.FONT_LIGHT,
+                            fontSize = 16.sp,
+                            modifier = Modifier
+                                .padding(vertical = 4.dp)
+                                .padding(start = 0.dp)
+                        )
+                        if(item.description?.isNotEmpty() ==true) {
+                            Spacer(Modifier.height(10.dp))
+                            Text(
+                                text = item.description.capitalize(),
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 13.sp,
+                                fontFamily = Constants.FONT_LIGHT,
+                                color = Color.White.copy(alpha = 0.8f),
+                                modifier = Modifier.padding(top = 4.dp)
+                            )
+                        }
                     }
-
                 }
+            }
+    }
+}
 
+
+
+@OptIn(ExperimentalGlideComposeApi::class)
+@Composable
+fun FlashPostWithImageScreen(item:FlashPostResponse, onFlashPostClicked:()->Unit, onUserProfileClicked:()->Unit,onPingOfFlashPostClicked:(String, String)->Unit, onCommentButtonClicked: () -> Unit) {
+
+    Box(
+        modifier = Modifier
+            .padding(top = 4.dp)
+            .padding(4.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(color=Color.Black)
+            .fillMaxWidth()
+    ) {
+        Column(modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentHeight()) {
+            Row(modifier = Modifier
+                .fillMaxWidth()
+                .wrapContentHeight()) {
+
+                    Box(modifier = Modifier
+                        .clickable { onFlashPostClicked() }
+                        .background(
+                            brush = Brush.verticalGradient(
+                                colors = listOf(
+                                    Color.Black, Color.Black
+                                )
+                            )
+                        )
+                        .fillMaxWidth()
+                        .wrapContentHeight()
+                    ){
+                        AsyncImage(
+                            model = imagePrefix + item.image,
+                            contentDescription = "Ping Image",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp)
+                                .clip(RoundedCornerShape(2.dp)),
+                            contentScale = ContentScale.Crop
+                        )
+
+                    }
+//                Box(modifier = Modifier
+//                    .clickable { onFlashPostClicked() }
+//                    .background(
+//                        brush = Brush.verticalGradient(
+//                            colors = listOf(
+//                                Color.Black, Color.Black
+//                            )
+//                        )
+//                    )
+//                    .fillMaxWidth()
+//                    .wrapContentHeight()
+//                ){
+//                    AsyncImage(
+//                        model = imagePrefix + item.image,
+//                        contentDescription = "Ping Image",
+//                        modifier = Modifier
+//                            .fillMaxWidth()
+//                            .height(200.dp)
+//                            .clip(RoundedCornerShape(2.dp)),
+//                        contentScale = ContentScale.FillBounds
+//                    )
+//
+//                }
 
             }
+            Box(modifier = Modifier
+                .padding(top = 6.dp)
+                .clip(shape = RoundedCornerShape(topStart = 12.dp, topEnd = 12.dp))
+                .wrapContentSize()
+                .wrapContentHeight()
+                .background(Color.Black)){
+                Row(modifier = Modifier
+                    .padding(vertical = 4.dp)
+                    .padding(start = 10.dp)
+                    .fillMaxWidth()
+                    .wrapContentHeight(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Box(
+                        modifier = Modifier
+                            .clickable { onUserProfileClicked() }
+                            .size(40.dp)
+                            .clip(CircleShape)
+                            .shadow(
+                                elevation = 20.dp,
+                                spotColor = Color.White,
+                                ambientColor = Color.White
+                            )) {
+                        AsyncImage(
+                            model = if (item.user?.profileImage.isNullOrEmpty()) R.drawable.profile_colored else imagePrefix + item.user.profileImage,
+                            contentDescription = "",
+                            modifier = Modifier
+                                .fillMaxSize(),
+                            contentScale = ContentScale.Crop,
+                            filterQuality = FilterQuality.High
+                        )
+                    }
 
+                    Column(modifier = Modifier.wrapContentSize()) {
+                        Row(
+                            modifier = Modifier.wrapContentSize(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(2.dp)
+                        ) {
+                            item.user?.name?.let {
+                                Text(
+                                    text = it,
+                                    modifier = Modifier.clickable { onUserProfileClicked() },
+                                    fontWeight = FontWeight.SemiBold,
+                                    fontFamily = Constants.USER_NAME_FONT,
+                                    fontSize = 16.sp,
+                                    color = Color.White.copy(alpha = 0.9f),
+                                    lineHeight = 12.sp
+                                )
+                            }
+                            Box (modifier= Modifier
+                                .wrapContentSize()
+                                .clip(RoundedCornerShape(50))
+                                .background(Color(0xFFC7DBEF))
+                                .border(width = 0.5.dp, color = Color(0xFF1976D2), shape = RoundedCornerShape(50))
+                            ) {
+                                Row(modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                                    Image(
+                                        painter = painterResource(R.drawable.person_blue),
+                                        contentDescription = "",
+                                        modifier=Modifier
+                                            .size(10.dp),
+                                    )
+                                    Text(
+                                        text = "real id",
+                                        fontWeight = FontWeight.SemiBold,
+                                        fontFamily = Constants.FONT_LIGHT,
+                                        fontSize = 10.sp,
+                                        color = Color(0xFF051D34),
+                                        lineHeight = 12.sp
+                                    )
+                                }
 
+                            }
+                            Box (modifier= Modifier
+                                .wrapContentSize()
+                                .clip(RoundedCornerShape(50))
+                                .background(Color(0xFFF5DBDB))
+                                .border(width = 0.5.dp, color = Color(0xFFC98989), shape = RoundedCornerShape(50))
+                            ) {
+                                Row(
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                ) {
+                                    Image(
+                                        painter = painterResource(R.drawable.heart),
+                                        contentDescription = "",
+                                        modifier = Modifier
+                                            .size(10.dp),
+                                    )
+                                    Text(
+                                        text = item.category.lowercase(),
+                                        fontWeight = FontWeight.SemiBold,
+                                        fontFamily = Constants.FONT_LIGHT,
+                                        fontSize = 10.sp,
+                                        color = Color(0xFF310808),
+                                        lineHeight = 12.sp
+                                    )
+                                }
+                            }
+                        }
+                        Row(
+                            modifier = Modifier
+                                .wrapContentHeight()
+                                .fillMaxWidth(0.8f),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(2.dp)
+                        ) {
+                            Text(
+                                text = "0.4 km.",
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 12.sp,
+                                fontFamily = Constants.FONT_LIGHT,
+                                color = Color.White.copy(alpha = 0.9f),
+                                lineHeight = 1.sp,
+                                modifier = Modifier.padding( vertical = 1.dp),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                            Text(
+                                text = item.location,
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 12.sp,
+                                fontFamily = Constants.FONT_LIGHT,
+                                color = Color.White.copy(alpha = 0.9f),
+                                lineHeight = 1.sp,
+                                modifier = Modifier.padding( vertical = 1.dp),
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                    }
+                }
+
+            }
+            Box(
+                modifier = Modifier
+                    .padding(horizontal = 10.dp)
+                    .padding(top = 8.dp)
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .clip(shape = RoundedCornerShape(6.dp))
+            ) {
+                Text(
+                    text = item.title?.capitalize() ?: "",
+                    fontFamily = Constants.FONT_LIGHT,
+                    fontSize = 16.sp,
+                    color=Color.White.copy(alpha = 0.9f),
+                    modifier = Modifier
+                        .padding(vertical = 4.dp)
+                        .padding(start = 0.dp)
+                )
+            }
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier
+                    .padding(vertical = 10.dp, horizontal = 10.dp)
+                    .fillMaxWidth()
+                    .background(color = Color.Transparent)
+            ) {
+                Image(
+                    painter = painterResource(R.drawable.clock_outlined),
+                    contentDescription = "",
+                    modifier=Modifier
+                        .size(14.dp),
+                    colorFilter = ColorFilter.tint(Color.LightGray)
+                )
+                Text(
+                    text = "Expires in",
+                    modifier = Modifier,
+                    fontWeight = FontWeight.Normal,
+                    fontFamily = Constants.FONT_LIGHT,
+                    fontSize = 12.sp,
+                    color = Color.LightGray,
+                    lineHeight = 12.sp
+                )
+                Text(
+                    text = "5h 12m",
+                    modifier = Modifier,
+                    fontWeight = FontWeight.SemiBold,
+                    fontFamily = Constants.FONT_LIGHT,
+                    fontSize = 12.sp,
+                    color = Color.White.copy(alpha = 0.9f),
+                    lineHeight = 12.sp
+                )
+                ExpiryTimerLine(67,100)
+
+            }
+            HorizontalDivider(modifier= Modifier.padding(top=20.dp).padding(horizontal = 10.dp).fillMaxWidth(), thickness = 0.5.dp,color=Color.DarkGray)
+
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment=Alignment.Bottom,
+                modifier = Modifier
+                    .padding(vertical = 12.dp, horizontal = 10.dp)
+                    .fillMaxWidth()
+                    .background(color = Color.Transparent)
+            ) {
+                Row(modifier=Modifier.fillMaxWidth(0.8f),horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                    Box(
+                        modifier = Modifier
+                            .wrapContentSize()
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(Color.Transparent)
+                            .border(
+                                width = 0.5.dp,
+                                color = Color.DarkGray,
+                                shape = RoundedCornerShape(6.dp)
+                            )
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Image(
+                                painter = painterResource(R.drawable.send_24),
+                                contentDescription = "",
+                                modifier = Modifier
+                                    .rotate((-35f))
+                                    .size(16.dp),
+                                colorFilter = ColorFilter.tint(Color.LightGray)
+                            )
+                            Text(
+                                text = "Respond",
+                                modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
+                                fontWeight = FontWeight.SemiBold,
+                                fontFamily = Constants.FONT_LIGHT,
+                                fontSize = 16.sp,
+                                color = Color.White.copy(alpha = 0.9f),
+                                lineHeight = 12.sp
+                            )
+                        }
+                    }
+                    Box(
+                        modifier = Modifier
+                            .wrapContentSize()
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(Color.Transparent)
+                            .border(
+                                width = 0.5.dp,
+                                color = Color.DarkGray,
+                                shape = RoundedCornerShape(6.dp)
+                            )
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Image(
+                                painter = painterResource(R.drawable.comment_outlined),
+                                contentDescription = "",
+                                modifier = Modifier
+                                    .rotate((-45f))
+                                    .size(18.dp),
+                                colorFilter = ColorFilter.tint(Color.LightGray)
+                            )
+                            Text(
+                                text = "5",
+                                modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
+                                fontWeight = FontWeight.SemiBold,
+                                fontFamily = Constants.FONT_LIGHT,
+                                fontSize = 16.sp,
+                                color = Color.White.copy(alpha = 0.9f),
+                                lineHeight = 12.sp
+                            )
+                        }
+                    }
+                    Box(
+                        modifier = Modifier
+                            .wrapContentSize()
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(Color.Transparent)
+                            .border(
+                                width = 0.5.dp,
+                                color = Color.DarkGray,
+                                shape = RoundedCornerShape(6.dp)
+                            )
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Image(
+                                painter = painterResource(R.drawable.share),
+                                contentDescription = "",
+                                modifier = Modifier
+                                    .padding(horizontal = 4.dp, vertical = 3.dp)
+                                    .size(18.dp),
+                                colorFilter = ColorFilter.tint(Color.LightGray)
+                            )
+
+                        }
+                    }
+                }
+                Row(modifier=Modifier
+                    .padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Image(
+                        painter = painterResource(R.drawable.view),
+                        contentDescription = "",
+                        modifier=Modifier
+                            .size(14.dp),
+                        colorFilter = ColorFilter.tint(Color.LightGray)
+                    )
+                    Text(
+                        text = "5",
+                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
+                        fontWeight = FontWeight.Normal,
+                        fontFamily = Constants.FONT_LIGHT,
+                        fontSize = 14.sp,
+                        color = Color.White.copy(alpha = 0.9f),
+                        lineHeight = 12.sp
+                    )
+                }
+            }
+        }
     }
+}
+
+@Composable
+fun ExpiryTimerLine(
+    remainingSeconds: Int,
+    totalSeconds: Int
+) {
+    val progress = remainingSeconds.toFloat() / totalSeconds.toFloat()
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(4.dp)
+            .background(Color.LightGray)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxHeight()
+                .fillMaxWidth(progress)
+                .background(Color(0xFF8D0707))
+        )
     }
+}
 
 
 @Composable
@@ -333,7 +870,7 @@ fun RoundUI(time: String, isLessThanHour: Boolean,isExpired: Boolean) {
 @Composable
 fun ShareRoundUI(shareCount:Int,onShareClicked:()->Unit) {
     Card(
-        onClick = {},
+        onClick = {onShareClicked()},
         modifier=Modifier.size(40.dp),
         shape = CircleShape, colors = CardDefaults.cardColors(containerColor =  Constants.HOME_TOP_BAR_COLOR)
     ) {
@@ -345,31 +882,29 @@ fun ShareRoundUI(shareCount:Int,onShareClicked:()->Unit) {
         }}
 
 }
-//@Composable
-//fun JoinRoundUI() {
-//    Card(
-//        onClick = {},
-//        modifier=Modifier.height(40.dp).width(80.dp),
-//        shape = RoundedCornerShape(12.dp), colors = CardDefaults.cardColors(containerColor =  Constants.HOME_TOP_BAR_COLOR)
-//    ) {
-//        Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-//            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
-//                Image(painter = painterResource(id = R.drawable.join_blue), contentDescription ="", modifier = Modifier.size(14.dp) )
-//                Spacer(modifier = Modifier.width(8.dp))
-//                Text("JOIN", color = Color.White, fontFamily = Constants.FONT_LIGHT, fontWeight = FontWeight.Bold, fontSize = 14.sp)
-//            }
-//            Text("122k", color = Color.White, fontFamily = Constants.FONT_EXTRA_LIGHT, fontSize = 9.sp)
-//        }}
-//
-//}
+
 @Composable
 fun AddPingOnFlashPost(joinedCount: Int,pingCount:Int,onClick:()-> Unit={}) {
-    Box(modifier= Modifier.height(40.dp).width(80.dp)) {
-        Box(modifier=Modifier.zIndex(2f).size(14.dp).clip(shape = CircleShape).background(color = Color.Red).align(Alignment.TopEnd)){
-            Text(pingCount.toString(), fontSize = 10.sp, modifier = Modifier.padding(bottom = 2.dp).fillMaxSize(), color = Color.White, textAlign = TextAlign.Center)
+    Box(modifier= Modifier
+        .height(40.dp)
+        .width(80.dp)) {
+        Box(modifier=Modifier
+            .zIndex(2f)
+            .size(14.dp)
+            .clip(shape = CircleShape)
+            .background(color = Color.Red)
+            .align(Alignment.TopEnd)){
+            Text(pingCount.toString(), fontSize = 10.sp, modifier = Modifier
+                .padding(bottom = 2.dp)
+                .fillMaxSize(), color = Color.White, textAlign = TextAlign.Center)
         }
     Box (
-        modifier= Modifier.height(40.dp).width(80.dp).clickable{onClick()}.clip(shape = RoundedCornerShape(12.dp)).background(color = Constants.HOME_TOP_BAR_COLOR)
+        modifier= Modifier
+            .height(40.dp)
+            .width(80.dp)
+            .clickable { onClick() }
+            .clip(shape = RoundedCornerShape(12.dp))
+            .background(color = Constants.HOME_TOP_BAR_COLOR)
     ) {
 
         Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {

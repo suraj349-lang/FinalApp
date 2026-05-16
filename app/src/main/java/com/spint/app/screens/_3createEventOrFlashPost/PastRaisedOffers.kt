@@ -1,4 +1,4 @@
-package com.spint.app.screens._3createEventOrPing
+package com.spint.app.screens._3createEventOrFlashPost
 
 import BottomBar
 import androidx.compose.foundation.background

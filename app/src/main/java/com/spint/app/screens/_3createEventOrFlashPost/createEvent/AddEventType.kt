@@ -1,4 +1,4 @@
-package com.spint.app.screens._3createEventOrPing.createPing
+package com.spint.app.screens._3createEventOrFlashPost.createEvent
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -35,7 +35,7 @@ import com.spint.app.utils.constants.Constants
 
 
 @Composable
-fun AddPingTypeCreatePing(
+fun AddEventTypeCreateEvent(
     event: String,
     onEventChange: (String) -> Unit,
     onNextClicked: () -> Unit

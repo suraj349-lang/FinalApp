@@ -35,11 +35,13 @@ import com.spint.app.utils.UserObject
 import com.spint.app.utils.RequestState
 import com.google.android.libraries.places.api.Places
 import com.spint.app.datastore.StoreLoginState
+import com.spint.app.model.flashPost.CommentPaginationResponse
 import com.spint.app.model.flashPost.CommentRequest
 import com.spint.app.model.flashPost.CommentResponse
 import com.spint.app.model.flashPost.FlashPostDetailsResponse
 import com.spint.app.model.flashPost.PingsOnFlashPostRequest
 import com.spint.app.model.flashPost.PingsOnFlashPostResponse
+import com.spint.app.model.flashPost.SingleCommentResponse
 import com.spint.app.model.places.Place
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -607,62 +609,145 @@ class HomeViewModel @Inject constructor(
     }
 
     //====================================================================================================================================//
-    val _flashPostComments =
-        MutableStateFlow<RequestState<List<CommentResponse>>>(RequestState.Idle)
+//    private val _flashPostComments = MutableStateFlow<RequestState<List<CommentResponse>>>(RequestState.Idle)
+//    val flashPostComments: StateFlow<RequestState<List<CommentResponse>>> = _flashPostComments
+
+    var nextCursor: String? = null
+        private set
+
+    var hasMore by mutableStateOf(true)
+        private set
+
+    var isLoading by mutableStateOf(false)
+        private set
+
+    private val _flashPostComments =
+        MutableStateFlow<RequestState<List<CommentResponse>>>(
+            RequestState.Idle
+        )
+
     val flashPostComments: StateFlow<RequestState<List<CommentResponse>>> = _flashPostComments
 
-    fun getFlashPostComments(pingId: String) = viewModelScope.launch {
-        eventsRepository.getFlashPostComments(pingId)
-            .onStart {
-                _flashPostComments.value = RequestState.Loading
-            }
+    private var currentCommentPostId: String? = null
+    fun getFlashPostComments(
+        pingId: String
+    ) = viewModelScope.launch {
+
+        // NEW POST OPENED
+        if (currentCommentPostId != pingId) {
+
+            currentCommentPostId = pingId
+
+            nextCursor = null
+            hasMore = true
+
+            _flashPostComments.value =
+                RequestState.Loading
+        }
+
+        if (isLoading || !hasMore) return@launch
+
+        isLoading = true
+
+        eventsRepository
+            .getFlashPostComments(
+                pingId,
+                nextCursor
+            )
+
             .catch { ex ->
-                _flashPostComments.value = RequestState.Error(ex)
+
+                isLoading = false
+
+                _flashPostComments.value =
+                    RequestState.Error(ex)
             }
+
             .collect { value ->
-                _flashPostComments.value = RequestState.Success(value.data)
+
+                nextCursor = value.nextCursor
+                hasMore = value.hasMore
+
+                val current =
+                    (_flashPostComments.value
+                            as? RequestState.Success)
+                        ?.data
+                        ?: emptyList()
+
+                val updated =
+                    (current + value.data)
+                        .distinctBy { it.id }
+
+                _flashPostComments.value =
+                    RequestState.Success(updated)
+
+                isLoading = false
             }
     }
-
+    
     //====================================================================================================================================//
-    val _addFlashPostComment = MutableStateFlow<RequestState<CommentResponse>>(RequestState.Idle)
-    val addFlashPostComment: StateFlow<RequestState<CommentResponse>> = _addFlashPostComment
+    private val _addFlashPostComment =
+        MutableStateFlow<RequestState<CommentResponse>>(
+            RequestState.Idle
+        )
 
-    fun addFlashPostComments(commentRequest: CommentRequest) = viewModelScope.launch {
-        eventsRepository.addFlashPostComments(commentRequest)
+    val addFlashPostComment:
+            StateFlow<RequestState<CommentResponse>> =
+        _addFlashPostComment
+
+    fun addFlashPostComments(
+        commentRequest: CommentRequest
+    ) = viewModelScope.launch {
+
+        eventsRepository
+            .addFlashPostComments(commentRequest)
+
             .onStart {
-                _addFlashPostComment.value = RequestState.Loading
+                _addFlashPostComment.value =
+                    RequestState.Loading
             }
+
             .catch { ex ->
-                _addFlashPostComment.value = RequestState.Error(ex)
+                _addFlashPostComment.value =
+                    RequestState.Error(ex)
             }
-//            .collect { value ->
-//                _addFlashPostComment.value = RequestState.Success(value.data)
-//                val currentState = _flashPostComments.value
-//
-//                if (currentState is RequestState.Success) {
-//                    val updatedList = listOf(value.data) + currentState.data
-//                    _flashPostComments.value = RequestState.Success(updatedList)
-//                }
-//            }
-            .collect { value ->
 
-                val newComment = value.data
-                val current = _flashPostComments.value
+            .collect { response ->
 
+                val newComment =
+                    response.data.data
+
+                // Update add comment state
+                _addFlashPostComment.value =
+                    RequestState.Success(newComment)
+
+                // Current comments state
+                val current =
+                    _flashPostComments.value
+
+                // Update UI comments instantly
                 if (current is RequestState.Success) {
 
-                    val updatedList = if (newComment.parentCommentId == null) {
-                        listOf(newComment) + current.data
-                    } else {
-                        insertReplyIntoTree(
-                            current.data,
-                            newComment.parentCommentId,
-                            newComment,
-                            closeReplyBox = true // 🔥 NEW
-                        )
-                    }
+                    val updatedList =
 
+                        // TOP LEVEL COMMENT
+                        if (newComment.parentCommentId == null) {
+
+                            listOf(newComment) + current.data
+
+                        }
+
+                        // REPLY
+                        else {
+
+                            insertReplyIntoTree(
+                                comments = current.data,
+                                parentId =
+                                    newComment.parentCommentId,
+                                newReply = newComment,
+                                closeReplyBox = true
+                            )
+                        }
 
                     _flashPostComments.value = RequestState.Success(updatedList)
                 }
@@ -674,23 +759,49 @@ class HomeViewModel @Inject constructor(
         newReply: CommentResponse,
         closeReplyBox: Boolean = false
     ): List<CommentResponse> {
+
         return comments.map { comment ->
+
+            // FOUND PARENT
             if (comment.id == parentId) {
+
                 comment.copy(
-                    replies = listOf(newReply) + (comment.replies ?: emptyList()),
-                    repliesCount = comment.repliesCount + 1,
+
+                    replies =
+                        listOf(newReply) + comment.replies,
+
+                    repliesCount =
+                        comment.repliesCount + 1,
+
                     isExpanded = true,
-                    showReplyBox = if (closeReplyBox) false else comment.showReplyBox, // 🔥 CLOSE
-                    replyText = if (closeReplyBox) "" else comment.replyText // 🔥 CLEAR
+
+                    showReplyBox =
+                        if (closeReplyBox)
+                            false
+                        else
+                            comment.showReplyBox,
+
+                    replyText =
+                        if (closeReplyBox)
+                            ""
+                        else
+                            comment.replyText
                 )
-            } else {
+
+            }
+
+            // SEARCH INSIDE CHILDREN
+            else {
+
                 comment.copy(
-                    replies = insertReplyIntoTree(
-                        comment.replies ?: emptyList(),
-                        parentId,
-                        newReply,
-                        closeReplyBox
-                    )
+
+                    replies =
+                        insertReplyIntoTree(
+                            comments = comment.replies,
+                            parentId = parentId,
+                            newReply = newReply,
+                            closeReplyBox = closeReplyBox
+                        )
                 )
             }
         }

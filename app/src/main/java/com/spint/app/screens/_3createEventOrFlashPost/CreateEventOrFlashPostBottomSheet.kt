@@ -1,4 +1,4 @@
-package com.spint.app.screens._3createEventOrPing
+package com.spint.app.screens._3createEventOrFlashPost
 
 
 import androidx.compose.foundation.Image
@@ -36,11 +36,26 @@ import com.spint.app.utils.constants.Constants
 @Composable
 fun CreateEventOrPingBottomSheet(showSheet: Boolean, onDismiss: () -> Unit, navHostController: NavHostController) {
     if (showSheet){
-        ModalBottomSheet(onDismissRequest = { onDismiss()}) {
+        ModalBottomSheet(onDismissRequest = { onDismiss()}, modifier = Modifier.padding(horizontal = 10.dp), containerColor = Color.White) {
             Column(modifier = Modifier.padding(start = 16.dp,end=16.dp, bottom = 60.dp)) {
-                Text("Click to add event / ping.", fontSize = 20.sp, fontWeight = FontWeight.Bold, fontFamily = Constants.FONT_MEDIUM)
+                Text("Click to add Flash Post / Event:", fontSize = 20.sp, fontWeight = FontWeight.Normal, fontFamily = Constants.FONT_MEDIUM,color=Color.Black)
                 Spacer(Modifier.height(12.dp))
                 Row() {
+                    Button(
+                        onClick = {
+                            navHostController.navigate(SCREENS.CREATE_PING.route)
+                            onDismiss()
+                        },
+                        modifier = Modifier.wrapContentWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray)
+                    ) {
+                        Row(modifier = Modifier.wrapContentSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            Image(painter = painterResource(id = R.drawable.ping), contentDescription = "", modifier = Modifier.size(20.dp))
+                            Text("Flash Post", fontFamily = Constants.DONGLE_BOLD, color = Color.White, fontSize = 20.sp)
+                        }
+                    }
+                    Spacer(Modifier.width(40.dp))
                     Button(
                         onClick = {
                             navHostController.navigate(SCREENS.CREATE_EVENT.route)
@@ -53,22 +68,6 @@ fun CreateEventOrPingBottomSheet(showSheet: Boolean, onDismiss: () -> Unit, navH
                         Row(modifier = Modifier.wrapContentSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                             Image(painter = painterResource(id = R.drawable.event), contentDescription = "", modifier = Modifier.size(20.dp))
                             Text("Event", fontFamily = Constants.DONGLE_BOLD, color = Color.White, fontSize = 20.sp)
-                        }
-                    }
-                    Spacer(Modifier.width(40.dp))
-
-                    Button(
-                        onClick = {
-                            navHostController.navigate(SCREENS.CREATE_PING.route)
-                            onDismiss()
-                        },
-                        modifier = Modifier.wrapContentWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.DarkGray)
-                    ) {
-                        Row(modifier = Modifier.wrapContentSize(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            Image(painter = painterResource(id = R.drawable.ping), contentDescription = "", modifier = Modifier.size(20.dp))
-                            Text("Ping", fontFamily = Constants.DONGLE_BOLD, color = Color.White, fontSize = 20.sp)
                         }
                     }
                 }

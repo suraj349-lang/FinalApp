@@ -54,7 +54,7 @@ import com.spint.app.screens._1home._1FlashPosts.others.Category
 import com.spint.app.screens._1home._1FlashPosts.presentation.util.PingsTopBar
 import com.spint.app.screens._1home._1FlashPosts.presentation.util.SearchBar
 import com.spint.app.screens._1home._1FlashPosts.others.categories
-import com.spint.app.screens._3createEventOrPing.CreateEventOrPingBottomSheet
+import com.spint.app.screens._3createEventOrFlashPost.CreateEventOrPingBottomSheet
 import com.spint.app.screens.common.NoPingsFoundScreen
 import com.spint.app.ui.theme.floatingActionBtnColor
 import com.spint.app.utils.UserLocationObject

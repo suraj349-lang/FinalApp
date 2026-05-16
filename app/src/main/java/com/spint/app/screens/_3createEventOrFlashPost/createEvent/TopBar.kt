@@ -1,4 +1,4 @@
-package com.spint.app.screens._3createEventOrPing.createEvent
+package com.spint.app.screens._3createEventOrFlashPost.createEvent
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable

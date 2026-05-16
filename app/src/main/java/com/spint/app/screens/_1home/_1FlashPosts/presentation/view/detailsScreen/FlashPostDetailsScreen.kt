@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
@@ -126,7 +127,7 @@ fun FlashPostDetailsScreen(
     )
 }
 
-
+/*
 
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
@@ -152,7 +153,8 @@ fun FlashPostDetailsScreenUI(flashPostResponse: FlashPostResponse?,homeViewModel
                     .padding(bottom = 16.dp)
                     .fillMaxSize()
                     .navigationBarsPadding()
-                    .verticalScroll(rememberScrollState()),
+                  //  .verticalScroll(rememberScrollState())
+                ,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 if(flashPostResponse.image.isNotEmpty()) {
@@ -272,7 +274,297 @@ fun FlashPostDetailsScreenUI(flashPostResponse: FlashPostResponse?,homeViewModel
         }
     }
 }
+*/
+@OptIn(ExperimentalGlideComposeApi::class)
+@Composable
+fun FlashPostDetailsScreenUI(
+    flashPostResponse: FlashPostResponse?,
+    homeViewModel: HomeViewModel
+) {
 
+    val context = LocalContext.current
+
+    var showFullImage by remember {
+        mutableStateOf(false)
+    }
+
+    val systemUiController =
+        rememberSystemUiController()
+
+    SideEffect {
+
+        systemUiController.setNavigationBarColor(
+            color = Color.DarkGray,
+            darkIcons = false
+        )
+    }
+
+    if (flashPostResponse == null) return
+
+    Box(
+        modifier = Modifier
+            .background(Color.DarkGray)
+            .fillMaxSize()
+            .statusBarsPadding()
+    ) {
+
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .navigationBarsPadding(),
+
+            horizontalAlignment =
+                Alignment.CenterHorizontally
+        ) {
+
+            // IMAGE
+            item {
+
+                if (flashPostResponse.image.isNotEmpty()) {
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(400.dp)
+                    ) {
+
+                        GlideImage(
+                            model =
+                                imagePrefix +
+                                        flashPostResponse.image,
+
+                            contentDescription = "",
+
+                            contentScale =
+                                ContentScale.Crop,
+
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .clickable {
+                                    showFullImage = true
+                                }
+                        )
+                    }
+
+                } else if (
+                    flashPostResponse.user?.profileImage != null
+                ) {
+
+                    Box(
+                        modifier = Modifier
+                            .size(300.dp)
+                            .clip(CircleShape)
+                    ) {
+
+                        GlideImage(
+                            model =
+                                imagePrefix +
+                                        flashPostResponse.user.profileImage,
+
+                            contentDescription = "",
+
+                            modifier =
+                                Modifier.fillMaxSize(),
+
+                            contentScale =
+                                ContentScale.Crop
+                        )
+                    }
+
+                } else {
+
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                    ) {
+
+                        Image(
+                            painter =
+                                painterResource(R.drawable.alien),
+
+                            contentDescription = "",
+
+                            contentScale =
+                                ContentScale.Crop,
+
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                        )
+                    }
+                }
+            }
+
+            // STATS
+            item {
+
+                Row(
+                    horizontalArrangement =
+                        Arrangement.SpaceEvenly,
+
+                    verticalAlignment =
+                        Alignment.Bottom,
+
+                    modifier = Modifier
+                        .padding(top = 10.dp)
+                        .fillMaxWidth()
+                ) {
+
+                    ViewRoundUI(
+                        flashPostResponse.viewsCount
+                    )
+
+                    CommentRoundUI(
+                        flashPostResponse.commentsCount,
+                        {}
+                    )
+
+                    CountdownTimer(
+                        flashPostResponse.expirationTime
+                    )
+
+                    AddPingOnFlashPost(
+                        flashPostResponse.peopleJoined,
+                        flashPostResponse.pingCount
+                    ) {}
+
+                    ShareRoundUI(
+                        flashPostResponse.totalShared
+                    ) {
+
+                        val deeplink =
+                            "http://${Constants.APP_NAME}.com/ping/${flashPostResponse._id}"
+
+                        sharePingDeepLink(
+                            context,
+                            deeplink
+                        )
+                    }
+                }
+            }
+
+            // LOCATION
+            item {
+
+                Row(
+                    modifier = Modifier
+                        .padding(top = 8.dp)
+                        .fillMaxWidth(),
+
+                    horizontalArrangement =
+                        Arrangement.Center,
+
+                    verticalAlignment =
+                        Alignment.CenterVertically
+                ) {
+
+                    Image(
+                        painter =
+                            painterResource(R.drawable.location_new),
+
+                        contentDescription = "",
+
+                        modifier = Modifier
+                            .padding(end = 6.dp)
+                            .size(8.dp)
+                    )
+
+                    Text(
+                        text = flashPostResponse.location,
+
+                        maxLines = 1,
+
+                        overflow = TextOverflow.Ellipsis,
+
+                        color = Color.White.copy(alpha = 0.95f),
+
+                        fontFamily =
+                            Constants.FONT_LIGHT,
+
+                        fontSize = 8.sp,
+
+                        lineHeight = 12.sp
+                    )
+                }
+            }
+
+            // TITLE + DESCRIPTION
+            item {
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color.DarkGray)
+                ) {
+
+                    Text(
+                        text =
+                            flashPostResponse.title ?: "",
+
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                start = 6.dp,
+                                top = 4.dp
+                            ),
+
+                        color = Color(0xFFE7E7E7),
+
+                        fontFamily =
+                            Constants.FONT_MEDIUM,
+
+                        fontSize = 18.sp,
+
+                        fontWeight =
+                            FontWeight.SemiBold
+                    )
+
+                    Text(
+                        text =
+                            flashPostResponse.description ?: "",
+
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                start = 6.dp,
+                                top = 4.dp,
+                                bottom = 4.dp
+                            ),
+
+                        color = Color(0xFFCAD8E8),
+
+                        fontFamily =
+                            Constants.FONT_LIGHT,
+
+                        fontSize = 14.sp,
+
+                        fontWeight =
+                            FontWeight.SemiBold
+                    )
+                }
+            }
+
+            // TABS
+            item {
+
+                FlashPostDetailsTabsScreen(
+                    flashPostResponse._id,
+                    homeViewModel
+                )
+            }
+        }
+
+        if (showFullImage) {
+
+            FullScreenImageViewDialogBox(
+                image = flashPostResponse.image,
+                onCloseClicked = {
+                    showFullImage = false
+                }
+            )
+        }
+    }
+}
 @Composable
 fun FlashPostDetailsTabsScreen(postId:String,homeViewModel: HomeViewModel) {
 
@@ -324,7 +616,7 @@ fun FlashPostDetailsTabsScreen(postId:String,homeViewModel: HomeViewModel) {
             state = pagerState,
             modifier = Modifier
                 .padding(top = 8.dp)
-                .fillMaxSize()
+                .height(700.dp)
         ) { page ->
 
             when (page) {

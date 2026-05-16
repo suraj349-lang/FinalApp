@@ -79,7 +79,7 @@ import org.webrtc.EglBase
 import org.webrtc.RendererCommon
 import org.webrtc.SurfaceViewRenderer
 
-
+/*
 @Composable
 fun DuelScreen(navController: NavHostController) {
     val context = LocalContext.current
@@ -376,7 +376,7 @@ fun DuelScreen(navController: NavHostController) {
         }
     }
 }
-
+*/
 @Composable
 fun DuelFirstScreenLocal(localView: SurfaceViewRenderer) {
     val user= UserObject.user.collectAsState()

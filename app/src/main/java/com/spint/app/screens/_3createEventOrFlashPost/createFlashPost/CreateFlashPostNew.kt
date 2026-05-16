@@ -1,4 +1,4 @@
-package com.spint.app.screens._3createEventOrPing.createPing
+package com.spint.app.screens._3createEventOrFlashPost.createFlashPost
 
 import android.net.Uri
 import android.os.Build
@@ -87,7 +87,7 @@ import java.time.ZoneId
 
 
 @Composable
-fun CreatePingWrapper(navController: NavHostController, homeViewModel: HomeViewModel) {
+fun CreateFlashPostWrapper(navController: NavHostController, homeViewModel: HomeViewModel) {
 
     var title by remember {
         mutableStateOf("")
@@ -104,9 +104,9 @@ fun CreatePingWrapper(navController: NavHostController, homeViewModel: HomeViewM
     val expiration by remember {
         mutableStateOf(12)
     }
-    var selectedCategory by remember { mutableStateOf<String>("") }
+    var selectedCategory by remember { mutableStateOf("") }
     val isActive by remember {
-        derivedStateOf {  title.isNotEmpty()}
+        derivedStateOf {  title.isNotEmpty() && selectedCategory.isNotEmpty()}
     }
     val userLocation by UserLocationObject.userLocation.collectAsState()
     val user by UserObject.user.collectAsState()
@@ -124,11 +124,11 @@ fun CreatePingWrapper(navController: NavHostController, homeViewModel: HomeViewM
 
 
     val context = LocalContext.current
-    val createPing by homeViewModel.createFlashPostResponse.collectAsState()
-    when(createPing){
+    val createFlashPost by homeViewModel.createFlashPostResponse.collectAsState()
+    when(createFlashPost){
         is RequestState.Idle ->{}
         is RequestState.Error ->{
-            Toast.makeText(LocalContext.current,"Error creating ping", Toast.LENGTH_SHORT).show()
+            Toast.makeText(LocalContext.current,"Error creating FlashPost", Toast.LENGTH_SHORT).show()
             navController.navigate(SCREENS.HOME.route){
                 popUpTo(0)
             }
@@ -136,7 +136,7 @@ fun CreatePingWrapper(navController: NavHostController, homeViewModel: HomeViewM
         }
         is RequestState.Success->{
 
-            Toast.makeText(LocalContext.current,"Ping created successfully", Toast.LENGTH_SHORT).show()
+            Toast.makeText(LocalContext.current,"FlashPost created successfully", Toast.LENGTH_SHORT).show()
             navController.navigate(SCREENS.HOME.route){
                 popUpTo(0)
             }
@@ -149,7 +149,7 @@ fun CreatePingWrapper(navController: NavHostController, homeViewModel: HomeViewM
 
     Scaffold(
         topBar = {
-            CreatePingTopNew(isActive) {
+            CreateFlashPostTopNew(isActive) {
                 if (title.isNotEmpty()) {val uri = imageUri
                     val imageFile: File? = if (uri != null && uri.toString().isNotBlank()) {
                         uriToFile(uri, context)
@@ -158,7 +158,7 @@ fun CreatePingWrapper(navController: NavHostController, homeViewModel: HomeViewM
                     }
 
                     if (imageFile != null) {
-                        // Upload image first, then create ping with the image key
+                        // Upload image first, then create FlashPost with the image key
                         homeViewModel.uploadImageAndThenCreateEvent(user.user, imageFile) { imageKey ->
                             homeViewModel.createFlashPost(
                                 FlashPostRequestDto(
@@ -175,7 +175,7 @@ fun CreatePingWrapper(navController: NavHostController, homeViewModel: HomeViewM
                             )
                         }
                     } else {
-                        // No image -> create ping directly
+                        // No image -> create FlashPost directly
                         homeViewModel.createFlashPost(
                             FlashPostRequestDto(
                                 user = user.user,
@@ -204,7 +204,7 @@ fun CreatePingWrapper(navController: NavHostController, homeViewModel: HomeViewM
                     .padding(it),
                 color = Color.White
             ) {
-                CreatePing(
+                CreateFlashPost(
                     title=title,
                     onTitleChange = { newTitle -> title = newTitle },
                     description=description,
@@ -228,7 +228,7 @@ fun CreatePingWrapper(navController: NavHostController, homeViewModel: HomeViewM
 
 
 @Composable
-fun CreatePing(
+fun CreateFlashPost(
     title: String,
     onTitleChange: (String) -> Unit,
     description: String,
@@ -286,7 +286,7 @@ fun CreatePing(
         SelectedImage(imageUri)
         if (showCategoryDialog) {
             CategorySelectionDialog(
-                categories = listOf("Food", "Event", "Music", "Study", "Travel", "Gaming", "News", "Workout", "Shopping"),
+                categories = listOf("Dating","Food", "Event", "Music", "Study", "Travel", "Gaming", "News", "Workout", "Shopping"),
                 onCategorySelected = {
                     onSelectCategoryClicked(it)
                     showCategoryDialog = false
@@ -654,7 +654,7 @@ fun DatePickerDialog(onDateSelected: (LocalDate) -> Unit, onDismiss: () -> Unit)
 }
 
 @Composable
-fun CreatePingTopNew(isActive:Boolean, onNext: () -> Unit) {
+fun CreateFlashPostTopNew(isActive:Boolean, onNext: () -> Unit) {
     Box(modifier = Modifier
         .shadow(elevation = 4.dp)
         .statusBarsPadding()
@@ -666,10 +666,10 @@ fun CreatePingTopNew(isActive:Boolean, onNext: () -> Unit) {
             .padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
             Image(
                 painterResource(id = R.drawable.baseline_arrow_back_24),
-                contentDescription = "back arrow on create ping",
+                contentDescription = "back arrow on create flash post",
                 modifier = Modifier.size(24.dp)
             )
-            Text(text = "Create ping", fontFamily = Constants.FONT_MEDIUM, fontSize = 18.sp, color = Constants.HOME_TOP_BAR_COLOR)
+            Text(text = "Create Flash Post", fontFamily = Constants.FONT_MEDIUM, fontSize = 18.sp, color = Constants.HOME_TOP_BAR_COLOR)
             Card(
                 modifier = Modifier
                     .wrapContentSize()

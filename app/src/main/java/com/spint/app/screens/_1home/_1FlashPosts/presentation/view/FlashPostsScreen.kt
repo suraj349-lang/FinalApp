@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.spint.app.screens._3createEventOrPing.CreateEventOrPingBottomSheet
+import com.spint.app.screens._3createEventOrFlashPost.CreateEventOrPingBottomSheet
 import com.spint.app.ui.theme.floatingActionBtnColor
 import com.spint.app.utils.UserLocationObject
 import com.spint.app.utils.constants.Constants

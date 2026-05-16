@@ -35,11 +35,13 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarScrollBehavior
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -67,6 +69,7 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
+import androidx.datastore.preferences.core.doublePreferencesKey
 import androidx.navigation.NavHostController
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -223,6 +226,7 @@ fun DirectChatProfiles(
 ) {
     val saveToChatResponse by homeViewModel.saveUserToChatListResponseState.collectAsState()
     val userObject by UserObject.user.collectAsState()
+    val userLocation by UserLocationObject.userLocation.collectAsState()
     val directChatList = homeViewModel.nearByUsersList.collectAsLazyPagingItems()
 
     // -----------------------------
@@ -260,8 +264,16 @@ fun DirectChatProfiles(
             CommonErrorScreen("Unable to get users.")
             return
         }
-        directChatList.itemCount == 0 && loadState.refresh !is LoadState.Loading  -> {
-            NoDirectChatUsersFound(onBackClicked = onCheckedChange,onJoinDuelClicked)
+//        directChatList.itemCount == 0 && loadState.refresh !is LoadState.Loading  -> {
+//            NoDirectChatUsersFound(onBackClicked = onCheckedChange,onJoinDuelClicked)
+//            return
+//        }
+
+        loadState.refresh is LoadState.NotLoading && loadState.append.endOfPaginationReached && directChatList.itemCount == 0 -> {
+            NoDirectChatUsersFound(
+                onBackClicked = onCheckedChange,
+                onJoinDuelClicked = onJoinDuelClicked
+            )
             return
         }
     }
@@ -276,18 +288,46 @@ fun DirectChatProfiles(
 
         // Header + Switch
         item {
+            Column(modifier = Modifier, verticalArrangement = Arrangement.spacedBy(1.dp)) {
             Row(
                 modifier = Modifier
-                    .padding(horizontal = 10.dp, vertical = 8.dp)
+                    .padding(horizontal = 10.dp).padding(top = 8.dp)
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "Verified users near you",
-                    fontFamily = Constants.FONT_LIGHT,
-                    color = Constants.HOME_TOP_BAR_ICON_COLOR,
-                    fontSize = 20.sp
+                Column(modifier = Modifier.fillMaxWidth(0.8f)) {
+                    Text(
+                        text = "Verified users near you",
+                        fontFamily = Constants.FONT_LIGHT,
+                        color = Constants.HOME_TOP_BAR_ICON_COLOR,
+                        fontSize = 20.sp
+                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.location_new),
+                            contentDescription = "",
+                            modifier = Modifier.padding(0.dp).size(12.dp)
+                        )
+                        Text(
+                            text = userLocation.city ?: "",
+                            fontFamily = Constants.FONT_LIGHT,
+                            color = Constants.HOME_TOP_BAR_ICON_COLOR,
+                            fontSize = 8.sp,
+                            overflow = TextOverflow.Ellipsis,
+                            maxLines = 1,
+                        )
+                    }
+
+                }
+                VerticalDivider(
+                    thickness = 1.dp,
+                    modifier = Modifier.padding(start = 6.dp).height(33.dp),
+                    color = Color.Gray
                 )
 
                 Switch(
@@ -302,7 +342,16 @@ fun DirectChatProfiles(
                     modifier = Modifier.size(80.dp)
                 )
             }
+
         }
+            HorizontalDivider(
+                modifier = Modifier.padding(horizontal = 4.dp).padding(top=0.dp).fillMaxWidth(),
+                thickness = 0.5.dp,
+                color = Color.DarkGray
+            )
+
+        }
+
 
         // Users list
         items(
@@ -370,9 +419,10 @@ fun DirectChatItem(
                         .height(300.dp)
                 ) {
                     GlideImage(
-                        model = if (directChatObject?.userId?.profileImage?.isNotEmpty() == true) imagePrefix + directChatObject.userId.profileImage else "",
+                        model = if (directChatObject?.userId?.profileImage?.isNotEmpty() == true) imagePrefix + directChatObject.userId.profileImage else R.drawable.profile_colored,
                         contentDescription = "",
-                        contentScale = ContentScale.Crop
+                        modifier = Modifier.align(Alignment.Center),
+                        contentScale = if (directChatObject?.userId?.profileImage?.isNotEmpty() == true) ContentScale.Crop else ContentScale.Fit
                     )
                 }
                 Row(

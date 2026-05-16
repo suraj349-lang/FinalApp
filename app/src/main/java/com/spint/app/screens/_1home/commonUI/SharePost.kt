@@ -63,14 +63,16 @@ fun sharePingDeepLink(context: Context, deepLink: String) {
     val shareIntent = Intent.createChooser(sendIntent, "Share Ping")
     context.startActivity(shareIntent)
 }
-//fun sharePingDeepLink(context: Context, pingId: String) {
-//    val deepLink = "${Constants.APP_NAME}://ping/$pingId"
-//    val intent = Intent(Intent.ACTION_SEND).apply {
-//        type = "text/plain"
-//        putExtra(Intent.EXTRA_TEXT, "Check out this ping: $deepLink")
-//    }
-//    context.startActivity(Intent.createChooser(intent, "Share Ping via"))
-//}
+fun shareProfileDeepLink(context: Context, deepLink: String) {
+    val sendIntent = Intent(Intent.ACTION_SEND).apply {
+        type = "text/plain"
+        putExtra(Intent.EXTRA_TEXT, deepLink)
+    }
+    val shareIntent = Intent.createChooser(sendIntent, "Share Profile")
+    context.startActivity(shareIntent)
+}
+
+
 
 fun sharePostUrl(context: Context, postUrl: String, postTitle: String) {
     val intent = Intent(Intent.ACTION_SEND).apply {

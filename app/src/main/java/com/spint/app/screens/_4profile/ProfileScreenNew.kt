@@ -80,14 +80,13 @@ import androidx.compose.ui.zIndex
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.NavHostController
-import coil.compose.AsyncImage
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.spint.app.R
 import com.spint.app.model.DropProfileResponse
 import com.spint.app.model.EventResponse
 import com.spint.app.navigation.SCREENS
-import com.spint.app.screens._3createEventOrPing.CreateEventOrPingBottomSheet
+import com.spint.app.screens._3createEventOrFlashPost.CreateEventOrPingBottomSheet
 import com.spint.app.screens._4profile.userPings.MyPings
 import com.spint.app.screens._4profile.privateUsername.PasswordForPrivateUsername
 import com.spint.app.screens.dialogBox.DropProfileDialog
@@ -103,7 +102,6 @@ import com.spint.app.viewmodels.ImageUploadViewModel
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.spint.app.screens.dialogBox.ShowDialog
 import com.spint.app.screens.dialogBox.ShowQRDialog
-import com.spint.app.screens.duel.SCREEN
 import kotlinx.coroutines.delay
 import java.io.File
 

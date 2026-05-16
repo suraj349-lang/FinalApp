@@ -1,4 +1,4 @@
-package com.spint.app.screens._3createEventOrPing.createEvent.unused
+package com.spint.app.screens._3createEventOrFlashPost.createEvent.unused
 
 import android.net.Uri
 import android.util.Log
@@ -17,12 +17,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import com.spint.app.model.Event
-import com.spint.app.screens._3createEventOrPing.createEvent.AddCaptionCreateEvent
-import com.spint.app.screens._3createEventOrPing.createEvent.AddEventTypeCreateEvent
-import com.spint.app.screens._3createEventOrPing.createEvent.AddImageCreateEvent
-import com.spint.app.screens._3createEventOrPing.createEvent.AddLocationCreateEvent
-import com.spint.app.screens._3createEventOrPing.createEvent.CreateEventTopBar2
-import com.spint.app.screens._3createEventOrPing.createEvent.PreviewCreateEvent
+import com.spint.app.screens._3createEventOrFlashPost.createEvent.AddCaptionCreateEvent
+import com.spint.app.screens._3createEventOrFlashPost.createEvent.AddEventTypeCreateEvent
+import com.spint.app.screens._3createEventOrFlashPost.createEvent.AddImageCreateEvent
+import com.spint.app.screens._3createEventOrFlashPost.createEvent.AddLocationCreateEvent
+import com.spint.app.screens._3createEventOrFlashPost.createEvent.CreateEventTopBar2
+import com.spint.app.screens._3createEventOrFlashPost.createEvent.PreviewCreateEvent
 import com.spint.app.screens.dialogBox.uriToFile
 import com.spint.app.utils.UserLocationObject
 import com.spint.app.viewmodels.HomeViewModel
