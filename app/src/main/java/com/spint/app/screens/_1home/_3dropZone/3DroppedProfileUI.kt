@@ -512,28 +512,7 @@ fun LocationAndNameSearchDialogBox(
                 .padding(20.dp)
                 .wrapContentSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
 
-                OutlinedTextField(
-                    value = name,
-                    onValueChange = {
-                        onNameChange(it)
-                    },
-                    label = {
-                        Text(
-                            text = "Search by name",
-                            fontSize = 14.sp,
-                            color = Color.LightGray,
-                            fontFamily = Constants.FONT_MEDIUM
-                        )
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(4.dp),
-                    shape = RoundedCornerShape(20.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedContainerColor = Color.Gray,
-                        unfocusedContainerColor = Color.Gray
-                    )
-                )
+
 
                 OutlinedTextField(
                     value = query,
@@ -581,6 +560,34 @@ fun LocationAndNameSearchDialogBox(
                         }
                     }
                 }
+                Text(
+                    text = "Search by name",
+                    fontSize = 14.sp,
+                    color = Color.LightGray,
+                    fontFamily = Constants.FONT_MEDIUM
+                )
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = {
+                        onNameChange(it)
+                    },
+                    label = {
+                        Text(
+                            text = "",
+                            fontSize = 14.sp,
+                            color = Color.LightGray,
+                            fontFamily = Constants.FONT_MEDIUM
+                        )
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(4.dp),
+                    shape = RoundedCornerShape(20.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedContainerColor = Color.Gray,
+                        unfocusedContainerColor = Color.Gray
+                    )
+                )
 
                 Button(
                     onClick = {onSearchClicked()},

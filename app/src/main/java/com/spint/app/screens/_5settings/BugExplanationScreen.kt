@@ -65,10 +65,20 @@ fun BugExplanationScreen(onBackClicked:()->Unit) {
                     Text(text = "Bug", fontFamily = Constants.FONT_MEDIUM, fontWeight = FontWeight.SemiBold, fontSize = 22.sp)
                 }
                 Spacer(modifier = Modifier.height(40.dp))
+                if (text.isNotEmpty()) {
+                    Text(
+                        text = "The issue is:",
+                        fontFamily = Constants.FONT_MEDIUM,
+                        fontWeight = FontWeight.SemiBold,
+                        fontSize = 14.sp,
+                        modifier = Modifier
+                            .padding(start = 16.dp)
+                    )
+                }
 
                 Column(
                     modifier = Modifier
-                        .padding(16.dp)
+                        .padding(horizontal = 16.dp)
                 ) {
                     BasicTextField(
                         value = text,
@@ -78,7 +88,9 @@ fun BugExplanationScreen(onBackClicked:()->Unit) {
                         modifier = Modifier
                             .fillMaxWidth()
                             .background(
-                                if (isFocused.value) Color.White else Color.Gray.copy(alpha = 0.3f),
+                                if (isFocused.value) Color.Gray.copy(alpha = 0.5f) else Color.Gray.copy(
+                                    alpha = 0.3f
+                                ),
                                 shape = RoundedCornerShape(8.dp)
                             )
                             .heightIn(min = 150.dp) // 6 lines in height (each line around 16dp)

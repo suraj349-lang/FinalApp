@@ -19,6 +19,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -27,6 +29,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -34,6 +37,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.spint.app.R
 import com.spint.app.model.flashPost.FlashPostResponse
+import com.spint.app.screens._1home.commonUI.sharePingDeepLink
 import com.spint.app.screens._4profile.privateUsername.dynamicText
 import com.spint.app.ui.imagePrefix
 import com.spint.app.utils.constants.Constants
@@ -43,6 +47,7 @@ import com.spint.app.utils.formatDateTime
 
 @Composable
 fun NoImageFlashPosts(flashPostResponse: FlashPostResponse,onFlashPostClicked:()-> Unit) {
+    val context= LocalContext.current
     Box(modifier = Modifier.clickable{onFlashPostClicked()}
         .padding(vertical = 4.dp, horizontal = 2.dp)
         .background(color = Color.Black)
@@ -88,25 +93,37 @@ fun NoImageFlashPosts(flashPostResponse: FlashPostResponse,onFlashPostClicked:()
                 Image(painter = painterResource(id = R.drawable.location_new), contentDescription = "", modifier = Modifier.size(16.dp))
                 Text(text = flashPostResponse.location, maxLines = 1, fontFamily = Constants.FONT_LIGHT, fontSize = 10.sp, color = Color.LightGray, lineHeight = 12.sp)
             }
-            Row(
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment=Alignment.Bottom,
-                modifier = Modifier.padding(vertical = 12.dp)
-                    .fillMaxWidth()
-                    .background(color = Color.Transparent)
-            ) {
-
-                ViewRoundUI(flashPostResponse.viewsCount)
-                CommentRoundUI(flashPostResponse.commentsCount)
-                CountdownTimer(flashPostResponse.expirationTime)
-                AddPingOnFlashPost(flashPostResponse.peopleJoined, flashPostResponse.pingCount)
-                ShareRoundUI(flashPostResponse.totalShared) {
-//                    val deeplink="http://socail.com/ping/${item._id}"
-//                    sharePingDeepLink(context,deeplink)
+//            Row(
+//                horizontalArrangement = Arrangement.SpaceEvenly,
+//                verticalAlignment=Alignment.Bottom,
+//                modifier = Modifier.padding(vertical = 12.dp)
+//                    .fillMaxWidth()
+//                    .background(color = Color.Transparent)
+//            ) {
+//
+//                ViewRoundUI(flashPostResponse.viewsCount)
+//                CommentRoundUI(flashPostResponse.commentsCount)
+//                CountdownTimer(flashPostResponse.expirationTime)
+//                AddPingOnFlashPost(flashPostResponse.peopleJoined, flashPostResponse.pingCount)
+//                ShareRoundUI(flashPostResponse.totalShared) {
+////                    val deeplink="http://socail.com/ping/${item._id}"
+////                    sharePingDeepLink(context,deeplink)
+//                }
+//
+//
+//            }
+            HorizontalDivider(modifier= Modifier
+                .padding(top = 20.dp)
+                .padding(horizontal = 10.dp)
+                .fillMaxWidth(), thickness = 0.5.dp,color=Color.DarkGray)
+            BottomUserActionsUI(
+                onRespondClicked = {},
+                onCommentButtonClicked = {},
+                onShareClicked = {
+                    val deeplink = "http://${Constants.APP_NAME}.com/flashPost/${flashPostResponse._id}"
+                    sharePingDeepLink(context, deeplink)
                 }
-
-
-            }
+            )
 
         }
 

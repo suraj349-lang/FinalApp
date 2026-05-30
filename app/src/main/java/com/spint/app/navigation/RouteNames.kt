@@ -119,8 +119,4 @@ sealed class SCREENS(val route:String){
     object BLOCKED_USERS:SCREENS("blocked_users")
     object SAVED_LOGIN_INFO:SCREENS("saved_login_info")
     object MY_DATA:SCREENS("my_data")
-    object LOG_OUT:SCREENS("log_out")
-
-
-
 }

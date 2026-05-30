@@ -28,6 +28,13 @@ class CallViewModel : ViewModel() {
     var showPostCallDialog by mutableStateOf(false)
     var remainingTime by mutableStateOf(0)
         private set
+    var isSpeakerEnabled by mutableStateOf(true)
+        private set
+
+    fun toggleSpeaker() {
+        isSpeakerEnabled = !isSpeakerEnabled
+        rtcEngine?.setEnableSpeakerphone(isSpeakerEnabled)
+    }
 
 
 
@@ -58,6 +65,11 @@ class CallViewModel : ViewModel() {
         )
 
         rtcEngine?.enableVideo()
+        rtcEngine?.setAudioScenario(
+            Constants.AUDIO_SCENARIO_GAME_STREAMING
+        )
+
+        rtcEngine?.setDefaultAudioRoutetoSpeakerphone(true)
         rtcEngine?.setVideoEncoderConfiguration(
             VideoEncoderConfiguration(
                 VideoEncoderConfiguration.VD_640x360,
@@ -96,6 +108,7 @@ class CallViewModel : ViewModel() {
         Log.d("AGORA", "joinChannel result = $result")
 
         callState = CallState.InCall(channel)
+        rtcEngine?.setEnableSpeakerphone(isSpeakerEnabled)
 
         // 🔥 60 second auto leave
         viewModelScope.launch {
@@ -134,11 +147,24 @@ class CallViewModel : ViewModel() {
         )
     }
 
-    fun endCall() {
-        rtcEngine?.leaveChannel()
-        remoteUid = null
-    }
+//    fun endCall() {
+//        rtcEngine?.leaveChannel()
+//        remoteUid = null
+//        rtcEngine?.setEnableSpeakerphone(false)
+//    }
 
+    fun endCall() {
+
+        rtcEngine?.stopPreview()
+
+        rtcEngine?.leaveChannel()
+
+        rtcEngine?.setEnableSpeakerphone(false)
+
+        remoteUid = null
+
+        callState = CallState.Idle
+    }
 
 
 

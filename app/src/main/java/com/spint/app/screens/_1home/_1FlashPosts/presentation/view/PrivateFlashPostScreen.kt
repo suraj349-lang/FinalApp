@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -107,26 +108,38 @@ fun PrivateFlashPostScreen(flashPostResponse: FlashPostResponse,onFlashPostClick
                 Image(painter = painterResource(id = R.drawable.location_new), contentDescription = "", modifier = Modifier.size(12.dp))
                 Text(text = flashPostResponse.location, maxLines = 1, fontFamily = Constants.FONT_LIGHT, fontSize = 10.sp, color = Color.LightGray, lineHeight = 12.sp)
             }
-            Row(
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment= Alignment.Bottom,
-                modifier = Modifier
-                    .padding(vertical = 12.dp)
-                    .fillMaxWidth()
-                    .background(color = Color.Transparent)
-            ) {
-
-                ViewRoundUI(flashPostResponse.viewsCount)
-                CommentRoundUI(flashPostResponse.commentsCount)
-                CountdownTimerForPrivate(flashPostResponse.expirationTime)
-                AddPingOnFlashPost(flashPostResponse.peopleJoined, flashPostResponse.pingCount)
-                ShareRoundUI(flashPostResponse.totalShared) {
-                    val deeplink = "http://socail.com/ping/${flashPostResponse._id}"
+//            Row(
+//                horizontalArrangement = Arrangement.SpaceEvenly,
+//                verticalAlignment= Alignment.Bottom,
+//                modifier = Modifier
+//                    .padding(vertical = 12.dp)
+//                    .fillMaxWidth()
+//                    .background(color = Color.Transparent)
+//            ) {
+//
+//                ViewRoundUI(flashPostResponse.viewsCount)
+//                CommentRoundUI(flashPostResponse.commentsCount)
+//                CountdownTimerForPrivate(flashPostResponse.expirationTime)
+//                AddPingOnFlashPost(flashPostResponse.peopleJoined, flashPostResponse.pingCount)
+//                ShareRoundUI(flashPostResponse.totalShared) {
+//                    val deeplink = "http://socail.com/ping/${flashPostResponse._id}"
+//                    sharePingDeepLink(context, deeplink)
+//                }
+//
+//
+//            }
+            HorizontalDivider(modifier= Modifier
+                .padding(top = 20.dp)
+                .padding(horizontal = 10.dp)
+                .fillMaxWidth(), thickness = 0.5.dp,color=Color.DarkGray)
+            BottomUserActionsUI(
+                onRespondClicked = {},
+                onCommentButtonClicked = {},
+                onShareClicked = {
+                    val deeplink = "http://${Constants.APP_NAME}.com/flashPost/${flashPostResponse._id}"
                     sharePingDeepLink(context, deeplink)
                 }
-
-
-            }
+            )
 
         }
 

@@ -42,10 +42,11 @@ data class FeatureList(
 )
 val featuresList = listOf(
     FeatureList(R.drawable.cameranew, BugsAndSuggestionsEnum.CAMERA),
-    FeatureList(R.drawable.ping, BugsAndSuggestionsEnum.PINGS),
+    FeatureList(R.drawable.ping, BugsAndSuggestionsEnum.FLASH_POSTS),
     FeatureList(R.drawable.event, BugsAndSuggestionsEnum.EVENT),
     FeatureList(R.drawable.drop_profile_new, BugsAndSuggestionsEnum.DROP_PROFILE),
     FeatureList(R.drawable.nearby_chat, BugsAndSuggestionsEnum.DIRECT_CHAT),
+    FeatureList(R.drawable.spint1, BugsAndSuggestionsEnum.DUEL),
     FeatureList(R.drawable.create_event_new, BugsAndSuggestionsEnum.CREATE_EVENT),
     FeatureList(R.drawable.chat_new, BugsAndSuggestionsEnum.CHATS),
     FeatureList(R.drawable.profile_new, BugsAndSuggestionsEnum.PROFILE),

@@ -397,9 +397,9 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
         composable(SCREENS.MY_DATA.route){
             MyData (navController = navController)
         }
-        composable(SCREENS.LOG_OUT.route){
-            Logout(navController = navController)
-        }
+//        composable(SCREENS.LOG_OUT.route){
+//            Logout(navController = navController)
+//        }
 
     }
 }

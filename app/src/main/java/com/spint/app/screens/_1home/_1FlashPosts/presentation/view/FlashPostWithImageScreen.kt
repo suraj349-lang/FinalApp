@@ -374,13 +374,13 @@ fun FlashPostWithImageScreen2(item:FlashPostResponse, onFlashPostClicked:()->Uni
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun FlashPostWithImageScreen(item:FlashPostResponse, onFlashPostClicked:()->Unit, onUserProfileClicked:()->Unit,onPingOfFlashPostClicked:(String, String)->Unit, onCommentButtonClicked: () -> Unit) {
-
+    val context=LocalContext.current
     Box(
         modifier = Modifier
             .padding(top = 4.dp)
             .padding(4.dp)
             .clip(RoundedCornerShape(12.dp))
-            .background(color=Color.Black)
+            .background(color = Color.Black)
             .fillMaxWidth()
     ) {
         Column(modifier = Modifier
@@ -492,7 +492,11 @@ fun FlashPostWithImageScreen(item:FlashPostResponse, onFlashPostClicked:()->Unit
                                 .wrapContentSize()
                                 .clip(RoundedCornerShape(50))
                                 .background(Color(0xFFC7DBEF))
-                                .border(width = 0.5.dp, color = Color(0xFF1976D2), shape = RoundedCornerShape(50))
+                                .border(
+                                    width = 0.5.dp,
+                                    color = Color(0xFF1976D2),
+                                    shape = RoundedCornerShape(50)
+                                )
                             ) {
                                 Row(modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                                     Image(
@@ -516,7 +520,11 @@ fun FlashPostWithImageScreen(item:FlashPostResponse, onFlashPostClicked:()->Unit
                                 .wrapContentSize()
                                 .clip(RoundedCornerShape(50))
                                 .background(Color(0xFFF5DBDB))
-                                .border(width = 0.5.dp, color = Color(0xFFC98989), shape = RoundedCornerShape(50))
+                                .border(
+                                    width = 0.5.dp,
+                                    color = Color(0xFFC98989),
+                                    shape = RoundedCornerShape(50)
+                                )
                             ) {
                                 Row(
                                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),
@@ -628,132 +636,19 @@ fun FlashPostWithImageScreen(item:FlashPostResponse, onFlashPostClicked:()->Unit
                 ExpiryTimerLine(67,100)
 
             }
-            HorizontalDivider(modifier= Modifier.padding(top=20.dp).padding(horizontal = 10.dp).fillMaxWidth(), thickness = 0.5.dp,color=Color.DarkGray)
+            HorizontalDivider(modifier= Modifier
+                .padding(top = 20.dp)
+                .padding(horizontal = 10.dp)
+                .fillMaxWidth(), thickness = 0.5.dp,color=Color.DarkGray)
 
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment=Alignment.Bottom,
-                modifier = Modifier
-                    .padding(vertical = 12.dp, horizontal = 10.dp)
-                    .fillMaxWidth()
-                    .background(color = Color.Transparent)
-            ) {
-                Row(modifier=Modifier.fillMaxWidth(0.8f),horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    Box(
-                        modifier = Modifier
-                            .wrapContentSize()
-                            .clip(RoundedCornerShape(6.dp))
-                            .background(Color.Transparent)
-                            .border(
-                                width = 0.5.dp,
-                                color = Color.DarkGray,
-                                shape = RoundedCornerShape(6.dp)
-                            )
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Image(
-                                painter = painterResource(R.drawable.send_24),
-                                contentDescription = "",
-                                modifier = Modifier
-                                    .rotate((-35f))
-                                    .size(16.dp),
-                                colorFilter = ColorFilter.tint(Color.LightGray)
-                            )
-                            Text(
-                                text = "Respond",
-                                modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
-                                fontWeight = FontWeight.SemiBold,
-                                fontFamily = Constants.FONT_LIGHT,
-                                fontSize = 16.sp,
-                                color = Color.White.copy(alpha = 0.9f),
-                                lineHeight = 12.sp
-                            )
-                        }
-                    }
-                    Box(
-                        modifier = Modifier
-                            .wrapContentSize()
-                            .clip(RoundedCornerShape(6.dp))
-                            .background(Color.Transparent)
-                            .border(
-                                width = 0.5.dp,
-                                color = Color.DarkGray,
-                                shape = RoundedCornerShape(6.dp)
-                            )
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Image(
-                                painter = painterResource(R.drawable.comment_outlined),
-                                contentDescription = "",
-                                modifier = Modifier
-                                    .rotate((-45f))
-                                    .size(18.dp),
-                                colorFilter = ColorFilter.tint(Color.LightGray)
-                            )
-                            Text(
-                                text = "5",
-                                modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
-                                fontWeight = FontWeight.SemiBold,
-                                fontFamily = Constants.FONT_LIGHT,
-                                fontSize = 16.sp,
-                                color = Color.White.copy(alpha = 0.9f),
-                                lineHeight = 12.sp
-                            )
-                        }
-                    }
-                    Box(
-                        modifier = Modifier
-                            .wrapContentSize()
-                            .clip(RoundedCornerShape(6.dp))
-                            .background(Color.Transparent)
-                            .border(
-                                width = 0.5.dp,
-                                color = Color.DarkGray,
-                                shape = RoundedCornerShape(6.dp)
-                            )
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Image(
-                                painter = painterResource(R.drawable.share),
-                                contentDescription = "",
-                                modifier = Modifier
-                                    .padding(horizontal = 4.dp, vertical = 3.dp)
-                                    .size(18.dp),
-                                colorFilter = ColorFilter.tint(Color.LightGray)
-                            )
-
-                        }
-                    }
+            BottomUserActionsUI(
+                onRespondClicked = {},
+                onCommentButtonClicked = {},
+                onShareClicked = {
+                    val deeplink = "http://${Constants.APP_NAME}.com/flashPost/${item._id}"
+                    sharePingDeepLink(context, deeplink)
                 }
-                Row(modifier=Modifier
-                    .padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
-                    Image(
-                        painter = painterResource(R.drawable.view),
-                        contentDescription = "",
-                        modifier=Modifier
-                            .size(14.dp),
-                        colorFilter = ColorFilter.tint(Color.LightGray)
-                    )
-                    Text(
-                        text = "5",
-                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
-                        fontWeight = FontWeight.Normal,
-                        fontFamily = Constants.FONT_LIGHT,
-                        fontSize = 14.sp,
-                        color = Color.White.copy(alpha = 0.9f),
-                        lineHeight = 12.sp
-                    )
-                }
-            }
+            )
         }
     }
 }
@@ -780,6 +675,133 @@ fun ExpiryTimerLine(
     }
 }
 
+@Composable
+fun BottomUserActionsUI(onRespondClicked:()-> Unit,onCommentButtonClicked: () -> Unit,onShareClicked: () -> Unit) {
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment=Alignment.Bottom,
+        modifier = Modifier
+            .padding(vertical = 12.dp, horizontal = 10.dp)
+            .fillMaxWidth()
+            .background(color = Color.Transparent)
+    ) {
+        Row(modifier=Modifier.fillMaxWidth(0.8f),horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            Box(
+                modifier = Modifier
+                    .wrapContentSize()
+                    .clip(RoundedCornerShape(6.dp))
+                    .background(Color.Transparent)
+                    .border(
+                        width = 0.5.dp,
+                        color = Color.DarkGray,
+                        shape = RoundedCornerShape(6.dp)
+                    )
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.send_24),
+                        contentDescription = "",
+                        modifier = Modifier
+                            .rotate((-35f))
+                            .size(16.dp),
+                        colorFilter = ColorFilter.tint(Color.LightGray)
+                    )
+                    Text(
+                        text = "Respond",
+                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
+                        fontWeight = FontWeight.SemiBold,
+                        fontFamily = Constants.FONT_LIGHT,
+                        fontSize = 16.sp,
+                        color = Color.White.copy(alpha = 0.9f),
+                        lineHeight = 12.sp
+                    )
+                }
+            }
+            Box(
+                modifier = Modifier
+                    .wrapContentSize()
+                    .clip(RoundedCornerShape(6.dp))
+                    .background(Color.Transparent)
+                    .border(
+                        width = 0.5.dp,
+                        color = Color.DarkGray,
+                        shape = RoundedCornerShape(6.dp)
+                    )
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.comment_outlined),
+                        contentDescription = "",
+                        modifier = Modifier
+                            .rotate((-45f))
+                            .size(18.dp),
+                        colorFilter = ColorFilter.tint(Color.LightGray)
+                    )
+                    Text(
+                        text = "5",
+                        modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
+                        fontWeight = FontWeight.SemiBold,
+                        fontFamily = Constants.FONT_LIGHT,
+                        fontSize = 16.sp,
+                        color = Color.White.copy(alpha = 0.9f),
+                        lineHeight = 12.sp
+                    )
+                }
+            }
+            Box(
+                modifier = Modifier
+                    .wrapContentSize()
+                    .clip(RoundedCornerShape(6.dp))
+                    .background(Color.Transparent)
+                    .border(
+                        width = 0.5.dp,
+                        color = Color.DarkGray,
+                        shape = RoundedCornerShape(6.dp)
+                    )
+            ) {
+                Row(
+                    modifier = Modifier.clickable{onShareClicked()}.padding(horizontal = 8.dp, vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Image(
+                        painter = painterResource(R.drawable.share),
+                        contentDescription = "",
+                        modifier = Modifier
+                            .padding(horizontal = 4.dp, vertical = 3.dp)
+                            .size(18.dp),
+                        colorFilter = ColorFilter.tint(Color.LightGray)
+                    )
+
+                }
+            }
+        }
+        Row(modifier=Modifier
+            .padding(horizontal = 8.dp, vertical = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+            Image(
+                painter = painterResource(R.drawable.view),
+                contentDescription = "",
+                modifier=Modifier
+                    .size(14.dp),
+                colorFilter = ColorFilter.tint(Color.LightGray)
+            )
+            Text(
+                text = "5",
+                modifier = Modifier.padding(horizontal = 4.dp, vertical = 2.dp),
+                fontWeight = FontWeight.Normal,
+                fontFamily = Constants.FONT_LIGHT,
+                fontSize = 14.sp,
+                color = Color.White.copy(alpha = 0.9f),
+                lineHeight = 12.sp
+            )
+        }
+    }
+}
 
 @Composable
 fun CountdownTimer(expirationIso: String) {

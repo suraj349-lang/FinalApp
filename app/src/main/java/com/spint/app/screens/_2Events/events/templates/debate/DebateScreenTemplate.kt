@@ -57,9 +57,9 @@ fun DebateDetailsScreen(modifier: Modifier = Modifier) {
                         .fillMaxWidth()
                         .wrapContentHeight()
                 ) {
-                    AutoPlayVideo(
-                        videoRes = R.raw.video1
-                    )
+//                    AutoPlayVideo(
+//                        videoRes = R.raw.video1
+//                    )
                     Column(
                         modifier.align(Alignment.BottomEnd).padding(8.dp),
                         verticalArrangement = Arrangement.spacedBy(10.dp),
