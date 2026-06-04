@@ -152,7 +152,7 @@ fun LoginScreenUINew(onBackClicked:()->Unit={},onSignUpClicked:()->Unit={},onLog
                     .wrapContentHeight()
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.app_icon_dynamic),
+                    painter = painterResource(id = Constants.APP_ICON),
                     contentDescription = "",
                     modifier = Modifier.size(50.dp)
                 )

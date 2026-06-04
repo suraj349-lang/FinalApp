@@ -56,7 +56,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.core.view.WindowCompat
 import com.spint.app.R
-import com.spint.app.screens.duel.ScreenOrientation
 
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -83,16 +82,59 @@ fun SettingsScreenUI(navController: NavHostController,authViewModel: AuthViewMod
          MyAccount("Password","Update",SCREENS.PASSWORD.route) ,
     )
     val listSupportAndFeedback = listOf(
-        SupportAndFeedBack("Bugs and Suggestions", SCREENS.BUGS_AND_SUGGESTION.route),
-        SupportAndFeedBack("Safety and Privacy", SCREENS.SAFETY_AND_PRIVACY.route),
-       // SupportAndFeedBack("Help Centre", SCREENS.HELP_CENTRE.route)
+        SupportAndFeedBack("Bugs and Suggestions"){
+            navController.navigate(SCREENS.BUGS_AND_SUGGESTION.route)},
+        SupportAndFeedBack("Safety and Privacy"){
+            navController.navigate(
+                SCREENS.WEBVIEW_SCREEN.createRoute(
+                    title = "Safety and Privacy",
+                    url = "https://finalapp-3494.web.app/privacy"
+                )
+            )
+        },
+        SupportAndFeedBack("Help Centre"){
+            navController.navigate(
+                SCREENS.WEBVIEW_SCREEN.createRoute(
+                    title = "Help Center",
+                    url = "https://finalapp-3494.web.app/contact"
+                )
+            )
+        }
     )
 
     val moreInformation = listOf(
-        MoreInformation("Privacy Policy", SCREENS.PRIVACY_POLICY.route),
-        MoreInformation("Safety Centre", SCREENS.SAFETY_CENTRE.route),
-        MoreInformation("Terms of Service", SCREENS.TERMS_OF_SERVICE.route),
-        MoreInformation("Other legal", SCREENS.OTHER_LEGAL.route)
+        MoreInformation("Safety Centre" ){
+            navController.navigate(
+                SCREENS.WEBVIEW_SCREEN.createRoute(
+                    title = "Safety Centre",
+                    url = "https://finalapp-3494.web.app/privacy"
+                )
+            )
+        },
+        MoreInformation("Safety Centre"){
+            navController.navigate(
+                SCREENS.WEBVIEW_SCREEN.createRoute(
+                    title = "Safety Centre",
+                    url = "https://finalapp-3494.web.app/contact"
+                )
+            )
+        },
+        MoreInformation("Terms of Service"){
+            navController.navigate(
+                SCREENS.WEBVIEW_SCREEN.createRoute(
+                    title = "Terms of Service",
+                    url = "https://finalapp-3494.web.app/contact"
+                )
+            )
+        },
+        MoreInformation("Other legal"){
+            navController.navigate(
+                SCREENS.WEBVIEW_SCREEN.createRoute(
+                    title = "Other legal",
+                    url = "https://finalapp-3494.web.app/contact"
+                )
+            )
+        }
     )
     val accountActions = listOf(
         AccountAction("Clear Search History", SCREENS.CLEAR_SEARCH_HISTORY.route),
@@ -127,8 +169,8 @@ fun SettingsScreenUI(navController: NavHostController,authViewModel: AuthViewMod
                 .navigationBarsPadding()
                 .verticalScroll(rememberScrollState())) {
                 MyAccount(list,navController)
-                SupportAndFeedback(list = listSupportAndFeedback,navController)
-                MoreInformationListScreen(moreInformation,navController)
+                SupportAndFeedback(list = listSupportAndFeedback)
+                MoreInformationListScreen(moreInformation)
                 AccountActions(list = accountActions,navController)
                 LogOutAction{
                     authViewModel.logout(onSuccess = {navController.navigate(SCREENS.LOGIN.route)})
@@ -250,19 +292,18 @@ fun MyAccountUI(item:MyAccount,navController: NavHostController) {
 }
 
 @Composable
-fun SupportAndFeedback(list: List<SupportAndFeedBack>,navController: NavHostController) {
+fun SupportAndFeedback(list: List<SupportAndFeedBack>) {
 
     Column(modifier = Modifier.fillMaxWidth()) {
         SettingsTitleCommonTextUI(title = "Support and feedback")
         list.forEach { item ->
             Card(
                 modifier = Modifier
-                    .clickable { navController.navigate(item.route) }
+                    .clickable { item.onClick() }
                     .fillMaxWidth()
                     .height(45.dp),
                 shape = RoundedCornerShape(0.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White),
-               // border = BorderStroke(width = 0.25.dp, color = Color.LightGray)
+                colors = CardDefaults.cardColors(containerColor = Color.White)
             ) {
                 Row(
                     modifier = Modifier
@@ -284,14 +325,14 @@ fun SupportAndFeedback(list: List<SupportAndFeedBack>,navController: NavHostCont
     }
 }
 @Composable
-fun MoreInformationListScreen(list: List<MoreInformation>, navController: NavHostController) {
+fun MoreInformationListScreen(list: List<MoreInformation>) {
 
     Column(modifier = Modifier.fillMaxWidth().wrapContentHeight()) {
         SettingsTitleCommonTextUI(title = "More information")
         list.forEach { item ->
             Card(
                 modifier = Modifier
-                    .clickable { navController.navigate(item.route) }
+                    .clickable { item.onClick() }
                     .fillMaxWidth()
                     .height(45.dp),
                 shape = RoundedCornerShape(0.dp),
@@ -300,7 +341,6 @@ fun MoreInformationListScreen(list: List<MoreInformation>, navController: NavHos
             ) {
                 Row(
                     modifier = Modifier
-                        .clickable { navController.navigate(SCREENS.PRIVACY_POLICY.route) }
                         .fillMaxSize()
                         .padding(horizontal = 16.dp),
                     verticalAlignment = Alignment.CenterVertically,
@@ -448,11 +488,11 @@ data class MyAccount(
 
 data class SupportAndFeedBack(
     val key:String,
-    val route: String
+    val onClick: () -> Unit
 )
 data class MoreInformation(
     val key:String,
-    val route: String
+    val onClick: () -> Unit
 )
 data class AccountAction(
     val key:String,

@@ -72,6 +72,7 @@ import com.spint.app.ui.theme.statusAndTopAppBarColor
 import com.spint.app.ui.theme.statusBarColor
 import com.spint.app.ui.theme.topAppBarTextColor
 import com.spint.app.utils.RequestState
+import com.spint.app.utils.constants.Constants
 import java.io.File
 
 
@@ -510,7 +511,7 @@ fun CreateEventTopBar(title: String, actionIcon: Int,onActionClicked:()->Unit){
         navigationIcon = {
             Image(
                 painter = painterResource(
-                    id = R.drawable.app_icon
+                    id = Constants.APP_ICON
                 ),
                 colorFilter = ColorFilter.tint(color= Color(0xFF000000)),
                 contentDescription = "",

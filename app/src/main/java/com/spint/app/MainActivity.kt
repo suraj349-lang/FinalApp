@@ -197,7 +197,7 @@ fun handleDeepLink(uri: Uri?, navController: NavHostController) {
 
     when (pathSegments.firstOrNull()) {
         "chat" -> navController.navigate("chat/${pathSegments.lastOrNull()}")
-        "ping" -> navController.navigate(SCREENS.FLASH_POSTS.route)
+        "ping" -> {}//navController.navigate(SCREENS.FLASH_POSTS.route)
         "profile" -> navController.navigate("profile/${pathSegments.lastOrNull()}")
         "qr" -> navController.navigate("qr/${pathSegments.lastOrNull()}")
     }

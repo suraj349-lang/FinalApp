@@ -404,38 +404,15 @@ fun FlashPostWithImageScreen(item:FlashPostResponse, onFlashPostClicked:()->Unit
                     ){
                         AsyncImage(
                             model = imagePrefix + item.image,
-                            contentDescription = "Ping Image",
+                            contentDescription = "FlashPost Image",
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(200.dp)
+                                .height(300.dp)
                                 .clip(RoundedCornerShape(2.dp)),
                             contentScale = ContentScale.Crop
                         )
 
                     }
-//                Box(modifier = Modifier
-//                    .clickable { onFlashPostClicked() }
-//                    .background(
-//                        brush = Brush.verticalGradient(
-//                            colors = listOf(
-//                                Color.Black, Color.Black
-//                            )
-//                        )
-//                    )
-//                    .fillMaxWidth()
-//                    .wrapContentHeight()
-//                ){
-//                    AsyncImage(
-//                        model = imagePrefix + item.image,
-//                        contentDescription = "Ping Image",
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .height(200.dp)
-//                            .clip(RoundedCornerShape(2.dp)),
-//                        contentScale = ContentScale.FillBounds
-//                    )
-//
-//                }
 
             }
             Box(modifier = Modifier
@@ -491,26 +468,20 @@ fun FlashPostWithImageScreen(item:FlashPostResponse, onFlashPostClicked:()->Unit
                             Box (modifier= Modifier
                                 .wrapContentSize()
                                 .clip(RoundedCornerShape(50))
-                                .background(Color(0xFFC7DBEF))
+                                .background(Color(0xFF050B13))
                                 .border(
                                     width = 0.5.dp,
-                                    color = Color(0xFF1976D2),
+                                    color = Color(0xFF050B13),
                                     shape = RoundedCornerShape(50)
                                 )
                             ) {
                                 Row(modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp),verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                                    Image(
-                                        painter = painterResource(R.drawable.person_blue),
-                                        contentDescription = "",
-                                        modifier=Modifier
-                                            .size(10.dp),
-                                    )
                                     Text(
                                         text = "real id",
                                         fontWeight = FontWeight.SemiBold,
                                         fontFamily = Constants.FONT_LIGHT,
-                                        fontSize = 10.sp,
-                                        color = Color(0xFF051D34),
+                                        fontSize = 11.sp,
+                                        color = Color(0xFF0A81F3),
                                         lineHeight = 12.sp
                                     )
                                 }
@@ -519,10 +490,10 @@ fun FlashPostWithImageScreen(item:FlashPostResponse, onFlashPostClicked:()->Unit
                             Box (modifier= Modifier
                                 .wrapContentSize()
                                 .clip(RoundedCornerShape(50))
-                                .background(Color(0xFFF5DBDB))
+                                .background(Color(0xFF210D0D))
                                 .border(
                                     width = 0.5.dp,
-                                    color = Color(0xFFC98989),
+                                    color = Color(0xFF210D0D),
                                     shape = RoundedCornerShape(50)
                                 )
                             ) {
@@ -531,18 +502,12 @@ fun FlashPostWithImageScreen(item:FlashPostResponse, onFlashPostClicked:()->Unit
                                     verticalAlignment = Alignment.CenterVertically,
                                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                                 ) {
-                                    Image(
-                                        painter = painterResource(R.drawable.heart),
-                                        contentDescription = "",
-                                        modifier = Modifier
-                                            .size(10.dp),
-                                    )
                                     Text(
                                         text = item.category.lowercase(),
                                         fontWeight = FontWeight.SemiBold,
                                         fontFamily = Constants.FONT_LIGHT,
-                                        fontSize = 10.sp,
-                                        color = Color(0xFF310808),
+                                        fontSize = 11.sp,
+                                        color = Color(0xFFEC7F7F),
                                         lineHeight = 12.sp
                                     )
                                 }
@@ -593,8 +558,9 @@ fun FlashPostWithImageScreen(item:FlashPostResponse, onFlashPostClicked:()->Unit
                 Text(
                     text = item.title?.capitalize() ?: "",
                     fontFamily = Constants.FONT_LIGHT,
-                    fontSize = 16.sp,
-                    color=Color.White.copy(alpha = 0.9f),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color=Color.White,
                     modifier = Modifier
                         .padding(vertical = 4.dp)
                         .padding(start = 0.dp)
@@ -630,16 +596,12 @@ fun FlashPostWithImageScreen(item:FlashPostResponse, onFlashPostClicked:()->Unit
                     fontWeight = FontWeight.SemiBold,
                     fontFamily = Constants.FONT_LIGHT,
                     fontSize = 12.sp,
-                    color = Color.White.copy(alpha = 0.9f),
+                    color = Color.White,
                     lineHeight = 12.sp
                 )
                 ExpiryTimerLine(67,100)
 
             }
-            HorizontalDivider(modifier= Modifier
-                .padding(top = 20.dp)
-                .padding(horizontal = 10.dp)
-                .fillMaxWidth(), thickness = 0.5.dp,color=Color.DarkGray)
 
             BottomUserActionsUI(
                 onRespondClicked = {},
@@ -681,21 +643,21 @@ fun BottomUserActionsUI(onRespondClicked:()-> Unit,onCommentButtonClicked: () ->
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment=Alignment.Bottom,
         modifier = Modifier
-            .padding(vertical = 12.dp, horizontal = 10.dp)
+            .padding(vertical = 6.dp, horizontal = 10.dp)
             .fillMaxWidth()
             .background(color = Color.Transparent)
     ) {
         Row(modifier=Modifier.fillMaxWidth(0.8f),horizontalArrangement = Arrangement.spacedBy(10.dp)) {
             Box(
-                modifier = Modifier
+                modifier = Modifier.clickable{onRespondClicked()}
                     .wrapContentSize()
                     .clip(RoundedCornerShape(6.dp))
-                    .background(Color.Transparent)
-                    .border(
-                        width = 0.5.dp,
-                        color = Color.DarkGray,
-                        shape = RoundedCornerShape(6.dp)
-                    )
+                    .background(Color(0xFF033805))
+//                    .border(
+//                        width = 0.5.dp,
+//                        color = Color.DarkGray,
+//                        shape = RoundedCornerShape(6.dp)
+//                    )
             ) {
                 Row(
                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
@@ -707,7 +669,7 @@ fun BottomUserActionsUI(onRespondClicked:()-> Unit,onCommentButtonClicked: () ->
                         modifier = Modifier
                             .rotate((-35f))
                             .size(16.dp),
-                        colorFilter = ColorFilter.tint(Color.LightGray)
+                        colorFilter = ColorFilter.tint(Color(0xFF0A9F10))
                     )
                     Text(
                         text = "Respond",
@@ -715,13 +677,13 @@ fun BottomUserActionsUI(onRespondClicked:()-> Unit,onCommentButtonClicked: () ->
                         fontWeight = FontWeight.SemiBold,
                         fontFamily = Constants.FONT_LIGHT,
                         fontSize = 16.sp,
-                        color = Color.White.copy(alpha = 0.9f),
+                        color = Color(0xFF0A9F10),
                         lineHeight = 12.sp
                     )
                 }
             }
             Box(
-                modifier = Modifier
+                modifier = Modifier.clickable{onCommentButtonClicked()}
                     .wrapContentSize()
                     .clip(RoundedCornerShape(6.dp))
                     .background(Color.Transparent)

@@ -185,7 +185,7 @@ class PushNotificationService:  FirebaseMessagingService() {
         val notificationManager =
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        val largeIcon = BitmapFactory.decodeResource(resources, R.drawable.app_icon_dynamic)
+        val largeIcon = BitmapFactory.decodeResource(resources, Constants.APP_ICON)
 
         val builder = NotificationCompat.Builder(this, "CHAT_CHANNEL")
             .setSmallIcon(R.drawable.spint1)

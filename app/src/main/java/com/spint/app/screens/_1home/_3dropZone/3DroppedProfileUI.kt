@@ -156,56 +156,92 @@ fun DroppedProfilesUI(
             verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-                Column(
-                    modifier=Modifier,
-                    verticalArrangement = Arrangement.Top,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    if(showLoader && droppedProfilesList?.itemCount==0) {
-                        LinearProgressIndicator(modifier = Modifier
-                            .fillMaxWidth()
-                            .height(4.dp), color = floatingActionBtnColor)
-                    }
-
-                    Box(
+            Column(
+                modifier = Modifier,
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                if (showLoader && droppedProfilesList?.itemCount == 0) {
+                    LinearProgressIndicator(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(Color(0xFF0E0A00))//0xFF0064C9
-                    ) {
-                        Column(modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp)) {
+                            .height(4.dp), color = floatingActionBtnColor
+                    )
+                }
 
-                            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
-                                Text(
-                                    text = "Dropped profiles here at :",
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 18.sp,
-                                    color = Color.White,
-                                    fontFamily=Constants.FONT_MEDIUM,
-                                    modifier = Modifier.alpha(animatedAlpha)
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color(0xFF0E0A00))//0xFF0064C9
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth(0.7f)
+                                .padding(8.dp)
+                        ) {
+                            Text(
+                                text = "Dropped profiles nearby",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 18.sp,
+                                color = Color.White,
+                                fontFamily = Constants.FONT_MEDIUM,
+                                modifier = Modifier.alpha(animatedAlpha)
+                            )
+                            Row(horizontalArrangement = Arrangement.spacedBy(2.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.location_new),
+                                    contentDescription = "",
+                                    modifier = Modifier
+                                        .size(8.dp),
+                                   // colorFilter = ColorFilter.tint(Color.Gray)
                                 )
-                                Row(modifier = Modifier.clickable { showDialog=true }, horizontalArrangement = Arrangement.spacedBy(4.dp), verticalAlignment = Alignment.CenterVertically) {
-                                    Image(painter = painterResource(id = R.drawable.edit_new), contentDescription ="", modifier = Modifier
-                                        .size(12.dp), colorFilter = ColorFilter.tint(Color.White) )
+                                userLocation.address?.let {location->
                                     Text(
-                                        text = "Search location",
-                                        fontWeight = FontWeight.Medium,
-                                        fontSize = 10.sp,
-                                        color = Color.White,
-                                        modifier = Modifier.alpha(animatedAlpha),
-                                        style = TextStyle(textDecoration = TextDecoration.Underline)
+                                        text = location,
+                                        overflow =TextOverflow.Ellipsis,
+                                        color = Color.Gray,
+                                        modifier = Modifier,
+                                        maxLines = 1,
+                                        fontFamily=Constants.FONT_EXTRA_LIGHT,
+                                        fontSize = 11.sp,
                                     )
                                 }
-
                             }
-
-                            Spacer(modifier = Modifier.height(10.dp))
-                            userLocation.address?.let {
-                                DroppedProfileLocation(trim = true, backgroundColor = Color.Transparent,location = it)
+                        }
+                        Box(modifier = Modifier
+                            .padding(end = 10.dp)
+                            .clip(shape = RoundedCornerShape(50))
+                            .background(Color(0xFF262525))) {
+                            Row(
+                                modifier = Modifier
+                                    .padding(horizontal = 14.dp, vertical = 8.dp)
+                                    .clickable { showDialog = true },
+                                horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Image(
+                                    painter = painterResource(id = R.drawable.search_new),
+                                    contentDescription = "",
+                                    modifier = Modifier
+                                        .size(12.dp),
+                                    colorFilter = ColorFilter.tint(Color.LightGray)
+                                )
+                                Text(
+                                    text = "Search",
+                                    fontWeight = FontWeight.Medium,
+                                    fontSize = 12.sp,
+                                    color = Color.LightGray,
+                                   // modifier = Modifier.alpha(animatedAlpha)
+                                )
                             }
                         }
                     }
+                }
             }
 
             if(droppedProfiles==null && !triggerFetch){
@@ -357,14 +393,32 @@ fun DroppedProfileItem(profile: DropProfileResponse, onProfileClicked:()->Unit) 
                         onProfileClicked()
                     }
                     .fillMaxSize())
-            Text(
-                text =  "$time left",
+            Box(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .padding(end = 4.dp)
-                    .shadow(elevation = 20.dp, spotColor = Color.White),
+                    .padding(4.dp)
+                    .clip(shape = RoundedCornerShape(50))
+                    .background(if (!isLessThanHour) Color(0xFF112222) else Color(0xFF070000))
+            ) {
+                Text(
+                    text = "$time left",
+                    modifier = Modifier
+                        .padding(horizontal = 6.dp, vertical = 4.dp)
+                        .shadow(elevation = 20.dp, spotColor = Color.White),
+                    fontFamily = Constants.FONT_MEDIUM,
+                    style = TextStyle(color = Color.White, fontSize = 11.sp)
+                )
+            }
+            Text(
+                text = profile.createdBy.name,
+                modifier = Modifier
+                    .padding(4.dp)
+                    .align(Alignment.BottomStart)
+                    .fillMaxWidth(),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
                 fontFamily = Constants.FONT_MEDIUM,
-                style = TextStyle(color = Color.White, fontSize = 9.sp)
+                style = TextStyle(color = Color.White, fontSize = 18.sp)
             )
 
 
@@ -393,16 +447,6 @@ fun DroppedProfileItem(profile: DropProfileResponse, onProfileClicked:()->Unit) 
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Text(
-                            text = profile.createdBy.name ?: "",
-                            modifier = Modifier
-                               // .shadow(elevation = 10.dp, spotColor = Color.White)
-                                .fillMaxWidth(0.6f),
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            fontFamily = Constants.FONT_MEDIUM,
-                            style = TextStyle(color = Color.White, fontSize = 18.sp)
-                        )
                         Text(
                             text = formatDateTime(profile.createdAt ?: ""),
                             maxLines = 1,

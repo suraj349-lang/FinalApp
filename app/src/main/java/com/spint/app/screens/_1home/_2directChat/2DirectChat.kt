@@ -35,13 +35,11 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarScrollBehavior
-import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -53,6 +51,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.BlendMode
@@ -65,11 +64,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import androidx.datastore.preferences.core.doublePreferencesKey
 import androidx.navigation.NavHostController
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -94,8 +91,10 @@ import com.spint.app.viewmodels.AuthViewModel
 import com.spint.app.viewmodels.ChatViewModel
 import com.spint.app.viewmodels.HomeViewModel
 import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.android.material.resources.CancelableFontCallback
 import com.spint.app.R
+import com.spint.app.screens._1home._1FlashPosts.presentation.util.PulsingGreenButton
+import com.spint.app.screens._1home._2directChat.util.DirectChatNotConnectedScreen
+import com.spint.app.screens._1home._2directChat.util.NoDirectChatUsersFound
 import com.spint.app.screens._1home._3dropZone.DroppedProfileLocation
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
@@ -163,11 +162,11 @@ fun DirectChatScreen(
 //                                    ), fontSize = 9.sp)
 //                                }
 //                            }
-                            Column(modifier = Modifier
-                                .wrapContentSize()
-                                .align(Alignment.TopStart)) {
-                                DirectChatHorizontalPager()
-                            }
+//                            Column(modifier = Modifier
+//                                .wrapContentSize()
+//                                .align(Alignment.TopStart)) {
+//                                DirectChatHorizontalPager()
+//                            }
                         }
                     }
                     DirectChatUI(
@@ -207,7 +206,7 @@ fun DirectChatUI(
     onShareProfileClicked: () -> Unit
 ) {
     if (!checked ) {
-        ShareProfileForDirectChat(address = address,onJoinDuelClicked,onShareProfileClicked)
+        DirectChatNotConnectedScreen(address = address,onJoinDuelClicked,onShareProfileClicked)
     } else {
         DirectChatProfiles(scrollBehavior,navController, homeViewModel,chatViewModel, onJoinDuelClicked = onJoinDuelClicked, onCheckedChange = onCheckedChange )
     }
@@ -288,67 +287,52 @@ fun DirectChatProfiles(
 
         // Header + Switch
         item {
-            Column(modifier = Modifier, verticalArrangement = Arrangement.spacedBy(1.dp)) {
             Row(
                 modifier = Modifier
-                    .padding(horizontal = 10.dp).padding(top = 8.dp)
+                    .padding(horizontal = 10.dp)
                     .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Column(modifier = Modifier.fillMaxWidth(0.8f)) {
+                Row(modifier = Modifier,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    verticalAlignment = Alignment.CenterVertically) {
+                    PulsingGreenButton()
                     Text(
                         text = "Verified users near you",
                         fontFamily = Constants.FONT_LIGHT,
                         color = Constants.HOME_TOP_BAR_ICON_COLOR,
-                        fontSize = 20.sp
+                        fontSize = 14.sp
                     )
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Image(
-                            painter = painterResource(R.drawable.location_new),
-                            contentDescription = "",
-                            modifier = Modifier.padding(0.dp).size(12.dp)
-                        )
-                        Text(
-                            text = userLocation.city ?: "",
-                            fontFamily = Constants.FONT_LIGHT,
-                            color = Constants.HOME_TOP_BAR_ICON_COLOR,
-                            fontSize = 8.sp,
-                            overflow = TextOverflow.Ellipsis,
-                            maxLines = 1,
-                        )
-                    }
-
                 }
-                VerticalDivider(
-                    thickness = 1.dp,
-                    modifier = Modifier.padding(start = 6.dp).height(33.dp),
-                    color = Color.Gray
-                )
-
-                Switch(
-                    checked = true,
-                    onCheckedChange = { onCheckedChange() },
-                    colors = SwitchDefaults.colors(
-                        checkedThumbColor = floatingActionBtnColor,
-                        checkedTrackColor = Color.White,
-                        uncheckedThumbColor = Color.White,
-                        uncheckedTrackColor = Color.White
-                    ),
-                    modifier = Modifier.size(80.dp)
-                )
-            }
+                Row(
+                    modifier = Modifier,
+                    horizontalArrangement = Arrangement.spacedBy(2.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = userLocation.city ?: "",
+                        fontFamily = Constants.FONT_LIGHT,
+                        color = Constants.HOME_TOP_BAR_ICON_COLOR,
+                        fontSize = 10.sp,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
+                    )
+                    Switch(
+                        checked = true,
+                        onCheckedChange = { onCheckedChange() },
+                        colors = SwitchDefaults.colors(
+                            checkedThumbColor = Color.White,
+                            checkedTrackColor = floatingActionBtnColor,
+                            uncheckedThumbColor = Color.White,
+                            uncheckedTrackColor = Color.White
+                        ),
+                        modifier = Modifier.scale(0.7f),
+                    )
+                }
 
         }
-            HorizontalDivider(
-                modifier = Modifier.padding(horizontal = 4.dp).padding(top=0.dp).fillMaxWidth(),
-                thickness = 0.5.dp,
-                color = Color.DarkGray
-            )
+
 
         }
 
@@ -396,19 +380,18 @@ fun DirectChatItem(
                 .fillMaxWidth()
                 .wrapContentHeight()
         ) {
-            Column() {
-            Box(modifier = Modifier
+            Box(modifier = Modifier.align(Alignment.TopStart).zIndex(2f).padding(10.dp)
                 .wrapContentSize()
-                .clip(RoundedCornerShape(2.dp))
-                .background(color = Constants.HOME_TOP_BAR_COLOR.copy(alpha = 0.2f))) {
-                Text("50m away", color = Color.LightGray, fontSize = 10.sp, fontFamily = Constants.FONT_LIGHT, modifier = Modifier.padding(horizontal = 10.dp, vertical = 0.dp))
+                .clip(RoundedCornerShape(50))
+                .background(color = Constants.HOME_TOP_BAR_COLOR.copy(alpha = 0.8f))) {
+                Text("50m away", color = Color.White, fontSize = 10.sp, fontFamily = Constants.FONT_MEDIUM, lineHeight = 12.sp, modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp))
 
             }
             Column(
                 modifier = Modifier
                     .wrapContentSize()
-                    .clip(RoundedCornerShape(bottomStart = 8.dp, bottomEnd = 8.dp, topEnd = 8.dp))
-                    .background(color = Constants.HOME_TOP_BAR_COLOR),
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(color = Color(0xFF090808)),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
 
@@ -424,41 +407,39 @@ fun DirectChatItem(
                         modifier = Modifier.align(Alignment.Center),
                         contentScale = if (directChatObject?.userId?.profileImage?.isNotEmpty() == true) ContentScale.Crop else ContentScale.Fit
                     )
-                }
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 2.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column(modifier = Modifier.wrapContentSize()) {
+                    Column(modifier = Modifier.padding(10.dp).wrapContentSize().align(Alignment.BottomStart)) {
                         directChatObject?.userId?.name?.capitalize()?.let {
                             Text(
                                 text = it,
                                 fontSize = 18.sp, lineHeight = 8.sp,
                                 color = Color.White,
-                                fontFamily = Constants.FONT_MEDIUM, fontWeight = FontWeight.SemiBold
+                                fontFamily = Constants.FONT_MEDIUM, fontWeight = FontWeight.Bold
                             )
                         }
                         directChatObject?.userId?.userName?.capitalize()?.let {
                             Text(
                                 text = "@$it",
-                                fontSize = 12.sp, lineHeight = 8.sp,
-                                color = Color.Gray,
+                                fontSize = 14.sp, lineHeight = 8.sp,
+                                color = Color.LightGray,
                                 fontFamily = Constants.FONT_LIGHT,
                                 fontWeight = FontWeight.Normal
                             )
                         }
-
                     }
-
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 10.dp, vertical = 2.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
 
                     Button(
                         onClick = { onSendMessageClicked() },
-                        shape = RoundedCornerShape(6.dp),
+                        shape = RoundedCornerShape(12.dp),
                         modifier = Modifier
-                            .wrapContentWidth()
+                            .fillMaxWidth(0.5f)
                         , colors = ButtonDefaults.buttonColors(
                             containerColor = Color.DarkGray,
                         )
@@ -471,255 +452,52 @@ fun DirectChatItem(
                             Image(
                                 painter = painterResource(id = R.drawable.chat_new),
                                 contentDescription = "",
-                                modifier = Modifier.size(16.dp),
+                                modifier = Modifier.size(12.dp),
                                 colorFilter = ColorFilter.tint(Color.White)
                             )
                             Text(
                                 text = "Message",
                                 color = Color.White,
-                                fontSize = 12.sp,
+                                fontSize = 14.sp,
+                                fontFamily = Constants.FONT_MEDIUM
+                            )
+                        }
+
+                    }
+                    Spacer(Modifier.width(10.dp))
+                    Button(
+                        onClick = { onSendMessageClicked() },
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                        , colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.DarkGray,
+                        )
+                    ) {
+                        Row(
+                            modifier = Modifier.wrapContentWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.cameranew),
+                                contentDescription = "",
+                                modifier = Modifier.size(12.dp),
+                                colorFilter = ColorFilter.tint(floatingActionBtnColor)
+                            )
+                            Text(
+                                text = "Join Duel",
+                                color = floatingActionBtnColor,
+                                fontSize = 14.sp,
                                 fontFamily = Constants.FONT_MEDIUM
                             )
                         }
 
                     }
                 }
-                Divider(color = floatingActionBtnColor.copy(alpha = 0.23f), thickness = 0.18.dp)
 
             }
-        }
 
    }
 }
 
-
-@Composable
-fun ShareProfileForDirectChat(address:String,onOmegleClicked:()->Unit,onShareProfileClicked: () -> Unit) {
-    val shimmerColors = listOf(
-        Color.White.copy(alpha = 0.1f),
-        Color.White.copy(alpha = 0.4f),
-        Color.White.copy(alpha = 0.1f)
-    )
-    val user by UserObject.user.collectAsState()
-
-    val transition = rememberInfiniteTransition(label = "shimmer")
-    val translateAnim by transition.animateFloat(
-        initialValue = -200f,
-        targetValue = 1000f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(durationMillis = 1800, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart
-        ),
-        label = "translateAnim"
-    )
-
-    Box(
-        modifier = Modifier
-            .padding(top = 50.dp)
-            .fillMaxWidth()
-            .fillMaxHeight(1f)
-    ) {
-
-        Column(
-            modifier = Modifier.align(Alignment.TopCenter),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Card(modifier = Modifier
-                .size(200.dp), shape = CircleShape) {
-                AsyncImage(
-                    model = imagePrefix + user.profileImage,
-                    contentDescription = "",
-                    filterQuality = FilterQuality.High,
-                    modifier = Modifier
-                        // .padding(1.dp)
-                        .clip(shape = CircleShape)
-                        .fillMaxSize(),
-                    contentScale = ContentScale.Crop,
-                )
-            }
-                Column(
-                    modifier = Modifier
-                        .padding(top = 4.dp)
-                        .padding(horizontal = 16.dp)
-                        .fillMaxWidth(0.8f)
-                        .wrapContentHeight(),
-                    verticalArrangement = Arrangement.spacedBy(4.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = user.userName,
-                        overflow = TextOverflow.Ellipsis,
-                        fontFamily = Constants.FONT_LIGHT,
-                        fontSize = 18.sp,
-                        color= Color(0xFFFFFFFF),
-                        fontWeight = FontWeight.ExtraBold
-                    )
-                    //0xFF2CA832  0xFF045708 0xFF77209C
-
-                    DroppedProfileLocation(
-                        location = address,
-                        backgroundColor = Color(0xFF558B26),
-                        trim = true
-                    )
-
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(40.dp)
-                            .clip(shape = RoundedCornerShape(12.dp))
-                            .graphicsLayer { clip = true }
-                            .drawWithCache {
-                                val shimmerBrush = Brush.linearGradient(
-                                    colors = shimmerColors,
-                                    start = Offset(translateAnim - 200f, 0f),
-                                    end = Offset(translateAnim, size.height)
-                                )
-                                onDrawWithContent {
-                                    // Draw original background
-                                    drawRoundRect(
-                                        color = Color(0xFF045708), //0xFF520772
-                                        cornerRadius = CornerRadius(12.dp.toPx())
-                                    )
-
-                                    drawContent() // Draw the text
-
-                                    // Draw shimmer glance
-                                    drawRect(
-                                        brush = shimmerBrush,
-                                        blendMode = BlendMode.SrcOver // prevents color washing
-                                    )
-                                }
-                            }
-                            .clickable { onShareProfileClicked() },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = "+ CONNECT",
-                            fontSize = 16.sp,
-                            fontFamily = Constants.FONT_LIGHT,
-                            color = Color.White
-                        )
-                    }
-                    Divider(
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(top = 20.dp), thickness = 0.5.dp, color = Color.Gray)
-                    Text(
-                        text = "or",
-                        fontSize = 12.sp,
-                        fontFamily = Constants.FONT_LIGHT,
-                        color = Color.White
-                    )
-                    Box(modifier = Modifier
-                        .fillMaxWidth()
-                        .wrapContentHeight()
-                        .clip(shape = RoundedCornerShape(12.dp))
-                        .background(
-                            brush = Brush.linearGradient(
-                                colors = listOf(
-                                    Color(0xFF1976D2), Color(0xFF460761)
-                                )
-                            )
-                        )) {
-
-                        Row(modifier = Modifier
-                            .clickable { onOmegleClicked() }
-                            .fillMaxWidth()
-                            .height(50.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center) {
-                            Image(
-                                painter = painterResource(id = androidx.core.R.drawable.ic_call_answer_video),
-                                contentDescription = "",
-                                modifier = Modifier.size(40.dp),
-                                colorFilter = ColorFilter.tint(Color.White)
-                            )
-                            Spacer(modifier = Modifier.width(20.dp))
-                            Text(
-                                text = "Join a Duel",
-                                fontSize = 16.sp,
-                                fontFamily = Constants.FONT_LIGHT,
-                                color = Color.White
-                            )
-
-                        }
-                    }
-                }
-            }
-
-    }
-}
-
-@Composable
-fun NoDirectChatUsersFound(onBackClicked:()->Unit,onJoinDuelClicked: () -> Unit) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Image(
-                painter = painterResource(id = R.drawable.smiley),
-                contentDescription = "",
-                modifier = Modifier
-                    .size(100.dp)
-                    .padding(bottom = 20.dp)
-            )
-            dynamicText(
-                text = "No users found near you!",
-                fontSize = 20,
-                fontFamily = Constants.FONT_MEDIUM,
-                lineHeight = 12
-            )
-            dynamicText(
-                text = "Try the Duel instead",
-                fontSize = 16,
-                fontFamily = Constants.FONT_LIGHT
-            )
-            Spacer(modifier = Modifier.height(30.dp))
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth(0.6f)
-                    .wrapContentHeight()
-                    .clip(shape = RoundedCornerShape(12.dp))
-                    .background(
-                        brush = Brush.linearGradient(
-                            colors = listOf(
-                                Color(0xFF1976D2), Color(0xFF460761)
-                            )
-                        )
-                    )
-            ) {
-
-                Row(
-                    modifier = Modifier
-                        .clickable { onJoinDuelClicked() }
-                        .fillMaxWidth()
-                        .height(50.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center) {
-                    Image(
-                        painter = painterResource(id = androidx.core.R.drawable.ic_call_answer_video),
-                        contentDescription = "",
-                        modifier = Modifier.size(40.dp),
-                        colorFilter = ColorFilter.tint(Color.White)
-                    )
-                    Spacer(modifier = Modifier.width(20.dp))
-                    Text(
-                        text = "Join a Duel",
-                        fontSize = 16.sp,
-                        fontFamily = Constants.FONT_LIGHT,
-                        color = Color.White
-                    )
-
-                }
-            }
-        }
-        Image(painter = painterResource(R.drawable.baseline_arrow_back_24), contentDescription = "", modifier = Modifier.padding(16.dp).align(Alignment.TopStart).clickable{onBackClicked()}, colorFilter = ColorFilter.tint(Color.White))
-    }
-}

@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -60,7 +61,6 @@ import com.spint.app.screens._5settings.EditPhoneNumber
 import com.spint.app.screens._5settings.EditUserName
 import com.spint.app.screens._5settings.FeaturesListScreen
 import com.spint.app.screens._5settings.HelpCentre
-import com.spint.app.screens._5settings.Logout
 import com.spint.app.screens._5settings.MyData
 import com.spint.app.screens._5settings.PermissionsUI
 import com.spint.app.screens._5settings.SafetyAndPrivacy
@@ -82,6 +82,8 @@ import com.google.firebase.messaging.messaging
 import com.spint.app.Duel.presentation.view.DuelScreen2
 import com.spint.app.screens._2Events.events.templates.xhmaslive.XHamsLiveScreenWrapper
 import com.spint.app.screens._4profile.userPings.MyFlashPostDetailsScreen
+import com.spint.app.screens.auth.createAccount.WebViewScreen
+import com.spint.app.utils.constants.Constants
 import kotlinx.coroutines.tasks.await
 import kotlinx.serialization.json.Json
 import java.net.URLDecoder
@@ -99,7 +101,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
     val notificationViewModel= hiltViewModel<NotificationViewModel>()
     var token by remember { mutableStateOf("") }
     LaunchedEffect(Unit) {
-        token= Firebase.messaging.token.await()
+        token = Firebase.messaging.token.await()
     }
 
 
@@ -127,6 +129,14 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
                 confirmPassword = authViewModel.confirmPassword.value,
                 onConfirmPasswordChange = {authViewModel.confirmPassword.value=it},
                 onBackClicked = {navController.navigate(SCREENS.LOGIN.route)},
+                onTermsAndConditionsClicked = {url->
+                    navController.navigate(
+                        SCREENS.WEBVIEW_SCREEN.createRoute(
+                            title = Constants.APP_NAME,
+                            url = url
+                        )
+                    )
+                },
                 onSignInClicked = {navController.navigate(SCREENS.LOGIN.route)},
                 onNextClicked = { navController.navigate(SCREENS.OTP.route)}
             )
@@ -209,7 +219,7 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
         }
         composable(SCREENS.FLASH_POSTS.route){
             //PingsScreenUI(navController,eventsViewModel)
-            FlashPostsScreen(navController,homeViewModel)
+            FlashPostsScreen(navController, homeViewModel)
         }
         composable(SCREENS.EVENTS_SCREEN.route){
             EventsScreenWrapper(homeViewModel = homeViewModel, navController = navController) {
@@ -343,6 +353,13 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
             DuelScreen2(navController)
         }
 
+        composable(route = SCREENS.WEBVIEW_SCREEN.route, arguments = listOf(navArgument("title") { type = NavType.StringType}, navArgument("url") { type = NavType.StringType })) { backStackEntry ->
+            val title = backStackEntry.arguments?.getString("title").orEmpty()
+            val url = backStackEntry.arguments?.getString("url").orEmpty()
+
+            WebViewScreen(title = title, url = url, onBackClick = { navController.popBackStack() })
+        }
+
 
         // SETTINGS---------------------------------------------------------------------------------------------------------------------------------------------------
         composable(SCREENS.EDIT_NAME.route){
@@ -358,7 +375,19 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
             EditPhoneNumber(navController = navController)
         }
         composable(SCREENS.DELETE_ACCOUNT.route){
-            DeleteAccount(navController = navController)
+            DeleteAccount(
+                onDeleteAccountClicked = {
+                    homeViewModel.deleteAccount() {
+                        navController.navigate(SCREENS.SIGNUP.route) {
+                            popUpTo(0) {
+                                inclusive = true
+                            }
+                            launchSingleTop = true
+                        }
+                    }
+                },
+                onBackClicked = {navController.navigateUp()}
+            )
         }
         composable(SCREENS.BUGS_AND_SUGGESTION.route){
             BugsAndSuggestion(navController = navController){
@@ -374,12 +403,6 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
             BugExplanationScreen(){
                 navController.navigateUp()
             }
-        }
-        composable(SCREENS.SAFETY_AND_PRIVACY.route){
-            SafetyAndPrivacy(navController = navController)
-        }
-        composable(SCREENS.HELP_CENTRE.route){
-            HelpCentre(navController = navController)
         }
         //---------------------------------------------------------------------------------//
         composable(SCREENS.CLEAR_SEARCH_HISTORY.route){
@@ -397,9 +420,6 @@ fun Navigation(authViewModel: AuthViewModel, screen: String) {
         composable(SCREENS.MY_DATA.route){
             MyData (navController = navController)
         }
-//        composable(SCREENS.LOG_OUT.route){
-//            Logout(navController = navController)
-//        }
 
     }
 }

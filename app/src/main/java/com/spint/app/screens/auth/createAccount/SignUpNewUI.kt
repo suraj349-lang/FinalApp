@@ -4,6 +4,9 @@ package com.spint.app.screens.auth.createAccount
 
 import android.content.Intent
 import android.net.Uri
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -25,11 +28,14 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -56,22 +62,26 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.navigation.NavController
 import com.spint.app.R
 import com.spint.app.screens.auth.util.BirthdayPicker
 import com.spint.app.utils.constants.Constants
+import java.net.URLEncoder
 
 
 @Composable
 fun SignupScreenNewUI(
-    name: String ,
+    name: String,
     onNameChange: (String) -> Unit,
     birthDay: String,
     onBirthDayChange: (String) -> Unit,
-    password: String ,
+    password: String,
     onPasswordChange: (String) -> Unit,
-    confirmPassword: String ,
+    confirmPassword: String,
     onConfirmPasswordChange: (String) -> Unit,
     onBackClicked: () -> Unit,
+    onTermsAndConditionsClicked:(String)->Unit,
     onSignInClicked: () -> Unit,
     onNextClicked: () -> Unit,
 ) {
@@ -100,14 +110,7 @@ fun SignupScreenNewUI(
             modifier = Modifier
                 .fillMaxSize()
                 .background(
-                    brush = Brush.verticalGradient(
-                        colors = listOf(
-                            //Color(0xFF0288D1),
-                            //   Color(0xFF7B1FA2)
-                            Color(0xFF020236),
-                            Color(0xFF2A033B)
-                        )
-                    )
+                    color = Color.Black
                 )
         ) {
             Image(
@@ -137,7 +140,7 @@ fun SignupScreenNewUI(
                         .wrapContentHeight()
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.app_icon_dynamic),
+                        painter = painterResource(id = Constants.APP_ICON),
                         contentDescription = "",
                         modifier = Modifier.size(50.dp)
                     )
@@ -150,34 +153,29 @@ fun SignupScreenNewUI(
 
                 }
                 Text(
-                    buildAnnotatedString {
-                        withStyle(
-                            style = SpanStyle(
-                                fontFamily =
-                                Constants.FONT_LIGHT,
-                                fontWeight = FontWeight.Normal,
-                                fontSize = 30.sp, color = Color.White
-                            )
-                        ) {
-                            append("Sign up to")
-                        }
-
-                        withStyle(
-                            style = SpanStyle(
-                                fontFamily =
-                                Constants.FONT_MEDIUM,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 30.sp, color = Color.White
-                            )
-                        ) {
-                            append(" continue!")
-                        }
-                    }, modifier = Modifier
+                    text="Create account",
+                    fontFamily = Constants.FONT_MEDIUM,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 30.sp, color = Color.White, modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 20.dp)
+                        .padding(top = 20.dp)
+                )
+                Text(
+                    text="Be someone real or don't upto you",
+                    fontFamily = Constants.FONT_LIGHT,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 14.sp, color = Color.Gray, modifier = Modifier
+                        .fillMaxWidth()
                 )
 
                 Spacer(modifier = Modifier.padding(bottom = 10.dp))
+                Text(
+                    "FULL NAME",
+                    fontFamily = Constants.FONT_LIGHT,
+                    fontWeight = FontWeight.Normal,
+                    fontSize = 14.sp, color = Color.Gray, modifier = Modifier
+                        .fillMaxWidth()
+                )
                 OutlinedTextField(
                     value = name,
                     onValueChange = {
@@ -321,7 +319,9 @@ fun SignupScreenNewUI(
                     horizontalArrangement = Arrangement.Start
                 ) {
                     Checkbox(checked = checked, onCheckedChange = { checked = !checked })
-                    TermsAndConditions()
+                    TermsAndConditions(
+                        onTermsAndConditionsClicked={encodedUrl ->onTermsAndConditionsClicked(encodedUrl)}
+                    )
                   }
 
                 Button(
@@ -359,7 +359,10 @@ fun SignupScreenNewUI(
 
 @Composable
 fun SignInText(onSignInClicked: () -> Unit) {
-    Row(modifier = Modifier.fillMaxWidth().wrapContentHeight().clickable{onSignInClicked()}, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
+    Row(modifier = Modifier
+        .fillMaxWidth()
+        .wrapContentHeight()
+        .clickable { onSignInClicked() }, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center) {
         Text(
             text = "Have an account? ",
             style = TextStyle(
@@ -380,124 +383,3 @@ fun SignInText(onSignInClicked: () -> Unit) {
         )
     }
 }
-
-@Composable
-fun TermsAndConditions() {
-    val context= LocalContext.current
-    val annotatedText = buildAnnotatedString {
-        withStyle(style = SpanStyle(color = Color.White.copy(alpha = 0.7f), fontSize = 8.sp,fontWeight = FontWeight.Normal, fontFamily = Constants.FONT_LIGHT)){
-            append("By proceeding to create your account, you are agreeing to our ")
-        }
-
-        pushStringAnnotation(tag = "URL", annotation = "https://finalapp-3494.web.app/")
-        withStyle(style = SpanStyle(color = Color.LightGray, fontWeight = FontWeight.SemiBold,fontSize = 8.sp, fontFamily = Constants.FONT_LIGHT)) {
-            append("Terms of Services & Privacy Policy")
-        }
-        pop()
-    }
-
-    ClickableText(
-        text = annotatedText,
-        onClick = { offset ->
-            annotatedText.getStringAnnotations(tag = "URL", start = offset, end = offset)
-                .firstOrNull()?.let { annotation ->
-                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(annotation.item))
-                    context.startActivity(intent)
-                }
-        }
-    )
-
-
-}
-
-/*
-@Composable
-fun UserNameAndPhone(phoneNumber:String,onPhoneNumberChange:(String)->Unit,userName:String,onUserNameChange:(String)->Unit,otp:String,onOtpChange:(String)->Unit) {
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .wrapContentHeight()) {
-        OutlinedTextField(
-            value = userName,
-            onValueChange = {
-                onUserNameChange(it)
-            },
-            placeholder = { Text(text = "Username", fontFamily = Constants.FONT_LIGHT) },
-            modifier = Modifier.fillMaxWidth(),
-            textStyle = TextStyle(
-                fontFamily = Constants.FONT_MEDIUM
-            ),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = Color.Black,
-                unfocusedTextColor = Color.Black,
-                cursorColor = Color.Black,
-                focusedContainerColor = Color.White,
-                unfocusedContainerColor = Color.White,
-                unfocusedLabelColor = Color.LightGray,
-                focusedLabelColor = Color.LightGray,
-            ),
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Next
-            ), keyboardActions = KeyboardActions(
-                onNext = { })
-
-
-        )
-        OutlinedTextField(
-            value = phoneNumber,
-            onValueChange = {
-                onPhoneNumberChange(it)
-            },
-            modifier = Modifier.fillMaxWidth(),
-            textStyle = TextStyle(
-                fontFamily = Constants.FONT_MEDIUM
-            ),
-            placeholder = { Text(text = "Phone Number", fontFamily = Constants.FONT_LIGHT) },
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedTextColor = Color.Black,
-                unfocusedTextColor = Color.Black,
-                cursorColor = Color.Black,
-                focusedContainerColor = Color.White,
-                unfocusedContainerColor = Color.White,
-                unfocusedLabelColor = Color.LightGray,
-                focusedLabelColor = Color.LightGray,
-            ),
-
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Next
-            )
-        )
-
-        OtpInputField(otp,otpLength = 6, onOtpChanged = { value -> onOtpChange(value) })
-        Spacer(modifier = Modifier.height(16.dp))
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Text(text = "Didn't Receive OTP?", fontFamily = Constants.FONT_LIGHT, fontSize = 12.sp, color = Color.Gray)
-            TextButton(onClick = { }) {
-                Text(
-                    text = "Resend SMS",
-                    fontSize = 16.sp,
-                    fontFamily = Constants.FONT_LIGHT,
-                    color = Color.Black,
-                    style = TextStyle(textDecoration = TextDecoration.Underline)
-                )
-            }
-        }
-
-        Button(
-            onClick = {
-
-            },
-            shape = RoundedCornerShape(6.dp)
-            , colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFC2185B), contentColor = Color.White)
-        ) {
-            Text(text = "Verify OTP",fontFamily = Constants.FONT_MEDIUM, fontSize = 14.sp, color = Color.Black)
-        }
-
-    }
-
-}
-*/

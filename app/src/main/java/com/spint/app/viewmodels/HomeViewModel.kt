@@ -75,6 +75,7 @@ class HomeViewModel @Inject constructor(
 
 
     private val placesClient by lazy { Places.createClient(context) }
+    var barsVisible by mutableStateOf(true)
     var checked = mutableStateOf(false)
     var shareProfileClicked = MutableStateFlow(false)
 
@@ -1019,7 +1020,7 @@ class HomeViewModel @Inject constructor(
             }
     }
 
-    fun deleteAccount(userID: String, onSuccess: () -> Unit) = viewModelScope.launch {
+    fun deleteAccount(userID: String = UserObject.user.value.user, onSuccess: () -> Unit) = viewModelScope.launch {
         profileRepository.deleteAccount(userID)
             .onStart {
 

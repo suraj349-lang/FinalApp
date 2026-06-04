@@ -265,10 +265,10 @@ fun EditPassword(navController: NavHostController) {
 
 
 @Composable
-fun DeleteAccount(navController: NavHostController) {
+fun DeleteAccount(onDeleteAccountClicked:()->Unit,onBackClicked:()-> Unit) {
     Scaffold(topBar = {
         CommonTopBar(title = "Delete Account ") {
-            navController.navigateUp()
+           onBackClicked()
         }
     },
         content = { padding ->
@@ -281,7 +281,7 @@ fun DeleteAccount(navController: NavHostController) {
             ) {
                 Text(text = "Delete Account", fontSize = 30.sp, fontFamily = DONGLE_BOLD)
                 Button(
-                    onClick = { /*TODO make and api call and then make a db call */ },
+                    onClick = { onDeleteAccountClicked() },
                     colors = ButtonDefaults.buttonColors(containerColor = floatingActionBtnColor)
                 ) {
                     Text(

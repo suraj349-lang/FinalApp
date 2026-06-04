@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 
@@ -39,7 +40,7 @@ import kotlinx.coroutines.delay
 @Composable
 fun FlashPostsScreen(
     navController: NavHostController,
-    homeViewModel: HomeViewModel
+    homeViewModel: HomeViewModel,
 ) {
     var searchOn by remember { mutableStateOf(false) }
     var showSheet by remember { mutableStateOf(false) }
@@ -48,6 +49,7 @@ fun FlashPostsScreen(
     var searchQuery by remember { mutableStateOf("") }
     val userLocation by UserLocationObject.userLocation.collectAsState()
     val user by UserObject.user.collectAsState()
+    val listState = rememberLazyListState()
 
     LaunchedEffect(key1 = Unit){
         homeViewModel.getAllFlashPosts(userLocation.address.toString())
@@ -66,13 +68,59 @@ fun FlashPostsScreen(
             darkIcons = false        // true = dark icons (for light backgrounds)
         )
     }
+    LaunchedEffect(listState) {
+
+        var firstEmission = true
+
+        var previousIndex = 0
+        var previousOffset = 0
+
+        var accumulatedScroll = 0
+
+        snapshotFlow {
+            listState.firstVisibleItemIndex to
+                    listState.firstVisibleItemScrollOffset
+        }.collect { (index, offset) ->
+
+            if (firstEmission) {
+                firstEmission = false
+                previousIndex = index
+                previousOffset = offset
+                return@collect
+            }
+
+            val delta =
+                if (index == previousIndex) {
+                    offset - previousOffset
+                } else {
+                    (index - previousIndex) * 100
+                }
+
+            accumulatedScroll += delta
+
+            // Hide bars when scrolling down enough
+            if (accumulatedScroll > 150) {
+                homeViewModel.barsVisible = false
+                accumulatedScroll = 0
+            }
+
+            // Show bars when scrolling up enough
+            if (accumulatedScroll < -150) {
+                homeViewModel.barsVisible = true
+                accumulatedScroll = 0
+            }
+
+            previousIndex = index
+            previousOffset = offset
+        }
+    }
     Scaffold(
         content = {
             Surface(modifier = Modifier
                 .fillMaxSize()
                 .padding(it)) {
                 LazyColumn(
-                    //state = listState,
+                    state = listState,
                     modifier= Modifier
                         .background(color = Constants.HOME_TOP_BAR_COLOR),
                     )

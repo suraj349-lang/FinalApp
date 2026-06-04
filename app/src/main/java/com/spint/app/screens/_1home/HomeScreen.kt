@@ -3,8 +3,9 @@ package com.spint.app.screens._1home
 
 import BottomBar
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -131,27 +133,35 @@ fun HomeScreenUI(navController: NavHostController, homeViewModel: HomeViewModel,
         onRefresh = { isRefreshing = true }
     )
 
-
     Scaffold(
+        containerColor = Constants.HOME_TOP_BAR_COLOR,
         topBar = {
-            HomeTopBar(
-                backgroundColor = Constants.HOME_TOP_BAR_COLOR,
-                iconAndTextColor = Constants.HOME_TOP_BAR_ICON_COLOR,
-                scrollBehavior = scrollBehavior,
-                title = Constants.APP_NAME,
-                titleColor = Constants.HOME_TOP_BAR_TITLE_COLOR,
-                navController = navController,
-                navIcon = true,
-                actionIcon = true,
-                icon = R.drawable.chat_new
-            ) { showQR = ShowDialog.OPEN }
+            AnimatedVisibility(
+                visible = homeViewModel.barsVisible,
+                enter = slideInVertically { -it },
+                exit = slideOutVertically { -it }
+            ) {
+                HomeTopBar(
+                    backgroundColor = Constants.HOME_TOP_BAR_COLOR,
+                    iconAndTextColor = Constants.HOME_TOP_BAR_ICON_COLOR,
+                    scrollBehavior = scrollBehavior,
+                    title = Constants.APP_NAME,
+                    titleColor = Constants.HOME_TOP_BAR_TITLE_COLOR,
+                    navController = navController,
+                    navIcon = true,
+                    actionIcon = true,
+                    icon = R.drawable.chat_new
+                ) {
+                    showQR = ShowDialog.OPEN
+                }
+            }
         },
         modifier = Modifier.windowInsetsPadding(WindowInsets.systemBars),
         bottomBar = {
             AnimatedVisibility(
-                visible = scrollBehavior.state.overlappedFraction == 0f, // Hide on scroll
-                enter = fadeIn(),
-                exit = fadeOut()
+                visible = homeViewModel.barsVisible,
+                enter = slideInVertically { it },
+                exit = slideOutVertically { it }
             ) {
                 BottomBar(
                     navController = navController,
@@ -178,7 +188,7 @@ fun HomeScreenUI(navController: NavHostController, homeViewModel: HomeViewModel,
             )
         }
     ) { padding ->
-        Surface(modifier = Modifier.fillMaxSize()) {
+        Surface(modifier = Modifier.fillMaxSize(), color = Constants.HOME_TOP_BAR_COLOR,) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -231,7 +241,8 @@ fun HomeScreenUI(navController: NavHostController, homeViewModel: HomeViewModel,
                             0 -> FlashPostsScreen(
                                 navController = navController,
                                 homeViewModel = homeViewModel
-                            )//EventScreenWrapper(eventsViewModel = eventsViewModel, navController = navController, onRetryCalled = {eventsViewModel.getAllEvents()})
+                            )
+                            //EventScreenWrapper(eventsViewModel = eventsViewModel, navController = navController, onRetryCalled = {eventsViewModel.getAllEvents()})
                             1 -> DirectChatScreen(
                                 scrollBehavior,
                                 authViewModel,

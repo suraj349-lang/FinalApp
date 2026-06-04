@@ -128,10 +128,7 @@ fun PrivateFlashPostScreen(flashPostResponse: FlashPostResponse,onFlashPostClick
 //
 //
 //            }
-            HorizontalDivider(modifier= Modifier
-                .padding(top = 20.dp)
-                .padding(horizontal = 10.dp)
-                .fillMaxWidth(), thickness = 0.5.dp,color=Color.DarkGray)
+
             BottomUserActionsUI(
                 onRespondClicked = {},
                 onCommentButtonClicked = {},

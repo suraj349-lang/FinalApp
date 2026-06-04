@@ -4,15 +4,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import com.spint.app.R
+import com.spint.app.ui.theme.floatingActionBtnColor
 
 object Constants {
 
-    const val APP_NAME="Spint"
-    val APP_ICON = R.drawable.app_icon_dynamic
+    const val APP_NAME="Tandem"
+    val APP_ICON_S_LETTER = R.drawable.app_icon_dynamic
+    val APP_ICON = R.drawable.spint_new
 
     const val TAG = APP_NAME
 
-    const val IP_ADD ="192.168.0.123" //3.108.55.84" //  192.168.1.5
+    const val IP_ADD ="192.168.0.101" //3.108.55.84" //  192.168.1.5
     const val BASE_URL = "http://${IP_ADD}:5000/"
     const val TEMP_SOCKET_URL = "http://${IP_ADD}:5001/"
     const val SIGNAL_SERVER = "http://${IP_ADD}:5002/"
@@ -60,7 +62,7 @@ object Constants {
     val TAB_ROW_BACKGROUND_COLOR=HOME_TOP_BAR_COLOR
     val TAB_ROW_ACTIVE_TEXT_COLOR=Color.White
     val TAB_ROW_INACTIVE_COLOR= Color.LightGray
-    val TAB_ROW_INDICATOR_COLOR=Color.White
+    val TAB_ROW_INDICATOR_COLOR= floatingActionBtnColor
 
     val HOME_BOTTOM_BAR_COLOR= Color(0xFF1A1919)
     val BOTTOM_BAR_ACTIVE_TEXT_COLOR= Color.White

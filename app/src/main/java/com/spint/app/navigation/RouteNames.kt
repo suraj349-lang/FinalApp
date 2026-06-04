@@ -88,6 +88,22 @@ sealed class SCREENS(val route:String){
     object IMAGE_CROPPER:SCREENS("auto_image_cropper")
 
     object CAMERAX_SCREEN:SCREENS("camerax_screen")
+    object WEBVIEW_SCREEN : SCREENS(
+        "webview/{title}/{url}"
+    ) {
+
+        fun createRoute(
+            title: String,
+            url: String
+        ): String {
+
+            return "webview/${
+                Uri.encode(title)
+            }/${
+                Uri.encode(url)
+            }"
+        }
+    }
 
 
 
